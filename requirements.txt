@@ -1,0 +1,23 @@
+lightgbm==4.6.0
+logging==0.4.9.6
+matplotlib==3.10.3
+mlflow==2.12.2
+pandas==2.3.0
+requests==2.32.3
+scikit-learn==1.7.0
+seaborn==0.13.2
+unidecode==1.4.0
+xgboost==3.0.4
+black==24.8.0
+ruff==0.6.4
+psycopg[binary]==3.2.1
+aiohttp==3.10.5
+tenacity==8.2.3
+pre-commit==3.8.0
+streamlit==1.37.1
+PyYAML==6.0.2
+pydantic==2.8.2
+minio==7.2.7  # extra opcional para RemotePersistence S3-compatible
+prometheus-client==0.20.0  # Sistema de métricas Prometheus
+flask==3.0.3  # Servidor HTTP para exposição de métricas
+pytest==8.0.0  # Framework de testes
