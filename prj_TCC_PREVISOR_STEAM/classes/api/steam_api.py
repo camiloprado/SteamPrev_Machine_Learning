@@ -240,7 +240,8 @@ class SteamClient:
             var_listOut = await asyncio.gather(*var_listTasks, return_exceptions=True)
         for var_tupleItem in var_listOut:
             if (isinstance(var_tupleItem, tuple) and isinstance(var_tupleItem[0], int) and isinstance(var_tupleItem[1], dict)):
-                var_dictResult[var_tupleItem[0]] = var_tupleItem[1]
+                if var_tupleItem[1]['total_reviews'] > 0:
+                    var_dictResult[var_tupleItem[0]] = var_tupleItem[1]
         return var_dictResult
 
     # ------------------- ITAD lookups -------------------
@@ -303,3 +304,49 @@ class SteamClient:
             return var_dictResults
         except Exception as e:
             raise RuntimeError(f"Falha histórico ITAD: {e}")
+        
+    # ------------------- Async ITAD price history bulk -------------------
+    @classmethod
+    async def fetch_price_history_bulk(cls, arg_seqItadPlain: Sequence[str], arg_intAnos: int = 5) -> dict:
+        """
+        Busca o histórico de preços de múltiplos jogos na API do IsThereAnyDeal (ITAD) de forma assíncrona.
+
+        Parâmetros:
+        - arg_seqItadPlain (Sequence[str]): Uma sequência de identificadores "plain" dos jogos no ITAD.
+        - arg_intAnos (int): O número de anos para buscar o histórico.
+
+        Retorna:
+        - var_dictResults (dict): Um dicionário mapeando cada plain para seu histórico de preços.
+        """
+
+        if not Settings._var_strItadApiKey:
+            raise RuntimeError("ITAD_API_KEY não definido")
+        
+        var_strSince = (datetime.now(timezone.utc) - timedelta(days=arg_intAnos * 365)).strftime("%Y-%m-%dT%H:%M:%SZ")
+        var_dictResults = {}
+        var_semSemaphore = asyncio.Semaphore(getattr(Settings, '_var_intAsyncConcurrency', 5))
+
+        async def worker(arg_clientSession: aiohttp.ClientSession, arg_strItadPlain: str):
+            async with var_semSemaphore:
+                await asyncio.sleep(random.random() * 0.2)
+                var_dictParams = {
+                    "key": Settings._var_strItadApiKey,
+                    "id": arg_strItadPlain,
+                    "shops": "61",
+                    "country": "BR",
+                    "since": var_strSince,
+                }
+                try:
+                    async with arg_clientSession.get(ITAD_HISTORY_URL, params=var_dictParams, timeout=30) as var_respResponse:
+                        var_respResponse.raise_for_status()
+                        var_dictData = await var_respResponse.json()
+                        return (arg_strItadPlain, var_dictData)
+                except Exception:
+                    return (arg_strItadPlain, None)
+
+        async with aiohttp.ClientSession() as var_respSession:
+            var_listTasks = [asyncio.create_task(worker(var_respSession, plain)) for plain in arg_seqItadPlain]
+            var_listOut = await asyncio.gather(*var_listTasks, return_exceptions=True)
+        for plain, result in var_listOut:
+            var_dictResults[plain] = result
+        return var_dictResults

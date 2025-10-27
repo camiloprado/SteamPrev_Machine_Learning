@@ -21,7 +21,7 @@ class Bot:
         """
         try:
             Initialization.execute()
-            Loop.run()
+            Loop.execute()
         except Exception as e:
             print(f"Erro ao iniciar o bot: {e}")
         

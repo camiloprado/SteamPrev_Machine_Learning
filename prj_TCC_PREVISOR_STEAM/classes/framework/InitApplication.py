@@ -1,5 +1,6 @@
 from prj_TCC_PREVISOR_STEAM.classes.framework.AllSettings import Settings
 from prj_TCC_PREVISOR_STEAM.classes.utils.GetTask import GetTask
+from prj_TCC_PREVISOR_STEAM.classes.SQL.postgre import PostgreSQL
 
 class InitApplication:
     """
@@ -18,6 +19,8 @@ class InitApplication:
         - None
         """
         if arg_boolFirstRun:
+            PostgreSQL.conectar()
+            PostgreSQL.criar_tabela()
             GetTask.abandona_fila(arg_boolAbandonar=True)
             GetTask.criar_fila()
 

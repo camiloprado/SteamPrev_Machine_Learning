@@ -13,7 +13,6 @@ class Initialization:
         Método de classe para executar a inicialização do sistema.
         """
         try:
-            var_listApp = SteamClient.load_app_list()
             InitApplication.execute(arg_boolFirstRun=True)
 
         except Exception as e:

@@ -1,2 +1,6 @@
 /.venv
 /prj_TCC_PREVISOR_STEAM.egg-info
+/__pycache__
+*.pyc
+.DS_Store
+.env

@@ -8,26 +8,6 @@ class Loop:
     Classe para gerenciar o loop principal da aplicação, executando as tarefas na fila.
     """
 
-    @classmethod
-    def __init__(cls):
-        cls.var_clsGetTask = GetTask()
-        cls.var_clsProcess = Process()
-
-    @classmethod
-    def run(cls):
-        """
-        Executa o loop principal para processar as tarefas na fila.
-        
-        Retorna:
-        - None
-        """
-        while True:
-            if cls.var_clsGetTask.var_listTaskQueue:
-                var_listTask = cls.var_clsGetTask.var_listTaskQueue.pop(0)
-                cls.execute(var_listTask)
-            else:
-                break
-
     @staticmethod
     def execute():
         """
@@ -38,12 +18,15 @@ class Loop:
         Retorna:
         
         """
-        while var_dictFila is not None:
+        var_listFila = GetTask.load_task_queue()
+
+        while len(var_listFila) > 0:
             for var_intTentativa in range(Settings._var_dictSettings["max_tentativas"]):
                 try:
                     # Lógica para executar a tarefa
                     Process.execute()
-                    
+                    var_listFila.pop(0)
+                    print(f"Tarefa concluída. Tarefas restantes: {len(var_listFila)}")
                 except Exception as e:
                     if var_intTentativa == Settings._var_dictSettings["max_tentativas"] - 1:
                         raise e

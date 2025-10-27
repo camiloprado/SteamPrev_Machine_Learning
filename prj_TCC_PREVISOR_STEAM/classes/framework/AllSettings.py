@@ -29,6 +29,13 @@ class Settings:
         cls.steam_api_settings()
         
         cls._var_dictSettings["max_tentativas"] = 3
+        cls._var_dictSettings["steam_itad_api_key"] = cls._var_strItadApiKey
+        cls._var_dictSettings["path_data_app_details"] = "resources/dados/steam_app_details.json"
+        cls._var_dictSettings["db_name"] = "previsao_steam"
+        cls._var_dictSettings["db_user"] = "postgres"
+        cls._var_dictSettings["db_password"] = "postgres"
+        cls._var_dictSettings["db_host"] = "localhost"
+        cls._var_dictSettings["db_port"] = "5433"
 
     @classmethod
     def remove_setting(cls, arg_strKey: str):
