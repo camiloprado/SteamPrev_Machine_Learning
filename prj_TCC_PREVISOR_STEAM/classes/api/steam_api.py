@@ -143,52 +143,55 @@ class SteamClient:
         Retorna:
         - var_listResults (list[dict]): Uma lista de dicionários com os detalhes dos jogos.
         """
-        # Controle de concorrência
-        var_semSemaphore = asyncio.Semaphore(Settings._var_intAsyncConcurrency)
-        
-        async def worker(arg_clientSession: aiohttp.ClientSession, arg_intAppid: int) -> dict | None:
-            """
-            Worker assíncrono para buscar detalhes de um único appid.
+        try:
+            # Controle de concorrência
+            var_semSemaphore = asyncio.Semaphore(Settings._var_intAsyncConcurrency)
             
-            Parâmetros:
-            - arg_clientSession (aiohttp.ClientSession): A sessão HTTP assíncrona.
-            - arg_intAppid (int): O appid do jogo.
-            
-            Retorna:
-            - var_dictDetails (dict | None): Um dicionário com os detalhes do jogo ou None se não encontrado.
-            """
-            async with var_semSemaphore:
-                # Pequena espera para evitar throttling
-                await asyncio.sleep(random.random() * 0.3)
-                var_dictParams = {"appids": arg_intAppid, "l": "brazilian"}
-                try:
-                    # Faz a requisição assíncrona
-                    async with arg_clientSession.get(STEAM_DETAILS_URL, params=var_dictParams, timeout=30) as var_respResponse:
-                        var_respResponse.raise_for_status()
-                        # Processa os dados recebidos
-                        var_dictData = await var_respResponse.json()
+            async def worker(arg_clientSession: aiohttp.ClientSession, arg_intAppid: int) -> dict | None:
+                """
+                Worker assíncrono para buscar detalhes de um único appid.
+                
+                Parâmetros:
+                - arg_clientSession (aiohttp.ClientSession): A sessão HTTP assíncrona.
+                - arg_intAppid (int): O appid do jogo.
+                
+                Retorna:
+                - var_dictDetails (dict | None): Um dicionário com os detalhes do jogo ou None se não encontrado.
+                """
+                async with var_semSemaphore:
+                    # Pequena espera para evitar throttling
+                    await asyncio.sleep(random.random() * 0.3)
+                    var_dictParams = {"appids": arg_intAppid, "l": "brazilian"}
+                    try:
+                        # Faz a requisição assíncrona
+                        async with arg_clientSession.get(STEAM_DETAILS_URL, params=var_dictParams, timeout=30) as var_respResponse:
+                            var_respResponse.raise_for_status()
+                            # Processa os dados recebidos
+                            var_dictData = await var_respResponse.json()
 
-                        # Verifica se os dados são válidos
-                        if var_dictData and str(arg_intAppid) in var_dictData and var_dictData[str(arg_intAppid)]["success"]:
-                            var_dictDetails = var_dictData[str(arg_intAppid)]["data"]
-                            return var_dictDetails
-                except Exception:
+                            # Verifica se os dados são válidos
+                            if var_dictData and str(arg_intAppid) in var_dictData and var_dictData[str(arg_intAppid)]["success"]:
+                                var_dictDetails = var_dictData[str(arg_intAppid)]["data"]
+                                return var_dictDetails
+                    except Exception:
+                        return None
                     return None
-                return None
 
-        # Executa os workers assíncronos
-        async with aiohttp.ClientSession(headers=CON_DEFAULT_HEADERS) as var_respSession:
-            var_listTasks = [asyncio.create_task(worker(var_respSession, var_intAppid)) for var_intAppid in arg_seqAppids]
-            # Aguarda a conclusão de todas as tarefas
-            var_listOut = await asyncio.gather(*var_listTasks, return_exceptions=True)
+            # Executa os workers assíncronos
+            async with aiohttp.ClientSession(headers=CON_DEFAULT_HEADERS) as var_respSession:
+                var_listTasks = [asyncio.create_task(worker(var_respSession, var_intAppid)) for var_intAppid in arg_seqAppids]
+                # Aguarda a conclusão de todas as tarefas
+                var_listOut = await asyncio.gather(*var_listTasks, return_exceptions=True)
 
-        # Filtra os resultados válidos e os retorna
-        var_listResults: list[dict] = []
-        for var_dictOut in var_listOut:
-            if isinstance(var_dictOut, dict):
-                var_listResults.append(var_dictOut)
-        return var_listResults
-
+            # Filtra os resultados válidos e os retorna
+            var_listResults: list[dict] = []
+            for var_dictOut in var_listOut:
+                if isinstance(var_dictOut, dict):
+                    var_listResults.append(var_dictOut)
+            return var_listResults
+        except Exception as e:
+            raise RuntimeError(f"Falha ao buscar detalhes em bulk: {e}")
+        
     # ------------------- Async reviews summary -------------------
     @classmethod
     async def fetch_reviews_summary(cls, arg_seqAppids: Sequence[int]) -> dict[int, dict]:
@@ -201,49 +204,52 @@ class SteamClient:
         Retorna:
         - var_dictResult (dict): Um dicionário mapeando appids para seus resumos de reviews.
         """
-        # Controle de concorrência
-        var_semSemaphore = asyncio.Semaphore(Settings._var_intAsyncConcurrency)
+        try:
+            # Controle de concorrência
+            var_semSemaphore = asyncio.Semaphore(Settings._var_intAsyncConcurrency)
 
-        async def worker(arg_clientSession: aiohttp.ClientSession, arg_intAppid: int):
-            """
-            Worker assíncrono para buscar o resumo de reviews de um único appid.
+            async def worker(arg_clientSession: aiohttp.ClientSession, arg_intAppid: int):
+                """
+                Worker assíncrono para buscar o resumo de reviews de um único appid.
 
-            Parâmetros:
-            - arg_clientSession (aiohttp.ClientSession): A sessão HTTP assíncrona.
-            - arg_intAppid (int): O appid do jogo.
+                Parâmetros:
+                - arg_clientSession (aiohttp.ClientSession): A sessão HTTP assíncrona.
+                - arg_intAppid (int): O appid do jogo.
 
-            Retorna:
-            - var_tupleResult (tuple): Uma tupla (arg_intAppid, var_dictSummary) contendo o Appid e o resumo das reviews ou None se não encontrado.
-            """
-            async with var_semSemaphore:
-                await asyncio.sleep(random.random() * 0.3)
-                var_strUrl = STEAM_REVIEWS_URL.format(appid=arg_intAppid)
-                var_dictParams = {"json": "1", "language": "all"}
-                try:
-                    async with arg_clientSession.get(var_strUrl, params=var_dictParams, timeout=30) as var_respResponse:
-                        var_respResponse.raise_for_status()
-                        var_dictData = await var_respResponse.json()
-                        if var_dictData and var_dictData.get("success") == 1:
-                            var_dictSummary = var_dictData.get("query_summary", {})
-                            if isinstance(var_dictSummary, dict):
-                                var_dictSummary = dict(var_dictSummary)
-                                var_dictSummary["appid"] = arg_intAppid
-                                var_tupleResult = (arg_intAppid, var_dictSummary)
-                                return var_tupleResult
-                except Exception:
+                Retorna:
+                - var_tupleResult (tuple): Uma tupla (arg_intAppid, var_dictSummary) contendo o Appid e o resumo das reviews ou None se não encontrado.
+                """
+                async with var_semSemaphore:
+                    await asyncio.sleep(random.random() * 0.3)
+                    var_strUrl = STEAM_REVIEWS_URL.format(appid=arg_intAppid)
+                    var_dictParams = {"json": "1", "language": "all"}
+                    try:
+                        async with arg_clientSession.get(var_strUrl, params=var_dictParams, timeout=30) as var_respResponse:
+                            var_respResponse.raise_for_status()
+                            var_dictData = await var_respResponse.json()
+                            if var_dictData and var_dictData.get("success") == 1:
+                                var_dictSummary = var_dictData.get("query_summary", {})
+                                if isinstance(var_dictSummary, dict):
+                                    var_dictSummary = dict(var_dictSummary)
+                                    var_dictSummary["appid"] = arg_intAppid
+                                    var_tupleResult = (arg_intAppid, var_dictSummary)
+                                    return var_tupleResult
+                    except Exception:
+                        return None
                     return None
-                return None
 
-        var_dictResult: dict[int, dict] = {}
-        async with aiohttp.ClientSession(headers=CON_DEFAULT_HEADERS) as var_respSession:
-            var_listTasks = [asyncio.create_task(worker(var_respSession, var_intAppid)) for var_intAppid in arg_seqAppids]
-            var_listOut = await asyncio.gather(*var_listTasks, return_exceptions=True)
-        for var_tupleItem in var_listOut:
-            if (isinstance(var_tupleItem, tuple) and isinstance(var_tupleItem[0], int) and isinstance(var_tupleItem[1], dict)):
-                if var_tupleItem[1]['total_reviews'] > 0:
-                    var_dictResult[var_tupleItem[0]] = var_tupleItem[1]
-        return var_dictResult
-
+            var_dictResult: dict[int, dict] = {}
+            async with aiohttp.ClientSession(headers=CON_DEFAULT_HEADERS) as var_respSession:
+                var_listTasks = [asyncio.create_task(worker(var_respSession, var_intAppid)) for var_intAppid in arg_seqAppids]
+                var_listOut = await asyncio.gather(*var_listTasks, return_exceptions=True)
+            for var_tupleItem in var_listOut:
+                if (isinstance(var_tupleItem, tuple) and isinstance(var_tupleItem[0], int) and isinstance(var_tupleItem[1], dict)):
+                    if var_tupleItem[1]['total_reviews'] > 0:
+                        var_dictResult[var_tupleItem[0]] = var_tupleItem[1]
+            return var_dictResult
+        except Exception as e:
+            raise RuntimeError(f"Falha ao buscar resumos de reviews: {e}")
+        
     # ------------------- ITAD lookups -------------------
     @classmethod
     def lookup_itad_ids(cls, arg_seqTitles: Sequence[str]) -> dict:
@@ -321,32 +327,35 @@ class SteamClient:
 
         if not Settings._var_strItadApiKey:
             raise RuntimeError("ITAD_API_KEY não definido")
+        try:
+            var_strSince = (datetime.now(timezone.utc) - timedelta(days=arg_intAnos * 365)).strftime("%Y-%m-%dT%H:%M:%SZ")
+            var_dictResults = {}
+            var_semSemaphore = asyncio.Semaphore(getattr(Settings, '_var_intAsyncConcurrency', 5))
+            
+            async def worker(arg_clientSession: aiohttp.ClientSession, arg_strItadPlain: str):
+                async with var_semSemaphore:
+                    await asyncio.sleep(random.random() * 0.2)
+                    var_dictParams = {
+                        "key": Settings._var_strItadApiKey,
+                        "id": arg_strItadPlain,
+                        "shops": "61",
+                        "country": "BR",
+                        "since": var_strSince,
+                    }
+                    try:
+                        async with arg_clientSession.get(ITAD_HISTORY_URL, params=var_dictParams, timeout=30) as var_respResponse:
+                            var_respResponse.raise_for_status()
+                            var_dictData = await var_respResponse.json()
+                            return (arg_strItadPlain, var_dictData)
+                    except Exception:
+                        return (arg_strItadPlain, None)
+
+            async with aiohttp.ClientSession() as var_respSession:
+                var_listTasks = [asyncio.create_task(worker(var_respSession, plain)) for plain in arg_seqItadPlain]
+                var_listOut = await asyncio.gather(*var_listTasks, return_exceptions=True)
+            for plain, result in var_listOut:
+                var_dictResults[plain] = result
+            return var_dictResults
         
-        var_strSince = (datetime.now(timezone.utc) - timedelta(days=arg_intAnos * 365)).strftime("%Y-%m-%dT%H:%M:%SZ")
-        var_dictResults = {}
-        var_semSemaphore = asyncio.Semaphore(getattr(Settings, '_var_intAsyncConcurrency', 5))
-
-        async def worker(arg_clientSession: aiohttp.ClientSession, arg_strItadPlain: str):
-            async with var_semSemaphore:
-                await asyncio.sleep(random.random() * 0.2)
-                var_dictParams = {
-                    "key": Settings._var_strItadApiKey,
-                    "id": arg_strItadPlain,
-                    "shops": "61",
-                    "country": "BR",
-                    "since": var_strSince,
-                }
-                try:
-                    async with arg_clientSession.get(ITAD_HISTORY_URL, params=var_dictParams, timeout=30) as var_respResponse:
-                        var_respResponse.raise_for_status()
-                        var_dictData = await var_respResponse.json()
-                        return (arg_strItadPlain, var_dictData)
-                except Exception:
-                    return (arg_strItadPlain, None)
-
-        async with aiohttp.ClientSession() as var_respSession:
-            var_listTasks = [asyncio.create_task(worker(var_respSession, plain)) for plain in arg_seqItadPlain]
-            var_listOut = await asyncio.gather(*var_listTasks, return_exceptions=True)
-        for plain, result in var_listOut:
-            var_dictResults[plain] = result
-        return var_dictResults
+        except Exception as e:
+            raise RuntimeError(f"Falha ao buscar histórico ITAD em bulk: {e}")

@@ -8,6 +8,38 @@ class Settings:
     """
     _var_dictSettings = {}
 
+    def bd_settings_default(cls):
+        """
+        Configurações padrão do banco de dados.
+        """
+        cls._var_strDBName: str = "default_db"
+        cls._var_strDBUser: str = "postgres"
+        cls._var_strDBPassword: str = "postgres"
+        cls._var_strDBHost: str = "localhost"
+        cls._var_strDBPort: str = "5433"
+
+    @classmethod
+    def bd_settings_steam(cls):
+        """
+        Configurações do banco de dados Steam.
+        """
+        cls._var_strDBName: str = "steam_data"
+        cls._var_strDBUser: str = "postgres"
+        cls._var_strDBPassword: str = "postgres"
+        cls._var_strDBHost: str = "localhost"
+        cls._var_strDBPort: str = "5433"
+
+    @classmethod 
+    def bd_settings_previsao(cls):
+        """
+        Configurações do banco de dados de previsão.
+        """
+        cls._var_strDBName: str = "previsao_steam"
+        cls._var_strDBUser: str = "postgres"
+        cls._var_strDBPassword: str = "postgres"
+        cls._var_strDBHost: str = "localhost"
+        cls._var_strDBPort: str = "5433"
+        
     @classmethod
     def steam_api_settings(cls):
         """
@@ -27,15 +59,18 @@ class Settings:
         Constrói as configurações iniciais do sistema.
         """
         cls.steam_api_settings()
-        
+        cls.bd_settings_default()
+        cls.bd_settings_previsao()
         cls._var_dictSettings["max_tentativas"] = 3
         cls._var_dictSettings["steam_itad_api_key"] = cls._var_strItadApiKey
         cls._var_dictSettings["path_data_app_details"] = "resources/dados/steam_app_details.json"
-        cls._var_dictSettings["db_name"] = "previsao_steam"
-        cls._var_dictSettings["db_user"] = "postgres"
-        cls._var_dictSettings["db_password"] = "postgres"
-        cls._var_dictSettings["db_host"] = "localhost"
-        cls._var_dictSettings["db_port"] = "5433"
+        cls._var_dictSettings["db_name"] = cls._var_strDBName
+        cls._var_dictSettings["db_user"] = cls._var_strDBUser
+        cls._var_dictSettings["db_password"] = cls._var_strDBPassword
+        cls._var_dictSettings["db_host"] = cls._var_strDBHost
+        cls._var_dictSettings["db_port"] = cls._var_strDBPort
+        cls._var_dictSettings["dias_para_atualizacao"] = 90
+        cls._var_dictSettings["partes_porte"] = 200
 
     @classmethod
     def remove_setting(cls, arg_strKey: str):
