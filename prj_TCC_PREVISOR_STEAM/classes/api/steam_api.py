@@ -173,6 +173,14 @@ class SteamClient:
                             if var_dictData and str(arg_intAppid) in var_dictData and var_dictData[str(arg_intAppid)]["success"]:
                                 var_dictDetails = var_dictData[str(arg_intAppid)]["data"]
                                 return var_dictDetails
+                    except aiohttp.ClientError as e_http:
+                        # Captura erros específicos de HTTP (conexão, timeout, status).
+                        # logger.error(f"Erro HTTP ao buscar AppID {arg_intAppid}: {e_http}")
+                        return None
+                    except asyncio.TimeoutError:
+                        # Captura erro de timeout.
+                        # logger.error(f"Timeout ao buscar AppID {arg_intAppid}.")
+                        return None
                     except Exception:
                         return None
                     return None
@@ -180,16 +188,24 @@ class SteamClient:
             # Executa os workers assíncronos
             async with aiohttp.ClientSession(headers=CON_DEFAULT_HEADERS) as var_respSession:
                 var_listTasks = [asyncio.create_task(worker(var_respSession, var_intAppid)) for var_intAppid in arg_seqAppids]
+                logger.info(f"Iniciando busca assíncrona para {len(var_listTasks)} AppIDs com concorrência {Settings._var_intAsyncConcurrency}...")
+                
                 # Aguarda a conclusão de todas as tarefas
                 var_listOut = await asyncio.gather(*var_listTasks, return_exceptions=True)
+                logger.info("Busca assíncrona concluída.")
 
             # Filtra os resultados válidos e os retorna
-            var_listResults: list[dict] = []
+            var_dictResults: dict = {}
             for var_dictOut in var_listOut:
                 if isinstance(var_dictOut, dict):
-                    var_listResults.append(var_dictOut)
-            return var_listResults
+                    var_dictResults[var_dictOut["steam_appid"]] = var_dictOut
+
+            var_intFalha = len(arg_seqAppids) - len(var_dictResults)
+            logger.info(f"Busca concluída: {len(var_dictResults)} sucesso(s) ({len(var_dictResults)/(len(arg_seqAppids)):.2%}), {var_intFalha} falha(s) ({var_intFalha/len(arg_seqAppids):.2%}).")
+            return var_dictResults
+        
         except Exception as e:
+            logger.critical(f"Falha crítica ao buscar detalhes em bulk: {e}")
             raise RuntimeError(f"Falha ao buscar detalhes em bulk: {e}")
         
     # ------------------- Async reviews summary -------------------

@@ -1,5 +1,6 @@
 
 import os
+import logging
 from typing import Any
 
 class Settings:
@@ -8,6 +9,7 @@ class Settings:
     """
     _var_dictSettings = {}
 
+    @classmethod
     def bd_settings_default(cls):
         """
         Configurações padrão do banco de dados.
@@ -54,10 +56,38 @@ class Settings:
         cls._var_boolAppListLoaded = False
 
     @classmethod
+    def configure_logging(cls):
+        """
+        Configura o sistema de logging do projeto.
+        """
+        # Obtém o nível de logging da variável de ambiente (padrão: INFO)
+        var_strLogLevel = os.getenv("LOG_LEVEL", "INFO").upper()
+        var_intLogLevel = getattr(logging, var_strLogLevel, logging.INFO)
+        
+        # Configuração básica do logging
+        logging.basicConfig(
+            level=var_intLogLevel,
+            format='%(asctime)s - %(levelname)s - %(message)s',
+            datefmt='%Y-%m-%d %H:%M:%S',
+            handlers=[
+                logging.StreamHandler(),  # Output para console
+                # Opcional: adicionar FileHandler para salvar logs em arquivo
+                # logging.FileHandler('resources/logs/app.log', encoding='utf-8')
+            ]
+        )
+        
+        # Define o nível de logging para bibliotecas externas (evitar spam)
+        logging.getLogger("aiohttp").setLevel(logging.WARNING)
+        logging.getLogger("urllib3").setLevel(logging.WARNING)
+        
+        cls._var_dictSettings["log_level"] = var_strLogLevel
+
+    @classmethod
     def build(cls):
         """
         Constrói as configurações iniciais do sistema.
         """
+        cls.configure_logging()  # Configura o logging primeiro
         cls.steam_api_settings()
         cls.bd_settings_default()
         cls.bd_settings_previsao()
@@ -70,7 +100,7 @@ class Settings:
         cls._var_dictSettings["db_host"] = cls._var_strDBHost
         cls._var_dictSettings["db_port"] = cls._var_strDBPort
         cls._var_dictSettings["dias_para_atualizacao"] = 90
-        cls._var_dictSettings["partes_porte"] = 200
+        cls._var_dictSettings["partes_por_serie"] = 200
 
     @classmethod
     def remove_setting(cls, arg_strKey: str):

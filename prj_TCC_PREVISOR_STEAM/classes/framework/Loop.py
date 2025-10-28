@@ -2,6 +2,9 @@ from prj_TCC_PREVISOR_STEAM.classes.framework.AllSettings import Settings
 from prj_TCC_PREVISOR_STEAM.classes.framework.InitApplication import InitApplication
 from prj_TCC_PREVISOR_STEAM.classes.utils.GetTask import GetTask
 from prj_TCC_PREVISOR_STEAM.classes.framework.Process import Process
+import logging
+
+logger = logging.getLogger(__name__)
 
 class Loop:
     """
@@ -26,7 +29,7 @@ class Loop:
                     # Lógica para executar a tarefa
                     Process.execute()
                     var_listFila.pop(0)
-                    print(f"Tarefa concluída. Tarefas restantes: {len(var_listFila)}")
+                    logger.info(f"Tarefa concluída. Tarefas restantes: {len(var_listFila)}")
                 except Exception as e:
                     if var_intTentativa == Settings._var_dictSettings["max_tentativas"] - 1:
                         raise e

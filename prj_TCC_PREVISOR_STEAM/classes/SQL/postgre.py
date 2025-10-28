@@ -1,7 +1,9 @@
 from prj_TCC_PREVISOR_STEAM.classes.framework.AllSettings import Settings
 
 from datetime import datetime
-import psycopg2, sqlalchemy, json
+import psycopg2, sqlalchemy, json, logging
+
+logger = logging.getLogger(__name__)
 
 class PostgreSQL:
     """
@@ -29,13 +31,13 @@ class PostgreSQL:
                         host=var_strHost,
                         port=var_intPort
                     )
-                    print("Conexão com o banco de dados estabelecida com sucesso.")
+                    logger.info("Conexão com o banco de dados estabelecida com sucesso.")
                 except Exception as e:
-                    print(f"Erro ao conectar ao banco de dados: {e}")
+                    logger.error(f"Erro ao conectar ao banco de dados: {e}")
             else:
-                print("Já existe uma conexão ativa com o banco de dados.")
+                logger.info("Já existe uma conexão ativa com o banco de dados.")
         except Exception as e:
-            print(f"Erro ao conectar ao banco de dados: {e}")
+            logger.error(f"Erro ao conectar ao banco de dados: {e}")
             raise Exception(f"Erro ao conectar ao banco de dados: {e}")
         
     @classmethod
@@ -46,12 +48,12 @@ class PostgreSQL:
         try:
             if cls._var_connConnection:
                 cls._var_connConnection.close()
-                print("Conexão com o banco de dados encerrada.")
+                logger.info("Conexão com o banco de dados encerrada.")
                 cls._var_connConnection = None
             else:
-                print("Nenhuma conexão ativa para encerrar.")
+                logger.info("Nenhuma conexão ativa para encerrar.")
         except Exception as e:
-            print(f"Erro ao desconectar do banco de dados: {e}")
+            logger.error(f"Erro ao desconectar do banco de dados: {e}")
             raise Exception(f"Erro ao desconectar do banco de dados: {e}")
     
     @classmethod
@@ -66,9 +68,9 @@ class PostgreSQL:
             with cls._var_connConnection.cursor() as cursor:
                 cursor.execute(arg_strSQL)
                 cls._var_connConnection.commit()
-                print("Tabela criada com sucesso.")
+                logger.info("Tabela criada com sucesso.")
         except Exception as e:
-            print(f"Erro ao criar a tabela: {e}")
+            logger.error(f"Erro ao criar a tabela: {e}")
             raise Exception(f"Erro ao criar a tabela: {e}")
     
     @classmethod
@@ -91,7 +93,7 @@ class PostgreSQL:
             """
             cls.criar_tabela(arg_strSQL=var_strSQL)
         except Exception as e:
-            print(f"Erro ao criar a tabela '{arg_strNomeTabela}': {e}")
+            logger.error(f"Erro ao criar a tabela '{arg_strNomeTabela}': {e}")
             raise Exception(f"Erro ao criar a tabela '{arg_strNomeTabela}': {e}")
         
     @classmethod
@@ -124,13 +126,79 @@ class PostgreSQL:
             """
             cls.criar_tabela(arg_strSQL=var_strSQL)
         except Exception as e:
-            print(f"Erro ao criar a tabela '{arg_strNomeTabela}': {e}")
+            logger.error(f"Erro ao criar a tabela '{arg_strNomeTabela}': {e}")
             raise Exception(f"Erro ao criar a tabela '{arg_strNomeTabela}': {e}")
+
+    @classmethod
+    def inserir_dadosSteamRaw(cls, arg_dictDados: dict):
+        """
+        Insere ou atualiza os dados brutos de um jogo na tabela do banco de dados SteamRaw.
+        Não sobrescreve valores preenchidos com valores nulos/vazios.
+
+        Parâmetros:
+        - arg_dictDados (dict): Dicionário contendo os dados brutos do jogo a serem inseridos.
+
+        Retorna:
+        - None
+        """
+        try:
+            # Verifica se há dados existentes
+            var_strSQLBusca = "SELECT detalhes, reviews FROM steam_raw WHERE appid = %s;"
+            var_dictDadosExistentes = {}
+            
+            with cls._var_connConnection.cursor() as cursor:
+                cursor.execute(var_strSQLBusca, (arg_dictDados.get('appid'),))
+                var_tupleResultado = cursor.fetchone()
+                if var_tupleResultado:
+                    var_dictDadosExistentes = {
+                        "detalhes": var_tupleResultado[0] if var_tupleResultado[0] else {},
+                        "reviews": var_tupleResultado[1] if var_tupleResultado[1] else {}
+                    }
+            
+            # Prepara os novos valores, mantendo os existentes se os novos forem vazios/nulos
+            var_dictDetalhes = arg_dictDados.get("detalhes", {})
+            var_dictReviews = arg_dictDados.get("reviews", {})
+            
+            # Se o novo valor for vazio/nulo e houver um valor existente, mantém o existente
+            if not var_dictDetalhes and var_dictDadosExistentes.get("detalhes"):
+                var_dictDetalhes = var_dictDadosExistentes["detalhes"]
+            if not var_dictReviews and var_dictDadosExistentes.get("reviews"):
+                var_dictReviews = var_dictDadosExistentes["reviews"]
+            
+            # Se ambos ainda estiverem vazios, não insere/atualiza
+            if not var_dictDetalhes and not var_dictReviews:
+                logger.warning(f"Nenhum dado válido para inserir/atualizar para o AppID {arg_dictDados.get('appid')}")
+                return
+            
+            var_strSQL = """
+            INSERT INTO steam_raw (
+                appid, detalhes, reviews, ultima_atualizacao
+            ) VALUES (%s, %s, %s, %s)
+            ON CONFLICT (appid) DO UPDATE SET
+                detalhes = EXCLUDED.detalhes,
+                reviews = EXCLUDED.reviews,
+                ultima_atualizacao = EXCLUDED.ultima_atualizacao;
+            """
+            
+            var_listValores = [
+                arg_dictDados.get("appid"),
+                json.dumps(var_dictDetalhes),
+                json.dumps(var_dictReviews),
+                datetime.now()
+            ]
+            with cls._var_connConnection.cursor() as cursor:
+                cursor.execute(var_strSQL, tuple(var_listValores))
+                cls._var_connConnection.commit()
+                logger.info(f"Dados brutos inseridos/atualizados para o AppID {arg_dictDados.get('appid')}")
+        except Exception as e:
+            logger.error(f"Erro ao inserir/atualizar dados brutos para o AppID {arg_dictDados.get('appid')}: {e}")
+            raise Exception(f"Erro ao inserir/atualizar dados brutos para o AppID {arg_dictDados.get('appid')}: {e}")
         
     @classmethod
     def inserir_dadosSteamBD(cls, arg_dictDados: dict):
         """
         Insere ou atualiza os dados de um jogo na tabela do banco de dados da Steam.
+        Não sobrescreve valores preenchidos com valores nulos/vazios.
 
         Parâmetros:
         - arg_dictDados (dict): Dicionário contendo os dados do jogo a serem inseridos.
@@ -139,11 +207,22 @@ class PostgreSQL:
         - None
         """
         try:
+            # Verifica se há dados existentes
+            var_strSQLBusca = "SELECT * FROM steam_bd WHERE appid = %s;"
+            var_dictDadosExistentes = {}
+            
+            with cls._var_connConnection.cursor() as cursor:
+                cursor.execute(var_strSQLBusca, (arg_dictDados.get('appid'),))
+                var_tupleResultado = cursor.fetchone()
+                if var_tupleResultado:
+                    var_listColnames = [desc[0] for desc in cursor.description]
+                    var_dictDadosExistentes = dict(zip(var_listColnames, var_tupleResultado))
+            
             var_strSQL = """
             INSERT INTO steam_bd (
                 appid, nome, idade_classificada, classificacao_etaria, linguagens, desenvolvedores,
-                distribuidores, preco, metacritic_score, categorias, genero, data_lancamento, ultima_atualizacao
-            ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                distribuidores, preco, metacritic_score, categorias, genero, data_lancamento, reviews, ultima_atualizacao
+            ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
             ON CONFLICT (appid) DO UPDATE SET
                 nome = EXCLUDED.nome,
                 idade_classificada = EXCLUDED.idade_classificada,
@@ -156,36 +235,56 @@ class PostgreSQL:
                 categorias = EXCLUDED.categorias,
                 genero = EXCLUDED.genero,
                 data_lancamento = EXCLUDED.data_lancamento,
+                reviews = EXCLUDED.reviews,
                 ultima_atualizacao = EXCLUDED.ultima_atualizacao;
             """
             # Extrai os campos na ordem correta
             var_listCampos = [
                 "appid", "nome", "idade_classificada", "classificacao_etaria", "linguagens", "desenvolvedores",
-                "distribuidores", "preco", "metacritic_score", "categorias", "genero", "data_lancamento", "ultima_atualizacao"
+                "distribuidores", "preco", "metacritic_score", "categorias", "genero", "data_lancamento", "reviews", "ultima_atualizacao"
             ]
 
             var_listValores = []
             for var_strColuna in var_listCampos[:-1]:
                 var_anyValor = arg_dictDados.get(var_strColuna)
-                # Se for None, alimenta como vazio (string ou lista)
-                if var_anyValor is None:
-                    # Campos que são listas
+                
+                # Se o novo valor for None ou vazio e houver um valor existente, mantém o existente
+                if var_dictDadosExistentes:
+                    var_anyValorExistente = var_dictDadosExistentes.get(var_strColuna)
+                    
+                    # Para listas: se o novo valor for None ou lista vazia e o existente tiver conteúdo
                     if var_strColuna in ["linguagens", "desenvolvedores", "distribuidores", "categorias", "genero"]:
-                        var_anyValor = []
+                        if (var_anyValor is None or var_anyValor == [] or var_anyValor == "null") and var_anyValorExistente:
+                            var_anyValor = var_anyValorExistente
+                        elif var_anyValor is None or var_anyValor == [] or var_anyValor == "null":
+                            var_anyValor = []
+                    # Para strings: se o novo valor for None ou vazio e o existente tiver conteúdo
                     else:
-                        var_anyValor = ""
+                        if (var_anyValor is None or var_anyValor == "" or var_anyValor == "null") and var_anyValorExistente:
+                            var_anyValor = var_anyValorExistente
+                        elif var_anyValor is None or var_anyValor == "null":
+                            var_anyValor = "null"
+                else:
+                    # Se não houver dados existentes, trata None normalmente
+                    if var_anyValor is None or var_anyValor == "null":
+                        if var_strColuna in ["linguagens", "desenvolvedores", "distribuidores", "categorias", "genero"]:
+                            var_anyValor = []
+                        else:
+                            var_anyValor = "null"
+                
                 var_listValores.append(var_anyValor)
             var_listValores.append(datetime.now())
+            
             with cls._var_connConnection.cursor() as cursor:
                 cursor.execute(var_strSQL, tuple(var_listValores))
                 cls._var_connConnection.commit()
-                print(f"Dados inseridos/atualizados para o AppID {arg_dictDados.get('appid')} - {arg_dictDados.get('nome')}")
+                logger.info(f"Dados inseridos/atualizados para o AppID {arg_dictDados.get('appid')} - {arg_dictDados.get('nome')}")
         except Exception as e:
-            print(f"Erro ao inserir/atualizar dados para o AppID {arg_dictDados.get('appid')}: {e}")
+            logger.error(f"Erro ao inserir/atualizar dados para o AppID {arg_dictDados.get('appid')}: {e}")
             raise Exception(f"Erro ao inserir/atualizar dados para o AppID {arg_dictDados.get('appid')}: {e}")
         
     @classmethod
-    def atualizar_reviews(cls, arg_intAppid: int, arg_jsonReviews: dict):
+    def atualizar_reviewsSteamBD(cls, arg_intAppid: int, arg_jsonReviews: dict):
         """
         Atualiza as resenhas de um jogo na tabela do banco de dados da Steam.
 
@@ -213,25 +312,26 @@ class PostgreSQL:
                     )
                 )
                 cls._var_connConnection.commit()
-                print(f"Resenhas atualizadas para o AppID {arg_intAppid}.")
+                logger.info(f"Resenhas atualizadas para o AppID {arg_intAppid}.")
         except Exception as e:
-            print(f"Erro ao atualizar resenhas para o AppID {arg_intAppid}: {e}")
+            logger.error(f"Erro ao atualizar resenhas para o AppID {arg_intAppid}: {e}")
             raise Exception(f"Erro ao atualizar resenhas para o AppID {arg_intAppid}: {e}")
         
     @classmethod
-    def buscar_dados(cls, arg_intAppid: int) -> dict | None:
+    def buscar_dados(cls, arg_intAppid: int, arg_strNomeTabela: str) -> dict | None:
         """
         Busca os dados de um jogo na tabela do banco de dados da Steam.
 
         Parâmetros:
         - arg_intAppid (int): ID do aplicativo Steam.
+        - arg_strNomeTabela (str): Nome da tabela onde os dados serão buscados.
 
         Retorna:
         - dict | None: Dicionário com os dados do jogo ou None se não encontrado.
         """
         try:
-            var_strSQL = """
-            SELECT * FROM steam_bd WHERE appid = %s;
+            var_strSQL = f"""
+            SELECT * FROM {arg_strNomeTabela} WHERE appid = %s;
             """
             with cls._var_connConnection.cursor() as cursor:
                 cursor.execute(var_strSQL, (arg_intAppid,))
@@ -240,14 +340,39 @@ class PostgreSQL:
                     var_listColnames = [desc[0] for desc in cursor.description]
                     return dict(zip(var_listColnames, var_resultado))
                 else:
-                    print(f"Nenhum dado encontrado para o AppID {arg_intAppid}.")
+                    logger.warning(f"Nenhum dado encontrado para o AppID {arg_intAppid}.")
                     return None
         except Exception as e:
-            print(f"Erro ao buscar dados para o AppID {arg_intAppid}: {e}")
+            logger.error(f"Erro ao buscar dados para o AppID {arg_intAppid}: {e}")
             raise Exception(f"Erro ao buscar dados para o AppID {arg_intAppid}: {e}")
+    
+    @classmethod
+    def buscar_todos_dados(cls, arg_strNomeTabela: str) -> list[dict]:
+        """
+        Busca todos os dados de jogos na tabela do banco de dados da Steam.
+
+        Parâmetros:
+        - arg_strNomeTabela (str): Nome da tabela onde os dados serão buscados.
+
+        Retorna:
+        - list[dict]: Lista de dicionários com os dados dos jogos.
+        """
+        try:
+            var_strSQL = f"""
+            SELECT * FROM {arg_strNomeTabela};
+            """
+            with cls._var_connConnection.cursor() as cursor:
+                cursor.execute(var_strSQL)
+                var_resultados = cursor.fetchall()
+                var_listColnames = [desc[0] for desc in cursor.description]
+                var_listDados = [dict(zip(var_listColnames, row)) for row in var_resultados]
+                return var_listDados
+        except Exception as e:
+            logger.error(f"Erro ao buscar todos os dados da tabela '{arg_strNomeTabela}': {e}")
+            raise Exception(f"Erro ao buscar todos os dados da tabela '{arg_strNomeTabela}': {e}")
         
     @classmethod
-    def verificar_ultima_atualizacao(cls, arg_intAppid: int) -> datetime | None:
+    def verificar_ultima_atualizacao(cls, arg_intAppid: int, arg_strNomeTabela: str) -> datetime | None:
         """
         Verifica a última atualização dos dados de um jogo na tabela do banco de dados da Steam.
 
@@ -258,8 +383,8 @@ class PostgreSQL:
         - datetime | None: Data e hora da última atualização ou None se não encontrado.
         """
         try:
-            var_strSQL = """
-            SELECT ultima_atualizacao FROM steam_bd WHERE appid = %s;
+            var_strSQL = f"""
+            SELECT ultima_atualizacao FROM {arg_strNomeTabela} WHERE appid = %s;
             """
             with cls._var_connConnection.cursor() as cursor:
                 cursor.execute(var_strSQL, (arg_intAppid,))
@@ -270,7 +395,7 @@ class PostgreSQL:
                     # print(f"Nenhum dado encontrado para o AppID {arg_intAppid}.")
                     return None
         except Exception as e:
-            print(f"Erro ao verificar última atualização para o AppID {arg_intAppid}: {e}")
+            logger.error(f"Erro ao verificar última atualização para o AppID {arg_intAppid}: {e}")
             raise Exception(f"Erro ao verificar última atualização para o AppID {arg_intAppid}: {e}")
             
     @classmethod
@@ -302,7 +427,7 @@ class PostgreSQL:
             with cls._var_connConnection.cursor() as cursor:
                 cursor.execute(var_strSQL, tuple(var_listValores))
                 cls._var_connConnection.commit()
-                print(f"Dados atualizados para o AppID {arg_intAppid}.")
+                logger.info(f"Dados atualizados para o AppID {arg_intAppid}.")
         except Exception as e:
-            print(f"Erro ao atualizar dados para o AppID {arg_intAppid}: {e}")
+            logger.error(f"Erro ao atualizar dados para o AppID {arg_intAppid}: {e}")
             raise Exception(f"Erro ao atualizar dados para o AppID {arg_intAppid}: {e}")

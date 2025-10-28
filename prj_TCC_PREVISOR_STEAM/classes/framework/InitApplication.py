@@ -21,6 +21,7 @@ class InitApplication:
         if arg_boolFirstRun:
             PostgreSQL.conectar()
             PostgreSQL.criar_tabela_dadosSteam()
+            PostgreSQL.criar_tabela_SteamRaw()
             GetTask.abandona_fila(arg_boolAbandonar=True)
             GetTask.criar_fila()
 
