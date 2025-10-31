@@ -131,6 +131,57 @@ class SteamClient:
             pass
         return {}
 
+    # ------------------- Async bulk details com batches -------------------
+    @classmethod
+    async def fetch_details_bulk_batched(cls, arg_seqAppids: Sequence[int]) -> dict:
+        """
+        Busca os detalhes de múltiplos jogos na Steam de forma assíncrona, processando em batches.
+        
+        Parâmetros:
+        - arg_seqAppids (Sequence[int]): Uma sequência de appids dos jogos.
+
+        Retorna:
+        - var_dictAllResults (dict): Um dicionário com todos os detalhes dos jogos.
+        """
+        var_dictConfigAPI = Settings.steam_api_details()
+        var_intBatchSize = var_dictConfigAPI.get("BatchSize", 200)
+        var_intDelay = var_dictConfigAPI.get("Delay", 120)
+        var_intAsyncConcurrency = var_dictConfigAPI.get("Concurrency", 1)
+        
+        var_intTotalItems = len(arg_seqAppids)
+        var_intTotalBatches = (var_intTotalItems + var_intBatchSize - 1) // var_intBatchSize
+        
+        logger.info(f"=== PROCESSAMENTO EM BATCHES ===")
+        logger.info(f"Total de itens: {var_intTotalItems:,}")
+        logger.info(f"Tamanho do batch: {var_intBatchSize:,}")
+        logger.info(f"Total de batches: {var_intTotalBatches}")
+        logger.info(f"Delay entre batches: {var_intDelay}s")
+        logger.info(f"Concorrência por batch: {var_intAsyncConcurrency}")
+        logger.info(f"================================\n")
+        
+        var_dictAllResults = {}
+        
+        for var_intBatchNum in range(var_intTotalBatches):
+            var_intStart = var_intBatchNum * var_intBatchSize
+            var_intEnd = min(var_intStart + var_intBatchSize, var_intTotalItems)
+            var_listBatch = arg_seqAppids[var_intStart:var_intEnd]
+            
+            logger.info(f"Batch {var_intBatchNum + 1}/{var_intTotalBatches} - Processando itens {var_intStart + 1} a {var_intEnd} ({len(var_listBatch)} itens)...")
+            
+            # Processa o batch atual
+            var_dictBatchResults = await cls.fetch_details_bulk(var_listBatch)
+            var_dictAllResults.update(var_dictBatchResults)
+            
+            # Aguarda entre batches (exceto no último)
+            if var_intBatchNum < var_intTotalBatches - 1:
+                logger.info(f"Aguardando {var_intDelay}s antes do próximo batch...\n")
+                await asyncio.sleep(var_intDelay)
+        
+        logger.info(f"\nPROCESSAMENTO COMPLETO!")
+        logger.info(f"Total processado: {len(var_dictAllResults):,} sucessos de {var_intTotalItems:,} itens ({len(var_dictAllResults)/var_intTotalItems:.2%})")
+        
+        return var_dictAllResults
+
     # ------------------- Async bulk details -------------------
     @classmethod
     async def fetch_details_bulk(cls, arg_seqAppids: Sequence[int]) -> list[dict]:
@@ -144,8 +195,17 @@ class SteamClient:
         - var_listResults (list[dict]): Uma lista de dicionários com os detalhes dos jogos.
         """
         try:
+            var_dictConfigAPI = Settings.steam_api_details()
             # Controle de concorrência
-            var_semSemaphore = asyncio.Semaphore(Settings._var_intAsyncConcurrency)
+            var_semSemaphore = asyncio.Semaphore(var_dictConfigAPI.get("Concurrency", 1))
+            
+            # Contadores de erro
+            var_intErrosHTTP = 0
+            var_intErrosForbidden = 0
+            var_intErrosTooManyRequests = 0
+            var_intErrosTimeout = 0
+            var_intErrosOutros = 0
+            var_intAusentes = 0
             
             async def worker(arg_clientSession: aiohttp.ClientSession, arg_intAppid: int) -> dict | None:
                 """
@@ -158,6 +218,8 @@ class SteamClient:
                 Retorna:
                 - var_dictDetails (dict | None): Um dicionário com os detalhes do jogo ou None se não encontrado.
                 """
+                nonlocal var_intErrosHTTP, var_intErrosForbidden, var_intErrosTooManyRequests, var_intErrosTimeout, var_intErrosOutros, var_intAusentes
+                
                 async with var_semSemaphore:
                     # Pequena espera para evitar throttling
                     await asyncio.sleep(random.random() * 0.3)
@@ -173,22 +235,32 @@ class SteamClient:
                             if var_dictData and str(arg_intAppid) in var_dictData and var_dictData[str(arg_intAppid)]["success"]:
                                 var_dictDetails = var_dictData[str(arg_intAppid)]["data"]
                                 return var_dictDetails
+                            
+                            # Caso não retorne dados válidos (success=False ou dados ausentes)
+                            var_intAusentes += 1
+                            return None
                     except aiohttp.ClientError as e_http:
                         # Captura erros específicos de HTTP (conexão, timeout, status).
-                        # logger.error(f"Erro HTTP ao buscar AppID {arg_intAppid}: {e_http}")
+                        var_intErrosHTTP += 1
+                        if hasattr(e_http, 'status'):
+                            if e_http.status == 403:
+                                var_intErrosForbidden += 1
+                            elif e_http.status == 429:
+                                var_intErrosTooManyRequests += 1
                         return None
                     except asyncio.TimeoutError:
                         # Captura erro de timeout.
-                        # logger.error(f"Timeout ao buscar AppID {arg_intAppid}.")
+                        var_intErrosTimeout += 1
                         return None
                     except Exception:
+                        # Captura outros erros não classificados.
+                        var_intErrosOutros += 1
                         return None
-                    return None
 
             # Executa os workers assíncronos
             async with aiohttp.ClientSession(headers=CON_DEFAULT_HEADERS) as var_respSession:
                 var_listTasks = [asyncio.create_task(worker(var_respSession, var_intAppid)) for var_intAppid in arg_seqAppids]
-                logger.info(f"Iniciando busca assíncrona para {len(var_listTasks)} AppIDs com concorrência {Settings._var_intAsyncConcurrency}...")
+                logger.info(f"Iniciando busca de 'DETALHES' assíncrona para {len(var_listTasks)} AppIDs com concorrência {Settings._var_intAsyncConcurrency}...")
                 
                 # Aguarda a conclusão de todas as tarefas
                 var_listOut = await asyncio.gather(*var_listTasks, return_exceptions=True)
@@ -201,13 +273,70 @@ class SteamClient:
                     var_dictResults[var_dictOut["steam_appid"]] = var_dictOut
 
             var_intFalha = len(arg_seqAppids) - len(var_dictResults)
-            logger.info(f"Busca concluída: {len(var_dictResults)} sucesso(s) ({len(var_dictResults)/(len(arg_seqAppids)):.2%}), {var_intFalha} falha(s) ({var_intFalha/len(arg_seqAppids):.2%}).")
+            logger.info(f"--- Busca concluída: ---")
+            logger.info(f"{len(var_dictResults)} sucesso(s) ({len(var_dictResults)/(len(arg_seqAppids)):.2%}),")
+            logger.info(f"{var_intFalha} falha(s) ({var_intFalha/len(arg_seqAppids):.2%}).")
+            logger.info(f"--- Detalhamento dos erros: ---")
+            logger.info(f"* HTTP: {var_intErrosHTTP} (403 Forbidden: {var_intErrosForbidden}, 429 Too Many Requests: {var_intErrosTooManyRequests})")
+            logger.info(f"* Timeout: {var_intErrosTimeout}")
+            logger.info(f"* Ausentes: {var_intAusentes}")
+            logger.info(f"* Outros: {var_intErrosOutros}")
             return var_dictResults
         
         except Exception as e:
             logger.critical(f"Falha crítica ao buscar detalhes em bulk: {e}")
             raise RuntimeError(f"Falha ao buscar detalhes em bulk: {e}")
         
+    # ------------------- Async reviews summary com batches -------------------
+    @classmethod
+    async def fetch_reviews_summary_batched(cls, arg_seqAppids: Sequence[int]) -> dict[int, dict]:
+        """
+        Busca o resumo de reviews de múltiplos jogos na Steam de forma assíncrona, processando em batches.
+        
+        Parâmetros:
+        - arg_seqAppids (Sequence[int]): Uma sequência de appids dos jogos.
+        
+        Retorna:
+        - var_dictAllResults (dict): Um dicionário mapeando appids para seus resumos de reviews.
+        """
+        var_dictConfigAPI = Settings.steam_api_reviews()
+        var_intBatchSize = var_dictConfigAPI.get("BatchSize", 200)
+        var_intDelay = var_dictConfigAPI.get("Delay", 120)
+        var_intAsyncConcurrency = var_dictConfigAPI.get("Concurrency", 1)
+        var_intTotalItems = len(arg_seqAppids)
+        var_intTotalBatches = (var_intTotalItems + var_intBatchSize - 1) // var_intBatchSize
+        
+        logger.info(f"=== PROCESSAMENTO EM BATCHES (REVIEWS) ===")
+        logger.info(f"Total de itens: {var_intTotalItems:,}")
+        logger.info(f"Tamanho do batch: {var_intBatchSize:,}")
+        logger.info(f"Total de batches: {var_intTotalBatches}")
+        logger.info(f"Delay entre batches: {var_intDelay}s")
+        logger.info(f"Concorrência por batch: {var_intAsyncConcurrency}")
+        logger.info(f"==========================================\n")
+        
+        var_dictAllResults = {}
+        
+        for var_intBatchNum in range(var_intTotalBatches):
+            var_intStart = var_intBatchNum * var_intBatchSize
+            var_intEnd = min(var_intStart + var_intBatchSize, var_intTotalItems)
+            var_listBatch = arg_seqAppids[var_intStart:var_intEnd]
+            
+            logger.info(f"Batch {var_intBatchNum + 1}/{var_intTotalBatches} - Processando itens {var_intStart + 1} a {var_intEnd} ({len(var_listBatch)} itens)...")
+            
+            # Processa o batch atual
+            var_dictBatchResults = await cls.fetch_reviews_summary(var_listBatch)
+            var_dictAllResults.update(var_dictBatchResults)
+            
+            # Aguarda entre batches (exceto no último)
+            if var_intBatchNum < var_intTotalBatches - 1:
+                logger.info(f"Aguardando {var_intDelay}s antes do próximo batch...\n")
+                await asyncio.sleep(var_intDelay)
+
+        logger.info(f"\nPROCESSAMENTO COMPLETO!")
+        logger.info(f"Total processado: {len(var_dictAllResults):,} sucessos de {var_intTotalItems:,} itens ({len(var_dictAllResults)/var_intTotalItems:.2%})")
+        
+        return var_dictAllResults
+    
     # ------------------- Async reviews summary -------------------
     @classmethod
     async def fetch_reviews_summary(cls, arg_seqAppids: Sequence[int]) -> dict[int, dict]:
@@ -221,10 +350,21 @@ class SteamClient:
         - var_dictResult (dict): Um dicionário mapeando appids para seus resumos de reviews.
         """
         try:
-            # Controle de concorrência
-            var_semSemaphore = asyncio.Semaphore(Settings._var_intAsyncConcurrency)
+            var_dictConfigAPI = Settings.steam_api_reviews()
+            var_intAsyncConcurrency = var_dictConfigAPI.get("Concurrency", 1)
 
-            async def worker(arg_clientSession: aiohttp.ClientSession, arg_intAppid: int):
+            # Controle de concorrência
+            var_semSemaphore = asyncio.Semaphore(var_intAsyncConcurrency)
+
+            # Contadores de erro
+            var_intErrosHTTP = 0
+            var_intErrosForbidden = 0
+            var_intErrosTooManyRequests = 0
+            var_intErrosTimeout = 0
+            var_intErrosOutros = 0
+            var_intAusentes = 0
+
+            async def worker(arg_clientSession: aiohttp.ClientSession, arg_intAppid: int) -> dict | None:
                 """
                 Worker assíncrono para buscar o resumo de reviews de um único appid.
 
@@ -233,37 +373,87 @@ class SteamClient:
                 - arg_intAppid (int): O appid do jogo.
 
                 Retorna:
-                - var_tupleResult (tuple): Uma tupla (arg_intAppid, var_dictSummary) contendo o Appid e o resumo das reviews ou None se não encontrado.
+                - var_dictSummary (dict | None): Um dicionário com o resumo das reviews ou None se não encontrado.
                 """
+                nonlocal var_intErrosHTTP, var_intErrosForbidden, var_intErrosTooManyRequests, var_intErrosTimeout, var_intErrosOutros, var_intAusentes
+                
                 async with var_semSemaphore:
+                    # Pequena espera para evitar throttling
                     await asyncio.sleep(random.random() * 0.3)
                     var_strUrl = STEAM_REVIEWS_URL.format(appid=arg_intAppid)
                     var_dictParams = {"json": "1", "language": "all"}
                     try:
+                        # Faz a requisição assíncrona
                         async with arg_clientSession.get(var_strUrl, params=var_dictParams, timeout=30) as var_respResponse:
                             var_respResponse.raise_for_status()
+                            # Processa os dados recebidos
                             var_dictData = await var_respResponse.json()
+                            
+                            # Verifica se os dados são válidos
                             if var_dictData and var_dictData.get("success") == 1:
                                 var_dictSummary = var_dictData.get("query_summary", {})
                                 if isinstance(var_dictSummary, dict):
                                     var_dictSummary = dict(var_dictSummary)
                                     var_dictSummary["appid"] = arg_intAppid
-                                    var_tupleResult = (arg_intAppid, var_dictSummary)
-                                    return var_tupleResult
-                    except Exception:
+                                    return var_dictSummary
+                            
+                            # Caso não retorne dados válidos (success != 1 ou dados ausentes)
+                            var_intAusentes += 1
+                            return None
+                    except aiohttp.ClientError as e_http:
+                        # Captura erros específicos de HTTP (conexão, timeout, status).
+                        var_intErrosHTTP += 1
+                        if hasattr(e_http, 'status'):
+                            if e_http.status == 403:
+                                var_intErrosForbidden += 1
+                            elif e_http.status == 429:
+                                var_intErrosTooManyRequests += 1
                         return None
-                    return None
+                    except asyncio.TimeoutError:
+                        # Captura erro de timeout.
+                        var_intErrosTimeout += 1
+                        return None
+                    except Exception:
+                        # Captura outros erros não classificados.
+                        var_intErrosOutros += 1
+                        return None
 
-            var_dictResult: dict[int, dict] = {}
+            # Executa os workers assíncronos
             async with aiohttp.ClientSession(headers=CON_DEFAULT_HEADERS) as var_respSession:
                 var_listTasks = [asyncio.create_task(worker(var_respSession, var_intAppid)) for var_intAppid in arg_seqAppids]
+                logger.info(f"Iniciando busca de 'REVIEWS' assíncrona para {len(var_listTasks)} AppIDs com concorrência {Settings._var_intAsyncConcurrency}...")
+                
+                # Aguarda a conclusão de todas as tarefas
                 var_listOut = await asyncio.gather(*var_listTasks, return_exceptions=True)
-            for var_tupleItem in var_listOut:
-                if (isinstance(var_tupleItem, tuple) and isinstance(var_tupleItem[0], int) and isinstance(var_tupleItem[1], dict)):
-                    if var_tupleItem[1]['total_reviews'] > 0:
-                        var_dictResult[var_tupleItem[0]] = var_tupleItem[1]
+                logger.info("Busca assíncrona concluída.")
+            
+            # Filtra os resultados válidos e os retorna
+            var_dictResult: dict[int, dict] = {}
+            var_intSemReviews = 0
+            for var_dictOut in var_listOut:
+                if isinstance(var_dictOut, dict):
+                    # Verifica se tem reviews
+                    if var_dictOut.get('total_reviews', 0) > 0:
+                        var_dictResult[var_dictOut["appid"]] = var_dictOut
+                    else:
+                        # Jogo válido mas sem reviews suficientes
+                        var_intSemReviews += 1
+            
+            # Atualiza contador de ausentes (jogos válidos mas sem reviews)
+            var_intAusentes += var_intSemReviews
+            var_intFalha = len(arg_seqAppids) - len(var_dictResult)
+            logger.info(f"--- Busca concluída: ---")
+            logger.info(f"{len(var_dictResult)} sucesso(s) ({len(var_dictResult)/(len(arg_seqAppids)):.2%}),")
+            logger.info(f"{var_intFalha} falha(s) ({var_intFalha/len(arg_seqAppids):.2%}).")
+            logger.info(f"--- Detalhamento dos erros: ---")
+            logger.info(f"* HTTP: {var_intErrosHTTP} (403 Forbidden: {var_intErrosForbidden}, 429 Too Many Requests: {var_intErrosTooManyRequests})")
+            logger.info(f"* Timeout: {var_intErrosTimeout}")
+            logger.info(f"* Ausentes: {var_intAusentes}")
+            logger.info(f"* Outros: {var_intErrosOutros}")
             return var_dictResult
+        
         except Exception as e:
+            logger.critical(f"Falha crítica ao buscar reviews em bulk: {e}")
             raise RuntimeError(f"Falha ao buscar resumos de reviews: {e}")
         
     # ------------------- ITAD lookups -------------------
@@ -327,6 +517,56 @@ class SteamClient:
         except Exception as e:
             raise RuntimeError(f"Falha histórico ITAD: {e}")
         
+    # ------------------- Async ITAD price history bulk com batches -------------------
+    @classmethod
+    async def fetch_price_history_bulk_batched(cls, arg_seqItadPlain: Sequence[str], arg_intAnos: int = 5) -> dict:
+        """
+        Busca o histórico de preços de múltiplos jogos na API do IsThereAnyDeal (ITAD) de forma assíncrona, processando em batches.
+
+        Parâmetros:
+        - arg_seqItadPlain (Sequence[str]): Uma sequência de identificadores "plain" dos jogos no ITAD.
+        - arg_intAnos (int): O número de anos para buscar o histórico.
+
+        Retorna:
+        - var_dictAllResults (dict): Um dicionário mapeando cada plain para seu histórico de preços.
+        """
+        var_intBatchSize = Settings._var_intBatchesSize
+        var_intDelay = Settings._var_intDelayBetweenBatches
+        var_intTotalItems = len(arg_seqItadPlain)
+        var_intTotalBatches = (var_intTotalItems + var_intBatchSize - 1) // var_intBatchSize
+        
+        logger.info(f"=== PROCESSAMENTO EM BATCHES (HISTÓRICO ITAD) ===")
+        logger.info(f"Total de itens: {var_intTotalItems:,}")
+        logger.info(f"Tamanho do batch: {var_intBatchSize:,}")
+        logger.info(f"Total de batches: {var_intTotalBatches}")
+        logger.info(f"Delay entre batches: {var_intDelay}s")
+        logger.info(f"Concorrência por batch: {Settings._var_intAsyncConcurrency}")
+        logger.info(f"Anos de histórico: {arg_intAnos}")
+        logger.info(f"==================================================\n")
+        
+        var_dictAllResults = {}
+        
+        for var_intBatchNum in range(var_intTotalBatches):
+            var_intStart = var_intBatchNum * var_intBatchSize
+            var_intEnd = min(var_intStart + var_intBatchSize, var_intTotalItems)
+            var_listBatch = arg_seqItadPlain[var_intStart:var_intEnd]
+            
+            logger.info(f"Batch {var_intBatchNum + 1}/{var_intTotalBatches} - Processando itens {var_intStart + 1} a {var_intEnd} ({len(var_listBatch)} itens)...")
+            
+            # Processa o batch atual
+            var_dictBatchResults = await cls.fetch_price_history_bulk(var_listBatch, arg_intAnos)
+            var_dictAllResults.update(var_dictBatchResults)
+            
+            # Aguarda entre batches (exceto no último)
+            if var_intBatchNum < var_intTotalBatches - 1:
+                logger.info(f"Aguardando {var_intDelay}s antes do próximo batch...\n")
+                await asyncio.sleep(var_intDelay)
+        
+        logger.info(f"\nPROCESSAMENTO COMPLETO!")
+        logger.info(f"Total processado: {len(var_dictAllResults):,} sucessos de {var_intTotalItems:,} itens ({len(var_dictAllResults)/var_intTotalItems:.2%})")
+        
+        return var_dictAllResults
+    
     # ------------------- Async ITAD price history bulk -------------------
     @classmethod
     async def fetch_price_history_bulk(cls, arg_seqItadPlain: Sequence[str], arg_intAnos: int = 5) -> dict:
@@ -340,16 +580,38 @@ class SteamClient:
         Retorna:
         - var_dictResults (dict): Um dicionário mapeando cada plain para seu histórico de preços.
         """
-
         if not Settings._var_strItadApiKey:
             raise RuntimeError("ITAD_API_KEY não definido")
+        
         try:
             var_strSince = (datetime.now(timezone.utc) - timedelta(days=arg_intAnos * 365)).strftime("%Y-%m-%dT%H:%M:%SZ")
-            var_dictResults = {}
-            var_semSemaphore = asyncio.Semaphore(getattr(Settings, '_var_intAsyncConcurrency', 5))
             
-            async def worker(arg_clientSession: aiohttp.ClientSession, arg_strItadPlain: str):
+            # Controle de concorrência
+            var_semSemaphore = asyncio.Semaphore(Settings._var_intAsyncConcurrency)
+            
+            # Contadores de erro
+            var_intErrosHTTP = 0
+            var_intErrosForbidden = 0
+            var_intErrosTooManyRequests = 0
+            var_intErrosTimeout = 0
+            var_intErrosOutros = 0
+            var_intAusentes = 0
+            
+            async def worker(arg_clientSession: aiohttp.ClientSession, arg_strItadPlain: str) -> dict | None:
+                """
+                Worker assíncrono para buscar o histórico de preços de um único jogo.
+                
+                Parâmetros:
+                - arg_clientSession (aiohttp.ClientSession): A sessão HTTP assíncrona.
+                - arg_strItadPlain (str): O identificador "plain" do jogo no ITAD.
+                
+                Retorna:
+                - var_dictData (dict | None): Um dicionário com o histórico de preços ou None se não encontrado.
+                """
+                nonlocal var_intErrosHTTP, var_intErrosForbidden, var_intErrosTooManyRequests, var_intErrosTimeout, var_intErrosOutros, var_intAusentes
+                
                 async with var_semSemaphore:
+                    # Pequena espera para evitar throttling
                     await asyncio.sleep(random.random() * 0.2)
                     var_dictParams = {
                         "key": Settings._var_strItadApiKey,
@@ -359,19 +621,63 @@ class SteamClient:
                         "since": var_strSince,
                     }
                     try:
+                        # Faz a requisição assíncrona
                         async with arg_clientSession.get(ITAD_HISTORY_URL, params=var_dictParams, timeout=30) as var_respResponse:
                             var_respResponse.raise_for_status()
+                            # Processa os dados recebidos
                             var_dictData = await var_respResponse.json()
-                            return (arg_strItadPlain, var_dictData)
+                            
+                            # Verifica se os dados são válidos
+                            if var_dictData and var_dictData is not None:
+                                return var_dictData
+                            
+                            # Caso não retorne dados válidos
+                            var_intAusentes += 1
+                            return None
+                    except aiohttp.ClientError as e_http:
+                        # Captura erros específicos de HTTP (conexão, timeout, status).
+                        var_intErrosHTTP += 1
+                        if hasattr(e_http, 'status'):
+                            if e_http.status == 403:
+                                var_intErrosForbidden += 1
+                            elif e_http.status == 429:
+                                var_intErrosTooManyRequests += 1
+                        return None
+                    except asyncio.TimeoutError:
+                        # Captura erro de timeout.
+                        var_intErrosTimeout += 1
+                        return None
                     except Exception:
-                        return (arg_strItadPlain, None)
+                        # Captura outros erros não classificados.
+                        var_intErrosOutros += 1
+                        return None
 
+            # Executa os workers assíncronos
             async with aiohttp.ClientSession() as var_respSession:
                 var_listTasks = [asyncio.create_task(worker(var_respSession, plain)) for plain in arg_seqItadPlain]
+                logger.info(f"Iniciando busca de 'HISTÓRICO DE PREÇOS' assíncrona para {len(var_listTasks)} jogos (ITAD) com concorrência {Settings._var_intAsyncConcurrency}...")
+                
+                # Aguarda a conclusão de todas as tarefas
                 var_listOut = await asyncio.gather(*var_listTasks, return_exceptions=True)
-            for plain, result in var_listOut:
-                var_dictResults[plain] = result
+                logger.info("Busca assíncrona concluída.")
+            
+            # Filtra os resultados válidos e os retorna
+            var_dictResults = {}
+            for idx, var_dictOut in enumerate(var_listOut):
+                if isinstance(var_dictOut, dict) and var_dictOut is not None:
+                    var_dictResults[arg_seqItadPlain[idx]] = var_dictOut
+            
+            var_intFalha = len(arg_seqItadPlain) - len(var_dictResults)
+            logger.info(f"--- Busca concluída: ---")
+            logger.info(f"{len(var_dictResults)} sucesso(s) ({len(var_dictResults)/(len(arg_seqItadPlain)):.2%}),")
+            logger.info(f"{var_intFalha} falha(s) ({var_intFalha/len(arg_seqItadPlain):.2%}).")
+            logger.info(f"--- Detalhamento dos erros: ---")
+            logger.info(f"* HTTP: {var_intErrosHTTP} (403 Forbidden: {var_intErrosForbidden}, 429 Too Many Requests: {var_intErrosTooManyRequests})")
+            logger.info(f"* Timeout: {var_intErrosTimeout}")
+            logger.info(f"* Ausentes: {var_intAusentes}")
+            logger.info(f"* Outros: {var_intErrosOutros}")
             return var_dictResults
         
         except Exception as e:
+            logger.critical(f"Falha crítica ao buscar histórico ITAD em bulk: {e}")
             raise RuntimeError(f"Falha ao buscar histórico ITAD em bulk: {e}")

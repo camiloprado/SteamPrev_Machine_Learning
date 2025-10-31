@@ -41,19 +41,55 @@ class Settings:
         cls._var_strDBPassword: str = "postgres"
         cls._var_strDBHost: str = "localhost"
         cls._var_strDBPort: str = "5433"
-        
+    
+    @classmethod
+    def steam_api_details(cls) -> dict:
+        """
+        Configurações da API de Detalhes da Steam.
+
+        Retorna:
+        - dict: Configurações da API de Detalhes da Steam.
+        """
+        var_intBatchesSize: int = int(os.getenv("STEAM_BATCH_SIZE", "200"))
+        var_intDelayBetweenBatches: int = int(os.getenv("STEAM_DELAY_BETWEEN_BATCHES", "120"))
+        var_intAsyncConcurrency: int = int(os.getenv("STEAM_ASYNC_CONCURRENCY", "1"))
+        return {
+            "BatchSize": var_intBatchesSize,
+            "Delay": var_intDelayBetweenBatches,
+            "Concurrency": var_intAsyncConcurrency
+        }
+
+    @classmethod
+    def steam_api_reviews(cls) -> dict:
+        """
+        Configurações da API de Reviews da Steam.
+
+        Retorna:
+        - dict: Configurações da API de Reviews da Steam.
+        """
+        var_intBatchesSize: int = int(os.getenv("STEAM_BATCH_SIZE", "500"))
+        var_intDelayBetweenBatches: int = int(os.getenv("STEAM_DELAY_BETWEEN_BATCHES", "60"))
+        var_intAsyncConcurrency: int = int(os.getenv("STEAM_ASYNC_CONCURRENCY", "3"))
+        return {
+            "BatchSize": var_intBatchesSize,
+            "Delay": var_intDelayBetweenBatches,
+            "Concurrency": var_intAsyncConcurrency
+        }
+
     @classmethod
     def steam_api_settings(cls):
         """
         Configurações para a Steam API.
         """
         cls._var_strItadApiKey: str | None = os.getenv("ITAD_API_KEY")
-        # Permite ajuste dinâmico via env para evitar throttling em E2E local (ex.: STEAM_ASYNC_CONCURRENCY=2)
-        cls._var_intAsyncConcurrency: int = int(os.getenv("STEAM_ASYNC_CONCURRENCY", "5"))
         cls._var_intCacheAppListMaxAgeDays: int = 30
         cls._var_strAppListPath: str = "resources/dados/steam_applist.json"
         cls._var_listApp: list[dict[str, Any]] = []
         cls._var_boolAppListLoaded = False
+        cls._var_dictConfigAPI = {
+            "detalhes": cls.steam_api_details(),
+            "reviews": cls.steam_api_reviews()
+        }
 
     @classmethod
     def configure_logging(cls):
@@ -64,6 +100,10 @@ class Settings:
         var_strLogLevel = os.getenv("LOG_LEVEL", "INFO").upper()
         var_intLogLevel = getattr(logging, var_strLogLevel, logging.INFO)
         
+        # Cria o diretório de logs se não existir
+        var_strLogDir = "resources/logs"
+        os.makedirs(var_strLogDir, exist_ok=True)
+        
         # Configuração básica do logging
         logging.basicConfig(
             level=var_intLogLevel,
@@ -72,7 +112,7 @@ class Settings:
             handlers=[
                 logging.StreamHandler(),  # Output para console
                 # Opcional: adicionar FileHandler para salvar logs em arquivo
-                # logging.FileHandler('resources/logs/app.log', encoding='utf-8')
+                logging.FileHandler(os.path.join(var_strLogDir, 'app.log'), encoding='utf-8')
             ]
         )
         
@@ -100,8 +140,7 @@ class Settings:
         cls._var_dictSettings["db_host"] = cls._var_strDBHost
         cls._var_dictSettings["db_port"] = cls._var_strDBPort
         cls._var_dictSettings["dias_para_atualizacao"] = 90
-        cls._var_dictSettings["partes_por_serie"] = 200
-
+        
     @classmethod
     def remove_setting(cls, arg_strKey: str):
         """
