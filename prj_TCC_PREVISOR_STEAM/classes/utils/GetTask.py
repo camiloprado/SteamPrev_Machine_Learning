@@ -31,40 +31,6 @@ class GetTask:
             
             var_listAppIDAtual = Previsor.selecionar_dados_velhos(arg_listDados=var_listApp, arg_strNomeTabela="steam_raw")
             logger.info(f"Número de AppIDs a processar: {len(var_listAppIDAtual)}")
-            # try:
-            #     var_listAppIDAtual = var_listAppIDAtual[:5000]  # Limite para testes iniciais
-            #     var_dictTeste = {
-            #         0: {
-            #             "BatchSize": int(os.getenv("STEAM_BATCH_SIZE", "200")), 
-            #             "Delay": int(os.getenv("STEAM_DELAY_BETWEEN_BATCHES", "120")),
-            #             "Concurrency": int(os.getenv("STEAM_ASYNC_CONCURRENCY", "1"))
-            #         },
-            #         1: {
-            #             "BatchSize": int(os.getenv("STEAM_BATCH_SIZE", "300")), 
-            #             "Delay": int(os.getenv("STEAM_DELAY_BETWEEN_BATCHES", "90")),
-            #             "Concurrency": int(os.getenv("STEAM_ASYNC_CONCURRENCY", "2"))
-            #         },
-            #         2: {
-            #             "BatchSize": int(os.getenv("STEAM_BATCH_SIZE", "500")), 
-            #             "Delay": int(os.getenv("STEAM_DELAY_BETWEEN_BATCHES", "60")),
-            #             "Concurrency": int(os.getenv("STEAM_ASYNC_CONCURRENCY", "3"))
-            #         }
-            #     }
-            #     for var_intIndex, var_dictConfig in var_dictTeste.items():
-            #         Settings._var_intBatchesSize = var_dictConfig["BatchSize"]
-            #         Settings._var_intDelayBetweenBatches = var_dictConfig["Delay"]
-            #         Settings._var_intAsyncConcurrency = var_dictConfig["Concurrency"]
-            #         logger.info("="*80)
-            #         logger.info(f"Teste {var_intIndex}: Batch Size={Settings._var_intBatchesSize}, Delay={Settings._var_intDelayBetweenBatches}, Concurrency={Settings._var_intAsyncConcurrency}")
-            #         sleep(1800)  # Espera 30 minutos entre os testes para evitar bloqueios
-            #         var_dictDetails = asyncio.run(SteamClient.fetch_details_bulk_batched(arg_seqAppids=var_listAppIDAtual))
-            #         sleep(1800)  # Espera 30 minutos entre os testes para evitar bloqueios
-            #         var_dictReview = asyncio.run(SteamClient.fetch_reviews_summary_batched(arg_seqAppids=var_listAppIDAtual))
-            #         logger.info("="*80)
-        
-            # except Exception as e:
-            #     logger.error(f"Erro durante os testes de configuração: {e}")
-            #     raise e
             
             sleep(1800)  # Espera 30 minutos entre os testes para evitar bloqueios
             var_dictDetails = asyncio.run(SteamClient.fetch_details_bulk_batched(arg_seqAppids=var_listAppIDAtual))
