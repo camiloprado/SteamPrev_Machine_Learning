@@ -3,7 +3,7 @@ from prj_TCC_PREVISOR_STEAM.classes.framework.AllSettings import Settings
 import os
 import logging
 from typing import Dict, List, Any, Optional
-from datetime import datetime
+from datetime import datetime, timedelta
 from dotenv import load_dotenv
 
 # Carrega variáveis de ambiente
@@ -279,7 +279,81 @@ class SupabaseDB:
             raise
     
     # ========== MÉTODOS UTILITÁRIOS ==========
+    @classmethod
+    def buscar_jogos_desatualizados(cls, arg_intLimite: int = 100) -> List[Dict[str, Any]]:
+        """
+        Busca jogos na tabela steam_raw que não foram atualizados recentemente.
+        
+        Parâmetros:
+        - arg_intLimite (int): Número máximo de registros a retornar (padrão: 100)
+            
+        Retorna:
+        - Lista de jogos desatualizados
+        """
+        
+        cls._garantir_conexao()
+        
+        try:
+            var_intDataLimite = Settings._var_dictSettings.get("dias_atualizacao", 30)
+            # Define data de corte, jogos com ultima_atualizacao menor que dias_atualizacao serão retornados
+            var_dataCorte = datetime.utcnow().replace(hour=0, minute=0, second=0, microsecond=0) - timedelta(days=var_intDataLimite)
+            var_apiResult = cls._var_botClient.table("steam_raw").select("*").lt(
+                "ultima_atualizacao", var_dataCorte.isoformat()
+            ).limit(arg_intLimite).execute()
+            
+            return var_apiResult.data if var_apiResult.data else []
+
+        except Exception as e:
+            logger.error(f"Erro ao buscar jogos antigos: {e}")
+            raise
+        
+    @classmethod
+    def buscar_jogos_incompletos(cls) -> List[Dict[str, Any]]:
+        """
+        Busca jogos na tabela steam_raw que não possuem detalhes ou reviews.
+        
+        Retorna:
+        - Lista de jogos incompletos
+        """
+        
+        cls._garantir_conexao()
+        
+        try:
+            var_apiResult = cls._var_botClient.table("steam_raw").select("*").or_(
+                "detalhes.is.null,reviews.is.null"
+            ).execute()
+            
+            return var_apiResult.data if var_apiResult.data else []
+
+        except Exception as e:
+            logger.error(f"Erro ao buscar jogos incompletos: {e}")
+            raise
     
+    @classmethod
+    def buscar_jogos_por_ID(cls, arg_listAppIDs: List[int], arg_strNomeTabel: str = 'steam_raw') -> List[Dict[str, Any]]:
+        """
+        Busca jogos por uma lista de AppIDs.
+        
+        Parâmetros:
+        - arg_listAppIDs (List[int]): Lista de IDs dos aplicativos Steam
+        - arg_strNomeTabel (str): Nome da tabela ('steam_raw' ou 'steam_bd')
+            
+        Retorna:
+        - Lista de jogos encontrados
+        """
+        cls._garantir_conexao()
+        
+        try:
+            var_apiResult = cls._var_botClient.table(arg_strNomeTabel).select("*").in_(
+                "appid", arg_listAppIDs
+            ).execute()
+
+            return var_apiResult.data if var_apiResult.data else []
+
+        except Exception as e:
+            logger.error(f"Erro ao buscar jogos por AppIDs: {e}")
+            raise
+
     @classmethod
     def buscar_jogos_por_nome(cls, arg_strNome: str) -> List[Dict[str, Any]]:
         """

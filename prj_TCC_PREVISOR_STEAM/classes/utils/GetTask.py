@@ -1,7 +1,5 @@
 from prj_TCC_PREVISOR_STEAM.classes.framework.AllSettings import Settings
-from prj_TCC_PREVISOR_STEAM.classes.SQL.postgre import PostgreSQL
-from prj_TCC_PREVISOR_STEAM.classes.SQL.supabase_db import SupabaseDB
-from prj_TCC_PREVISOR_STEAM.classes.scripts.previsor import Previsor
+from prj_TCC_PREVISOR_STEAM.classes.api.steam_api import SteamClient
 
 from datetime import datetime
 from time import sleep
@@ -24,7 +22,9 @@ class GetTask:
         Retorna:
         """
         try:
-            pass
+            var_listApp = SteamClient.load_app_list()
+            logger.info(f"Número total de aplicativos carregados: {len(var_listApp)}")
+            cls._var_listTaskQueue = var_listApp.copy()
             
         except Exception as e:
             logger.error(f"Erro ao criar a fila de tarefas: {e}")

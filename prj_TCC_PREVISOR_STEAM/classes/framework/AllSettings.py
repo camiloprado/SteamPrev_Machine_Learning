@@ -57,9 +57,9 @@ class Settings:
         Retorna:
         - dict: Configurações da API de Detalhes da Steam.
         """
-        var_intBatchesSize: int = int(os.getenv("STEAM_BATCH_SIZE", "200"))
-        var_intDelayBetweenBatches: int = int(os.getenv("STEAM_DELAY_BETWEEN_BATCHES", "120"))
-        var_intAsyncConcurrency: int = int(os.getenv("STEAM_ASYNC_CONCURRENCY", "1"))
+        var_intBatchesSize: int = int(os.getenv("STEAM_BATCH_SIZE_DETAILS", "200"))
+        var_intDelayBetweenBatches: int = int(os.getenv("STEAM_DELAY_BETWEEN_BATCHES_DETAILS", "120"))
+        var_intAsyncConcurrency: int = int(os.getenv("STEAM_ASYNC_CONCURRENCY_DETAILS", "1"))
         return {
             "BatchSize": var_intBatchesSize,
             "Delay": var_intDelayBetweenBatches,
@@ -74,9 +74,9 @@ class Settings:
         Retorna:
         - dict: Configurações da API de Reviews da Steam.
         """
-        var_intBatchesSize: int = int(os.getenv("STEAM_BATCH_SIZE", "500"))
-        var_intDelayBetweenBatches: int = int(os.getenv("STEAM_DELAY_BETWEEN_BATCHES", "60"))
-        var_intAsyncConcurrency: int = int(os.getenv("STEAM_ASYNC_CONCURRENCY", "3"))
+        var_intBatchesSize: int = int(os.getenv("STEAM_BATCH_SIZE_REVIEWS", "500"))
+        var_intDelayBetweenBatches: int = int(os.getenv("STEAM_DELAY_BETWEEN_BATCHES_REVIEWS", "60"))
+        var_intAsyncConcurrency: int = int(os.getenv("STEAM_ASYNC_CONCURRENCY_REVIEWS", "3"))
         return {
             "BatchSize": var_intBatchesSize,
             "Delay": var_intDelayBetweenBatches,

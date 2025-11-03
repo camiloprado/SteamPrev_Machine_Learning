@@ -1,4 +1,5 @@
 from prj_TCC_PREVISOR_STEAM.classes.framework.AllSettings import Settings
+from prj_TCC_PREVISOR_STEAM.classes.scripts.previsor import Previsor
 
 class Process:
     """
@@ -17,4 +18,5 @@ class Process:
         - Resultado do processamento da tarefa.
         """
         # Lógica para processar a tarefa
-        pass
+        Previsor.alimentar_banco_dados_raw()
+        Previsor.alimentar_banco_dados_Steam()

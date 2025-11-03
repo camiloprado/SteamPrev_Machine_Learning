@@ -19,13 +19,9 @@ class InitApplication:
         - None
         """
         if arg_boolFirstRun:
-            PostgreSQL.conectar()
-            PostgreSQL.criar_tabela_dadosSteam()
-            PostgreSQL.criar_tabela_SteamRaw_details()
-            PostgreSQL.criar_tabela_SteamRaw_reviews()
             GetTask.abandona_fila(arg_boolAbandonar=True)
             GetTask.criar_fila()
-
+            
         for var_intTentativa in range(Settings._var_dictSettings["max_tentativas"]):
             try:
                 # Lógica para inicializar a aplicação
