@@ -74,12 +74,34 @@ class PostgreSQL:
             raise Exception(f"Erro ao criar a tabela: {e}")
     
     @classmethod
-    def criar_tabela_SteamRaw(cls, arg_strNomeTabela: str = "steam_raw"):
+    def criar_tabela_SteamRaw_reviews(cls, arg_strNomeTabela: str = "steam_raw_reviews"):
         """
         Cria a tabela de dados brutos da Steam no banco de dados.
 
         Parâmetros:
-        - arg_strNomeTabela (str): Nome da tabela a ser criada. (Padrão: "steam_raw")
+        - arg_strNomeTabela (str): Nome da tabela a ser criada. (Padrão: "steam_raw_reviews")
+        """
+        try:
+            var_strSQL = f"""
+            CREATE TABLE IF NOT EXISTS {arg_strNomeTabela} (
+                id SERIAL PRIMARY KEY,
+                appid INTEGER UNIQUE NOT NULL,
+                reviews JSONB,
+                ultima_atualizacao TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            );
+            """
+            cls.criar_tabela(arg_strSQL=var_strSQL)
+        except Exception as e:
+            logger.error(f"Erro ao criar a tabela '{arg_strNomeTabela}': {e}")
+            raise Exception(f"Erro ao criar a tabela '{arg_strNomeTabela}': {e}")
+        
+    @classmethod
+    def criar_tabela_SteamRaw_details(cls, arg_strNomeTabela: str = "steam_raw_details"):
+        """
+        Cria a tabela de dados brutos da Steam no banco de dados.
+
+        Parâmetros:
+        - arg_strNomeTabela (str): Nome da tabela a ser criada. (Padrão: "steam_raw_details")
         """
         try:
             var_strSQL = f"""
@@ -87,7 +109,6 @@ class PostgreSQL:
                 id SERIAL PRIMARY KEY,
                 appid INTEGER UNIQUE NOT NULL,
                 detalhes JSONB,
-                reviews JSONB,
                 ultima_atualizacao TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             );
             """
@@ -130,7 +151,7 @@ class PostgreSQL:
             raise Exception(f"Erro ao criar a tabela '{arg_strNomeTabela}': {e}")
 
     @classmethod
-    def inserir_dadosSteamRaw(cls, arg_dictDados: dict):
+    def inserir_dadosSteamRaw_details(cls, arg_dictDados: dict):
         """
         Insere ou atualiza os dados brutos de um jogo na tabela do banco de dados SteamRaw.
         Não sobrescreve valores preenchidos com valores nulos/vazios.
@@ -143,7 +164,7 @@ class PostgreSQL:
         """
         try:
             # Verifica se há dados existentes
-            var_strSQLBusca = "SELECT detalhes, reviews FROM steam_raw WHERE appid = %s;"
+            var_strSQLBusca = "SELECT detalhes FROM steam_raw_details WHERE appid = %s;"
             var_dictDadosExistentes = {}
             
             with cls._var_connConnection.cursor() as cursor:
@@ -151,38 +172,91 @@ class PostgreSQL:
                 var_tupleResultado = cursor.fetchone()
                 if var_tupleResultado:
                     var_dictDadosExistentes = {
-                        "detalhes": var_tupleResultado[0] if var_tupleResultado[0] else {},
-                        "reviews": var_tupleResultado[1] if var_tupleResultado[1] else {}
+                        "detalhes": var_tupleResultado[0] if var_tupleResultado[0] else {}
                     }
             
             # Prepara os novos valores, mantendo os existentes se os novos forem vazios/nulos
             var_dictDetalhes = arg_dictDados.get("detalhes", {})
-            var_dictReviews = arg_dictDados.get("reviews", {})
             
             # Se o novo valor for vazio/nulo e houver um valor existente, mantém o existente
             if not var_dictDetalhes and var_dictDadosExistentes.get("detalhes"):
                 var_dictDetalhes = var_dictDadosExistentes["detalhes"]
-            if not var_dictReviews and var_dictDadosExistentes.get("reviews"):
-                var_dictReviews = var_dictDadosExistentes["reviews"]
             
             # Se ambos ainda estiverem vazios, não insere/atualiza
-            if not var_dictDetalhes and not var_dictReviews:
+            if not var_dictDetalhes:
                 logger.warning(f"Nenhum dado válido para inserir/atualizar para o AppID {arg_dictDados.get('appid')}")
                 return
             
             var_strSQL = """
             INSERT INTO steam_raw (
-                appid, detalhes, reviews, ultima_atualizacao
-            ) VALUES (%s, %s, %s, %s)
+                appid, detalhes, ultima_atualizacao
+            ) VALUES (%s, %s, %s)
             ON CONFLICT (appid) DO UPDATE SET
                 detalhes = EXCLUDED.detalhes,
-                reviews = EXCLUDED.reviews,
                 ultima_atualizacao = EXCLUDED.ultima_atualizacao;
             """
             
             var_listValores = [
                 arg_dictDados.get("appid"),
                 json.dumps(var_dictDetalhes),
+                datetime.now()
+            ]
+            with cls._var_connConnection.cursor() as cursor:
+                cursor.execute(var_strSQL, tuple(var_listValores))
+                cls._var_connConnection.commit()
+                logger.info(f"Dados brutos inseridos/atualizados para o AppID {arg_dictDados.get('appid')}")
+        except Exception as e:
+            logger.error(f"Erro ao inserir/atualizar dados brutos para o AppID {arg_dictDados.get('appid')}: {e}")
+            raise Exception(f"Erro ao inserir/atualizar dados brutos para o AppID {arg_dictDados.get('appid')}: {e}")
+    
+    @classmethod
+    def inserir_dadosSteamRaw_reviews(cls, arg_dictDados: dict):
+        """
+        Insere ou atualiza os dados brutos de um jogo na tabela do banco de dados SteamRaw.
+        Não sobrescreve valores preenchidos com valores nulos/vazios.
+
+        Parâmetros:
+        - arg_dictDados (dict): Dicionário contendo os dados brutos do jogo a serem inseridos.
+
+        Retorna:
+        - None
+        """
+        try:
+            # Verifica se há dados existentes
+            var_strSQLBusca = "SELECT reviews FROM steam_raw_reviews WHERE appid = %s;"
+            var_dictDadosExistentes = {}
+            
+            with cls._var_connConnection.cursor() as cursor:
+                cursor.execute(var_strSQLBusca, (arg_dictDados.get('appid'),))
+                var_tupleResultado = cursor.fetchone()
+                if var_tupleResultado:
+                    var_dictDadosExistentes = {
+                        "reviews": var_tupleResultado[0] if var_tupleResultado[0] else {}
+                    }
+            
+            # Prepara os novos valores, mantendo os existentes se os novos forem vazios/nulos
+            var_dictReviews = arg_dictDados.get("reviews", {})
+            
+            # Se o novo valor for vazio/nulo e houver um valor existente, mantém o existente
+            if not var_dictReviews and var_dictDadosExistentes.get("reviews"):
+                var_dictReviews = var_dictDadosExistentes["reviews"]
+            
+            # Se ambos ainda estiverem vazios, não insere/atualiza
+            if not var_dictReviews:
+                logger.warning(f"Nenhum dado válido para inserir/atualizar para o AppID {arg_dictDados.get('appid')}")
+                return
+            
+            var_strSQL = """
+            INSERT INTO steam_raw (
+                appid, reviews, ultima_atualizacao
+            ) VALUES (%s, %s, %s)
+            ON CONFLICT (appid) DO UPDATE SET
+                reviews = EXCLUDED.reviews,
+                ultima_atualizacao = EXCLUDED.ultima_atualizacao;
+            """
+            
+            var_listValores = [
+                arg_dictDados.get("appid"),
                 json.dumps(var_dictReviews),
                 datetime.now()
             ]

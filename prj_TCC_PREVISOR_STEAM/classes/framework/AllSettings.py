@@ -2,6 +2,10 @@
 import os
 import logging
 from typing import Any
+from dotenv import load_dotenv
+
+# Carrega as variáveis de ambiente do arquivo .env
+load_dotenv()
 
 class Settings:
     """
@@ -13,34 +17,37 @@ class Settings:
     def bd_settings_default(cls):
         """
         Configurações padrão do banco de dados.
+        Lê as configurações do arquivo .env ou usa valores padrão.
         """
-        cls._var_strDBName: str = "default_db"
-        cls._var_strDBUser: str = "postgres"
-        cls._var_strDBPassword: str = "postgres"
-        cls._var_strDBHost: str = "localhost"
-        cls._var_strDBPort: str = "5433"
+        cls._var_strDBName: str = os.getenv("DB_NAME", "default_db")
+        cls._var_strDBUser: str = os.getenv("DB_USER", "postgres")
+        cls._var_strDBPassword: str = os.getenv("DB_PASSWORD", "postgres")
+        cls._var_strDBHost: str = os.getenv("DB_HOST", "localhost")
+        cls._var_strDBPort: str = os.getenv("DB_PORT", "5433")
 
     @classmethod
     def bd_settings_steam(cls):
         """
         Configurações do banco de dados Steam.
+        Lê as configurações do arquivo .env ou usa valores padrão.
         """
-        cls._var_strDBName: str = "steam_data"
-        cls._var_strDBUser: str = "postgres"
-        cls._var_strDBPassword: str = "postgres"
-        cls._var_strDBHost: str = "localhost"
-        cls._var_strDBPort: str = "5433"
+        cls._var_strDBName: str = os.getenv("DB_NAME", "steam_data")
+        cls._var_strDBUser: str = os.getenv("DB_USER", "postgres")
+        cls._var_strDBPassword: str = os.getenv("DB_PASSWORD", "postgres")
+        cls._var_strDBHost: str = os.getenv("DB_HOST", "localhost")
+        cls._var_strDBPort: str = os.getenv("DB_PORT", "5433")
 
     @classmethod 
     def bd_settings_previsao(cls):
         """
         Configurações do banco de dados de previsão.
+        Lê as configurações do arquivo .env ou usa valores padrão.
         """
-        cls._var_strDBName: str = "previsao_steam"
-        cls._var_strDBUser: str = "postgres"
-        cls._var_strDBPassword: str = "postgres"
-        cls._var_strDBHost: str = "localhost"
-        cls._var_strDBPort: str = "5433"
+        cls._var_strDBName: str = os.getenv("DB_NAME", "previsao_steam")
+        cls._var_strDBUser: str = os.getenv("DB_USER", "postgres")
+        cls._var_strDBPassword: str = os.getenv("DB_PASSWORD", "postgres")
+        cls._var_strDBHost: str = os.getenv("DB_HOST", "localhost")
+        cls._var_strDBPort: str = os.getenv("DB_PORT", "5433")
     
     @classmethod
     def steam_api_details(cls) -> dict:

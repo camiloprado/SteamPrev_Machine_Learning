@@ -196,8 +196,9 @@ class SteamClient:
         """
         try:
             var_dictConfigAPI = Settings.steam_api_details()
+            var_intAsyncConcurrency = var_dictConfigAPI.get("Concurrency", 1)
             # Controle de concorrência
-            var_semSemaphore = asyncio.Semaphore(var_dictConfigAPI.get("Concurrency", 1))
+            var_semSemaphore = asyncio.Semaphore(var_intAsyncConcurrency)
             
             # Contadores de erro
             var_intErrosHTTP = 0
@@ -260,7 +261,7 @@ class SteamClient:
             # Executa os workers assíncronos
             async with aiohttp.ClientSession(headers=CON_DEFAULT_HEADERS) as var_respSession:
                 var_listTasks = [asyncio.create_task(worker(var_respSession, var_intAppid)) for var_intAppid in arg_seqAppids]
-                logger.info(f"Iniciando busca de 'DETALHES' assíncrona para {len(var_listTasks)} AppIDs com concorrência {Settings._var_intAsyncConcurrency}...")
+                logger.info(f"Iniciando busca de 'DETALHES' assíncrona para {len(var_listTasks)} AppIDs com concorrência {var_intAsyncConcurrency}...")
                 
                 # Aguarda a conclusão de todas as tarefas
                 var_listOut = await asyncio.gather(*var_listTasks, return_exceptions=True)
@@ -421,7 +422,7 @@ class SteamClient:
             # Executa os workers assíncronos
             async with aiohttp.ClientSession(headers=CON_DEFAULT_HEADERS) as var_respSession:
                 var_listTasks = [asyncio.create_task(worker(var_respSession, var_intAppid)) for var_intAppid in arg_seqAppids]
-                logger.info(f"Iniciando busca de 'REVIEWS' assíncrona para {len(var_listTasks)} AppIDs com concorrência {Settings._var_intAsyncConcurrency}...")
+                logger.info(f"Iniciando busca de 'REVIEWS' assíncrona para {len(var_listTasks)} AppIDs com concorrência {var_intAsyncConcurrency}...")
                 
                 # Aguarda a conclusão de todas as tarefas
                 var_listOut = await asyncio.gather(*var_listTasks, return_exceptions=True)
