@@ -169,8 +169,8 @@ class Previsor:
         """
         try:
             var_listApp = GetTask.load_task_queue()
-            var_intRange = 2000  # Processa 2000 AppIDs por vez (ajustável)
-            
+            var_intRange = 500  # Processa 500 AppIDs por vez (ajustável)
+            var_listApp = var_listApp[len(var_listApp)//2:(len(var_listApp)//2)+var_intRange]  # Processa apenas a segunda metade da lista para testes
             # Itera sobre os aplicativos em lotes
             for i in range(0, len(var_listApp), var_intRange):
                 var_listAppAtual = var_listApp[i:i+var_intRange]
