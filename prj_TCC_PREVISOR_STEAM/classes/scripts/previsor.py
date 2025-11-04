@@ -17,6 +17,7 @@ class Previsor:
     Classe responsável por gerenciar módulos gerais do projeto.
     """
     _var_boolUseSupabase = os.getenv("USE_SUPABASE", "false").lower() == "true"
+    _var_intTamanhoTotalFila = 0
 
     @classmethod
     def seleciona_games(cls, arg_listDados: list) -> list:
@@ -61,48 +62,66 @@ class Previsor:
 
                 var_intAppid = int(var_dictDetalhes.get("steam_appid"))
                 var_strName = var_dictDetalhes.get("name")
-                var_intIdadeClassificada = var_dictDetalhes.get("required_age")
+
                 if var_dictDetalhes.get("ratings") and var_dictDetalhes.get("ratings").get("dejus"):
                     var_strClassificacaoEtaria = var_dictDetalhes.get("ratings").get("dejus").get("rating")
                 else:
-                    var_strClassificacaoEtaria = None
-                var_listLinguagens = var_dictDetalhes.get("supported_languages").replace("<strong>*</strong>", "").replace("<br>", ", ").split(", ")
-                var_listDesenvolvedores = var_dictDetalhes.get("developers")
-                var_listDistribuidores = var_dictDetalhes.get("publishers")
-                var_strPreco = var_dictDetalhes.get("price_overview").get("final_formatted") if var_dictDetalhes.get("price_overview") else None
-                var_intMetacriticScore = var_dictDetalhes.get("metacritic").get("score") if var_dictDetalhes.get("metacritic") else None
-                for var_dictCategoria in var_dictDetalhes.get("categories"):
-                    var_setCategorias.add(var_dictCategoria.get("description"))
-                for var_dictGenero in var_dictDetalhes.get("genres"):
-                    var_setGenero.add(var_dictGenero.get("description"))
-                if var_dictDetalhes.get("release_date").get("date"):
-                    var_strdataLancamento = LimpezaDados.tratar_data(arg_strData=var_dictDetalhes.get("release_date").get("date"))
-                elif var_dictDetalhes.get("release_date").get("coming_soon"):
-                    var_strdataLancamento = "Em breve"
+                    var_strClassificacaoEtaria = "l"
+
+                if var_dictDetalhes.get("supported_languages"):
+                    var_listLinguagens = var_dictDetalhes.get("supported_languages").replace("<strong>*</strong>", "").replace("<br>", ", ").split(", ")
                 else:
-                    var_strdataLancamento = None
+                    var_listLinguagens = []
+
+                if var_dictDetalhes.get("developers"):
+                    var_listDesenvolvedores = var_dictDetalhes.get("developers")
+                else:
+                    var_listDesenvolvedores = []
+
+                if var_dictDetalhes.get("publishers"):
+                    var_listDistribuidores = var_dictDetalhes.get("publishers")
+                else:
+                    var_listDistribuidores = []
+
+                var_strPreco = var_dictDetalhes.get("price_overview").get("final_formatted") if var_dictDetalhes.get("price_overview") else 0
+                var_intMetacriticScore = var_dictDetalhes.get("metacritic").get("score") if var_dictDetalhes.get("metacritic") else 0
                 
+                if var_dictDetalhes.get("categories"):
+                    for var_dictCategoria in var_dictDetalhes.get("categories"):
+                        var_setCategorias.add(var_dictCategoria.get("description"))
+                
+                if var_dictDetalhes.get("genres"):
+                    for var_dictGenero in var_dictDetalhes.get("genres"):
+                        var_setGenero.add(var_dictGenero.get("description"))
+
+                if not var_dictDetalhes.get("release_date").get("coming_soon"):
+                    if var_dictDetalhes.get("release_date").get("date"):
+                        var_strdataLancamento = LimpezaDados.tratar_data(arg_strData=var_dictDetalhes.get("release_date").get("date"))
+                    else:
+                        var_strdataLancamento = None
+                else:
+                    var_strdataLancamento = "Em Breve"
+
                 var_listCategorias = list(var_setCategorias)
                 var_listGenero = list(var_setGenero)
 
                 # Dados Reviews
                 var_dictReviews = var_dictApp.get("reviews")
-                var_intReviewScore = int(json.dumps(var_dictReviews.get("review_score"))) if var_dictReviews else None
-                var_intTotalReviews = int(json.dumps(var_dictReviews.get("total_reviews"))) if var_dictReviews else None
-                var_intTotalNegative = int(json.dumps(var_dictReviews.get("total_negative"))) if var_dictReviews else None
-                var_intTotalPositive = int(json.dumps(var_dictReviews.get("total_positive"))) if var_dictReviews else None
+                var_intReviewScore = int(json.dumps(var_dictReviews.get("review_score"))) if var_dictReviews else 0
+                var_intTotalReviews = int(json.dumps(var_dictReviews.get("total_reviews"))) if var_dictReviews else 0
+                var_intTotalNegative = int(json.dumps(var_dictReviews.get("total_negative"))) if var_dictReviews else 0
+                var_intTotalPositive = int(json.dumps(var_dictReviews.get("total_positive"))) if var_dictReviews else 0
                 var_strReviewDesc = json.dumps(var_dictReviews.get("review_score_desc")) if var_dictReviews else None
 
                 var_dictDados={
                     "appid": var_intAppid,
                     "nome": var_strName,
-                    "idade_classificada": str(var_intIdadeClassificada),
                     "classificacao_etaria": var_strClassificacaoEtaria,
                     "linguagens": var_listLinguagens,
                     "desenvolvedores": var_listDesenvolvedores,
                     "distribuidores": var_listDistribuidores,
                     "preco": var_strPreco,
-                    "metacritic_score": str(var_intMetacriticScore),
+                    "metacritic_score": var_intMetacriticScore,
                     "categorias": var_listCategorias,
                     "genero": var_listGenero,
                     "data_lancamento": var_strdataLancamento,
@@ -138,8 +157,7 @@ class Previsor:
                 if var_dictApp.get("appid"):
                     if cls._var_boolUseSupabase:
                         var_dateUltimaAtualizacao = SupabaseDB.buscar_jogos_por_ID(arg_intAppid=var_dictApp.get("appid"), arg_strNomeTabela=arg_strNomeTabela)
-                    else:
-                        var_dateUltimaAtualizacao = PostgreSQL.verificar_ultima_atualizacao(arg_intAppid=var_dictApp.get("appid"), arg_strNomeTabela=arg_strNomeTabela)
+                    
                     
                     if var_dateUltimaAtualizacao:
                         var_intDiasDesdeAtualizacao = (datetime.now().replace(tzinfo=None) - var_dateUltimaAtualizacao.replace(tzinfo=None)).days
@@ -169,16 +187,28 @@ class Previsor:
         """
         try:
             var_listApp = GetTask.load_task_queue()
-            var_intRange = 500  # Processa 500 AppIDs por vez (ajustável)
-            var_listApp = var_listApp[len(var_listApp)//2:(len(var_listApp)//2)+var_intRange]  # Processa apenas a segunda metade da lista para testes
+            cls._var_intTamanhoTotalFila = len(var_listApp)
+            var_intRange = 2000  # Processa x AppIDs por vez (ajustável)
+            # var_listApp = var_listApp[5000:5050]  # Copia a lista para evitar modificação durante a iteração
             # Itera sobre os aplicativos em lotes
             for i in range(0, len(var_listApp), var_intRange):
+                logger.info(f"Processando aplicativos de {i + 1} a {min(i + var_intRange, len(var_listApp))} de {len(var_listApp)}")
                 var_listAppAtual = var_listApp[i:i+var_intRange]
                 var_listAppIDAtual = [var_listAppAtual[j]['appid'] for j in range(len(var_listAppAtual))]
                 
                 # Verifica quais AppIDs já estão no banco de dados
                 var_listAppIDnoBD = SupabaseDB.buscar_jogos_por_ID(arg_listAppIDs=var_listAppIDAtual, arg_strNomeTabel="steam_raw")
                 var_listAppIDDesatualizado = SupabaseDB.buscar_jogos_desatualizados(arg_intLimite=var_intRange)
+                var_listAppIDIncompleto = SupabaseDB.buscar_jogos_incompletos()
+
+                if var_listAppIDIncompleto:
+                    logger.info(f"Número de AppIDs com dados incompletos: {len(var_listAppIDIncompleto)}")
+                    for var_dictAppID in var_listAppIDIncompleto:
+                        var_intAppID = var_dictAppID['appid']
+                        if var_dictAppID.get('detalhes') is None:
+                            if var_intAppID not in var_listAppIDAtual:
+                                var_listAppIDAtual.append(var_intAppID)
+
                 for var_dictAppID in var_listAppIDnoBD:
                     var_intAppID = var_dictAppID['appid']
                     if var_intAppID in var_listAppIDAtual:
@@ -209,7 +239,15 @@ class Previsor:
                         SupabaseDB.inserir_dadosSteamRaw(var_dictRawData)    
                     logger.info("Dados de detalhes inseridos com sucesso.")
 
-                    sleep(1800)  # Espera 30 minutos entre os testes para evitar bloqueios
+                    # sleep(1800)  # Espera 30 minutos entre os testes para evitar bloqueios
+
+                if var_listAppIDIncompleto:
+                    logger.info(f"Número de AppIDs com dados incompletos: {len(var_listAppIDIncompleto)}")
+                    for var_dictAppID in var_listAppIDIncompleto:
+                        var_intAppID = var_dictAppID['appid']
+                        if var_dictAppID.get('reviews') is None:
+                            if var_intAppID not in var_listAppIDAtual:
+                                var_listAppIDAtual.append(var_intAppID)
 
                 # Busca reviews dos jogos
                 var_dictReview = asyncio.run(SteamClient.fetch_reviews_summary_batched(arg_seqAppids=var_listAppIDAtual))
@@ -241,19 +279,19 @@ class Previsor:
         - None
         """
         try:
-            
-            # Processa dados para steam_bd
-            var_listDadosSteamRaw = SupabaseDB.buscar_todos_dadosSteamRaw(arg_intLimit=300000)
+            for var_intAppID in range(0, cls._var_intTamanhoTotalFila, 1000):
+                logger.info(f"Processando aplicativos de {var_intAppID + 1} a {min(var_intAppID + 1000, cls._var_intTamanhoTotalFila)} de {cls._var_intTamanhoTotalFila}")
                 
-            var_listGames = cls.seleciona_games(var_listDadosSteamRaw)
-            if var_listGames:
-                var_listDados = cls.selecionar_base_dadosSteamBD(var_listGames)
-                var_listDadosVelhos = cls.selecionar_dados_velhos(arg_listDados=var_listDados, arg_strNomeTabela="steam_bd")
-                for var_intAppID in var_listDadosVelhos:
-                    SupabaseDB.inserir_dadosSteamBD(var_listDados[var_intAppID])
-                logger.info("Dados processados inseridos na tabela steam_bd com sucesso.")
-            else:
-                raise Exception("Nenhum jogo válido encontrado para processar.")
+                # Processa dados para steam_bd
+                var_listDadosSteamRaw = SupabaseDB.buscar_todos_dadosSteamRaw()
+                    
+                var_listGames = cls.seleciona_games(var_listDadosSteamRaw)
+                if var_listGames:
+                    var_listDados = cls.selecionar_base_dadosSteamBD(var_listGames)
+                    SupabaseDB.inserir_dadosSteamBD(var_listDados)
+                    logger.info("Dados processados inseridos na tabela steam_bd com sucesso.")
+                else:
+                    raise Exception("Nenhum jogo válido encontrado para processar.")
 
         except Exception as e:
             logger.error(f"Erro ao alimentar o banco de dados Steam BD: {e}")

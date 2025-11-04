@@ -113,8 +113,6 @@ class SupabaseDB:
                     on_conflict="appid"
                 ).execute()
 
-                logger.info(f"Detalhes salvos para appid {var_intAppid}")
-            
             # Caso 2: Atualizar apenas REVIEWS (registro já deve existir)
             if var_dictReviews is not None:
                 # Busca o registro existente
@@ -125,8 +123,6 @@ class SupabaseDB:
                     var_apiResult = cls._var_botClient.table("steam_raw").update({
                         "reviews": var_dictReviews
                     }).eq("appid", var_intAppid).execute()
-
-                    logger.info(f"Reviews atualizados para appid {var_intAppid}")
                 else:
                     logger.warning(
                         f"AppID {var_intAppid} não encontrado. "
@@ -164,12 +160,12 @@ class SupabaseDB:
             raise
     
     @classmethod
-    def buscar_todos_dadosSteamRaw(cls, arg_intLimit: int = 1000) -> List[Dict[str, Any]]:
+    def buscar_todos_dadosSteamRaw(cls, arg_intLimit: int = None) -> List[Dict[str, Any]]:
         """
         Busca todos os jogos da tabela steam_raw.
         
         Parâmetros:
-        - arg_intLimit (int): Número máximo de registros (padrão: 1000)
+        - arg_intLimit (int): Número máximo de registros. Se None, busca todos com paginação. (padrão: None)
             
         Retorna:
         - Lista de dicionários com os dados
@@ -177,8 +173,34 @@ class SupabaseDB:
         cls._garantir_conexao()
         
         try:
-            var_apiResult = cls._var_botClient.table("steam_raw").select("*").limit(arg_intLimit).execute()
-            return var_apiResult.data if var_apiResult.data else []
+            if arg_intLimit is not None:
+                # Com limite específico
+                var_apiResult = cls._var_botClient.table("steam_raw").select("*").limit(arg_intLimit).execute()
+                return var_apiResult.data if var_apiResult.data else []
+            else:
+                # Sem limite - busca todos com paginação
+                var_listTodosDados = []
+                var_intOffset = 0
+                var_intPageSize = 1000  # Tamanho da página
+                
+                while True:
+                    var_apiResult = cls._var_botClient.table("steam_raw").select("*").range(
+                        var_intOffset, var_intOffset + var_intPageSize - 1
+                    ).execute()
+                    
+                    if not var_apiResult.data or len(var_apiResult.data) == 0:
+                        break
+                    
+                    var_listTodosDados.extend(var_apiResult.data)
+                    
+                    # Se retornou menos que o page size, chegou no fim
+                    if len(var_apiResult.data) < var_intPageSize:
+                        break
+                    
+                    var_intOffset += var_intPageSize
+                
+                logger.info(f"Total de registros carregados de steam_raw: {len(var_listTodosDados)}")
+                return var_listTodosDados
 
         except Exception as e:
             logger.error(f"Erro ao buscar todos os dados steam_raw: {e}")
@@ -187,45 +209,51 @@ class SupabaseDB:
     # ========== MÉTODOS PARA steam_bd ==========
     
     @classmethod
-    def inserir_dadosSteamBD(cls, arg_dictDados: Dict[str, Any]) -> None:
+    def inserir_dadosSteamBD(cls, arg_listDados: list) -> None:
         """
         Insere ou atualiza dados processados na tabela steam_bd.
         
         Parâmetros:
-        - arg_dictDados (dict): Dicionário com os dados processados do jogo
+        - arg_listDados (list): Dicionário com os dados processados do jogo
         """
         cls._garantir_conexao()
         
         try:
-            var_intAppid = arg_dictDados.get("appid")
-            if not var_intAppid:
-                raise ValueError("appid é obrigatório")
-            
-            # Prepara dados para inserção
-            var_dictDadosInsert = {
-                "appid": var_intAppid,
-                "nome": arg_dictDados.get("nome"),
-                "data_lancamento": arg_dictDados.get("data_lancamento"),
-                "desenvolvedores": arg_dictDados.get("desenvolvedores"),
-                "publicadores": arg_dictDados.get("publicadores"),
-                "categorias": arg_dictDados.get("categorias"),
-                "generos": arg_dictDados.get("generos"),
-                "preco_inicial": arg_dictDados.get("preco_inicial"),
-                "preco_final": arg_dictDados.get("preco_final"),
-                "desconto": arg_dictDados.get("desconto"),
-                "avaliacoes_totais": arg_dictDados.get("avaliacoes_totais"),
-                "avaliacoes_positivas": arg_dictDados.get("avaliacoes_positivas"),
-                "porcentagem_positiva": arg_dictDados.get("porcentagem_positiva"),
-                "plataformas": arg_dictDados.get("plataformas")
-            }
-            
-            # Upsert: insere se não existe, atualiza se existe
-            var_apiResult = cls._var_botClient.table("steam_bd").upsert(
-                var_dictDadosInsert,
-                on_conflict="appid"
-            ).execute()
+            for var_dictDados in arg_listDados:
+                var_intAppid = var_dictDados.get("appid")
+                if not var_intAppid:
+                    raise ValueError("appid é obrigatório")
 
-            logger.info(f"Dados processados salvos para appid {var_intAppid}")
+                # Prepara dados para inserção
+                var_dictDadosInsert = {
+                    "appid": var_intAppid,
+                    "nome": var_dictDados.get("nome"),
+                    "classificacao_etaria": var_dictDados.get("classificacao_etaria"),
+                    "linguagens": var_dictDados.get("linguagens"),
+                    "desenvolvedores": var_dictDados.get("desenvolvedores"),
+                    "distribuidores": var_dictDados.get("distribuidores"),
+                    "preco": var_dictDados.get("preco"),
+                    "metacritic_score": var_dictDados.get("metacritic_score"),
+                    "categorias": var_dictDados.get("categorias"),
+                    "genero": var_dictDados.get("genero"),
+                    "data_lancamento": var_dictDados.get("data_lancamento"),
+                    "review_score": var_dictDados.get("review_score"),
+                    "total_reviews": var_dictDados.get("total_reviews"),
+                    "total_negative": var_dictDados.get("total_negative"),
+                    "total_positive": var_dictDados.get("total_positive"),
+                    "review_score_desc": var_dictDados.get("review_score_desc"),
+                }
+                # Upsert: insere se não existe, atualiza se existe
+                var_apiResult = cls._var_botClient.table("steam_bd").upsert(
+                    var_dictDadosInsert,
+                    on_conflict="appid"
+                ).execute()
+
+                if var_apiResult.error:
+                    logger.error(f"Erro ao inserir/atualizar AppID {var_intAppid}: {var_apiResult.error}")
+                    continue
+                
+            logger.info(f"Dados processados salvos para {len(arg_listDados)} registros.")
             
         except Exception as e:
             logger.error(f"Erro ao inserir dados steam_bd: {e}")
@@ -258,12 +286,12 @@ class SupabaseDB:
             raise
     
     @classmethod
-    def buscar_todos_dadosSteamBD(cls, arg_intLimit: int = 1000) -> List[Dict[str, Any]]:
+    def buscar_todos_dadosSteamBD(cls, arg_intLimit: int = None) -> List[Dict[str, Any]]:
         """
         Busca todos os jogos da tabela steam_bd.
         
         Parâmetros:
-        - arg_intLimit (int): Número máximo de registros (padrão: 1000)
+        - arg_intLimit (int): Número máximo de registros. Se None, busca todos com paginação. (padrão: None)
             
         Retorna:
         - Lista de dicionários com os dados
@@ -271,8 +299,34 @@ class SupabaseDB:
         cls._garantir_conexao()
         
         try:
-            var_apiResult = cls._var_botClient.table("steam_bd").select("*").limit(arg_intLimit).execute()
-            return var_apiResult.data if var_apiResult.data else []
+            if arg_intLimit is not None:
+                # Com limite específico
+                var_apiResult = cls._var_botClient.table("steam_bd").select("*").limit(arg_intLimit).execute()
+                return var_apiResult.data if var_apiResult.data else []
+            else:
+                # Sem limite - busca todos com paginação
+                var_listTodosDados = []
+                var_intOffset = 0
+                var_intPageSize = 1000  # Tamanho da página
+                
+                while True:
+                    var_apiResult = cls._var_botClient.table("steam_bd").select("*").range(
+                        var_intOffset, var_intOffset + var_intPageSize - 1
+                    ).execute()
+                    
+                    if not var_apiResult.data or len(var_apiResult.data) == 0:
+                        break
+                    
+                    var_listTodosDados.extend(var_apiResult.data)
+                    
+                    # Se retornou menos que o page size, chegou no fim
+                    if len(var_apiResult.data) < var_intPageSize:
+                        break
+                    
+                    var_intOffset += var_intPageSize
+                
+                logger.info(f"Total de registros carregados de steam_bd: {len(var_listTodosDados)}")
+                return var_listTodosDados
 
         except Exception as e:
             logger.error(f"Erro ao buscar todos os dados steam_bd: {e}")

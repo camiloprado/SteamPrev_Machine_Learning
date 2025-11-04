@@ -127,6 +127,10 @@ class Settings:
         logging.getLogger("aiohttp").setLevel(logging.WARNING)
         logging.getLogger("urllib3").setLevel(logging.WARNING)
         
+        # Desabilita logs HTTP do httpx (usado pelo Supabase)
+        logging.getLogger("httpx").setLevel(logging.WARNING)
+        logging.getLogger("httpcore").setLevel(logging.WARNING)
+        
         cls._var_dictSettings["log_level"] = var_strLogLevel
 
     @classmethod
