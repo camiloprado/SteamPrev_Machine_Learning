@@ -53,7 +53,7 @@ class SupabaseDB:
             
         except Exception as e:
             logger.error(f"Erro ao conectar ao Supabase: {e}")
-            raise
+            raise Exception(f"Erro ao conectar ao Supabase: {e}")
     
     @classmethod
     def desconectar(cls) -> None:
@@ -131,7 +131,7 @@ class SupabaseDB:
             
         except Exception as e:
             logger.error(f"Erro ao inserir dados steam_raw: {e}")
-            raise
+            raise Exception(f"Erro ao inserir dados steam_raw: {e}")
     
     @classmethod
     def buscar_dadosSteamRaw(cls, arg_intAppid: int) -> Optional[Dict[str, Any]]:
@@ -157,7 +157,7 @@ class SupabaseDB:
             
         except Exception as e:
             logger.error(f"Erro ao buscar dados steam_raw: {e}")
-            raise
+            raise Exception(f"Erro ao buscar dados steam_raw: {e}")
     
     @classmethod
     def buscar_todos_dadosSteamRaw(cls, arg_intLimit: int = None) -> List[Dict[str, Any]]:
@@ -204,7 +204,7 @@ class SupabaseDB:
 
         except Exception as e:
             logger.error(f"Erro ao buscar todos os dados steam_raw: {e}")
-            raise
+            raise Exception(f"Erro ao buscar todos os dados steam_raw: {e}")
     
     # ========== MÉTODOS PARA steam_bd ==========
     
@@ -249,7 +249,7 @@ class SupabaseDB:
                     on_conflict="appid"
                 ).execute()
 
-                if var_apiResult.error:
+                if not var_apiResult:
                     logger.error(f"Erro ao inserir/atualizar AppID {var_intAppid}: {var_apiResult.error}")
                     continue
 
@@ -257,7 +257,7 @@ class SupabaseDB:
             
         except Exception as e:
             logger.error(f"Erro ao inserir dados steam_bd: {e}")
-            raise
+            raise Exception(f"Erro ao inserir dados steam_bd: {e}")
     
     @classmethod
     def buscar_dadosSteamBD(cls, arg_intAppid: int) -> Optional[Dict[str, Any]]:
@@ -283,7 +283,7 @@ class SupabaseDB:
             
         except Exception as e:
             logger.error(f"Erro ao buscar dados steam_bd: {e}")
-            raise
+            raise Exception(f"Erro ao buscar dados steam_bd: {e}")
     
     @classmethod
     def buscar_todos_dadosSteamBD(cls, arg_intLimit: int = None) -> List[Dict[str, Any]]:
@@ -330,7 +330,7 @@ class SupabaseDB:
 
         except Exception as e:
             logger.error(f"Erro ao buscar todos os dados steam_bd: {e}")
-            raise
+            raise Exception(f"Erro ao buscar todos os dados steam_bd: {e}")
     
     # ========== MÉTODOS UTILITÁRIOS ==========
     @classmethod
@@ -391,9 +391,13 @@ class SupabaseDB:
             raise Exception(f"Erro ao buscar jogos antigos: {e}")
         
     @classmethod
-    def buscar_jogos_incompletos(cls) -> List[Dict[str, Any]]:
+    def buscar_jogos_incompletos(cls, arg_boolRequererReviews: bool = False) -> List[Dict[str, Any]]:
         """
-        Busca jogos na tabela steam_raw que não possuem detalhes ou reviews.
+        Busca jogos na tabela steam_raw que não possuem detalhes ou (opcionalmente) reviews.
+        
+        Parâmetros:
+        - arg_boolRequererReviews (bool): Se True, considera incompletos apenas jogos sem reviews.
+                                          Se False, considera incompletos apenas jogos sem detalhes. (padrão: False)
         
         Retorna:
         - Lista de jogos incompletos
@@ -408,11 +412,20 @@ class SupabaseDB:
             var_intPageSize = 1000  # Tamanho da página
             
             while True:
-                var_apiResult = cls._var_botClient.table("steam_raw").select("*").range(
-                    var_intOffset, var_intOffset + var_intPageSize - 1
-                ).or_(
-                    "detalhes.is.null,reviews.is.null"
-                ).execute()
+                if arg_boolRequererReviews:
+                    # Busca jogos sem detalhes OU sem reviews
+                    var_apiResult = cls._var_botClient.table("steam_raw").select("*").range(
+                        var_intOffset, var_intOffset + var_intPageSize - 1
+                    ).or_(
+                        "detalhes.is.null,reviews.is.null"
+                    ).execute()
+                else:
+                    # Busca apenas jogos sem detalhes (reviews opcionais)
+                    var_apiResult = cls._var_botClient.table("steam_raw").select("*").range(
+                        var_intOffset, var_intOffset + var_intPageSize - 1
+                    ).is_(
+                        "detalhes", "null"
+                    ).execute()
                 
                 if not var_apiResult.data or len(var_apiResult.data) == 0:
                     break
@@ -425,7 +438,7 @@ class SupabaseDB:
                 
                 var_intOffset += var_intPageSize
 
-            logger.info(f"Total de registros incompletos de 'steam_raw': {len(var_listTodosDados)}")
+            logger.info(f"Total de registros incompletos de 'steam_raw': {len(var_listTodosDados)} (reviews {'obrigatórios' if arg_boolRequererReviews else 'opcionais'})")
             return var_listTodosDados
             
         except Exception as e:

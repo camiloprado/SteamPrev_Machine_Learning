@@ -67,6 +67,23 @@ class Settings:
         }
 
     @classmethod
+    def steam_api_itad(cls) -> dict:
+        """
+        Configurações da API de ITAD da Steam.
+
+        Retorna:
+        - dict: Configurações da API de ITAD da Steam.
+        """
+        var_intBatchesSize: int = int(os.getenv("STEAM_BATCH_SIZE_ITAD", "200"))
+        var_intDelayBetweenBatches: int = int(os.getenv("STEAM_DELAY_BETWEEN_BATCHES_ITAD", "120"))
+        var_intAsyncConcurrency: int = int(os.getenv("STEAM_ASYNC_CONCURRENCY_ITAD", "1"))
+        return {
+            "BatchSize": var_intBatchesSize,
+            "Delay": var_intDelayBetweenBatches,
+            "Concurrency": var_intAsyncConcurrency
+        }
+    
+    @classmethod
     def steam_api_reviews(cls) -> dict:
         """
         Configurações da API de Reviews da Steam.
@@ -130,7 +147,7 @@ class Settings:
         # Desabilita logs HTTP do httpx (usado pelo Supabase)
         logging.getLogger("httpx").setLevel(logging.WARNING)
         logging.getLogger("httpcore").setLevel(logging.WARNING)
-        
+
         cls._var_dictSettings["log_level"] = var_strLogLevel
 
     @classmethod

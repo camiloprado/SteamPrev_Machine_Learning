@@ -16,6 +16,7 @@ STEAM_DETAILS_URL = "https://store.steampowered.com/api/appdetails"
 STEAM_REVIEWS_URL = "https://store.steampowered.com/appreviews/{appid}"
 ITAD_LOOKUP_URL = "https://api.isthereanydeal.com/lookup/id/title/v1"
 ITAD_HISTORY_URL = "https://api.isthereanydeal.com/games/history/v2"
+ITAD_LOOKUP_IDS_URL = "https://api.isthereanydeal.com/games/lookup/v1"
 
 
 class SteamClient:
@@ -431,15 +432,10 @@ class SteamClient:
             # Filtra os resultados válidos e os retorna
             var_dictResult: dict[int, dict] = {}
             var_intSemReviews = 0
-            for var_dictOut in var_listOut:
+            for idx, var_dictOut in enumerate(var_listOut):
                 if isinstance(var_dictOut, dict):
-                    # Verifica se tem reviews
-                    if var_dictOut.get('total_reviews', 0) > 0:
-                        var_dictResult[var_dictOut["appid"]] = var_dictOut
-                    else:
-                        # Jogo válido mas sem reviews suficientes
-                        var_intSemReviews += 1
-            
+                    var_dictResult[var_dictOut["appid"]] = var_dictOut
+
             # Atualiza contador de ausentes (jogos válidos mas sem reviews)
             var_intAusentes += var_intSemReviews
             var_intFalha = len(arg_seqAppids) - len(var_dictResult)
@@ -459,7 +455,179 @@ class SteamClient:
         
     # ------------------- ITAD lookups -------------------
     @classmethod
-    def lookup_itad_ids(cls, arg_seqTitles: Sequence[str]) -> dict:
+    async def lookup_itad_ids_batched(cls, arg_seqAppids: Sequence[int]) -> dict[int, dict]:
+        """
+        Realiza lookup de IDs na API do IsThereAnyDeal (ITAD) de forma assíncrona, processando em batches.
+        
+        Parâmetros:
+        - arg_seqAppids (Sequence[int]): Uma sequência de appids dos jogos.
+        
+        Retorna:
+        - var_dictAllResults (dict): Um dicionário mapeando appids para seus dados do ITAD.
+        """
+        var_dictConfigAPI = Settings.steam_api_itad()
+        var_intBatchSize = var_dictConfigAPI.get("BatchSize", 200)
+        var_intDelay = var_dictConfigAPI.get("Delay", 120)
+        var_intAsyncConcurrency = var_dictConfigAPI.get("Concurrency", 3)
+
+        var_intTotalItems = len(arg_seqAppids)
+        var_intTotalBatches = (var_intTotalItems + var_intBatchSize - 1) // var_intBatchSize
+        
+        logger.info(f"=== PROCESSAMENTO EM BATCHES (ITAD LOOKUP) ===")
+        logger.info(f"Total de itens: {var_intTotalItems:,}")
+        logger.info(f"Tamanho do batch: {var_intBatchSize:,}")
+        logger.info(f"Total de batches: {var_intTotalBatches}")
+        logger.info(f"Delay entre batches: {var_intDelay}s")
+        logger.info(f"Concorrência por batch: {var_intAsyncConcurrency}")
+        logger.info(f"===============================================\n")
+        
+        var_dictAllResults = {}
+        
+        for var_intBatchNum in range(var_intTotalBatches):
+            var_intStart = var_intBatchNum * var_intBatchSize
+            var_intEnd = min(var_intStart + var_intBatchSize, var_intTotalItems)
+            var_listBatch = arg_seqAppids[var_intStart:var_intEnd]
+            
+            logger.info(f"Batch {var_intBatchNum + 1}/{var_intTotalBatches} - Processando itens {var_intStart + 1} a {var_intEnd} ({len(var_listBatch)} itens)...")
+            
+            # Processa o batch atual
+            var_dictBatchResults = await cls.lookup_itad_ids(var_listBatch)
+            var_dictAllResults.update(var_dictBatchResults)
+            
+            # Aguarda entre batches (exceto no último)
+            if var_intBatchNum < var_intTotalBatches - 1:
+                logger.info(f"Aguardando {var_intDelay}s antes do próximo batch...\n")
+                await asyncio.sleep(var_intDelay)
+        
+        logger.info(f"\nPROCESSAMENTO COMPLETO!")
+        logger.info(f"Total processado: {len(var_dictAllResults):,} sucessos de {var_intTotalItems:,} itens ({len(var_dictAllResults)/var_intTotalItems:.2%})")
+        
+        return var_dictAllResults
+    
+    @classmethod
+    async def lookup_itad_ids(cls, arg_seqAppids: Sequence[int]) -> dict[int, dict]:
+        """
+        Realiza lookup de IDs na API do IsThereAnyDeal (ITAD) de forma assíncrona.
+        
+        Parâmetros:
+        - arg_seqAppids (Sequence[int]): Uma sequência de appids dos jogos.
+        
+        Retorna:
+        - var_dictResults (dict): Um dicionário mapeando appids para seus dados do ITAD.
+        """
+        if not Settings._var_strItadApiKey:
+            raise RuntimeError("ITAD_API_KEY não definido")
+        
+        try:
+            var_dictConfigAPI = Settings.steam_api_itad()
+            var_intAsyncConcurrency = var_dictConfigAPI.get("Concurrency", 3)
+
+            # Controle de concorrência
+            var_semSemaphore = asyncio.Semaphore(var_intAsyncConcurrency)
+            
+            # Contadores de erro
+            var_intErrosHTTP = 0
+            var_intErrosForbidden = 0
+            var_intErrosTooManyRequests = 0
+            var_intErrosTimeout = 0
+            var_intErrosOutros = 0
+            var_intNaoEncontrados = 0
+            
+            async def worker(arg_clientSession: aiohttp.ClientSession, arg_intAppid: int) -> tuple[int, dict | None]:
+                """
+                Worker assíncrono para buscar dados ITAD de um único appid.
+                
+                Parâmetros:
+                - arg_clientSession (aiohttp.ClientSession): A sessão HTTP assíncrona.
+                - arg_intAppid (int): O appid do jogo.
+                
+                Retorna:
+                - tuple: (appid, dados do ITAD ou None se não encontrado)
+                """
+                nonlocal var_intErrosHTTP, var_intErrosForbidden, var_intErrosTooManyRequests, var_intErrosTimeout, var_intErrosOutros, var_intNaoEncontrados
+                
+                async with var_semSemaphore:
+                    # Pequena espera para evitar throttling
+                    await asyncio.sleep(random.random() * 0.2)
+                    
+                    if not isinstance(arg_intAppid, int) or arg_intAppid <= 0:
+                        var_intErrosOutros += 1
+                        return (arg_intAppid, None)
+                    
+                    var_dictParams = {
+                        "key": Settings._var_strItadApiKey,
+                        "appid": arg_intAppid,
+                    }
+                    
+                    try:
+                        # Faz a requisição assíncrona
+                        async with arg_clientSession.get(ITAD_LOOKUP_IDS_URL, params=var_dictParams, timeout=30) as var_respResponse:
+                            var_respResponse.raise_for_status()
+                            # Processa os dados recebidos
+                            var_dictData = await var_respResponse.json()
+                            
+                            # Verifica se o jogo foi encontrado
+                            if var_dictData and var_dictData.get("found"):
+                                var_dictGame = var_dictData.get("game", {})
+                                if isinstance(var_dictGame, dict):
+                                    return (arg_intAppid, var_dictGame)
+                            
+                            # Jogo não encontrado no ITAD
+                            var_intNaoEncontrados += 1
+                            return (arg_intAppid, None)
+                            
+                    except aiohttp.ClientError as e_http:
+                        # Captura erros específicos de HTTP (conexão, timeout, status).
+                        var_intErrosHTTP += 1
+                        if hasattr(e_http, 'status'):
+                            if e_http.status == 403:
+                                var_intErrosForbidden += 1
+                            elif e_http.status == 429:
+                                var_intErrosTooManyRequests += 1
+                        return (arg_intAppid, None)
+                    except asyncio.TimeoutError:
+                        # Captura erro de timeout.
+                        var_intErrosTimeout += 1
+                        return (arg_intAppid, None)
+                    except Exception:
+                        # Captura outros erros não classificados.
+                        var_intErrosOutros += 1
+                        return (arg_intAppid, None)
+            
+            # Executa os workers assíncronos
+            async with aiohttp.ClientSession() as var_respSession:
+                var_listTasks = [asyncio.create_task(worker(var_respSession, var_intAppid)) for var_intAppid in arg_seqAppids]
+                logger.info(f"Iniciando busca de 'ITAD LOOKUP' assíncrona para {len(var_listTasks)} AppIDs com concorrência {var_intAsyncConcurrency}...")
+                
+                # Aguarda a conclusão de todas as tarefas
+                var_listOut = await asyncio.gather(*var_listTasks, return_exceptions=True)
+                logger.info("Busca assíncrona concluída.")
+            
+            # Filtra os resultados válidos e os retorna
+            var_dictResults: dict[int, dict] = {}
+            for var_tupleResult in var_listOut:
+                if isinstance(var_tupleResult, tuple) and len(var_tupleResult) == 2:
+                    var_intAppid, var_dictData = var_tupleResult
+                    if var_dictData is not None:
+                        var_dictResults[var_intAppid] = var_dictData
+            
+            var_intFalha = len(arg_seqAppids) - len(var_dictResults)
+            logger.info(f"--- Busca concluída: ---")
+            logger.info(f"{len(var_dictResults)} sucesso(s) ({len(var_dictResults)/(len(arg_seqAppids)):.2%}),")
+            logger.info(f"{var_intFalha} falha(s) ({var_intFalha/len(arg_seqAppids):.2%}).")
+            logger.info(f"--- Detalhamento dos erros: ---")
+            logger.info(f"* HTTP: {var_intErrosHTTP} (403 Forbidden: {var_intErrosForbidden}, 429 Too Many Requests: {var_intErrosTooManyRequests})")
+            logger.info(f"* Timeout: {var_intErrosTimeout}")
+            logger.info(f"* Não encontrados no ITAD: {var_intNaoEncontrados}")
+            logger.info(f"* Outros: {var_intErrosOutros}")
+            return var_dictResults
+        
+        except Exception as e:
+            logger.critical(f"Falha crítica ao buscar ITAD lookup em bulk: {e}")
+            raise RuntimeError(f"ITAD lookup falhou: {e}")
+    
+    @classmethod
+    def lookup_itad_title(cls, arg_seqTitles: Sequence[str]) -> dict:
         """
         Realiza lookup de títulos na API do IsThereAnyDeal (ITAD).
         

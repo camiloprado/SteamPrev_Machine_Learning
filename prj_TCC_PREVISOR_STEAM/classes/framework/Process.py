@@ -20,3 +20,4 @@ class Process:
         # Lógica para processar a tarefa
         Previsor.alimentar_banco_dados_raw()
         Previsor.alimentar_banco_dados_Steam()
+        Previsor.alimentar_banco_dados_ITAD()

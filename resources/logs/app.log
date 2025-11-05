@@ -80468,3 +80468,2447 @@ PROCESSAMENTO COMPLETO!
 PROCESSAMENTO COMPLETO!
 2025-11-05 07:32:53 - INFO - Total processado: 11 sucessos de 1,390 itens (0.79%)
 2025-11-05 07:32:55 - INFO - Dados de detalhes inseridos com sucesso.
+2025-11-05 08:05:20 - INFO - Número total de aplicativos carregados: 273744
+2025-11-05 08:05:20 - INFO - Processando aplicativos de 1 a 5 de 5
+2025-11-05 08:05:20 - INFO - Conectado ao Supabase com sucesso
+2025-11-05 08:05:22 - INFO - Total de registros desatualizados de steam_raw: 0
+2025-11-05 08:05:30 - INFO - Total de registros incompletos de 'steam_raw': 6859
+2025-11-05 08:05:30 - INFO - Número de AppIDs a processar: 5
+2025-11-05 08:05:30 - INFO - === PROCESSAMENTO EM BATCHES ===
+2025-11-05 08:05:30 - INFO - Total de itens: 5
+2025-11-05 08:05:30 - INFO - Tamanho do batch: 200
+2025-11-05 08:05:30 - INFO - Total de batches: 1
+2025-11-05 08:05:30 - INFO - Delay entre batches: 120s
+2025-11-05 08:05:30 - INFO - Concorrência por batch: 1
+2025-11-05 08:05:30 - INFO - ================================
+
+2025-11-05 08:05:30 - INFO - Batch 1/1 - Processando itens 1 a 5 (5 itens)...
+2025-11-05 08:05:30 - INFO - Iniciando busca de 'DETALHES' assíncrona para 5 AppIDs com concorrência 1...
+2025-11-05 08:05:32 - INFO - Busca assíncrona concluída.
+2025-11-05 08:05:32 - INFO - --- Busca concluída: ---
+2025-11-05 08:05:32 - INFO - 0 sucesso(s) (0.00%),
+2025-11-05 08:05:32 - INFO - 5 falha(s) (100.00%).
+2025-11-05 08:05:32 - INFO - --- Detalhamento dos erros: ---
+2025-11-05 08:05:32 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-05 08:05:32 - INFO - * Timeout: 0
+2025-11-05 08:05:32 - INFO - * Ausentes: 5
+2025-11-05 08:05:32 - INFO - * Outros: 0
+2025-11-05 08:05:32 - INFO - 
+PROCESSAMENTO COMPLETO!
+2025-11-05 08:05:32 - INFO - Total processado: 0 sucessos de 5 itens (0.00%)
+2025-11-05 08:05:32 - WARNING - Nenhum dado de detalhes retornado da API Steam.
+2025-11-05 08:05:32 - INFO - Número de AppIDs com dados incompletos: 6859
+2025-11-05 08:05:33 - INFO - === PROCESSAMENTO EM BATCHES (REVIEWS) ===
+2025-11-05 08:05:33 - INFO - Total de itens: 6,864
+2025-11-05 08:05:33 - INFO - Tamanho do batch: 500
+2025-11-05 08:05:33 - INFO - Total de batches: 14
+2025-11-05 08:05:33 - INFO - Delay entre batches: 60s
+2025-11-05 08:05:33 - INFO - Concorrência por batch: 3
+2025-11-05 08:05:33 - INFO - ==========================================
+
+2025-11-05 08:05:33 - INFO - Batch 1/14 - Processando itens 1 a 500 (500 itens)...
+2025-11-05 08:05:33 - INFO - Iniciando busca de 'REVIEWS' assíncrona para 500 AppIDs com concorrência 3...
+2025-11-05 08:06:50 - INFO - Busca assíncrona concluída.
+2025-11-05 08:06:50 - INFO - --- Busca concluída: ---
+2025-11-05 08:06:50 - INFO - 263 sucesso(s) (52.60%),
+2025-11-05 08:06:50 - INFO - 237 falha(s) (47.40%).
+2025-11-05 08:06:50 - INFO - --- Detalhamento dos erros: ---
+2025-11-05 08:06:50 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-05 08:06:50 - INFO - * Timeout: 0
+2025-11-05 08:06:50 - INFO - * Ausentes: 237
+2025-11-05 08:06:50 - INFO - * Outros: 0
+2025-11-05 08:06:50 - INFO - Aguardando 60s antes do próximo batch...
+
+2025-11-05 08:07:50 - INFO - Batch 2/14 - Processando itens 501 a 1000 (500 itens)...
+2025-11-05 08:07:50 - INFO - Iniciando busca de 'REVIEWS' assíncrona para 500 AppIDs com concorrência 3...
+2025-11-05 08:09:10 - INFO - Busca assíncrona concluída.
+2025-11-05 08:09:10 - INFO - --- Busca concluída: ---
+2025-11-05 08:09:10 - INFO - 406 sucesso(s) (81.20%),
+2025-11-05 08:09:10 - INFO - 94 falha(s) (18.80%).
+2025-11-05 08:09:10 - INFO - --- Detalhamento dos erros: ---
+2025-11-05 08:09:10 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-05 08:09:10 - INFO - * Timeout: 0
+2025-11-05 08:09:10 - INFO - * Ausentes: 94
+2025-11-05 08:09:10 - INFO - * Outros: 0
+2025-11-05 08:09:10 - INFO - Aguardando 60s antes do próximo batch...
+
+2025-11-05 08:10:10 - INFO - Batch 3/14 - Processando itens 1001 a 1500 (500 itens)...
+2025-11-05 08:10:10 - INFO - Iniciando busca de 'REVIEWS' assíncrona para 500 AppIDs com concorrência 3...
+2025-11-05 08:11:28 - INFO - Busca assíncrona concluída.
+2025-11-05 08:11:28 - INFO - --- Busca concluída: ---
+2025-11-05 08:11:28 - INFO - 120 sucesso(s) (24.00%),
+2025-11-05 08:11:28 - INFO - 380 falha(s) (76.00%).
+2025-11-05 08:11:28 - INFO - --- Detalhamento dos erros: ---
+2025-11-05 08:11:28 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-05 08:11:28 - INFO - * Timeout: 0
+2025-11-05 08:11:28 - INFO - * Ausentes: 380
+2025-11-05 08:11:28 - INFO - * Outros: 0
+2025-11-05 08:11:28 - INFO - Aguardando 60s antes do próximo batch...
+
+2025-11-05 08:12:28 - INFO - Batch 4/14 - Processando itens 1501 a 2000 (500 itens)...
+2025-11-05 08:12:28 - INFO - Iniciando busca de 'REVIEWS' assíncrona para 500 AppIDs com concorrência 3...
+2025-11-05 08:13:46 - INFO - Busca assíncrona concluída.
+2025-11-05 08:13:46 - INFO - --- Busca concluída: ---
+2025-11-05 08:13:46 - INFO - 137 sucesso(s) (27.40%),
+2025-11-05 08:13:46 - INFO - 363 falha(s) (72.60%).
+2025-11-05 08:13:46 - INFO - --- Detalhamento dos erros: ---
+2025-11-05 08:13:46 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-05 08:13:46 - INFO - * Timeout: 0
+2025-11-05 08:13:46 - INFO - * Ausentes: 363
+2025-11-05 08:13:46 - INFO - * Outros: 0
+2025-11-05 08:13:46 - INFO - Aguardando 60s antes do próximo batch...
+
+2025-11-05 08:14:46 - INFO - Batch 5/14 - Processando itens 2001 a 2500 (500 itens)...
+2025-11-05 08:14:46 - INFO - Iniciando busca de 'REVIEWS' assíncrona para 500 AppIDs com concorrência 3...
+2025-11-05 08:16:05 - INFO - Busca assíncrona concluída.
+2025-11-05 08:16:05 - INFO - --- Busca concluída: ---
+2025-11-05 08:16:05 - INFO - 6 sucesso(s) (1.20%),
+2025-11-05 08:16:05 - INFO - 494 falha(s) (98.80%).
+2025-11-05 08:16:05 - INFO - --- Detalhamento dos erros: ---
+2025-11-05 08:16:05 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-05 08:16:05 - INFO - * Timeout: 0
+2025-11-05 08:16:05 - INFO - * Ausentes: 494
+2025-11-05 08:16:05 - INFO - * Outros: 0
+2025-11-05 08:16:05 - INFO - Aguardando 60s antes do próximo batch...
+
+2025-11-05 08:17:05 - INFO - Batch 6/14 - Processando itens 2501 a 3000 (500 itens)...
+2025-11-05 08:17:05 - INFO - Iniciando busca de 'REVIEWS' assíncrona para 500 AppIDs com concorrência 3...
+2025-11-05 08:18:23 - INFO - Busca assíncrona concluída.
+2025-11-05 08:18:23 - INFO - --- Busca concluída: ---
+2025-11-05 08:18:23 - INFO - 63 sucesso(s) (12.60%),
+2025-11-05 08:18:23 - INFO - 437 falha(s) (87.40%).
+2025-11-05 08:18:23 - INFO - --- Detalhamento dos erros: ---
+2025-11-05 08:18:23 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-05 08:18:23 - INFO - * Timeout: 0
+2025-11-05 08:18:23 - INFO - * Ausentes: 437
+2025-11-05 08:18:23 - INFO - * Outros: 0
+2025-11-05 08:18:23 - INFO - Aguardando 60s antes do próximo batch...
+
+2025-11-05 08:19:23 - INFO - Batch 7/14 - Processando itens 3001 a 3500 (500 itens)...
+2025-11-05 08:19:23 - INFO - Iniciando busca de 'REVIEWS' assíncrona para 500 AppIDs com concorrência 3...
+2025-11-05 08:20:36 - INFO - Busca assíncrona concluída.
+2025-11-05 08:20:36 - INFO - --- Busca concluída: ---
+2025-11-05 08:20:36 - INFO - 7 sucesso(s) (1.40%),
+2025-11-05 08:20:36 - INFO - 493 falha(s) (98.60%).
+2025-11-05 08:20:36 - INFO - --- Detalhamento dos erros: ---
+2025-11-05 08:20:36 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-05 08:20:36 - INFO - * Timeout: 0
+2025-11-05 08:20:36 - INFO - * Ausentes: 493
+2025-11-05 08:20:36 - INFO - * Outros: 0
+2025-11-05 08:20:36 - INFO - Aguardando 60s antes do próximo batch...
+
+2025-11-05 08:21:36 - INFO - Batch 8/14 - Processando itens 3501 a 4000 (500 itens)...
+2025-11-05 08:21:36 - INFO - Iniciando busca de 'REVIEWS' assíncrona para 500 AppIDs com concorrência 3...
+2025-11-05 08:22:54 - INFO - Busca assíncrona concluída.
+2025-11-05 08:22:54 - INFO - --- Busca concluída: ---
+2025-11-05 08:22:54 - INFO - 279 sucesso(s) (55.80%),
+2025-11-05 08:22:54 - INFO - 221 falha(s) (44.20%).
+2025-11-05 08:22:54 - INFO - --- Detalhamento dos erros: ---
+2025-11-05 08:22:54 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-05 08:22:54 - INFO - * Timeout: 0
+2025-11-05 08:22:54 - INFO - * Ausentes: 221
+2025-11-05 08:22:54 - INFO - * Outros: 0
+2025-11-05 08:22:54 - INFO - Aguardando 60s antes do próximo batch...
+
+2025-11-05 08:23:54 - INFO - Batch 9/14 - Processando itens 4001 a 4500 (500 itens)...
+2025-11-05 08:23:54 - INFO - Iniciando busca de 'REVIEWS' assíncrona para 500 AppIDs com concorrência 3...
+2025-11-05 08:25:11 - INFO - Busca assíncrona concluída.
+2025-11-05 08:25:11 - INFO - --- Busca concluída: ---
+2025-11-05 08:25:11 - INFO - 320 sucesso(s) (64.00%),
+2025-11-05 08:25:11 - INFO - 180 falha(s) (36.00%).
+2025-11-05 08:25:11 - INFO - --- Detalhamento dos erros: ---
+2025-11-05 08:25:11 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-05 08:25:11 - INFO - * Timeout: 0
+2025-11-05 08:25:11 - INFO - * Ausentes: 180
+2025-11-05 08:25:11 - INFO - * Outros: 0
+2025-11-05 08:25:11 - INFO - Aguardando 60s antes do próximo batch...
+
+2025-11-05 08:26:11 - INFO - Batch 10/14 - Processando itens 4501 a 5000 (500 itens)...
+2025-11-05 08:26:11 - INFO - Iniciando busca de 'REVIEWS' assíncrona para 500 AppIDs com concorrência 3...
+2025-11-05 08:27:27 - INFO - Busca assíncrona concluída.
+2025-11-05 08:27:27 - INFO - --- Busca concluída: ---
+2025-11-05 08:27:27 - INFO - 52 sucesso(s) (10.40%),
+2025-11-05 08:27:27 - INFO - 448 falha(s) (89.60%).
+2025-11-05 08:27:27 - INFO - --- Detalhamento dos erros: ---
+2025-11-05 08:27:27 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-05 08:27:27 - INFO - * Timeout: 0
+2025-11-05 08:27:27 - INFO - * Ausentes: 448
+2025-11-05 08:27:27 - INFO - * Outros: 0
+2025-11-05 08:27:27 - INFO - Aguardando 60s antes do próximo batch...
+
+2025-11-05 08:28:27 - INFO - Batch 11/14 - Processando itens 5001 a 5500 (500 itens)...
+2025-11-05 08:28:27 - INFO - Iniciando busca de 'REVIEWS' assíncrona para 500 AppIDs com concorrência 3...
+2025-11-05 08:29:44 - INFO - Busca assíncrona concluída.
+2025-11-05 08:29:44 - INFO - --- Busca concluída: ---
+2025-11-05 08:29:44 - INFO - 42 sucesso(s) (8.40%),
+2025-11-05 08:29:44 - INFO - 458 falha(s) (91.60%).
+2025-11-05 08:29:44 - INFO - --- Detalhamento dos erros: ---
+2025-11-05 08:29:44 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-05 08:29:44 - INFO - * Timeout: 0
+2025-11-05 08:29:44 - INFO - * Ausentes: 458
+2025-11-05 08:29:44 - INFO - * Outros: 0
+2025-11-05 08:29:44 - INFO - Aguardando 60s antes do próximo batch...
+
+2025-11-05 08:30:44 - INFO - Batch 12/14 - Processando itens 5501 a 6000 (500 itens)...
+2025-11-05 08:30:44 - INFO - Iniciando busca de 'REVIEWS' assíncrona para 500 AppIDs com concorrência 3...
+2025-11-05 08:32:00 - INFO - Busca assíncrona concluída.
+2025-11-05 08:32:00 - INFO - --- Busca concluída: ---
+2025-11-05 08:32:00 - INFO - 41 sucesso(s) (8.20%),
+2025-11-05 08:32:00 - INFO - 459 falha(s) (91.80%).
+2025-11-05 08:32:00 - INFO - --- Detalhamento dos erros: ---
+2025-11-05 08:32:00 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-05 08:32:00 - INFO - * Timeout: 0
+2025-11-05 08:32:00 - INFO - * Ausentes: 459
+2025-11-05 08:32:00 - INFO - * Outros: 0
+2025-11-05 08:32:00 - INFO - Aguardando 60s antes do próximo batch...
+
+2025-11-05 08:33:00 - INFO - Batch 13/14 - Processando itens 6001 a 6500 (500 itens)...
+2025-11-05 08:33:00 - INFO - Iniciando busca de 'REVIEWS' assíncrona para 500 AppIDs com concorrência 3...
+2025-11-05 08:34:17 - INFO - Busca assíncrona concluída.
+2025-11-05 08:34:17 - INFO - --- Busca concluída: ---
+2025-11-05 08:34:17 - INFO - 5 sucesso(s) (1.00%),
+2025-11-05 08:34:17 - INFO - 495 falha(s) (99.00%).
+2025-11-05 08:34:17 - INFO - --- Detalhamento dos erros: ---
+2025-11-05 08:34:17 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-05 08:34:17 - INFO - * Timeout: 0
+2025-11-05 08:34:17 - INFO - * Ausentes: 495
+2025-11-05 08:34:17 - INFO - * Outros: 0
+2025-11-05 08:34:17 - INFO - Aguardando 60s antes do próximo batch...
+
+2025-11-05 08:35:17 - INFO - Batch 14/14 - Processando itens 6501 a 6864 (364 itens)...
+2025-11-05 08:35:17 - INFO - Iniciando busca de 'REVIEWS' assíncrona para 364 AppIDs com concorrência 3...
+2025-11-05 08:36:15 - INFO - Busca assíncrona concluída.
+2025-11-05 08:36:15 - INFO - --- Busca concluída: ---
+2025-11-05 08:36:15 - INFO - 272 sucesso(s) (74.73%),
+2025-11-05 08:36:15 - INFO - 92 falha(s) (25.27%).
+2025-11-05 08:36:15 - INFO - --- Detalhamento dos erros: ---
+2025-11-05 08:36:15 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-05 08:36:15 - INFO - * Timeout: 0
+2025-11-05 08:36:15 - INFO - * Ausentes: 92
+2025-11-05 08:36:15 - INFO - * Outros: 0
+2025-11-05 08:36:15 - INFO - 
+PROCESSAMENTO COMPLETO!
+2025-11-05 08:36:15 - INFO - Total processado: 2,013 sucessos de 6,864 itens (29.33%)
+2025-11-05 08:36:15 - INFO - Dados de reviews inseridos com sucesso.
+2025-11-05 08:38:49 - INFO - Processando aplicativos de 1 a 1000 de 273744
+2025-11-05 08:39:16 - INFO - Total de registros carregados de steam_raw: 20082
+2025-11-05 08:39:17 - INFO - Número de jogos pagos selecionados: 10090
+2025-11-05 08:39:28 - ERROR - Erro ao inserir dados steam_bd: 'APIResponse[TypeVar]' object has no attribute 'error'
+2025-11-05 08:39:30 - ERROR - Erro ao alimentar o banco de dados Steam BD: 'APIResponse[TypeVar]' object has no attribute 'error'
+2025-11-05 08:40:18 - INFO - Número total de aplicativos carregados: 273744
+2025-11-05 08:40:18 - INFO - Processando aplicativos de 1 a 5 de 5
+2025-11-05 08:40:18 - INFO - Conectado ao Supabase com sucesso
+2025-11-05 08:40:19 - INFO - Total de registros desatualizados de steam_raw: 0
+2025-11-05 08:40:26 - INFO - Total de registros incompletos de 'steam_raw': 6859
+2025-11-05 08:40:26 - INFO - Número de AppIDs a processar: 5
+2025-11-05 08:40:26 - INFO - === PROCESSAMENTO EM BATCHES ===
+2025-11-05 08:40:26 - INFO - Total de itens: 5
+2025-11-05 08:40:26 - INFO - Tamanho do batch: 200
+2025-11-05 08:40:26 - INFO - Total de batches: 1
+2025-11-05 08:40:26 - INFO - Delay entre batches: 120s
+2025-11-05 08:40:26 - INFO - Concorrência por batch: 1
+2025-11-05 08:40:26 - INFO - ================================
+
+2025-11-05 08:40:26 - INFO - Batch 1/1 - Processando itens 1 a 5 (5 itens)...
+2025-11-05 08:40:26 - INFO - Iniciando busca de 'DETALHES' assíncrona para 5 AppIDs com concorrência 1...
+2025-11-05 08:40:28 - INFO - Busca assíncrona concluída.
+2025-11-05 08:40:28 - INFO - --- Busca concluída: ---
+2025-11-05 08:40:28 - INFO - 0 sucesso(s) (0.00%),
+2025-11-05 08:40:28 - INFO - 5 falha(s) (100.00%).
+2025-11-05 08:40:28 - INFO - --- Detalhamento dos erros: ---
+2025-11-05 08:40:28 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-05 08:40:28 - INFO - * Timeout: 0
+2025-11-05 08:40:28 - INFO - * Ausentes: 5
+2025-11-05 08:40:28 - INFO - * Outros: 0
+2025-11-05 08:40:28 - INFO - 
+PROCESSAMENTO COMPLETO!
+2025-11-05 08:40:28 - INFO - Total processado: 0 sucessos de 5 itens (0.00%)
+2025-11-05 08:40:28 - WARNING - Nenhum dado de detalhes retornado da API Steam.
+2025-11-05 08:40:28 - INFO - Número de AppIDs com dados incompletos: 6859
+2025-11-05 08:40:28 - INFO - === PROCESSAMENTO EM BATCHES (REVIEWS) ===
+2025-11-05 08:40:28 - INFO - Total de itens: 6,864
+2025-11-05 08:40:28 - INFO - Tamanho do batch: 500
+2025-11-05 08:40:28 - INFO - Total de batches: 14
+2025-11-05 08:40:28 - INFO - Delay entre batches: 60s
+2025-11-05 08:40:28 - INFO - Concorrência por batch: 3
+2025-11-05 08:40:28 - INFO - ==========================================
+
+2025-11-05 08:40:28 - INFO - Batch 1/14 - Processando itens 1 a 500 (500 itens)...
+2025-11-05 08:40:28 - INFO - Iniciando busca de 'REVIEWS' assíncrona para 500 AppIDs com concorrência 3...
+2025-11-05 08:41:43 - INFO - Busca assíncrona concluída.
+2025-11-05 08:41:43 - INFO - --- Busca concluída: ---
+2025-11-05 08:41:43 - INFO - 263 sucesso(s) (52.60%),
+2025-11-05 08:41:43 - INFO - 237 falha(s) (47.40%).
+2025-11-05 08:41:43 - INFO - --- Detalhamento dos erros: ---
+2025-11-05 08:41:43 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-05 08:41:43 - INFO - * Timeout: 0
+2025-11-05 08:41:43 - INFO - * Ausentes: 237
+2025-11-05 08:41:43 - INFO - * Outros: 0
+2025-11-05 08:41:43 - INFO - Aguardando 60s antes do próximo batch...
+
+2025-11-05 08:42:43 - INFO - Batch 2/14 - Processando itens 501 a 1000 (500 itens)...
+2025-11-05 08:42:43 - INFO - Iniciando busca de 'REVIEWS' assíncrona para 500 AppIDs com concorrência 3...
+2025-11-05 08:43:59 - INFO - Busca assíncrona concluída.
+2025-11-05 08:43:59 - INFO - --- Busca concluída: ---
+2025-11-05 08:43:59 - INFO - 406 sucesso(s) (81.20%),
+2025-11-05 08:43:59 - INFO - 94 falha(s) (18.80%).
+2025-11-05 08:43:59 - INFO - --- Detalhamento dos erros: ---
+2025-11-05 08:43:59 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-05 08:43:59 - INFO - * Timeout: 0
+2025-11-05 08:43:59 - INFO - * Ausentes: 94
+2025-11-05 08:43:59 - INFO - * Outros: 0
+2025-11-05 08:43:59 - INFO - Aguardando 60s antes do próximo batch...
+
+2025-11-05 08:44:59 - INFO - Batch 3/14 - Processando itens 1001 a 1500 (500 itens)...
+2025-11-05 08:44:59 - INFO - Iniciando busca de 'REVIEWS' assíncrona para 500 AppIDs com concorrência 3...
+2025-11-05 08:46:13 - INFO - Busca assíncrona concluída.
+2025-11-05 08:46:13 - INFO - --- Busca concluída: ---
+2025-11-05 08:46:13 - INFO - 120 sucesso(s) (24.00%),
+2025-11-05 08:46:13 - INFO - 380 falha(s) (76.00%).
+2025-11-05 08:46:13 - INFO - --- Detalhamento dos erros: ---
+2025-11-05 08:46:13 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-05 08:46:13 - INFO - * Timeout: 0
+2025-11-05 08:46:13 - INFO - * Ausentes: 380
+2025-11-05 08:46:13 - INFO - * Outros: 0
+2025-11-05 08:46:13 - INFO - Aguardando 60s antes do próximo batch...
+
+2025-11-05 08:47:13 - INFO - Batch 4/14 - Processando itens 1501 a 2000 (500 itens)...
+2025-11-05 08:47:13 - INFO - Iniciando busca de 'REVIEWS' assíncrona para 500 AppIDs com concorrência 3...
+2025-11-05 08:48:27 - INFO - Busca assíncrona concluída.
+2025-11-05 08:48:27 - INFO - --- Busca concluída: ---
+2025-11-05 08:48:27 - INFO - 137 sucesso(s) (27.40%),
+2025-11-05 08:48:27 - INFO - 363 falha(s) (72.60%).
+2025-11-05 08:48:27 - INFO - --- Detalhamento dos erros: ---
+2025-11-05 08:48:27 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-05 08:48:27 - INFO - * Timeout: 0
+2025-11-05 08:48:27 - INFO - * Ausentes: 363
+2025-11-05 08:48:27 - INFO - * Outros: 0
+2025-11-05 08:48:27 - INFO - Aguardando 60s antes do próximo batch...
+
+2025-11-05 08:49:27 - INFO - Batch 5/14 - Processando itens 2001 a 2500 (500 itens)...
+2025-11-05 08:49:27 - INFO - Iniciando busca de 'REVIEWS' assíncrona para 500 AppIDs com concorrência 3...
+2025-11-05 08:50:42 - INFO - Busca assíncrona concluída.
+2025-11-05 08:50:42 - INFO - --- Busca concluída: ---
+2025-11-05 08:50:42 - INFO - 6 sucesso(s) (1.20%),
+2025-11-05 08:50:42 - INFO - 494 falha(s) (98.80%).
+2025-11-05 08:50:42 - INFO - --- Detalhamento dos erros: ---
+2025-11-05 08:50:42 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-05 08:50:42 - INFO - * Timeout: 0
+2025-11-05 08:50:42 - INFO - * Ausentes: 494
+2025-11-05 08:50:42 - INFO - * Outros: 0
+2025-11-05 08:50:42 - INFO - Aguardando 60s antes do próximo batch...
+
+2025-11-05 08:51:42 - INFO - Batch 6/14 - Processando itens 2501 a 3000 (500 itens)...
+2025-11-05 08:51:42 - INFO - Iniciando busca de 'REVIEWS' assíncrona para 500 AppIDs com concorrência 3...
+2025-11-05 08:52:56 - INFO - Busca assíncrona concluída.
+2025-11-05 08:52:56 - INFO - --- Busca concluída: ---
+2025-11-05 08:52:56 - INFO - 63 sucesso(s) (12.60%),
+2025-11-05 08:52:56 - INFO - 437 falha(s) (87.40%).
+2025-11-05 08:52:56 - INFO - --- Detalhamento dos erros: ---
+2025-11-05 08:52:56 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-05 08:52:56 - INFO - * Timeout: 0
+2025-11-05 08:52:56 - INFO - * Ausentes: 437
+2025-11-05 08:52:56 - INFO - * Outros: 0
+2025-11-05 08:52:56 - INFO - Aguardando 60s antes do próximo batch...
+
+2025-11-05 08:53:56 - INFO - Batch 7/14 - Processando itens 3001 a 3500 (500 itens)...
+2025-11-05 08:53:56 - INFO - Iniciando busca de 'REVIEWS' assíncrona para 500 AppIDs com concorrência 3...
+2025-11-05 08:55:09 - INFO - Busca assíncrona concluída.
+2025-11-05 08:55:09 - INFO - --- Busca concluída: ---
+2025-11-05 08:55:09 - INFO - 7 sucesso(s) (1.40%),
+2025-11-05 08:55:09 - INFO - 493 falha(s) (98.60%).
+2025-11-05 08:55:09 - INFO - --- Detalhamento dos erros: ---
+2025-11-05 08:55:09 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-05 08:55:09 - INFO - * Timeout: 0
+2025-11-05 08:55:09 - INFO - * Ausentes: 493
+2025-11-05 08:55:09 - INFO - * Outros: 0
+2025-11-05 08:55:09 - INFO - Aguardando 60s antes do próximo batch...
+
+2025-11-05 08:56:09 - INFO - Batch 8/14 - Processando itens 3501 a 4000 (500 itens)...
+2025-11-05 08:56:09 - INFO - Iniciando busca de 'REVIEWS' assíncrona para 500 AppIDs com concorrência 3...
+2025-11-05 08:57:25 - INFO - Busca assíncrona concluída.
+2025-11-05 08:57:25 - INFO - --- Busca concluída: ---
+2025-11-05 08:57:25 - INFO - 279 sucesso(s) (55.80%),
+2025-11-05 08:57:25 - INFO - 221 falha(s) (44.20%).
+2025-11-05 08:57:25 - INFO - --- Detalhamento dos erros: ---
+2025-11-05 08:57:25 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-05 08:57:25 - INFO - * Timeout: 0
+2025-11-05 08:57:25 - INFO - * Ausentes: 221
+2025-11-05 08:57:25 - INFO - * Outros: 0
+2025-11-05 08:57:25 - INFO - Aguardando 60s antes do próximo batch...
+
+2025-11-05 08:58:25 - INFO - Batch 9/14 - Processando itens 4001 a 4500 (500 itens)...
+2025-11-05 08:58:25 - INFO - Iniciando busca de 'REVIEWS' assíncrona para 500 AppIDs com concorrência 3...
+2025-11-05 08:59:39 - INFO - Busca assíncrona concluída.
+2025-11-05 08:59:39 - INFO - --- Busca concluída: ---
+2025-11-05 08:59:39 - INFO - 320 sucesso(s) (64.00%),
+2025-11-05 08:59:39 - INFO - 180 falha(s) (36.00%).
+2025-11-05 08:59:39 - INFO - --- Detalhamento dos erros: ---
+2025-11-05 08:59:39 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-05 08:59:39 - INFO - * Timeout: 0
+2025-11-05 08:59:39 - INFO - * Ausentes: 180
+2025-11-05 08:59:39 - INFO - * Outros: 0
+2025-11-05 08:59:39 - INFO - Aguardando 60s antes do próximo batch...
+
+2025-11-05 09:00:39 - INFO - Batch 10/14 - Processando itens 4501 a 5000 (500 itens)...
+2025-11-05 09:00:40 - INFO - Iniciando busca de 'REVIEWS' assíncrona para 500 AppIDs com concorrência 3...
+2025-11-05 09:01:54 - INFO - Busca assíncrona concluída.
+2025-11-05 09:01:54 - INFO - --- Busca concluída: ---
+2025-11-05 09:01:54 - INFO - 52 sucesso(s) (10.40%),
+2025-11-05 09:01:54 - INFO - 448 falha(s) (89.60%).
+2025-11-05 09:01:54 - INFO - --- Detalhamento dos erros: ---
+2025-11-05 09:01:54 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-05 09:01:54 - INFO - * Timeout: 0
+2025-11-05 09:01:54 - INFO - * Ausentes: 448
+2025-11-05 09:01:54 - INFO - * Outros: 0
+2025-11-05 09:01:54 - INFO - Aguardando 60s antes do próximo batch...
+
+2025-11-05 09:02:54 - INFO - Batch 11/14 - Processando itens 5001 a 5500 (500 itens)...
+2025-11-05 09:02:54 - INFO - Iniciando busca de 'REVIEWS' assíncrona para 500 AppIDs com concorrência 3...
+2025-11-05 09:04:07 - INFO - Busca assíncrona concluída.
+2025-11-05 09:04:07 - INFO - --- Busca concluída: ---
+2025-11-05 09:04:07 - INFO - 42 sucesso(s) (8.40%),
+2025-11-05 09:04:07 - INFO - 458 falha(s) (91.60%).
+2025-11-05 09:04:07 - INFO - --- Detalhamento dos erros: ---
+2025-11-05 09:04:07 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-05 09:04:07 - INFO - * Timeout: 0
+2025-11-05 09:04:07 - INFO - * Ausentes: 458
+2025-11-05 09:04:07 - INFO - * Outros: 0
+2025-11-05 09:04:07 - INFO - Aguardando 60s antes do próximo batch...
+
+2025-11-05 09:05:07 - INFO - Batch 12/14 - Processando itens 5501 a 6000 (500 itens)...
+2025-11-05 09:05:07 - INFO - Iniciando busca de 'REVIEWS' assíncrona para 500 AppIDs com concorrência 3...
+2025-11-05 09:06:19 - INFO - Busca assíncrona concluída.
+2025-11-05 09:06:19 - INFO - --- Busca concluída: ---
+2025-11-05 09:06:19 - INFO - 41 sucesso(s) (8.20%),
+2025-11-05 09:06:19 - INFO - 459 falha(s) (91.80%).
+2025-11-05 09:06:19 - INFO - --- Detalhamento dos erros: ---
+2025-11-05 09:06:19 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-05 09:06:19 - INFO - * Timeout: 0
+2025-11-05 09:06:19 - INFO - * Ausentes: 459
+2025-11-05 09:06:19 - INFO - * Outros: 0
+2025-11-05 09:06:19 - INFO - Aguardando 60s antes do próximo batch...
+
+2025-11-05 09:07:19 - INFO - Batch 13/14 - Processando itens 6001 a 6500 (500 itens)...
+2025-11-05 09:07:19 - INFO - Iniciando busca de 'REVIEWS' assíncrona para 500 AppIDs com concorrência 3...
+2025-11-05 09:08:31 - INFO - Busca assíncrona concluída.
+2025-11-05 09:08:31 - INFO - --- Busca concluída: ---
+2025-11-05 09:08:31 - INFO - 5 sucesso(s) (1.00%),
+2025-11-05 09:08:31 - INFO - 495 falha(s) (99.00%).
+2025-11-05 09:08:31 - INFO - --- Detalhamento dos erros: ---
+2025-11-05 09:08:31 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-05 09:08:31 - INFO - * Timeout: 0
+2025-11-05 09:08:31 - INFO - * Ausentes: 495
+2025-11-05 09:08:31 - INFO - * Outros: 0
+2025-11-05 09:08:31 - INFO - Aguardando 60s antes do próximo batch...
+
+2025-11-05 09:09:31 - INFO - Batch 14/14 - Processando itens 6501 a 6864 (364 itens)...
+2025-11-05 09:09:31 - INFO - Iniciando busca de 'REVIEWS' assíncrona para 364 AppIDs com concorrência 3...
+2025-11-05 09:10:27 - INFO - Busca assíncrona concluída.
+2025-11-05 09:10:27 - INFO - --- Busca concluída: ---
+2025-11-05 09:10:27 - INFO - 272 sucesso(s) (74.73%),
+2025-11-05 09:10:27 - INFO - 92 falha(s) (25.27%).
+2025-11-05 09:10:27 - INFO - --- Detalhamento dos erros: ---
+2025-11-05 09:10:27 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-05 09:10:27 - INFO - * Timeout: 0
+2025-11-05 09:10:27 - INFO - * Ausentes: 92
+2025-11-05 09:10:27 - INFO - * Outros: 0
+2025-11-05 09:10:27 - INFO - 
+PROCESSAMENTO COMPLETO!
+2025-11-05 09:10:27 - INFO - Total processado: 2,013 sucessos de 6,864 itens (29.33%)
+2025-11-05 09:10:27 - INFO - Dados de reviews inseridos com sucesso.
+2025-11-05 09:11:42 - INFO - Processando aplicativos de 1 a 1000 de 273744
+2025-11-05 09:12:09 - INFO - Total de registros carregados de steam_raw: 20082
+2025-11-05 09:12:10 - INFO - Número de jogos pagos selecionados: 10090
+2025-11-05 09:19:43 - ERROR - Erro ao inserir dados steam_bd: <ConnectionTerminated error_code:0, last_stream_id:19999, additional_data:None>
+2025-11-05 09:19:43 - ERROR - Erro ao alimentar o banco de dados Steam BD: <ConnectionTerminated error_code:0, last_stream_id:19999, additional_data:None>
+2025-11-05 09:19:43 - INFO - Processando aplicativos de 1 a 5 de 5
+2025-11-05 09:19:44 - INFO - Total de registros desatualizados de steam_raw: 0
+2025-11-05 09:19:52 - INFO - Total de registros incompletos de 'steam_raw': 6859
+2025-11-05 09:19:52 - INFO - Número de AppIDs a processar: 5
+2025-11-05 09:19:52 - INFO - === PROCESSAMENTO EM BATCHES ===
+2025-11-05 09:19:52 - INFO - Total de itens: 5
+2025-11-05 09:19:52 - INFO - Tamanho do batch: 200
+2025-11-05 09:19:52 - INFO - Total de batches: 1
+2025-11-05 09:19:52 - INFO - Delay entre batches: 120s
+2025-11-05 09:19:52 - INFO - Concorrência por batch: 1
+2025-11-05 09:19:52 - INFO - ================================
+
+2025-11-05 09:19:52 - INFO - Batch 1/1 - Processando itens 1 a 5 (5 itens)...
+2025-11-05 09:19:52 - INFO - Iniciando busca de 'DETALHES' assíncrona para 5 AppIDs com concorrência 1...
+2025-11-05 09:19:54 - INFO - Busca assíncrona concluída.
+2025-11-05 09:19:54 - INFO - --- Busca concluída: ---
+2025-11-05 09:19:54 - INFO - 0 sucesso(s) (0.00%),
+2025-11-05 09:19:54 - INFO - 5 falha(s) (100.00%).
+2025-11-05 09:19:54 - INFO - --- Detalhamento dos erros: ---
+2025-11-05 09:19:54 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-05 09:19:54 - INFO - * Timeout: 0
+2025-11-05 09:19:54 - INFO - * Ausentes: 5
+2025-11-05 09:19:54 - INFO - * Outros: 0
+2025-11-05 09:19:54 - INFO - 
+PROCESSAMENTO COMPLETO!
+2025-11-05 09:19:54 - INFO - Total processado: 0 sucessos de 5 itens (0.00%)
+2025-11-05 09:19:54 - WARNING - Nenhum dado de detalhes retornado da API Steam.
+2025-11-05 09:19:54 - INFO - Número de AppIDs com dados incompletos: 6859
+2025-11-05 09:19:54 - INFO - === PROCESSAMENTO EM BATCHES (REVIEWS) ===
+2025-11-05 09:19:54 - INFO - Total de itens: 6,864
+2025-11-05 09:19:54 - INFO - Tamanho do batch: 500
+2025-11-05 09:19:54 - INFO - Total de batches: 14
+2025-11-05 09:19:54 - INFO - Delay entre batches: 60s
+2025-11-05 09:19:54 - INFO - Concorrência por batch: 3
+2025-11-05 09:19:54 - INFO - ==========================================
+
+2025-11-05 09:19:54 - INFO - Batch 1/14 - Processando itens 1 a 500 (500 itens)...
+2025-11-05 09:19:54 - INFO - Iniciando busca de 'REVIEWS' assíncrona para 500 AppIDs com concorrência 3...
+2025-11-05 09:24:51 - INFO - Conectado ao Supabase com sucesso
+2025-11-05 09:24:51 - INFO - Conectado ao Supabase
+2025-11-05 09:24:51 - INFO - Carregando dados da steam_raw...
+2025-11-05 09:25:38 - INFO - Total de registros carregados de steam_raw: 20082
+2025-11-05 09:25:38 - INFO - 
+============================================================
+2025-11-05 09:25:38 - INFO - ANÁLISE DE REVIEWS - Total de registros: 20,082
+2025-11-05 09:25:38 - INFO - ============================================================
+
+2025-11-05 09:25:38 - INFO - Desconectado do Supabase
+2025-11-05 09:53:46 - INFO - Número total de aplicativos carregados: 273744
+2025-11-05 09:53:46 - INFO - Processando aplicativos de 1 a 5 de 5
+2025-11-05 09:53:47 - INFO - Conectado ao Supabase com sucesso
+2025-11-05 09:53:48 - INFO - Total de registros desatualizados de steam_raw: 0
+2025-11-05 09:53:49 - INFO - Total de registros incompletos de 'steam_raw': 0 (reviews opcionais)
+2025-11-05 09:53:49 - INFO - Número de AppIDs a processar: 5
+2025-11-05 09:53:49 - INFO - === PROCESSAMENTO EM BATCHES ===
+2025-11-05 09:53:49 - INFO - Total de itens: 5
+2025-11-05 09:53:49 - INFO - Tamanho do batch: 200
+2025-11-05 09:53:49 - INFO - Total de batches: 1
+2025-11-05 09:53:49 - INFO - Delay entre batches: 120s
+2025-11-05 09:53:49 - INFO - Concorrência por batch: 1
+2025-11-05 09:53:49 - INFO - ================================
+
+2025-11-05 09:53:49 - INFO - Batch 1/1 - Processando itens 1 a 5 (5 itens)...
+2025-11-05 09:53:49 - INFO - Iniciando busca de 'DETALHES' assíncrona para 5 AppIDs com concorrência 1...
+2025-11-05 09:53:51 - INFO - Busca assíncrona concluída.
+2025-11-05 09:53:51 - INFO - --- Busca concluída: ---
+2025-11-05 09:53:51 - INFO - 0 sucesso(s) (0.00%),
+2025-11-05 09:53:51 - INFO - 5 falha(s) (100.00%).
+2025-11-05 09:53:51 - INFO - --- Detalhamento dos erros: ---
+2025-11-05 09:53:51 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-05 09:53:51 - INFO - * Timeout: 0
+2025-11-05 09:53:51 - INFO - * Ausentes: 5
+2025-11-05 09:53:51 - INFO - * Outros: 0
+2025-11-05 09:53:51 - INFO - 
+PROCESSAMENTO COMPLETO!
+2025-11-05 09:53:51 - INFO - Total processado: 0 sucessos de 5 itens (0.00%)
+2025-11-05 09:53:51 - WARNING - Nenhum dado de detalhes retornado da API Steam.
+2025-11-05 09:53:51 - INFO - === PROCESSAMENTO EM BATCHES (REVIEWS) ===
+2025-11-05 09:53:51 - INFO - Total de itens: 5
+2025-11-05 09:53:51 - INFO - Tamanho do batch: 500
+2025-11-05 09:53:51 - INFO - Total de batches: 1
+2025-11-05 09:53:51 - INFO - Delay entre batches: 60s
+2025-11-05 09:53:51 - INFO - Concorrência por batch: 3
+2025-11-05 09:53:51 - INFO - ==========================================
+
+2025-11-05 09:53:51 - INFO - Batch 1/1 - Processando itens 1 a 5 (5 itens)...
+2025-11-05 09:53:51 - INFO - Iniciando busca de 'REVIEWS' assíncrona para 5 AppIDs com concorrência 3...
+2025-11-05 09:53:52 - INFO - Busca assíncrona concluída.
+2025-11-05 09:54:54 - INFO - Número total de aplicativos carregados: 273744
+2025-11-05 09:54:54 - INFO - Processando aplicativos de 1 a 5 de 5
+2025-11-05 09:54:55 - INFO - Conectado ao Supabase com sucesso
+2025-11-05 09:54:55 - INFO - Total de registros desatualizados de steam_raw: 0
+2025-11-05 09:54:55 - INFO - Total de registros incompletos de 'steam_raw': 0 (reviews opcionais)
+2025-11-05 09:54:55 - INFO - Número de AppIDs a processar: 5
+2025-11-05 09:54:55 - INFO - === PROCESSAMENTO EM BATCHES ===
+2025-11-05 09:54:55 - INFO - Total de itens: 5
+2025-11-05 09:54:55 - INFO - Tamanho do batch: 200
+2025-11-05 09:54:55 - INFO - Total de batches: 1
+2025-11-05 09:54:55 - INFO - Delay entre batches: 120s
+2025-11-05 09:54:55 - INFO - Concorrência por batch: 1
+2025-11-05 09:54:55 - INFO - ================================
+
+2025-11-05 09:54:55 - INFO - Batch 1/1 - Processando itens 1 a 5 (5 itens)...
+2025-11-05 09:54:55 - INFO - Iniciando busca de 'DETALHES' assíncrona para 5 AppIDs com concorrência 1...
+2025-11-05 09:54:57 - INFO - Busca assíncrona concluída.
+2025-11-05 09:54:57 - INFO - --- Busca concluída: ---
+2025-11-05 09:54:57 - INFO - 0 sucesso(s) (0.00%),
+2025-11-05 09:54:57 - INFO - 5 falha(s) (100.00%).
+2025-11-05 09:54:57 - INFO - --- Detalhamento dos erros: ---
+2025-11-05 09:54:57 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-05 09:54:57 - INFO - * Timeout: 0
+2025-11-05 09:54:57 - INFO - * Ausentes: 5
+2025-11-05 09:54:57 - INFO - * Outros: 0
+2025-11-05 09:54:57 - INFO - 
+PROCESSAMENTO COMPLETO!
+2025-11-05 09:54:57 - INFO - Total processado: 0 sucessos de 5 itens (0.00%)
+2025-11-05 09:54:57 - WARNING - Nenhum dado de detalhes retornado da API Steam.
+2025-11-05 09:54:57 - INFO - === PROCESSAMENTO EM BATCHES (REVIEWS) ===
+2025-11-05 09:54:57 - INFO - Total de itens: 5
+2025-11-05 09:54:57 - INFO - Tamanho do batch: 500
+2025-11-05 09:54:57 - INFO - Total de batches: 1
+2025-11-05 09:54:57 - INFO - Delay entre batches: 60s
+2025-11-05 09:54:57 - INFO - Concorrência por batch: 3
+2025-11-05 09:54:57 - INFO - ==========================================
+
+2025-11-05 09:54:57 - INFO - Batch 1/1 - Processando itens 1 a 5 (5 itens)...
+2025-11-05 09:54:57 - INFO - Iniciando busca de 'REVIEWS' assíncrona para 5 AppIDs com concorrência 3...
+2025-11-05 09:54:58 - INFO - Busca assíncrona concluída.
+2025-11-05 09:55:20 - INFO - --- Busca concluída: ---
+2025-11-05 09:55:20 - INFO - 5 sucesso(s) (100.00%),
+2025-11-05 09:55:20 - INFO - 0 falha(s) (0.00%).
+2025-11-05 09:55:20 - INFO - --- Detalhamento dos erros: ---
+2025-11-05 09:55:20 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-05 09:55:20 - INFO - * Timeout: 0
+2025-11-05 09:55:20 - INFO - * Ausentes: 0
+2025-11-05 09:55:20 - INFO - * Outros: 0
+2025-11-05 09:55:20 - INFO - 
+PROCESSAMENTO COMPLETO!
+2025-11-05 09:55:20 - INFO - Total processado: 5 sucessos de 5 itens (100.00%)
+2025-11-05 09:55:20 - INFO - Dados de reviews inseridos com sucesso.
+2025-11-05 09:55:42 - ERROR - Erro ao alimentar o banco de dados: argument of type 'int' is not iterable
+2025-11-05 09:55:54 - INFO - Número total de aplicativos carregados: 273744
+2025-11-05 09:55:54 - INFO - Processando aplicativos de 1 a 5 de 5
+2025-11-05 09:55:55 - INFO - Conectado ao Supabase com sucesso
+2025-11-05 09:55:56 - INFO - Total de registros desatualizados de steam_raw: 0
+2025-11-05 09:55:56 - INFO - Total de registros incompletos de 'steam_raw': 0 (reviews opcionais)
+2025-11-05 09:55:56 - INFO - Número de AppIDs a processar: 5
+2025-11-05 09:55:56 - INFO - === PROCESSAMENTO EM BATCHES ===
+2025-11-05 09:55:56 - INFO - Total de itens: 5
+2025-11-05 09:55:56 - INFO - Tamanho do batch: 200
+2025-11-05 09:55:56 - INFO - Total de batches: 1
+2025-11-05 09:55:56 - INFO - Delay entre batches: 120s
+2025-11-05 09:55:56 - INFO - Concorrência por batch: 1
+2025-11-05 09:55:56 - INFO - ================================
+
+2025-11-05 09:55:56 - INFO - Batch 1/1 - Processando itens 1 a 5 (5 itens)...
+2025-11-05 09:55:56 - INFO - Iniciando busca de 'DETALHES' assíncrona para 5 AppIDs com concorrência 1...
+2025-11-05 09:55:58 - INFO - Busca assíncrona concluída.
+2025-11-05 09:55:58 - INFO - --- Busca concluída: ---
+2025-11-05 09:55:58 - INFO - 0 sucesso(s) (0.00%),
+2025-11-05 09:55:58 - INFO - 5 falha(s) (100.00%).
+2025-11-05 09:55:58 - INFO - --- Detalhamento dos erros: ---
+2025-11-05 09:55:58 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-05 09:55:58 - INFO - * Timeout: 0
+2025-11-05 09:55:58 - INFO - * Ausentes: 5
+2025-11-05 09:55:58 - INFO - * Outros: 0
+2025-11-05 09:55:58 - INFO - 
+PROCESSAMENTO COMPLETO!
+2025-11-05 09:55:58 - INFO - Total processado: 0 sucessos de 5 itens (0.00%)
+2025-11-05 09:55:58 - WARNING - Nenhum dado de detalhes retornado da API Steam.
+2025-11-05 09:55:58 - INFO - === PROCESSAMENTO EM BATCHES (REVIEWS) ===
+2025-11-05 09:55:58 - INFO - Total de itens: 5
+2025-11-05 09:55:58 - INFO - Tamanho do batch: 500
+2025-11-05 09:55:58 - INFO - Total de batches: 1
+2025-11-05 09:55:58 - INFO - Delay entre batches: 60s
+2025-11-05 09:55:58 - INFO - Concorrência por batch: 3
+2025-11-05 09:55:58 - INFO - ==========================================
+
+2025-11-05 09:55:58 - INFO - Batch 1/1 - Processando itens 1 a 5 (5 itens)...
+2025-11-05 09:55:58 - INFO - Iniciando busca de 'REVIEWS' assíncrona para 5 AppIDs com concorrência 3...
+2025-11-05 09:55:59 - INFO - Busca assíncrona concluída.
+2025-11-05 09:55:59 - INFO - --- Busca concluída: ---
+2025-11-05 09:55:59 - INFO - 5 sucesso(s) (100.00%),
+2025-11-05 09:55:59 - INFO - 0 falha(s) (0.00%).
+2025-11-05 09:55:59 - INFO - --- Detalhamento dos erros: ---
+2025-11-05 09:55:59 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-05 09:55:59 - INFO - * Timeout: 0
+2025-11-05 09:55:59 - INFO - * Ausentes: 0
+2025-11-05 09:55:59 - INFO - * Outros: 0
+2025-11-05 09:55:59 - INFO - 
+PROCESSAMENTO COMPLETO!
+2025-11-05 09:55:59 - INFO - Total processado: 5 sucessos de 5 itens (100.00%)
+2025-11-05 09:55:59 - INFO - Dados de reviews inseridos com sucesso.
+2025-11-05 09:56:07 - ERROR - Erro ao alimentar o banco de dados: argument of type 'int' is not iterable
+2025-11-05 09:56:07 - INFO - Processando aplicativos de 1 a 5 de 5
+2025-11-05 09:56:08 - INFO - Total de registros desatualizados de steam_raw: 0
+2025-11-05 09:56:08 - INFO - Total de registros incompletos de 'steam_raw': 0 (reviews opcionais)
+2025-11-05 09:56:08 - INFO - Número de AppIDs a processar: 5
+2025-11-05 09:56:08 - INFO - === PROCESSAMENTO EM BATCHES ===
+2025-11-05 09:56:08 - INFO - Total de itens: 5
+2025-11-05 09:56:08 - INFO - Tamanho do batch: 200
+2025-11-05 09:56:08 - INFO - Total de batches: 1
+2025-11-05 09:56:08 - INFO - Delay entre batches: 120s
+2025-11-05 09:56:08 - INFO - Concorrência por batch: 1
+2025-11-05 09:56:08 - INFO - ================================
+
+2025-11-05 09:56:08 - INFO - Batch 1/1 - Processando itens 1 a 5 (5 itens)...
+2025-11-05 09:56:08 - INFO - Iniciando busca de 'DETALHES' assíncrona para 5 AppIDs com concorrência 1...
+2025-11-05 09:56:10 - INFO - Busca assíncrona concluída.
+2025-11-05 09:56:10 - INFO - --- Busca concluída: ---
+2025-11-05 09:56:10 - INFO - 0 sucesso(s) (0.00%),
+2025-11-05 09:56:10 - INFO - 5 falha(s) (100.00%).
+2025-11-05 09:56:10 - INFO - --- Detalhamento dos erros: ---
+2025-11-05 09:56:10 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-05 09:56:10 - INFO - * Timeout: 0
+2025-11-05 09:56:10 - INFO - * Ausentes: 5
+2025-11-05 09:56:10 - INFO - * Outros: 0
+2025-11-05 09:56:10 - INFO - 
+PROCESSAMENTO COMPLETO!
+2025-11-05 09:56:10 - INFO - Total processado: 0 sucessos de 5 itens (0.00%)
+2025-11-05 09:56:10 - WARNING - Nenhum dado de detalhes retornado da API Steam.
+2025-11-05 09:56:10 - INFO - === PROCESSAMENTO EM BATCHES (REVIEWS) ===
+2025-11-05 09:56:10 - INFO - Total de itens: 5
+2025-11-05 09:56:10 - INFO - Tamanho do batch: 500
+2025-11-05 09:56:10 - INFO - Total de batches: 1
+2025-11-05 09:56:10 - INFO - Delay entre batches: 60s
+2025-11-05 09:56:10 - INFO - Concorrência por batch: 3
+2025-11-05 09:56:10 - INFO - ==========================================
+
+2025-11-05 09:56:10 - INFO - Batch 1/1 - Processando itens 1 a 5 (5 itens)...
+2025-11-05 09:56:10 - INFO - Iniciando busca de 'REVIEWS' assíncrona para 5 AppIDs com concorrência 3...
+2025-11-05 09:56:10 - INFO - Busca assíncrona concluída.
+2025-11-05 09:56:10 - INFO - --- Busca concluída: ---
+2025-11-05 09:56:10 - INFO - 5 sucesso(s) (100.00%),
+2025-11-05 09:56:10 - INFO - 0 falha(s) (0.00%).
+2025-11-05 09:56:10 - INFO - --- Detalhamento dos erros: ---
+2025-11-05 09:56:10 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-05 09:56:10 - INFO - * Timeout: 0
+2025-11-05 09:56:10 - INFO - * Ausentes: 0
+2025-11-05 09:56:10 - INFO - * Outros: 0
+2025-11-05 09:56:10 - INFO - 
+PROCESSAMENTO COMPLETO!
+2025-11-05 09:56:10 - INFO - Total processado: 5 sucessos de 5 itens (100.00%)
+2025-11-05 09:56:10 - INFO - Dados de reviews inseridos com sucesso.
+2025-11-05 09:57:08 - INFO - Número total de aplicativos carregados: 273744
+2025-11-05 09:57:08 - INFO - Processando aplicativos de 1 a 5 de 5
+2025-11-05 09:57:08 - INFO - Conectado ao Supabase com sucesso
+2025-11-05 09:57:09 - INFO - Total de registros desatualizados de steam_raw: 0
+2025-11-05 09:57:09 - INFO - Total de registros incompletos de 'steam_raw': 0 (reviews opcionais)
+2025-11-05 09:57:09 - INFO - Número de AppIDs a processar: 5
+2025-11-05 09:57:09 - INFO - === PROCESSAMENTO EM BATCHES ===
+2025-11-05 09:57:09 - INFO - Total de itens: 5
+2025-11-05 09:57:09 - INFO - Tamanho do batch: 200
+2025-11-05 09:57:09 - INFO - Total de batches: 1
+2025-11-05 09:57:09 - INFO - Delay entre batches: 120s
+2025-11-05 09:57:09 - INFO - Concorrência por batch: 1
+2025-11-05 09:57:09 - INFO - ================================
+
+2025-11-05 09:57:09 - INFO - Batch 1/1 - Processando itens 1 a 5 (5 itens)...
+2025-11-05 09:57:09 - INFO - Iniciando busca de 'DETALHES' assíncrona para 5 AppIDs com concorrência 1...
+2025-11-05 09:57:11 - INFO - Busca assíncrona concluída.
+2025-11-05 09:57:11 - INFO - --- Busca concluída: ---
+2025-11-05 09:57:11 - INFO - 0 sucesso(s) (0.00%),
+2025-11-05 09:57:11 - INFO - 5 falha(s) (100.00%).
+2025-11-05 09:57:11 - INFO - --- Detalhamento dos erros: ---
+2025-11-05 09:57:11 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-05 09:57:11 - INFO - * Timeout: 0
+2025-11-05 09:57:11 - INFO - * Ausentes: 5
+2025-11-05 09:57:11 - INFO - * Outros: 0
+2025-11-05 09:57:11 - INFO - 
+PROCESSAMENTO COMPLETO!
+2025-11-05 09:57:11 - INFO - Total processado: 0 sucessos de 5 itens (0.00%)
+2025-11-05 09:57:11 - WARNING - Nenhum dado de detalhes retornado da API Steam.
+2025-11-05 09:57:11 - INFO - === PROCESSAMENTO EM BATCHES (REVIEWS) ===
+2025-11-05 09:57:11 - INFO - Total de itens: 5
+2025-11-05 09:57:11 - INFO - Tamanho do batch: 500
+2025-11-05 09:57:11 - INFO - Total de batches: 1
+2025-11-05 09:57:11 - INFO - Delay entre batches: 60s
+2025-11-05 09:57:11 - INFO - Concorrência por batch: 3
+2025-11-05 09:57:11 - INFO - ==========================================
+
+2025-11-05 09:57:11 - INFO - Batch 1/1 - Processando itens 1 a 5 (5 itens)...
+2025-11-05 09:57:11 - INFO - Iniciando busca de 'REVIEWS' assíncrona para 5 AppIDs com concorrência 3...
+2025-11-05 09:57:12 - INFO - Busca assíncrona concluída.
+2025-11-05 09:57:12 - INFO - --- Busca concluída: ---
+2025-11-05 09:57:12 - INFO - 5 sucesso(s) (100.00%),
+2025-11-05 09:57:12 - INFO - 0 falha(s) (0.00%).
+2025-11-05 09:57:12 - INFO - --- Detalhamento dos erros: ---
+2025-11-05 09:57:12 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-05 09:57:12 - INFO - * Timeout: 0
+2025-11-05 09:57:12 - INFO - * Ausentes: 0
+2025-11-05 09:57:12 - INFO - * Outros: 0
+2025-11-05 09:57:12 - INFO - 
+PROCESSAMENTO COMPLETO!
+2025-11-05 09:57:12 - INFO - Total processado: 5 sucessos de 5 itens (100.00%)
+2025-11-05 09:57:12 - INFO - Dados de reviews inseridos com sucesso.
+2025-11-05 09:58:39 - INFO - Número total de aplicativos carregados: 273744
+2025-11-05 09:58:39 - INFO - Processando aplicativos de 1 a 5 de 5
+2025-11-05 09:58:40 - INFO - Conectado ao Supabase com sucesso
+2025-11-05 09:58:41 - INFO - Total de registros desatualizados de steam_raw: 0
+2025-11-05 09:58:41 - INFO - Total de registros incompletos de 'steam_raw': 0 (reviews opcionais)
+2025-11-05 09:58:41 - INFO - Número de AppIDs a processar: 5
+2025-11-05 09:58:41 - INFO - === PROCESSAMENTO EM BATCHES ===
+2025-11-05 09:58:41 - INFO - Total de itens: 5
+2025-11-05 09:58:41 - INFO - Tamanho do batch: 200
+2025-11-05 09:58:41 - INFO - Total de batches: 1
+2025-11-05 09:58:41 - INFO - Delay entre batches: 120s
+2025-11-05 09:58:41 - INFO - Concorrência por batch: 1
+2025-11-05 09:58:41 - INFO - ================================
+
+2025-11-05 09:58:41 - INFO - Batch 1/1 - Processando itens 1 a 5 (5 itens)...
+2025-11-05 09:58:41 - INFO - Iniciando busca de 'DETALHES' assíncrona para 5 AppIDs com concorrência 1...
+2025-11-05 09:58:43 - INFO - Busca assíncrona concluída.
+2025-11-05 09:58:43 - INFO - --- Busca concluída: ---
+2025-11-05 09:58:43 - INFO - 0 sucesso(s) (0.00%),
+2025-11-05 09:58:43 - INFO - 5 falha(s) (100.00%).
+2025-11-05 09:58:43 - INFO - --- Detalhamento dos erros: ---
+2025-11-05 09:58:43 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-05 09:58:43 - INFO - * Timeout: 0
+2025-11-05 09:58:43 - INFO - * Ausentes: 5
+2025-11-05 09:58:43 - INFO - * Outros: 0
+2025-11-05 09:58:43 - INFO - 
+PROCESSAMENTO COMPLETO!
+2025-11-05 09:58:43 - INFO - Total processado: 0 sucessos de 5 itens (0.00%)
+2025-11-05 09:58:43 - WARNING - Nenhum dado de detalhes retornado da API Steam.
+2025-11-05 09:58:43 - INFO - === PROCESSAMENTO EM BATCHES (REVIEWS) ===
+2025-11-05 09:58:43 - INFO - Total de itens: 5
+2025-11-05 09:58:43 - INFO - Tamanho do batch: 500
+2025-11-05 09:58:43 - INFO - Total de batches: 1
+2025-11-05 09:58:43 - INFO - Delay entre batches: 60s
+2025-11-05 09:58:43 - INFO - Concorrência por batch: 3
+2025-11-05 09:58:43 - INFO - ==========================================
+
+2025-11-05 09:58:43 - INFO - Batch 1/1 - Processando itens 1 a 5 (5 itens)...
+2025-11-05 09:58:43 - INFO - Iniciando busca de 'REVIEWS' assíncrona para 5 AppIDs com concorrência 3...
+2025-11-05 09:58:44 - INFO - Busca assíncrona concluída.
+2025-11-05 09:58:44 - INFO - --- Busca concluída: ---
+2025-11-05 09:58:44 - INFO - 5 sucesso(s) (100.00%),
+2025-11-05 09:58:44 - INFO - 0 falha(s) (0.00%).
+2025-11-05 09:58:44 - INFO - --- Detalhamento dos erros: ---
+2025-11-05 09:58:44 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-05 09:58:44 - INFO - * Timeout: 0
+2025-11-05 09:58:44 - INFO - * Ausentes: 0
+2025-11-05 09:58:44 - INFO - * Outros: 0
+2025-11-05 09:58:44 - INFO - 
+PROCESSAMENTO COMPLETO!
+2025-11-05 09:58:44 - INFO - Total processado: 5 sucessos de 5 itens (100.00%)
+2025-11-05 09:58:44 - INFO - Dados de reviews inseridos com sucesso.
+2025-11-05 09:59:30 - INFO - Número total de aplicativos carregados: 273744
+2025-11-05 09:59:30 - INFO - Processando aplicativos de 1 a 5 de 5
+2025-11-05 09:59:31 - INFO - Conectado ao Supabase com sucesso
+2025-11-05 09:59:31 - INFO - Total de registros desatualizados de steam_raw: 0
+2025-11-05 09:59:31 - INFO - Total de registros incompletos de 'steam_raw': 0 (reviews opcionais)
+2025-11-05 09:59:31 - INFO - Número de AppIDs a processar: 5
+2025-11-05 09:59:31 - INFO - === PROCESSAMENTO EM BATCHES ===
+2025-11-05 09:59:31 - INFO - Total de itens: 5
+2025-11-05 09:59:31 - INFO - Tamanho do batch: 200
+2025-11-05 09:59:31 - INFO - Total de batches: 1
+2025-11-05 09:59:31 - INFO - Delay entre batches: 120s
+2025-11-05 09:59:31 - INFO - Concorrência por batch: 1
+2025-11-05 09:59:31 - INFO - ================================
+
+2025-11-05 09:59:31 - INFO - Batch 1/1 - Processando itens 1 a 5 (5 itens)...
+2025-11-05 09:59:31 - INFO - Iniciando busca de 'DETALHES' assíncrona para 5 AppIDs com concorrência 1...
+2025-11-05 09:59:33 - INFO - Busca assíncrona concluída.
+2025-11-05 09:59:33 - INFO - --- Busca concluída: ---
+2025-11-05 09:59:33 - INFO - 0 sucesso(s) (0.00%),
+2025-11-05 09:59:33 - INFO - 5 falha(s) (100.00%).
+2025-11-05 09:59:33 - INFO - --- Detalhamento dos erros: ---
+2025-11-05 09:59:33 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-05 09:59:33 - INFO - * Timeout: 0
+2025-11-05 09:59:33 - INFO - * Ausentes: 5
+2025-11-05 09:59:33 - INFO - * Outros: 0
+2025-11-05 09:59:33 - INFO - 
+PROCESSAMENTO COMPLETO!
+2025-11-05 09:59:33 - INFO - Total processado: 0 sucessos de 5 itens (0.00%)
+2025-11-05 09:59:33 - WARNING - Nenhum dado de detalhes retornado da API Steam.
+2025-11-05 09:59:33 - INFO - === PROCESSAMENTO EM BATCHES (REVIEWS) ===
+2025-11-05 09:59:33 - INFO - Total de itens: 5
+2025-11-05 09:59:33 - INFO - Tamanho do batch: 500
+2025-11-05 09:59:33 - INFO - Total de batches: 1
+2025-11-05 09:59:33 - INFO - Delay entre batches: 60s
+2025-11-05 09:59:33 - INFO - Concorrência por batch: 3
+2025-11-05 09:59:33 - INFO - ==========================================
+
+2025-11-05 09:59:33 - INFO - Batch 1/1 - Processando itens 1 a 5 (5 itens)...
+2025-11-05 09:59:33 - INFO - Iniciando busca de 'REVIEWS' assíncrona para 5 AppIDs com concorrência 3...
+2025-11-05 09:59:34 - INFO - Busca assíncrona concluída.
+2025-11-05 09:59:34 - INFO - --- Busca concluída: ---
+2025-11-05 09:59:34 - INFO - 5 sucesso(s) (100.00%),
+2025-11-05 09:59:34 - INFO - 0 falha(s) (0.00%).
+2025-11-05 09:59:34 - INFO - --- Detalhamento dos erros: ---
+2025-11-05 09:59:34 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-05 09:59:34 - INFO - * Timeout: 0
+2025-11-05 09:59:34 - INFO - * Ausentes: 0
+2025-11-05 09:59:34 - INFO - * Outros: 0
+2025-11-05 09:59:34 - INFO - 
+PROCESSAMENTO COMPLETO!
+2025-11-05 09:59:34 - INFO - Total processado: 5 sucessos de 5 itens (100.00%)
+2025-11-05 09:59:34 - INFO - Dados de reviews inseridos com sucesso.
+2025-11-05 10:00:25 - INFO - Número total de aplicativos carregados: 273744
+2025-11-05 10:00:25 - INFO - Processando aplicativos de 1 a 5 de 5
+2025-11-05 10:00:26 - INFO - Conectado ao Supabase com sucesso
+2025-11-05 10:00:28 - INFO - Total de registros desatualizados de steam_raw: 0
+2025-11-05 10:00:28 - INFO - Total de registros incompletos de 'steam_raw': 0 (reviews opcionais)
+2025-11-05 10:00:28 - INFO - Número de AppIDs a processar: 5
+2025-11-05 10:00:28 - INFO - === PROCESSAMENTO EM BATCHES ===
+2025-11-05 10:00:28 - INFO - Total de itens: 5
+2025-11-05 10:00:28 - INFO - Tamanho do batch: 200
+2025-11-05 10:00:28 - INFO - Total de batches: 1
+2025-11-05 10:00:28 - INFO - Delay entre batches: 120s
+2025-11-05 10:00:28 - INFO - Concorrência por batch: 1
+2025-11-05 10:00:28 - INFO - ================================
+
+2025-11-05 10:00:28 - INFO - Batch 1/1 - Processando itens 1 a 5 (5 itens)...
+2025-11-05 10:00:28 - INFO - Iniciando busca de 'DETALHES' assíncrona para 5 AppIDs com concorrência 1...
+2025-11-05 10:00:30 - INFO - Busca assíncrona concluída.
+2025-11-05 10:00:30 - INFO - --- Busca concluída: ---
+2025-11-05 10:00:30 - INFO - 0 sucesso(s) (0.00%),
+2025-11-05 10:00:30 - INFO - 5 falha(s) (100.00%).
+2025-11-05 10:00:30 - INFO - --- Detalhamento dos erros: ---
+2025-11-05 10:00:30 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-05 10:00:30 - INFO - * Timeout: 0
+2025-11-05 10:00:30 - INFO - * Ausentes: 5
+2025-11-05 10:00:30 - INFO - * Outros: 0
+2025-11-05 10:00:30 - INFO - 
+PROCESSAMENTO COMPLETO!
+2025-11-05 10:00:30 - INFO - Total processado: 0 sucessos de 5 itens (0.00%)
+2025-11-05 10:00:30 - WARNING - Nenhum dado de detalhes retornado da API Steam.
+2025-11-05 10:00:30 - INFO - === PROCESSAMENTO EM BATCHES (REVIEWS) ===
+2025-11-05 10:00:30 - INFO - Total de itens: 5
+2025-11-05 10:00:30 - INFO - Tamanho do batch: 500
+2025-11-05 10:00:30 - INFO - Total de batches: 1
+2025-11-05 10:00:30 - INFO - Delay entre batches: 60s
+2025-11-05 10:00:30 - INFO - Concorrência por batch: 3
+2025-11-05 10:00:30 - INFO - ==========================================
+
+2025-11-05 10:00:30 - INFO - Batch 1/1 - Processando itens 1 a 5 (5 itens)...
+2025-11-05 10:00:30 - INFO - Iniciando busca de 'REVIEWS' assíncrona para 5 AppIDs com concorrência 3...
+2025-11-05 10:00:31 - INFO - Busca assíncrona concluída.
+2025-11-05 10:00:31 - INFO - --- Busca concluída: ---
+2025-11-05 10:00:31 - INFO - 5 sucesso(s) (100.00%),
+2025-11-05 10:00:31 - INFO - 0 falha(s) (0.00%).
+2025-11-05 10:00:31 - INFO - --- Detalhamento dos erros: ---
+2025-11-05 10:00:31 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-05 10:00:31 - INFO - * Timeout: 0
+2025-11-05 10:00:31 - INFO - * Ausentes: 0
+2025-11-05 10:00:31 - INFO - * Outros: 0
+2025-11-05 10:00:31 - INFO - 
+PROCESSAMENTO COMPLETO!
+2025-11-05 10:00:31 - INFO - Total processado: 5 sucessos de 5 itens (100.00%)
+2025-11-05 10:00:31 - INFO - Dados de reviews inseridos com sucesso.
+2025-11-05 10:03:24 - INFO - Número total de aplicativos carregados: 273744
+2025-11-05 10:03:24 - INFO - Processando aplicativos de 1 a 5 de 5
+2025-11-05 10:03:25 - INFO - Conectado ao Supabase com sucesso
+2025-11-05 10:03:26 - INFO - Total de registros desatualizados de steam_raw: 0
+2025-11-05 10:03:26 - INFO - Total de registros incompletos de 'steam_raw': 0 (reviews opcionais)
+2025-11-05 10:03:26 - INFO - Número de AppIDs a processar: 5
+2025-11-05 10:03:26 - INFO - === PROCESSAMENTO EM BATCHES ===
+2025-11-05 10:03:26 - INFO - Total de itens: 5
+2025-11-05 10:03:26 - INFO - Tamanho do batch: 200
+2025-11-05 10:03:26 - INFO - Total de batches: 1
+2025-11-05 10:03:26 - INFO - Delay entre batches: 120s
+2025-11-05 10:03:26 - INFO - Concorrência por batch: 1
+2025-11-05 10:03:26 - INFO - ================================
+
+2025-11-05 10:03:26 - INFO - Batch 1/1 - Processando itens 1 a 5 (5 itens)...
+2025-11-05 10:03:26 - INFO - Iniciando busca de 'DETALHES' assíncrona para 5 AppIDs com concorrência 1...
+2025-11-05 10:03:28 - INFO - Busca assíncrona concluída.
+2025-11-05 10:03:28 - INFO - --- Busca concluída: ---
+2025-11-05 10:03:28 - INFO - 0 sucesso(s) (0.00%),
+2025-11-05 10:03:28 - INFO - 5 falha(s) (100.00%).
+2025-11-05 10:03:28 - INFO - --- Detalhamento dos erros: ---
+2025-11-05 10:03:28 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-05 10:03:28 - INFO - * Timeout: 0
+2025-11-05 10:03:28 - INFO - * Ausentes: 5
+2025-11-05 10:03:28 - INFO - * Outros: 0
+2025-11-05 10:03:28 - INFO - 
+PROCESSAMENTO COMPLETO!
+2025-11-05 10:03:28 - INFO - Total processado: 0 sucessos de 5 itens (0.00%)
+2025-11-05 10:03:28 - WARNING - Nenhum dado de detalhes retornado da API Steam.
+2025-11-05 10:03:28 - INFO - === PROCESSAMENTO EM BATCHES (REVIEWS) ===
+2025-11-05 10:03:28 - INFO - Total de itens: 5
+2025-11-05 10:03:28 - INFO - Tamanho do batch: 500
+2025-11-05 10:03:28 - INFO - Total de batches: 1
+2025-11-05 10:03:28 - INFO - Delay entre batches: 60s
+2025-11-05 10:03:28 - INFO - Concorrência por batch: 3
+2025-11-05 10:03:28 - INFO - ==========================================
+
+2025-11-05 10:03:28 - INFO - Batch 1/1 - Processando itens 1 a 5 (5 itens)...
+2025-11-05 10:03:28 - INFO - Iniciando busca de 'REVIEWS' assíncrona para 5 AppIDs com concorrência 3...
+2025-11-05 10:03:29 - INFO - Busca assíncrona concluída.
+2025-11-05 10:03:29 - INFO - --- Busca concluída: ---
+2025-11-05 10:03:29 - INFO - 5 sucesso(s) (100.00%),
+2025-11-05 10:03:29 - INFO - 0 falha(s) (0.00%).
+2025-11-05 10:03:29 - INFO - --- Detalhamento dos erros: ---
+2025-11-05 10:03:29 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-05 10:03:29 - INFO - * Timeout: 0
+2025-11-05 10:03:29 - INFO - * Ausentes: 0
+2025-11-05 10:03:29 - INFO - * Outros: 0
+2025-11-05 10:03:29 - INFO - 
+PROCESSAMENTO COMPLETO!
+2025-11-05 10:03:29 - INFO - Total processado: 5 sucessos de 5 itens (100.00%)
+2025-11-05 10:03:29 - INFO - Dados de reviews inseridos com sucesso.
+2025-11-05 10:03:35 - INFO - Processando aplicativos de 1 a 1000 de 273744
+2025-11-05 10:04:02 - INFO - Total de registros carregados de steam_raw: 20082
+2025-11-05 10:04:10 - INFO - Número de jogos pagos selecionados: 10090
+2025-11-05 10:04:40 - INFO - Número total de aplicativos carregados: 273744
+2025-11-05 10:04:40 - INFO - Processando aplicativos de 1 a 5 de 5
+2025-11-05 10:04:40 - INFO - Conectado ao Supabase com sucesso
+2025-11-05 10:04:41 - INFO - Total de registros desatualizados de steam_raw: 0
+2025-11-05 10:04:41 - INFO - Total de registros incompletos de 'steam_raw': 0 (reviews opcionais)
+2025-11-05 10:04:41 - INFO - Número de AppIDs a processar: 5
+2025-11-05 10:04:41 - INFO - === PROCESSAMENTO EM BATCHES ===
+2025-11-05 10:04:41 - INFO - Total de itens: 5
+2025-11-05 10:04:41 - INFO - Tamanho do batch: 200
+2025-11-05 10:04:41 - INFO - Total de batches: 1
+2025-11-05 10:04:41 - INFO - Delay entre batches: 120s
+2025-11-05 10:04:41 - INFO - Concorrência por batch: 1
+2025-11-05 10:04:41 - INFO - ================================
+
+2025-11-05 10:04:41 - INFO - Batch 1/1 - Processando itens 1 a 5 (5 itens)...
+2025-11-05 10:04:41 - INFO - Iniciando busca de 'DETALHES' assíncrona para 5 AppIDs com concorrência 1...
+2025-11-05 10:04:43 - INFO - Busca assíncrona concluída.
+2025-11-05 10:04:43 - INFO - --- Busca concluída: ---
+2025-11-05 10:04:43 - INFO - 0 sucesso(s) (0.00%),
+2025-11-05 10:04:43 - INFO - 5 falha(s) (100.00%).
+2025-11-05 10:04:43 - INFO - --- Detalhamento dos erros: ---
+2025-11-05 10:04:43 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-05 10:04:43 - INFO - * Timeout: 0
+2025-11-05 10:04:43 - INFO - * Ausentes: 5
+2025-11-05 10:04:43 - INFO - * Outros: 0
+2025-11-05 10:04:43 - INFO - 
+PROCESSAMENTO COMPLETO!
+2025-11-05 10:04:43 - INFO - Total processado: 0 sucessos de 5 itens (0.00%)
+2025-11-05 10:04:43 - WARNING - Nenhum dado de detalhes retornado da API Steam.
+2025-11-05 10:04:43 - INFO - === PROCESSAMENTO EM BATCHES (REVIEWS) ===
+2025-11-05 10:04:43 - INFO - Total de itens: 5
+2025-11-05 10:04:43 - INFO - Tamanho do batch: 500
+2025-11-05 10:04:43 - INFO - Total de batches: 1
+2025-11-05 10:04:43 - INFO - Delay entre batches: 60s
+2025-11-05 10:04:43 - INFO - Concorrência por batch: 3
+2025-11-05 10:04:43 - INFO - ==========================================
+
+2025-11-05 10:04:43 - INFO - Batch 1/1 - Processando itens 1 a 5 (5 itens)...
+2025-11-05 10:04:43 - INFO - Iniciando busca de 'REVIEWS' assíncrona para 5 AppIDs com concorrência 3...
+2025-11-05 10:04:44 - INFO - Busca assíncrona concluída.
+2025-11-05 10:04:44 - INFO - --- Busca concluída: ---
+2025-11-05 10:04:44 - INFO - 5 sucesso(s) (100.00%),
+2025-11-05 10:04:44 - INFO - 0 falha(s) (0.00%).
+2025-11-05 10:04:44 - INFO - --- Detalhamento dos erros: ---
+2025-11-05 10:04:44 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-05 10:04:44 - INFO - * Timeout: 0
+2025-11-05 10:04:44 - INFO - * Ausentes: 0
+2025-11-05 10:04:44 - INFO - * Outros: 0
+2025-11-05 10:04:44 - INFO - 
+PROCESSAMENTO COMPLETO!
+2025-11-05 10:04:44 - INFO - Total processado: 5 sucessos de 5 itens (100.00%)
+2025-11-05 10:04:44 - INFO - Dados de reviews inseridos com sucesso.
+2025-11-05 10:05:13 - INFO - Total de registros carregados de steam_raw: 20082
+2025-11-05 10:05:15 - INFO - Número de jogos pagos selecionados: 10090
+2025-11-05 10:13:24 - ERROR - Erro ao inserir dados steam_bd: <ConnectionTerminated error_code:0, last_stream_id:19999, additional_data:None>
+2025-11-05 10:18:57 - ERROR - Erro ao alimentar o banco de dados Steam BD: <ConnectionTerminated error_code:0, last_stream_id:19999, additional_data:None>
+2025-11-05 10:21:13 - INFO - Número total de aplicativos carregados: 273744
+2025-11-05 10:21:13 - INFO - Processando aplicativos de 1 a 5 de 5
+2025-11-05 10:21:13 - INFO - Conectado ao Supabase com sucesso
+2025-11-05 10:21:15 - INFO - Total de registros desatualizados de steam_raw: 0
+2025-11-05 10:21:15 - INFO - Total de registros incompletos de 'steam_raw': 0 (reviews opcionais)
+2025-11-05 10:21:15 - INFO - Número de AppIDs a processar: 5
+2025-11-05 10:21:15 - INFO - === PROCESSAMENTO EM BATCHES ===
+2025-11-05 10:21:15 - INFO - Total de itens: 5
+2025-11-05 10:21:15 - INFO - Tamanho do batch: 200
+2025-11-05 10:21:15 - INFO - Total de batches: 1
+2025-11-05 10:21:15 - INFO - Delay entre batches: 120s
+2025-11-05 10:21:15 - INFO - Concorrência por batch: 1
+2025-11-05 10:21:15 - INFO - ================================
+
+2025-11-05 10:21:15 - INFO - Batch 1/1 - Processando itens 1 a 5 (5 itens)...
+2025-11-05 10:21:15 - INFO - Iniciando busca de 'DETALHES' assíncrona para 5 AppIDs com concorrência 1...
+2025-11-05 10:21:17 - INFO - Busca assíncrona concluída.
+2025-11-05 10:21:17 - INFO - --- Busca concluída: ---
+2025-11-05 10:21:17 - INFO - 0 sucesso(s) (0.00%),
+2025-11-05 10:21:17 - INFO - 5 falha(s) (100.00%).
+2025-11-05 10:21:17 - INFO - --- Detalhamento dos erros: ---
+2025-11-05 10:21:17 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-05 10:21:17 - INFO - * Timeout: 0
+2025-11-05 10:21:17 - INFO - * Ausentes: 5
+2025-11-05 10:21:17 - INFO - * Outros: 0
+2025-11-05 10:21:17 - INFO - 
+PROCESSAMENTO COMPLETO!
+2025-11-05 10:21:17 - INFO - Total processado: 0 sucessos de 5 itens (0.00%)
+2025-11-05 10:21:17 - WARNING - Nenhum dado de detalhes retornado da API Steam.
+2025-11-05 10:21:17 - INFO - === PROCESSAMENTO EM BATCHES (REVIEWS) ===
+2025-11-05 10:21:17 - INFO - Total de itens: 5
+2025-11-05 10:21:17 - INFO - Tamanho do batch: 500
+2025-11-05 10:21:17 - INFO - Total de batches: 1
+2025-11-05 10:21:17 - INFO - Delay entre batches: 60s
+2025-11-05 10:21:17 - INFO - Concorrência por batch: 3
+2025-11-05 10:21:17 - INFO - ==========================================
+
+2025-11-05 10:21:17 - INFO - Batch 1/1 - Processando itens 1 a 5 (5 itens)...
+2025-11-05 10:21:17 - INFO - Iniciando busca de 'REVIEWS' assíncrona para 5 AppIDs com concorrência 3...
+2025-11-05 10:21:18 - INFO - Busca assíncrona concluída.
+2025-11-05 10:21:18 - INFO - --- Busca concluída: ---
+2025-11-05 10:21:18 - INFO - 5 sucesso(s) (100.00%),
+2025-11-05 10:21:18 - INFO - 0 falha(s) (0.00%).
+2025-11-05 10:21:18 - INFO - --- Detalhamento dos erros: ---
+2025-11-05 10:21:18 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-05 10:21:18 - INFO - * Timeout: 0
+2025-11-05 10:21:18 - INFO - * Ausentes: 0
+2025-11-05 10:21:18 - INFO - * Outros: 0
+2025-11-05 10:21:18 - INFO - 
+PROCESSAMENTO COMPLETO!
+2025-11-05 10:21:18 - INFO - Total processado: 5 sucessos de 5 itens (100.00%)
+2025-11-05 10:21:18 - INFO - Dados de reviews inseridos com sucesso.
+2025-11-05 10:21:49 - INFO - Total de registros carregados de steam_raw: 20082
+2025-11-05 10:21:52 - INFO - Número de jogos pagos selecionados: 10090
+2025-11-05 10:22:00 - INFO - Inserindo registros de 1 a 3000 de 10090 na tabela steam_bd
+2025-11-05 10:24:53 - INFO - Dados processados salvos para 3000 registros.
+2025-11-05 10:25:38 - INFO - Inserindo registros de 3001 a 6000 de 10090 na tabela steam_bd
+2025-11-05 10:28:27 - INFO - Dados processados salvos para 3000 registros.
+2025-11-05 10:28:35 - INFO - Inserindo registros de 6001 a 9000 de 10090 na tabela steam_bd
+2025-11-05 10:31:00 - INFO - Dados processados salvos para 3000 registros.
+2025-11-05 10:31:10 - INFO - Inserindo registros de 9001 a 10090 de 10090 na tabela steam_bd
+2025-11-05 10:32:08 - INFO - Dados processados salvos para 1090 registros.
+2025-11-05 10:32:49 - INFO - Dados processados inseridos na tabela steam_bd com sucesso.
+2025-11-05 10:32:57 - INFO - Total de registros carregados de steam_bd: 10090
+2025-11-05 10:33:13 - ERROR - Erro ao alimentar o banco de dados ITAD: cannot access local variable 'var_listAppAtual' where it is not associated with a value
+2025-11-05 10:34:23 - INFO - Número total de aplicativos carregados: 273744
+2025-11-05 10:34:23 - INFO - Processando aplicativos de 1 a 5 de 5
+2025-11-05 10:34:23 - INFO - Conectado ao Supabase com sucesso
+2025-11-05 10:34:25 - INFO - Total de registros desatualizados de steam_raw: 0
+2025-11-05 10:34:25 - INFO - Total de registros incompletos de 'steam_raw': 0 (reviews opcionais)
+2025-11-05 10:34:25 - INFO - Número de AppIDs a processar: 5
+2025-11-05 10:34:25 - INFO - === PROCESSAMENTO EM BATCHES ===
+2025-11-05 10:34:25 - INFO - Total de itens: 5
+2025-11-05 10:34:25 - INFO - Tamanho do batch: 200
+2025-11-05 10:34:25 - INFO - Total de batches: 1
+2025-11-05 10:34:25 - INFO - Delay entre batches: 120s
+2025-11-05 10:34:25 - INFO - Concorrência por batch: 1
+2025-11-05 10:34:25 - INFO - ================================
+
+2025-11-05 10:34:25 - INFO - Batch 1/1 - Processando itens 1 a 5 (5 itens)...
+2025-11-05 10:34:25 - INFO - Iniciando busca de 'DETALHES' assíncrona para 5 AppIDs com concorrência 1...
+2025-11-05 10:34:27 - INFO - Busca assíncrona concluída.
+2025-11-05 10:34:27 - INFO - --- Busca concluída: ---
+2025-11-05 10:34:27 - INFO - 0 sucesso(s) (0.00%),
+2025-11-05 10:34:27 - INFO - 5 falha(s) (100.00%).
+2025-11-05 10:34:27 - INFO - --- Detalhamento dos erros: ---
+2025-11-05 10:34:27 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-05 10:34:27 - INFO - * Timeout: 0
+2025-11-05 10:34:27 - INFO - * Ausentes: 5
+2025-11-05 10:34:27 - INFO - * Outros: 0
+2025-11-05 10:34:27 - INFO - 
+PROCESSAMENTO COMPLETO!
+2025-11-05 10:34:27 - INFO - Total processado: 0 sucessos de 5 itens (0.00%)
+2025-11-05 10:34:27 - WARNING - Nenhum dado de detalhes retornado da API Steam.
+2025-11-05 10:34:27 - INFO - === PROCESSAMENTO EM BATCHES (REVIEWS) ===
+2025-11-05 10:34:27 - INFO - Total de itens: 5
+2025-11-05 10:34:27 - INFO - Tamanho do batch: 500
+2025-11-05 10:34:27 - INFO - Total de batches: 1
+2025-11-05 10:34:27 - INFO - Delay entre batches: 60s
+2025-11-05 10:34:27 - INFO - Concorrência por batch: 3
+2025-11-05 10:34:27 - INFO - ==========================================
+
+2025-11-05 10:34:27 - INFO - Batch 1/1 - Processando itens 1 a 5 (5 itens)...
+2025-11-05 10:34:27 - INFO - Iniciando busca de 'REVIEWS' assíncrona para 5 AppIDs com concorrência 3...
+2025-11-05 10:34:28 - INFO - Busca assíncrona concluída.
+2025-11-05 10:34:28 - INFO - --- Busca concluída: ---
+2025-11-05 10:34:28 - INFO - 5 sucesso(s) (100.00%),
+2025-11-05 10:34:28 - INFO - 0 falha(s) (0.00%).
+2025-11-05 10:34:28 - INFO - --- Detalhamento dos erros: ---
+2025-11-05 10:34:28 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-05 10:34:28 - INFO - * Timeout: 0
+2025-11-05 10:34:28 - INFO - * Ausentes: 0
+2025-11-05 10:34:28 - INFO - * Outros: 0
+2025-11-05 10:34:28 - INFO - 
+PROCESSAMENTO COMPLETO!
+2025-11-05 10:34:28 - INFO - Total processado: 5 sucessos de 5 itens (100.00%)
+2025-11-05 10:34:28 - INFO - Dados de reviews inseridos com sucesso.
+2025-11-05 10:34:53 - INFO - Total de registros carregados de steam_raw: 20082
+2025-11-05 10:34:53 - INFO - Número de jogos pagos selecionados: 10090
+2025-11-05 10:34:53 - INFO - Inserindo registros de 1 a 3000 de 10090 na tabela steam_bd
+2025-11-05 10:37:07 - INFO - Dados processados salvos para 3000 registros.
+2025-11-05 10:37:07 - INFO - Inserindo registros de 3001 a 6000 de 10090 na tabela steam_bd
+2025-11-05 10:39:18 - INFO - Dados processados salvos para 3000 registros.
+2025-11-05 10:39:18 - INFO - Inserindo registros de 6001 a 9000 de 10090 na tabela steam_bd
+2025-11-05 10:41:32 - INFO - Dados processados salvos para 3000 registros.
+2025-11-05 10:41:32 - INFO - Inserindo registros de 9001 a 10090 de 10090 na tabela steam_bd
+2025-11-05 10:42:16 - ERROR - Erro ao inserir dados steam_bd: <ConnectionTerminated error_code:0, last_stream_id:19999, additional_data:None>
+2025-11-05 10:42:16 - ERROR - Erro ao alimentar o banco de dados Steam BD: Erro ao inserir dados steam_bd: <ConnectionTerminated error_code:0, last_stream_id:19999, additional_data:None>
+2025-11-05 10:42:16 - INFO - Processando aplicativos de 1 a 5 de 5
+2025-11-05 10:42:17 - INFO - Total de registros desatualizados de steam_raw: 0
+2025-11-05 10:42:17 - INFO - Total de registros incompletos de 'steam_raw': 0 (reviews opcionais)
+2025-11-05 10:42:17 - INFO - Número de AppIDs a processar: 5
+2025-11-05 10:42:17 - INFO - === PROCESSAMENTO EM BATCHES ===
+2025-11-05 10:42:17 - INFO - Total de itens: 5
+2025-11-05 10:42:17 - INFO - Tamanho do batch: 200
+2025-11-05 10:42:17 - INFO - Total de batches: 1
+2025-11-05 10:42:17 - INFO - Delay entre batches: 120s
+2025-11-05 10:42:17 - INFO - Concorrência por batch: 1
+2025-11-05 10:42:17 - INFO - ================================
+
+2025-11-05 10:42:17 - INFO - Batch 1/1 - Processando itens 1 a 5 (5 itens)...
+2025-11-05 10:42:17 - INFO - Iniciando busca de 'DETALHES' assíncrona para 5 AppIDs com concorrência 1...
+2025-11-05 10:42:18 - INFO - Busca assíncrona concluída.
+2025-11-05 10:42:18 - INFO - --- Busca concluída: ---
+2025-11-05 10:42:18 - INFO - 0 sucesso(s) (0.00%),
+2025-11-05 10:42:18 - INFO - 5 falha(s) (100.00%).
+2025-11-05 10:42:18 - INFO - --- Detalhamento dos erros: ---
+2025-11-05 10:42:18 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-05 10:42:18 - INFO - * Timeout: 0
+2025-11-05 10:42:18 - INFO - * Ausentes: 5
+2025-11-05 10:42:18 - INFO - * Outros: 0
+2025-11-05 10:42:18 - INFO - 
+PROCESSAMENTO COMPLETO!
+2025-11-05 10:42:18 - INFO - Total processado: 0 sucessos de 5 itens (0.00%)
+2025-11-05 10:42:18 - WARNING - Nenhum dado de detalhes retornado da API Steam.
+2025-11-05 10:42:18 - INFO - === PROCESSAMENTO EM BATCHES (REVIEWS) ===
+2025-11-05 10:42:18 - INFO - Total de itens: 5
+2025-11-05 10:42:18 - INFO - Tamanho do batch: 500
+2025-11-05 10:42:18 - INFO - Total de batches: 1
+2025-11-05 10:42:18 - INFO - Delay entre batches: 60s
+2025-11-05 10:42:18 - INFO - Concorrência por batch: 3
+2025-11-05 10:42:18 - INFO - ==========================================
+
+2025-11-05 10:42:18 - INFO - Batch 1/1 - Processando itens 1 a 5 (5 itens)...
+2025-11-05 10:42:18 - INFO - Iniciando busca de 'REVIEWS' assíncrona para 5 AppIDs com concorrência 3...
+2025-11-05 10:42:20 - INFO - Busca assíncrona concluída.
+2025-11-05 10:42:20 - INFO - --- Busca concluída: ---
+2025-11-05 10:42:20 - INFO - 5 sucesso(s) (100.00%),
+2025-11-05 10:42:20 - INFO - 0 falha(s) (0.00%).
+2025-11-05 10:42:20 - INFO - --- Detalhamento dos erros: ---
+2025-11-05 10:42:20 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-05 10:42:20 - INFO - * Timeout: 0
+2025-11-05 10:42:20 - INFO - * Ausentes: 0
+2025-11-05 10:42:20 - INFO - * Outros: 0
+2025-11-05 10:42:20 - INFO - 
+PROCESSAMENTO COMPLETO!
+2025-11-05 10:42:20 - INFO - Total processado: 5 sucessos de 5 itens (100.00%)
+2025-11-05 10:42:20 - INFO - Dados de reviews inseridos com sucesso.
+2025-11-05 10:42:46 - INFO - Total de registros carregados de steam_raw: 20082
+2025-11-05 10:42:46 - INFO - Número de jogos pagos selecionados: 10090
+2025-11-05 10:42:47 - INFO - Inserindo registros de 1 a 3000 de 10090 na tabela steam_bd
+2025-11-05 10:45:33 - INFO - Dados processados salvos para 3000 registros.
+2025-11-05 10:45:33 - INFO - Inserindo registros de 3001 a 6000 de 10090 na tabela steam_bd
+2025-11-05 10:47:42 - INFO - Número total de aplicativos carregados: 273744
+2025-11-05 10:47:42 - INFO - Processando aplicativos de 1 a 5 de 5
+2025-11-05 10:47:42 - INFO - Conectado ao Supabase com sucesso
+2025-11-05 10:47:43 - INFO - Total de registros desatualizados de steam_raw: 0
+2025-11-05 10:47:53 - INFO - Total de registros incompletos de 'steam_raw': 6859 (reviews obrigatórios)
+2025-11-05 10:47:53 - INFO - Número de AppIDs a processar: 5
+2025-11-05 10:47:53 - INFO - === PROCESSAMENTO EM BATCHES ===
+2025-11-05 10:47:53 - INFO - Total de itens: 5
+2025-11-05 10:47:53 - INFO - Tamanho do batch: 200
+2025-11-05 10:47:53 - INFO - Total de batches: 1
+2025-11-05 10:47:53 - INFO - Delay entre batches: 120s
+2025-11-05 10:47:53 - INFO - Concorrência por batch: 1
+2025-11-05 10:47:53 - INFO - ================================
+
+2025-11-05 10:47:53 - INFO - Batch 1/1 - Processando itens 1 a 5 (5 itens)...
+2025-11-05 10:47:53 - INFO - Iniciando busca de 'DETALHES' assíncrona para 5 AppIDs com concorrência 1...
+2025-11-05 10:47:55 - INFO - Busca assíncrona concluída.
+2025-11-05 10:47:55 - INFO - --- Busca concluída: ---
+2025-11-05 10:47:55 - INFO - 0 sucesso(s) (0.00%),
+2025-11-05 10:47:55 - INFO - 5 falha(s) (100.00%).
+2025-11-05 10:47:55 - INFO - --- Detalhamento dos erros: ---
+2025-11-05 10:47:55 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-05 10:47:55 - INFO - * Timeout: 0
+2025-11-05 10:47:55 - INFO - * Ausentes: 5
+2025-11-05 10:47:55 - INFO - * Outros: 0
+2025-11-05 10:47:55 - INFO - 
+PROCESSAMENTO COMPLETO!
+2025-11-05 10:47:55 - INFO - Total processado: 0 sucessos de 5 itens (0.00%)
+2025-11-05 10:47:55 - WARNING - Nenhum dado de detalhes retornado da API Steam.
+2025-11-05 10:47:55 - INFO - Número de AppIDs com dados incompletos: 6859
+2025-11-05 10:47:55 - INFO - === PROCESSAMENTO EM BATCHES (REVIEWS) ===
+2025-11-05 10:47:55 - INFO - Total de itens: 6,864
+2025-11-05 10:47:55 - INFO - Tamanho do batch: 500
+2025-11-05 10:47:55 - INFO - Total de batches: 14
+2025-11-05 10:47:55 - INFO - Delay entre batches: 60s
+2025-11-05 10:47:55 - INFO - Concorrência por batch: 3
+2025-11-05 10:47:55 - INFO - ==========================================
+
+2025-11-05 10:47:55 - INFO - Batch 1/14 - Processando itens 1 a 500 (500 itens)...
+2025-11-05 10:47:55 - INFO - Iniciando busca de 'REVIEWS' assíncrona para 500 AppIDs com concorrência 3...
+2025-11-05 10:49:08 - INFO - Busca assíncrona concluída.
+2025-11-05 10:49:08 - INFO - --- Busca concluída: ---
+2025-11-05 10:49:08 - INFO - 500 sucesso(s) (100.00%),
+2025-11-05 10:49:08 - INFO - 0 falha(s) (0.00%).
+2025-11-05 10:49:08 - INFO - --- Detalhamento dos erros: ---
+2025-11-05 10:49:08 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-05 10:49:08 - INFO - * Timeout: 0
+2025-11-05 10:49:08 - INFO - * Ausentes: 0
+2025-11-05 10:49:08 - INFO - * Outros: 0
+2025-11-05 10:49:08 - INFO - Aguardando 60s antes do próximo batch...
+
+2025-11-05 10:50:08 - INFO - Batch 2/14 - Processando itens 501 a 1000 (500 itens)...
+2025-11-05 10:50:08 - INFO - Iniciando busca de 'REVIEWS' assíncrona para 500 AppIDs com concorrência 3...
+2025-11-05 10:51:27 - INFO - Busca assíncrona concluída.
+2025-11-05 10:51:27 - INFO - --- Busca concluída: ---
+2025-11-05 10:51:27 - INFO - 500 sucesso(s) (100.00%),
+2025-11-05 10:51:27 - INFO - 0 falha(s) (0.00%).
+2025-11-05 10:51:27 - INFO - --- Detalhamento dos erros: ---
+2025-11-05 10:51:27 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-05 10:51:27 - INFO - * Timeout: 0
+2025-11-05 10:51:27 - INFO - * Ausentes: 0
+2025-11-05 10:51:27 - INFO - * Outros: 0
+2025-11-05 10:51:27 - INFO - Aguardando 60s antes do próximo batch...
+
+2025-11-05 10:52:27 - INFO - Batch 3/14 - Processando itens 1001 a 1500 (500 itens)...
+2025-11-05 10:52:27 - INFO - Iniciando busca de 'REVIEWS' assíncrona para 500 AppIDs com concorrência 3...
+2025-11-05 10:53:43 - INFO - Busca assíncrona concluída.
+2025-11-05 10:53:43 - INFO - --- Busca concluída: ---
+2025-11-05 10:53:43 - INFO - 500 sucesso(s) (100.00%),
+2025-11-05 10:53:43 - INFO - 0 falha(s) (0.00%).
+2025-11-05 10:53:43 - INFO - --- Detalhamento dos erros: ---
+2025-11-05 10:53:43 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-05 10:53:43 - INFO - * Timeout: 0
+2025-11-05 10:53:43 - INFO - * Ausentes: 0
+2025-11-05 10:53:43 - INFO - * Outros: 0
+2025-11-05 10:53:43 - INFO - Aguardando 60s antes do próximo batch...
+
+2025-11-05 10:54:43 - INFO - Batch 4/14 - Processando itens 1501 a 2000 (500 itens)...
+2025-11-05 10:54:43 - INFO - Iniciando busca de 'REVIEWS' assíncrona para 500 AppIDs com concorrência 3...
+2025-11-05 10:56:05 - INFO - Busca assíncrona concluída.
+2025-11-05 10:56:05 - INFO - --- Busca concluída: ---
+2025-11-05 10:56:05 - INFO - 500 sucesso(s) (100.00%),
+2025-11-05 10:56:05 - INFO - 0 falha(s) (0.00%).
+2025-11-05 10:56:05 - INFO - --- Detalhamento dos erros: ---
+2025-11-05 10:56:05 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-05 10:56:05 - INFO - * Timeout: 0
+2025-11-05 10:56:05 - INFO - * Ausentes: 0
+2025-11-05 10:56:05 - INFO - * Outros: 0
+2025-11-05 10:56:05 - INFO - Aguardando 60s antes do próximo batch...
+
+2025-11-05 10:57:05 - INFO - Batch 5/14 - Processando itens 2001 a 2500 (500 itens)...
+2025-11-05 10:57:05 - INFO - Iniciando busca de 'REVIEWS' assíncrona para 500 AppIDs com concorrência 3...
+2025-11-05 10:58:22 - INFO - Busca assíncrona concluída.
+2025-11-05 10:58:22 - INFO - --- Busca concluída: ---
+2025-11-05 10:58:22 - INFO - 500 sucesso(s) (100.00%),
+2025-11-05 10:58:22 - INFO - 0 falha(s) (0.00%).
+2025-11-05 10:58:22 - INFO - --- Detalhamento dos erros: ---
+2025-11-05 10:58:22 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-05 10:58:22 - INFO - * Timeout: 0
+2025-11-05 10:58:22 - INFO - * Ausentes: 0
+2025-11-05 10:58:22 - INFO - * Outros: 0
+2025-11-05 10:58:22 - INFO - Aguardando 60s antes do próximo batch...
+
+2025-11-05 10:59:22 - INFO - Batch 6/14 - Processando itens 2501 a 3000 (500 itens)...
+2025-11-05 10:59:22 - INFO - Iniciando busca de 'REVIEWS' assíncrona para 500 AppIDs com concorrência 3...
+2025-11-05 11:00:41 - INFO - Busca assíncrona concluída.
+2025-11-05 11:00:41 - INFO - --- Busca concluída: ---
+2025-11-05 11:00:41 - INFO - 500 sucesso(s) (100.00%),
+2025-11-05 11:00:41 - INFO - 0 falha(s) (0.00%).
+2025-11-05 11:00:41 - INFO - --- Detalhamento dos erros: ---
+2025-11-05 11:00:41 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-05 11:00:41 - INFO - * Timeout: 0
+2025-11-05 11:00:41 - INFO - * Ausentes: 0
+2025-11-05 11:00:41 - INFO - * Outros: 0
+2025-11-05 11:00:41 - INFO - Aguardando 60s antes do próximo batch...
+
+2025-11-05 11:01:41 - INFO - Batch 7/14 - Processando itens 3001 a 3500 (500 itens)...
+2025-11-05 11:01:41 - INFO - Iniciando busca de 'REVIEWS' assíncrona para 500 AppIDs com concorrência 3...
+2025-11-05 11:02:57 - INFO - Busca assíncrona concluída.
+2025-11-05 11:02:57 - INFO - --- Busca concluída: ---
+2025-11-05 11:02:57 - INFO - 500 sucesso(s) (100.00%),
+2025-11-05 11:02:57 - INFO - 0 falha(s) (0.00%).
+2025-11-05 11:02:57 - INFO - --- Detalhamento dos erros: ---
+2025-11-05 11:02:57 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-05 11:02:57 - INFO - * Timeout: 0
+2025-11-05 11:02:57 - INFO - * Ausentes: 0
+2025-11-05 11:02:57 - INFO - * Outros: 0
+2025-11-05 11:02:57 - INFO - Aguardando 60s antes do próximo batch...
+
+2025-11-05 11:03:57 - INFO - Batch 8/14 - Processando itens 3501 a 4000 (500 itens)...
+2025-11-05 11:03:57 - INFO - Iniciando busca de 'REVIEWS' assíncrona para 500 AppIDs com concorrência 3...
+2025-11-05 11:05:15 - INFO - Busca assíncrona concluída.
+2025-11-05 11:05:15 - INFO - --- Busca concluída: ---
+2025-11-05 11:05:15 - INFO - 500 sucesso(s) (100.00%),
+2025-11-05 11:05:15 - INFO - 0 falha(s) (0.00%).
+2025-11-05 11:05:15 - INFO - --- Detalhamento dos erros: ---
+2025-11-05 11:05:15 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-05 11:05:15 - INFO - * Timeout: 0
+2025-11-05 11:05:15 - INFO - * Ausentes: 0
+2025-11-05 11:05:15 - INFO - * Outros: 0
+2025-11-05 11:05:15 - INFO - Aguardando 60s antes do próximo batch...
+
+2025-11-05 11:06:15 - INFO - Batch 9/14 - Processando itens 4001 a 4500 (500 itens)...
+2025-11-05 11:06:15 - INFO - Iniciando busca de 'REVIEWS' assíncrona para 500 AppIDs com concorrência 3...
+2025-11-05 11:07:31 - INFO - Busca assíncrona concluída.
+2025-11-05 11:07:31 - INFO - --- Busca concluída: ---
+2025-11-05 11:07:31 - INFO - 500 sucesso(s) (100.00%),
+2025-11-05 11:07:31 - INFO - 0 falha(s) (0.00%).
+2025-11-05 11:07:31 - INFO - --- Detalhamento dos erros: ---
+2025-11-05 11:07:31 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-05 11:07:31 - INFO - * Timeout: 0
+2025-11-05 11:07:31 - INFO - * Ausentes: 0
+2025-11-05 11:07:31 - INFO - * Outros: 0
+2025-11-05 11:07:31 - INFO - Aguardando 60s antes do próximo batch...
+
+2025-11-05 11:08:31 - INFO - Batch 10/14 - Processando itens 4501 a 5000 (500 itens)...
+2025-11-05 11:08:31 - INFO - Iniciando busca de 'REVIEWS' assíncrona para 500 AppIDs com concorrência 3...
+2025-11-05 11:09:47 - INFO - Busca assíncrona concluída.
+2025-11-05 11:09:47 - INFO - --- Busca concluída: ---
+2025-11-05 11:09:47 - INFO - 500 sucesso(s) (100.00%),
+2025-11-05 11:09:47 - INFO - 0 falha(s) (0.00%).
+2025-11-05 11:09:47 - INFO - --- Detalhamento dos erros: ---
+2025-11-05 11:09:47 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-05 11:09:47 - INFO - * Timeout: 0
+2025-11-05 11:09:47 - INFO - * Ausentes: 0
+2025-11-05 11:09:47 - INFO - * Outros: 0
+2025-11-05 11:09:47 - INFO - Aguardando 60s antes do próximo batch...
+
+2025-11-05 11:10:47 - INFO - Batch 11/14 - Processando itens 5001 a 5500 (500 itens)...
+2025-11-05 11:10:47 - INFO - Iniciando busca de 'REVIEWS' assíncrona para 500 AppIDs com concorrência 3...
+2025-11-05 11:12:04 - INFO - Busca assíncrona concluída.
+2025-11-05 11:12:04 - INFO - --- Busca concluída: ---
+2025-11-05 11:12:04 - INFO - 500 sucesso(s) (100.00%),
+2025-11-05 11:12:04 - INFO - 0 falha(s) (0.00%).
+2025-11-05 11:12:04 - INFO - --- Detalhamento dos erros: ---
+2025-11-05 11:12:04 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-05 11:12:04 - INFO - * Timeout: 0
+2025-11-05 11:12:04 - INFO - * Ausentes: 0
+2025-11-05 11:12:04 - INFO - * Outros: 0
+2025-11-05 11:12:04 - INFO - Aguardando 60s antes do próximo batch...
+
+2025-11-05 11:13:04 - INFO - Batch 12/14 - Processando itens 5501 a 6000 (500 itens)...
+2025-11-05 11:13:04 - INFO - Iniciando busca de 'REVIEWS' assíncrona para 500 AppIDs com concorrência 3...
+2025-11-05 11:14:20 - INFO - Busca assíncrona concluída.
+2025-11-05 11:14:20 - INFO - --- Busca concluída: ---
+2025-11-05 11:14:20 - INFO - 500 sucesso(s) (100.00%),
+2025-11-05 11:14:20 - INFO - 0 falha(s) (0.00%).
+2025-11-05 11:14:20 - INFO - --- Detalhamento dos erros: ---
+2025-11-05 11:14:20 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-05 11:14:20 - INFO - * Timeout: 0
+2025-11-05 11:14:20 - INFO - * Ausentes: 0
+2025-11-05 11:14:20 - INFO - * Outros: 0
+2025-11-05 11:14:20 - INFO - Aguardando 60s antes do próximo batch...
+
+2025-11-05 11:15:20 - INFO - Batch 13/14 - Processando itens 6001 a 6500 (500 itens)...
+2025-11-05 11:15:20 - INFO - Iniciando busca de 'REVIEWS' assíncrona para 500 AppIDs com concorrência 3...
+2025-11-05 11:16:36 - INFO - Busca assíncrona concluída.
+2025-11-05 11:16:36 - INFO - --- Busca concluída: ---
+2025-11-05 11:16:36 - INFO - 500 sucesso(s) (100.00%),
+2025-11-05 11:16:36 - INFO - 0 falha(s) (0.00%).
+2025-11-05 11:16:36 - INFO - --- Detalhamento dos erros: ---
+2025-11-05 11:16:36 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-05 11:16:36 - INFO - * Timeout: 0
+2025-11-05 11:16:36 - INFO - * Ausentes: 0
+2025-11-05 11:16:36 - INFO - * Outros: 0
+2025-11-05 11:16:36 - INFO - Aguardando 60s antes do próximo batch...
+
+2025-11-05 11:17:36 - INFO - Batch 14/14 - Processando itens 6501 a 6864 (364 itens)...
+2025-11-05 11:17:36 - INFO - Iniciando busca de 'REVIEWS' assíncrona para 364 AppIDs com concorrência 3...
+2025-11-05 11:18:33 - INFO - Busca assíncrona concluída.
+2025-11-05 11:18:33 - INFO - --- Busca concluída: ---
+2025-11-05 11:18:33 - INFO - 364 sucesso(s) (100.00%),
+2025-11-05 11:18:33 - INFO - 0 falha(s) (0.00%).
+2025-11-05 11:18:33 - INFO - --- Detalhamento dos erros: ---
+2025-11-05 11:18:33 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-05 11:18:33 - INFO - * Timeout: 0
+2025-11-05 11:18:33 - INFO - * Ausentes: 0
+2025-11-05 11:18:33 - INFO - * Outros: 0
+2025-11-05 11:18:33 - INFO - 
+PROCESSAMENTO COMPLETO!
+2025-11-05 11:18:33 - INFO - Total processado: 6,864 sucessos de 6,864 itens (100.00%)
+2025-11-05 11:18:33 - INFO - Dados de reviews inseridos com sucesso.
+2025-11-05 11:18:59 - INFO - Total de registros carregados de steam_raw: 20082
+2025-11-05 11:18:59 - INFO - Número de jogos pagos selecionados: 10090
+2025-11-05 11:18:59 - INFO - Inserindo registros de 1 a 3000 de 10090 na tabela steam_bd
+2025-11-05 11:21:22 - INFO - Dados processados salvos para 3000 registros.
+2025-11-05 11:21:22 - INFO - Inserindo registros de 3001 a 6000 de 10090 na tabela steam_bd
+2025-11-05 11:23:43 - INFO - Dados processados salvos para 3000 registros.
+2025-11-05 11:23:43 - INFO - Inserindo registros de 6001 a 9000 de 10090 na tabela steam_bd
+2025-11-05 11:26:00 - INFO - Dados processados salvos para 3000 registros.
+2025-11-05 11:26:00 - INFO - Inserindo registros de 9001 a 10090 de 10090 na tabela steam_bd
+2025-11-05 11:26:45 - ERROR - Erro ao inserir dados steam_bd: <ConnectionTerminated error_code:0, last_stream_id:19999, additional_data:None>
+2025-11-05 11:26:45 - ERROR - Erro ao alimentar o banco de dados Steam BD: Erro ao inserir dados steam_bd: <ConnectionTerminated error_code:0, last_stream_id:19999, additional_data:None>
+2025-11-05 11:26:45 - INFO - Processando aplicativos de 1 a 5 de 5
+2025-11-05 11:26:46 - INFO - Total de registros desatualizados de steam_raw: 0
+2025-11-05 11:26:55 - INFO - Total de registros incompletos de 'steam_raw': 6859 (reviews obrigatórios)
+2025-11-05 11:26:55 - INFO - Número de AppIDs a processar: 5
+2025-11-05 11:26:55 - INFO - === PROCESSAMENTO EM BATCHES ===
+2025-11-05 11:26:55 - INFO - Total de itens: 5
+2025-11-05 11:26:55 - INFO - Tamanho do batch: 200
+2025-11-05 11:26:55 - INFO - Total de batches: 1
+2025-11-05 11:26:55 - INFO - Delay entre batches: 120s
+2025-11-05 11:26:55 - INFO - Concorrência por batch: 1
+2025-11-05 11:26:55 - INFO - ================================
+
+2025-11-05 11:26:55 - INFO - Batch 1/1 - Processando itens 1 a 5 (5 itens)...
+2025-11-05 11:26:55 - INFO - Iniciando busca de 'DETALHES' assíncrona para 5 AppIDs com concorrência 1...
+2025-11-05 11:26:57 - INFO - Busca assíncrona concluída.
+2025-11-05 11:26:57 - INFO - --- Busca concluída: ---
+2025-11-05 11:26:57 - INFO - 0 sucesso(s) (0.00%),
+2025-11-05 11:26:57 - INFO - 5 falha(s) (100.00%).
+2025-11-05 11:26:57 - INFO - --- Detalhamento dos erros: ---
+2025-11-05 11:26:57 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-05 11:26:57 - INFO - * Timeout: 0
+2025-11-05 11:26:57 - INFO - * Ausentes: 5
+2025-11-05 11:26:57 - INFO - * Outros: 0
+2025-11-05 11:26:57 - INFO - 
+PROCESSAMENTO COMPLETO!
+2025-11-05 11:26:57 - INFO - Total processado: 0 sucessos de 5 itens (0.00%)
+2025-11-05 11:26:57 - WARNING - Nenhum dado de detalhes retornado da API Steam.
+2025-11-05 11:26:57 - INFO - Número de AppIDs com dados incompletos: 6859
+2025-11-05 11:26:58 - INFO - === PROCESSAMENTO EM BATCHES (REVIEWS) ===
+2025-11-05 11:26:58 - INFO - Total de itens: 6,864
+2025-11-05 11:26:58 - INFO - Tamanho do batch: 500
+2025-11-05 11:26:58 - INFO - Total de batches: 14
+2025-11-05 11:26:58 - INFO - Delay entre batches: 60s
+2025-11-05 11:26:58 - INFO - Concorrência por batch: 3
+2025-11-05 11:26:58 - INFO - ==========================================
+
+2025-11-05 11:26:58 - INFO - Batch 1/14 - Processando itens 1 a 500 (500 itens)...
+2025-11-05 11:26:58 - INFO - Iniciando busca de 'REVIEWS' assíncrona para 500 AppIDs com concorrência 3...
+2025-11-05 11:28:15 - INFO - Número total de aplicativos carregados: 273744
+2025-11-05 11:28:15 - INFO - Processando aplicativos de 1 a 5 de 5
+2025-11-05 11:28:15 - INFO - Conectado ao Supabase com sucesso
+2025-11-05 11:28:17 - INFO - Total de registros desatualizados de steam_raw: 0
+2025-11-05 11:28:23 - INFO - Total de registros incompletos de 'steam_raw': 6859 (reviews obrigatórios)
+2025-11-05 11:28:23 - INFO - Número de AppIDs a processar: 5
+2025-11-05 11:28:23 - INFO - === PROCESSAMENTO EM BATCHES ===
+2025-11-05 11:28:23 - INFO - Total de itens: 5
+2025-11-05 11:28:23 - INFO - Tamanho do batch: 200
+2025-11-05 11:28:23 - INFO - Total de batches: 1
+2025-11-05 11:28:23 - INFO - Delay entre batches: 120s
+2025-11-05 11:28:23 - INFO - Concorrência por batch: 1
+2025-11-05 11:28:23 - INFO - ================================
+
+2025-11-05 11:28:23 - INFO - Batch 1/1 - Processando itens 1 a 5 (5 itens)...
+2025-11-05 11:28:23 - INFO - Iniciando busca de 'DETALHES' assíncrona para 5 AppIDs com concorrência 1...
+2025-11-05 11:28:24 - INFO - Busca assíncrona concluída.
+2025-11-05 11:28:24 - INFO - --- Busca concluída: ---
+2025-11-05 11:28:24 - INFO - 0 sucesso(s) (0.00%),
+2025-11-05 11:28:24 - INFO - 5 falha(s) (100.00%).
+2025-11-05 11:28:24 - INFO - --- Detalhamento dos erros: ---
+2025-11-05 11:28:24 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-05 11:28:24 - INFO - * Timeout: 0
+2025-11-05 11:28:24 - INFO - * Ausentes: 5
+2025-11-05 11:28:24 - INFO - * Outros: 0
+2025-11-05 11:28:24 - INFO - 
+PROCESSAMENTO COMPLETO!
+2025-11-05 11:28:24 - INFO - Total processado: 0 sucessos de 5 itens (0.00%)
+2025-11-05 11:28:24 - WARNING - Nenhum dado de detalhes retornado da API Steam.
+2025-11-05 11:28:24 - INFO - Número de AppIDs com dados incompletos: 6859
+2025-11-05 11:28:25 - INFO - === PROCESSAMENTO EM BATCHES (REVIEWS) ===
+2025-11-05 11:28:25 - INFO - Total de itens: 6,864
+2025-11-05 11:28:25 - INFO - Tamanho do batch: 500
+2025-11-05 11:28:25 - INFO - Total de batches: 14
+2025-11-05 11:28:25 - INFO - Delay entre batches: 60s
+2025-11-05 11:28:25 - INFO - Concorrência por batch: 3
+2025-11-05 11:28:25 - INFO - ==========================================
+
+2025-11-05 11:28:25 - INFO - Batch 1/14 - Processando itens 1 a 500 (500 itens)...
+2025-11-05 11:28:25 - INFO - Iniciando busca de 'REVIEWS' assíncrona para 500 AppIDs com concorrência 3...
+2025-11-05 11:29:39 - INFO - Busca assíncrona concluída.
+2025-11-05 11:29:39 - INFO - --- Busca concluída: ---
+2025-11-05 11:29:39 - INFO - 500 sucesso(s) (100.00%),
+2025-11-05 11:29:39 - INFO - 0 falha(s) (0.00%).
+2025-11-05 11:29:39 - INFO - --- Detalhamento dos erros: ---
+2025-11-05 11:29:39 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-05 11:29:39 - INFO - * Timeout: 0
+2025-11-05 11:29:39 - INFO - * Ausentes: 0
+2025-11-05 11:29:39 - INFO - * Outros: 0
+2025-11-05 11:29:39 - INFO - Aguardando 60s antes do próximo batch...
+
+2025-11-05 11:30:39 - INFO - Batch 2/14 - Processando itens 501 a 1000 (500 itens)...
+2025-11-05 11:30:39 - INFO - Iniciando busca de 'REVIEWS' assíncrona para 500 AppIDs com concorrência 3...
+2025-11-05 11:33:06 - INFO - Busca assíncrona concluída.
+2025-11-05 11:33:06 - INFO - --- Busca concluída: ---
+2025-11-05 11:33:06 - INFO - 500 sucesso(s) (100.00%),
+2025-11-05 11:33:06 - INFO - 0 falha(s) (0.00%).
+2025-11-05 11:33:06 - INFO - --- Detalhamento dos erros: ---
+2025-11-05 11:33:06 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-05 11:33:06 - INFO - * Timeout: 0
+2025-11-05 11:33:06 - INFO - * Ausentes: 0
+2025-11-05 11:33:06 - INFO - * Outros: 0
+2025-11-05 11:33:06 - INFO - Aguardando 60s antes do próximo batch...
+
+2025-11-05 11:34:06 - INFO - Batch 3/14 - Processando itens 1001 a 1500 (500 itens)...
+2025-11-05 11:34:06 - INFO - Iniciando busca de 'REVIEWS' assíncrona para 500 AppIDs com concorrência 3...
+2025-11-05 11:35:21 - INFO - Busca assíncrona concluída.
+2025-11-05 11:35:21 - INFO - --- Busca concluída: ---
+2025-11-05 11:35:21 - INFO - 500 sucesso(s) (100.00%),
+2025-11-05 11:35:21 - INFO - 0 falha(s) (0.00%).
+2025-11-05 11:35:21 - INFO - --- Detalhamento dos erros: ---
+2025-11-05 11:35:21 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-05 11:35:21 - INFO - * Timeout: 0
+2025-11-05 11:35:21 - INFO - * Ausentes: 0
+2025-11-05 11:35:21 - INFO - * Outros: 0
+2025-11-05 11:35:21 - INFO - Aguardando 60s antes do próximo batch...
+
+2025-11-05 11:36:21 - INFO - Batch 4/14 - Processando itens 1501 a 2000 (500 itens)...
+2025-11-05 11:36:21 - INFO - Iniciando busca de 'REVIEWS' assíncrona para 500 AppIDs com concorrência 3...
+2025-11-05 11:37:35 - INFO - Busca assíncrona concluída.
+2025-11-05 11:37:35 - INFO - --- Busca concluída: ---
+2025-11-05 11:37:35 - INFO - 500 sucesso(s) (100.00%),
+2025-11-05 11:37:35 - INFO - 0 falha(s) (0.00%).
+2025-11-05 11:37:35 - INFO - --- Detalhamento dos erros: ---
+2025-11-05 11:37:35 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-05 11:37:35 - INFO - * Timeout: 0
+2025-11-05 11:37:35 - INFO - * Ausentes: 0
+2025-11-05 11:37:35 - INFO - * Outros: 0
+2025-11-05 11:37:35 - INFO - Aguardando 60s antes do próximo batch...
+
+2025-11-05 11:38:35 - INFO - Batch 5/14 - Processando itens 2001 a 2500 (500 itens)...
+2025-11-05 11:38:35 - INFO - Iniciando busca de 'REVIEWS' assíncrona para 500 AppIDs com concorrência 3...
+2025-11-05 11:39:50 - INFO - Busca assíncrona concluída.
+2025-11-05 11:39:50 - INFO - --- Busca concluída: ---
+2025-11-05 11:39:50 - INFO - 500 sucesso(s) (100.00%),
+2025-11-05 11:39:50 - INFO - 0 falha(s) (0.00%).
+2025-11-05 11:39:50 - INFO - --- Detalhamento dos erros: ---
+2025-11-05 11:39:50 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-05 11:39:50 - INFO - * Timeout: 0
+2025-11-05 11:39:50 - INFO - * Ausentes: 0
+2025-11-05 11:39:50 - INFO - * Outros: 0
+2025-11-05 11:39:50 - INFO - Aguardando 60s antes do próximo batch...
+
+2025-11-05 11:40:50 - INFO - Batch 6/14 - Processando itens 2501 a 3000 (500 itens)...
+2025-11-05 11:40:50 - INFO - Iniciando busca de 'REVIEWS' assíncrona para 500 AppIDs com concorrência 3...
+2025-11-05 11:42:05 - INFO - Busca assíncrona concluída.
+2025-11-05 11:42:05 - INFO - --- Busca concluída: ---
+2025-11-05 11:42:05 - INFO - 500 sucesso(s) (100.00%),
+2025-11-05 11:42:05 - INFO - 0 falha(s) (0.00%).
+2025-11-05 11:42:05 - INFO - --- Detalhamento dos erros: ---
+2025-11-05 11:42:05 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-05 11:42:05 - INFO - * Timeout: 0
+2025-11-05 11:42:05 - INFO - * Ausentes: 0
+2025-11-05 11:42:05 - INFO - * Outros: 0
+2025-11-05 11:42:05 - INFO - Aguardando 60s antes do próximo batch...
+
+2025-11-05 11:43:05 - INFO - Batch 7/14 - Processando itens 3001 a 3500 (500 itens)...
+2025-11-05 11:43:05 - INFO - Iniciando busca de 'REVIEWS' assíncrona para 500 AppIDs com concorrência 3...
+2025-11-05 11:44:17 - INFO - Busca assíncrona concluída.
+2025-11-05 11:44:17 - INFO - --- Busca concluída: ---
+2025-11-05 11:44:17 - INFO - 500 sucesso(s) (100.00%),
+2025-11-05 11:44:17 - INFO - 0 falha(s) (0.00%).
+2025-11-05 11:44:17 - INFO - --- Detalhamento dos erros: ---
+2025-11-05 11:44:17 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-05 11:44:17 - INFO - * Timeout: 0
+2025-11-05 11:44:17 - INFO - * Ausentes: 0
+2025-11-05 11:44:17 - INFO - * Outros: 0
+2025-11-05 11:44:17 - INFO - Aguardando 60s antes do próximo batch...
+
+2025-11-05 11:45:17 - INFO - Batch 8/14 - Processando itens 3501 a 4000 (500 itens)...
+2025-11-05 11:45:17 - INFO - Iniciando busca de 'REVIEWS' assíncrona para 500 AppIDs com concorrência 3...
+2025-11-05 11:46:36 - INFO - Busca assíncrona concluída.
+2025-11-05 11:46:36 - INFO - --- Busca concluída: ---
+2025-11-05 11:46:36 - INFO - 500 sucesso(s) (100.00%),
+2025-11-05 11:46:36 - INFO - 0 falha(s) (0.00%).
+2025-11-05 11:46:36 - INFO - --- Detalhamento dos erros: ---
+2025-11-05 11:46:36 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-05 11:46:36 - INFO - * Timeout: 0
+2025-11-05 11:46:36 - INFO - * Ausentes: 0
+2025-11-05 11:46:36 - INFO - * Outros: 0
+2025-11-05 11:46:36 - INFO - Aguardando 60s antes do próximo batch...
+
+2025-11-05 11:47:36 - INFO - Batch 9/14 - Processando itens 4001 a 4500 (500 itens)...
+2025-11-05 11:47:36 - INFO - Iniciando busca de 'REVIEWS' assíncrona para 500 AppIDs com concorrência 3...
+2025-11-05 11:48:53 - INFO - Busca assíncrona concluída.
+2025-11-05 11:48:53 - INFO - --- Busca concluída: ---
+2025-11-05 11:48:53 - INFO - 500 sucesso(s) (100.00%),
+2025-11-05 11:48:53 - INFO - 0 falha(s) (0.00%).
+2025-11-05 11:48:53 - INFO - --- Detalhamento dos erros: ---
+2025-11-05 11:48:53 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-05 11:48:53 - INFO - * Timeout: 0
+2025-11-05 11:48:53 - INFO - * Ausentes: 0
+2025-11-05 11:48:53 - INFO - * Outros: 0
+2025-11-05 11:48:53 - INFO - Aguardando 60s antes do próximo batch...
+
+2025-11-05 11:49:53 - INFO - Batch 10/14 - Processando itens 4501 a 5000 (500 itens)...
+2025-11-05 11:49:53 - INFO - Iniciando busca de 'REVIEWS' assíncrona para 500 AppIDs com concorrência 3...
+2025-11-05 11:51:07 - INFO - Busca assíncrona concluída.
+2025-11-05 11:51:07 - INFO - --- Busca concluída: ---
+2025-11-05 11:51:07 - INFO - 500 sucesso(s) (100.00%),
+2025-11-05 11:51:07 - INFO - 0 falha(s) (0.00%).
+2025-11-05 11:51:07 - INFO - --- Detalhamento dos erros: ---
+2025-11-05 11:51:07 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-05 11:51:07 - INFO - * Timeout: 0
+2025-11-05 11:51:07 - INFO - * Ausentes: 0
+2025-11-05 11:51:07 - INFO - * Outros: 0
+2025-11-05 11:51:07 - INFO - Aguardando 60s antes do próximo batch...
+
+2025-11-05 11:52:07 - INFO - Batch 11/14 - Processando itens 5001 a 5500 (500 itens)...
+2025-11-05 11:52:07 - INFO - Iniciando busca de 'REVIEWS' assíncrona para 500 AppIDs com concorrência 3...
+2025-11-05 11:53:21 - INFO - Busca assíncrona concluída.
+2025-11-05 11:53:21 - INFO - --- Busca concluída: ---
+2025-11-05 11:53:21 - INFO - 500 sucesso(s) (100.00%),
+2025-11-05 11:53:21 - INFO - 0 falha(s) (0.00%).
+2025-11-05 11:53:21 - INFO - --- Detalhamento dos erros: ---
+2025-11-05 11:53:21 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-05 11:53:21 - INFO - * Timeout: 0
+2025-11-05 11:53:21 - INFO - * Ausentes: 0
+2025-11-05 11:53:21 - INFO - * Outros: 0
+2025-11-05 11:53:21 - INFO - Aguardando 60s antes do próximo batch...
+
+2025-11-05 11:54:21 - INFO - Batch 12/14 - Processando itens 5501 a 6000 (500 itens)...
+2025-11-05 11:54:21 - INFO - Iniciando busca de 'REVIEWS' assíncrona para 500 AppIDs com concorrência 3...
+2025-11-05 11:55:37 - INFO - Busca assíncrona concluída.
+2025-11-05 11:55:37 - INFO - --- Busca concluída: ---
+2025-11-05 11:55:37 - INFO - 500 sucesso(s) (100.00%),
+2025-11-05 11:55:37 - INFO - 0 falha(s) (0.00%).
+2025-11-05 11:55:37 - INFO - --- Detalhamento dos erros: ---
+2025-11-05 11:55:37 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-05 11:55:37 - INFO - * Timeout: 0
+2025-11-05 11:55:37 - INFO - * Ausentes: 0
+2025-11-05 11:55:37 - INFO - * Outros: 0
+2025-11-05 11:55:37 - INFO - Aguardando 60s antes do próximo batch...
+
+2025-11-05 11:56:37 - INFO - Batch 13/14 - Processando itens 6001 a 6500 (500 itens)...
+2025-11-05 11:56:37 - INFO - Iniciando busca de 'REVIEWS' assíncrona para 500 AppIDs com concorrência 3...
+2025-11-05 11:57:52 - INFO - Busca assíncrona concluída.
+2025-11-05 11:57:52 - INFO - --- Busca concluída: ---
+2025-11-05 11:57:52 - INFO - 500 sucesso(s) (100.00%),
+2025-11-05 11:57:52 - INFO - 0 falha(s) (0.00%).
+2025-11-05 11:57:52 - INFO - --- Detalhamento dos erros: ---
+2025-11-05 11:57:52 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-05 11:57:52 - INFO - * Timeout: 0
+2025-11-05 11:57:52 - INFO - * Ausentes: 0
+2025-11-05 11:57:52 - INFO - * Outros: 0
+2025-11-05 11:57:52 - INFO - Aguardando 60s antes do próximo batch...
+
+2025-11-05 11:58:52 - INFO - Batch 14/14 - Processando itens 6501 a 6864 (364 itens)...
+2025-11-05 11:58:52 - INFO - Iniciando busca de 'REVIEWS' assíncrona para 364 AppIDs com concorrência 3...
+2025-11-05 11:59:48 - INFO - Busca assíncrona concluída.
+2025-11-05 11:59:48 - INFO - --- Busca concluída: ---
+2025-11-05 11:59:48 - INFO - 364 sucesso(s) (100.00%),
+2025-11-05 11:59:48 - INFO - 0 falha(s) (0.00%).
+2025-11-05 11:59:48 - INFO - --- Detalhamento dos erros: ---
+2025-11-05 11:59:48 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-05 11:59:48 - INFO - * Timeout: 0
+2025-11-05 11:59:48 - INFO - * Ausentes: 0
+2025-11-05 11:59:48 - INFO - * Outros: 0
+2025-11-05 11:59:48 - INFO - 
+PROCESSAMENTO COMPLETO!
+2025-11-05 11:59:48 - INFO - Total processado: 6,864 sucessos de 6,864 itens (100.00%)
+2025-11-05 13:27:15 - INFO - Número total de aplicativos carregados: 273744
+2025-11-05 13:27:15 - INFO - Processando aplicativos de 1 a 5 de 5
+2025-11-05 13:27:16 - INFO - Conectado ao Supabase com sucesso
+2025-11-05 13:27:18 - INFO - Total de registros desatualizados de steam_raw: 0
+2025-11-05 13:27:25 - INFO - Total de registros incompletos de 'steam_raw': 6859 (reviews obrigatórios)
+2025-11-05 13:27:25 - INFO - Número de AppIDs a processar: 5
+2025-11-05 13:27:25 - INFO - === PROCESSAMENTO EM BATCHES ===
+2025-11-05 13:27:25 - INFO - Total de itens: 5
+2025-11-05 13:27:25 - INFO - Tamanho do batch: 200
+2025-11-05 13:27:25 - INFO - Total de batches: 1
+2025-11-05 13:27:25 - INFO - Delay entre batches: 120s
+2025-11-05 13:27:25 - INFO - Concorrência por batch: 1
+2025-11-05 13:27:25 - INFO - ================================
+
+2025-11-05 13:27:25 - INFO - Batch 1/1 - Processando itens 1 a 5 (5 itens)...
+2025-11-05 13:27:25 - INFO - Iniciando busca de 'DETALHES' assíncrona para 5 AppIDs com concorrência 1...
+2025-11-05 13:27:27 - INFO - Busca assíncrona concluída.
+2025-11-05 13:27:27 - INFO - --- Busca concluída: ---
+2025-11-05 13:27:27 - INFO - 0 sucesso(s) (0.00%),
+2025-11-05 13:27:27 - INFO - 5 falha(s) (100.00%).
+2025-11-05 13:27:27 - INFO - --- Detalhamento dos erros: ---
+2025-11-05 13:27:27 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-05 13:27:27 - INFO - * Timeout: 0
+2025-11-05 13:27:27 - INFO - * Ausentes: 5
+2025-11-05 13:27:27 - INFO - * Outros: 0
+2025-11-05 13:27:27 - INFO - 
+PROCESSAMENTO COMPLETO!
+2025-11-05 13:27:27 - INFO - Total processado: 0 sucessos de 5 itens (0.00%)
+2025-11-05 13:27:27 - WARNING - Nenhum dado de detalhes retornado da API Steam.
+2025-11-05 13:27:27 - INFO - Número de AppIDs com dados incompletos: 6859
+2025-11-05 13:27:28 - INFO - === PROCESSAMENTO EM BATCHES (REVIEWS) ===
+2025-11-05 13:27:28 - INFO - Total de itens: 6,864
+2025-11-05 13:27:28 - INFO - Tamanho do batch: 500
+2025-11-05 13:27:28 - INFO - Total de batches: 14
+2025-11-05 13:27:28 - INFO - Delay entre batches: 60s
+2025-11-05 13:27:28 - INFO - Concorrência por batch: 3
+2025-11-05 13:27:28 - INFO - ==========================================
+
+2025-11-05 13:27:28 - INFO - Batch 1/14 - Processando itens 1 a 500 (500 itens)...
+2025-11-05 13:27:28 - INFO - Iniciando busca de 'REVIEWS' assíncrona para 500 AppIDs com concorrência 3...
+2025-11-05 13:28:47 - INFO - Busca assíncrona concluída.
+2025-11-05 13:28:47 - INFO - --- Busca concluída: ---
+2025-11-05 13:28:47 - INFO - 500 sucesso(s) (100.00%),
+2025-11-05 13:28:47 - INFO - 0 falha(s) (0.00%).
+2025-11-05 13:28:47 - INFO - --- Detalhamento dos erros: ---
+2025-11-05 13:28:47 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-05 13:28:47 - INFO - * Timeout: 0
+2025-11-05 13:28:47 - INFO - * Ausentes: 0
+2025-11-05 13:28:47 - INFO - * Outros: 0
+2025-11-05 13:28:47 - INFO - Aguardando 60s antes do próximo batch...
+
+2025-11-05 13:29:47 - INFO - Batch 2/14 - Processando itens 501 a 1000 (500 itens)...
+2025-11-05 13:29:47 - INFO - Iniciando busca de 'REVIEWS' assíncrona para 500 AppIDs com concorrência 3...
+2025-11-05 13:31:07 - INFO - Busca assíncrona concluída.
+2025-11-05 13:31:07 - INFO - --- Busca concluída: ---
+2025-11-05 13:31:07 - INFO - 500 sucesso(s) (100.00%),
+2025-11-05 13:31:07 - INFO - 0 falha(s) (0.00%).
+2025-11-05 13:31:07 - INFO - --- Detalhamento dos erros: ---
+2025-11-05 13:31:07 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-05 13:31:07 - INFO - * Timeout: 0
+2025-11-05 13:31:07 - INFO - * Ausentes: 0
+2025-11-05 13:31:07 - INFO - * Outros: 0
+2025-11-05 13:31:07 - INFO - Aguardando 60s antes do próximo batch...
+
+2025-11-05 13:32:07 - INFO - Batch 3/14 - Processando itens 1001 a 1500 (500 itens)...
+2025-11-05 13:32:07 - INFO - Iniciando busca de 'REVIEWS' assíncrona para 500 AppIDs com concorrência 3...
+2025-11-05 13:33:35 - INFO - Busca assíncrona concluída.
+2025-11-05 13:33:35 - INFO - --- Busca concluída: ---
+2025-11-05 13:33:35 - INFO - 500 sucesso(s) (100.00%),
+2025-11-05 13:33:35 - INFO - 0 falha(s) (0.00%).
+2025-11-05 13:33:35 - INFO - --- Detalhamento dos erros: ---
+2025-11-05 13:33:35 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-05 13:33:35 - INFO - * Timeout: 0
+2025-11-05 13:33:35 - INFO - * Ausentes: 0
+2025-11-05 13:33:35 - INFO - * Outros: 0
+2025-11-05 13:33:35 - INFO - Aguardando 60s antes do próximo batch...
+
+2025-11-05 13:34:35 - INFO - Batch 4/14 - Processando itens 1501 a 2000 (500 itens)...
+2025-11-05 13:34:35 - INFO - Iniciando busca de 'REVIEWS' assíncrona para 500 AppIDs com concorrência 3...
+2025-11-05 13:35:53 - INFO - Busca assíncrona concluída.
+2025-11-05 13:35:53 - INFO - --- Busca concluída: ---
+2025-11-05 13:35:53 - INFO - 500 sucesso(s) (100.00%),
+2025-11-05 13:35:53 - INFO - 0 falha(s) (0.00%).
+2025-11-05 13:35:53 - INFO - --- Detalhamento dos erros: ---
+2025-11-05 13:35:53 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-05 13:35:53 - INFO - * Timeout: 0
+2025-11-05 13:35:53 - INFO - * Ausentes: 0
+2025-11-05 13:35:53 - INFO - * Outros: 0
+2025-11-05 13:35:53 - INFO - Aguardando 60s antes do próximo batch...
+
+2025-11-05 13:36:53 - INFO - Batch 5/14 - Processando itens 2001 a 2500 (500 itens)...
+2025-11-05 13:36:53 - INFO - Iniciando busca de 'REVIEWS' assíncrona para 500 AppIDs com concorrência 3...
+2025-11-05 13:38:20 - INFO - Busca assíncrona concluída.
+2025-11-05 13:38:20 - INFO - --- Busca concluída: ---
+2025-11-05 13:38:20 - INFO - 500 sucesso(s) (100.00%),
+2025-11-05 13:38:20 - INFO - 0 falha(s) (0.00%).
+2025-11-05 13:38:20 - INFO - --- Detalhamento dos erros: ---
+2025-11-05 13:38:20 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-05 13:38:20 - INFO - * Timeout: 0
+2025-11-05 13:38:20 - INFO - * Ausentes: 0
+2025-11-05 13:38:20 - INFO - * Outros: 0
+2025-11-05 13:38:20 - INFO - Aguardando 60s antes do próximo batch...
+
+2025-11-05 13:39:20 - INFO - Batch 6/14 - Processando itens 2501 a 3000 (500 itens)...
+2025-11-05 13:39:20 - INFO - Iniciando busca de 'REVIEWS' assíncrona para 500 AppIDs com concorrência 3...
+2025-11-05 13:40:38 - INFO - Busca assíncrona concluída.
+2025-11-05 13:40:38 - INFO - --- Busca concluída: ---
+2025-11-05 13:40:38 - INFO - 500 sucesso(s) (100.00%),
+2025-11-05 13:40:38 - INFO - 0 falha(s) (0.00%).
+2025-11-05 13:40:38 - INFO - --- Detalhamento dos erros: ---
+2025-11-05 13:40:38 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-05 13:40:38 - INFO - * Timeout: 0
+2025-11-05 13:40:38 - INFO - * Ausentes: 0
+2025-11-05 13:40:38 - INFO - * Outros: 0
+2025-11-05 13:40:38 - INFO - Aguardando 60s antes do próximo batch...
+
+2025-11-05 13:41:38 - INFO - Batch 7/14 - Processando itens 3001 a 3500 (500 itens)...
+2025-11-05 13:41:38 - INFO - Iniciando busca de 'REVIEWS' assíncrona para 500 AppIDs com concorrência 3...
+2025-11-05 13:42:54 - INFO - Busca assíncrona concluída.
+2025-11-05 13:42:54 - INFO - --- Busca concluída: ---
+2025-11-05 13:42:54 - INFO - 500 sucesso(s) (100.00%),
+2025-11-05 13:42:54 - INFO - 0 falha(s) (0.00%).
+2025-11-05 13:42:54 - INFO - --- Detalhamento dos erros: ---
+2025-11-05 13:42:54 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-05 13:42:54 - INFO - * Timeout: 0
+2025-11-05 13:42:54 - INFO - * Ausentes: 0
+2025-11-05 13:42:54 - INFO - * Outros: 0
+2025-11-05 13:42:54 - INFO - Aguardando 60s antes do próximo batch...
+
+2025-11-05 13:43:54 - INFO - Batch 8/14 - Processando itens 3501 a 4000 (500 itens)...
+2025-11-05 13:43:54 - INFO - Iniciando busca de 'REVIEWS' assíncrona para 500 AppIDs com concorrência 3...
+2025-11-05 13:45:21 - INFO - Busca assíncrona concluída.
+2025-11-05 13:45:21 - INFO - --- Busca concluída: ---
+2025-11-05 13:45:21 - INFO - 500 sucesso(s) (100.00%),
+2025-11-05 13:45:21 - INFO - 0 falha(s) (0.00%).
+2025-11-05 13:45:21 - INFO - --- Detalhamento dos erros: ---
+2025-11-05 13:45:21 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-05 13:45:21 - INFO - * Timeout: 0
+2025-11-05 13:45:21 - INFO - * Ausentes: 0
+2025-11-05 13:45:21 - INFO - * Outros: 0
+2025-11-05 13:45:21 - INFO - Aguardando 60s antes do próximo batch...
+
+2025-11-05 13:46:21 - INFO - Batch 9/14 - Processando itens 4001 a 4500 (500 itens)...
+2025-11-05 13:46:21 - INFO - Iniciando busca de 'REVIEWS' assíncrona para 500 AppIDs com concorrência 3...
+2025-11-05 13:47:43 - INFO - Busca assíncrona concluída.
+2025-11-05 13:47:43 - INFO - --- Busca concluída: ---
+2025-11-05 13:47:43 - INFO - 500 sucesso(s) (100.00%),
+2025-11-05 13:47:43 - INFO - 0 falha(s) (0.00%).
+2025-11-05 13:47:43 - INFO - --- Detalhamento dos erros: ---
+2025-11-05 13:47:43 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-05 13:47:43 - INFO - * Timeout: 0
+2025-11-05 13:47:43 - INFO - * Ausentes: 0
+2025-11-05 13:47:43 - INFO - * Outros: 0
+2025-11-05 13:47:43 - INFO - Aguardando 60s antes do próximo batch...
+
+2025-11-05 13:48:43 - INFO - Batch 10/14 - Processando itens 4501 a 5000 (500 itens)...
+2025-11-05 13:48:44 - INFO - Iniciando busca de 'REVIEWS' assíncrona para 500 AppIDs com concorrência 3...
+2025-11-05 13:49:58 - INFO - Busca assíncrona concluída.
+2025-11-05 13:49:58 - INFO - --- Busca concluída: ---
+2025-11-05 13:49:58 - INFO - 500 sucesso(s) (100.00%),
+2025-11-05 13:49:58 - INFO - 0 falha(s) (0.00%).
+2025-11-05 13:49:58 - INFO - --- Detalhamento dos erros: ---
+2025-11-05 13:49:58 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-05 13:49:58 - INFO - * Timeout: 0
+2025-11-05 13:49:58 - INFO - * Ausentes: 0
+2025-11-05 13:49:58 - INFO - * Outros: 0
+2025-11-05 13:49:58 - INFO - Aguardando 60s antes do próximo batch...
+
+2025-11-05 13:50:58 - INFO - Batch 11/14 - Processando itens 5001 a 5500 (500 itens)...
+2025-11-05 13:50:58 - INFO - Iniciando busca de 'REVIEWS' assíncrona para 500 AppIDs com concorrência 3...
+2025-11-05 13:52:13 - INFO - Busca assíncrona concluída.
+2025-11-05 13:52:13 - INFO - --- Busca concluída: ---
+2025-11-05 13:52:13 - INFO - 500 sucesso(s) (100.00%),
+2025-11-05 13:52:13 - INFO - 0 falha(s) (0.00%).
+2025-11-05 13:52:13 - INFO - --- Detalhamento dos erros: ---
+2025-11-05 13:52:13 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-05 13:52:13 - INFO - * Timeout: 0
+2025-11-05 13:52:13 - INFO - * Ausentes: 0
+2025-11-05 13:52:13 - INFO - * Outros: 0
+2025-11-05 13:52:13 - INFO - Aguardando 60s antes do próximo batch...
+
+2025-11-05 13:53:13 - INFO - Batch 12/14 - Processando itens 5501 a 6000 (500 itens)...
+2025-11-05 13:53:13 - INFO - Iniciando busca de 'REVIEWS' assíncrona para 500 AppIDs com concorrência 3...
+2025-11-05 13:54:26 - INFO - Busca assíncrona concluída.
+2025-11-05 13:54:26 - INFO - --- Busca concluída: ---
+2025-11-05 13:54:26 - INFO - 500 sucesso(s) (100.00%),
+2025-11-05 13:54:26 - INFO - 0 falha(s) (0.00%).
+2025-11-05 13:54:26 - INFO - --- Detalhamento dos erros: ---
+2025-11-05 13:54:26 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-05 13:54:26 - INFO - * Timeout: 0
+2025-11-05 13:54:26 - INFO - * Ausentes: 0
+2025-11-05 13:54:26 - INFO - * Outros: 0
+2025-11-05 13:54:26 - INFO - Aguardando 60s antes do próximo batch...
+
+2025-11-05 13:55:26 - INFO - Batch 13/14 - Processando itens 6001 a 6500 (500 itens)...
+2025-11-05 13:55:26 - INFO - Iniciando busca de 'REVIEWS' assíncrona para 500 AppIDs com concorrência 3...
+2025-11-05 13:56:45 - INFO - Busca assíncrona concluída.
+2025-11-05 13:56:45 - INFO - --- Busca concluída: ---
+2025-11-05 13:56:45 - INFO - 500 sucesso(s) (100.00%),
+2025-11-05 13:56:45 - INFO - 0 falha(s) (0.00%).
+2025-11-05 13:56:45 - INFO - --- Detalhamento dos erros: ---
+2025-11-05 13:56:45 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-05 13:56:45 - INFO - * Timeout: 0
+2025-11-05 13:56:45 - INFO - * Ausentes: 0
+2025-11-05 13:56:45 - INFO - * Outros: 0
+2025-11-05 13:56:45 - INFO - Aguardando 60s antes do próximo batch...
+
+2025-11-05 13:57:45 - INFO - Batch 14/14 - Processando itens 6501 a 6864 (364 itens)...
+2025-11-05 13:57:45 - INFO - Iniciando busca de 'REVIEWS' assíncrona para 364 AppIDs com concorrência 3...
+2025-11-05 13:58:41 - INFO - Busca assíncrona concluída.
+2025-11-05 13:58:41 - INFO - --- Busca concluída: ---
+2025-11-05 13:58:41 - INFO - 364 sucesso(s) (100.00%),
+2025-11-05 13:58:41 - INFO - 0 falha(s) (0.00%).
+2025-11-05 13:58:41 - INFO - --- Detalhamento dos erros: ---
+2025-11-05 13:58:41 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-05 13:58:41 - INFO - * Timeout: 0
+2025-11-05 13:58:41 - INFO - * Ausentes: 0
+2025-11-05 13:58:41 - INFO - * Outros: 0
+2025-11-05 13:58:41 - INFO - 
+PROCESSAMENTO COMPLETO!
+2025-11-05 13:58:41 - INFO - Total processado: 6,864 sucessos de 6,864 itens (100.00%)
+2025-11-05 13:58:59 - WARNING - AppID 5585 não encontrado. Insira os detalhes primeiro antes de adicionar reviews.
+2025-11-05 13:59:09 - WARNING - AppID 5586 não encontrado. Insira os detalhes primeiro antes de adicionar reviews.
+2025-11-05 13:59:12 - WARNING - AppID 5587 não encontrado. Insira os detalhes primeiro antes de adicionar reviews.
+2025-11-05 13:59:15 - WARNING - AppID 5588 não encontrado. Insira os detalhes primeiro antes de adicionar reviews.
+2025-11-05 13:59:21 - WARNING - AppID 5589 não encontrado. Insira os detalhes primeiro antes de adicionar reviews.
+2025-11-05 14:07:26 - ERROR - Erro ao inserir dados steam_raw: <ConnectionTerminated error_code:0, last_stream_id:19999, additional_data:None>
+2025-11-05 14:07:26 - ERROR - Erro ao alimentar o banco de dados: Erro ao inserir dados steam_raw: <ConnectionTerminated error_code:0, last_stream_id:19999, additional_data:None>
+2025-11-05 14:07:26 - INFO - Processando aplicativos de 1 a 5 de 5
+2025-11-05 14:07:26 - INFO - Total de registros desatualizados de steam_raw: 0
+2025-11-05 14:07:28 - INFO - Total de registros incompletos de 'steam_raw': 1860 (reviews obrigatórios)
+2025-11-05 14:07:28 - INFO - Número de AppIDs a processar: 5
+2025-11-05 14:07:28 - INFO - === PROCESSAMENTO EM BATCHES ===
+2025-11-05 14:07:28 - INFO - Total de itens: 5
+2025-11-05 14:07:28 - INFO - Tamanho do batch: 200
+2025-11-05 14:07:28 - INFO - Total de batches: 1
+2025-11-05 14:07:28 - INFO - Delay entre batches: 120s
+2025-11-05 14:07:28 - INFO - Concorrência por batch: 1
+2025-11-05 14:07:28 - INFO - ================================
+
+2025-11-05 14:07:28 - INFO - Batch 1/1 - Processando itens 1 a 5 (5 itens)...
+2025-11-05 14:07:28 - INFO - Iniciando busca de 'DETALHES' assíncrona para 5 AppIDs com concorrência 1...
+2025-11-05 14:07:30 - INFO - Busca assíncrona concluída.
+2025-11-05 14:07:30 - INFO - --- Busca concluída: ---
+2025-11-05 14:07:30 - INFO - 0 sucesso(s) (0.00%),
+2025-11-05 14:07:30 - INFO - 5 falha(s) (100.00%).
+2025-11-05 14:07:30 - INFO - --- Detalhamento dos erros: ---
+2025-11-05 14:07:30 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-05 14:07:30 - INFO - * Timeout: 0
+2025-11-05 14:07:30 - INFO - * Ausentes: 5
+2025-11-05 14:07:30 - INFO - * Outros: 0
+2025-11-05 14:07:30 - INFO - 
+PROCESSAMENTO COMPLETO!
+2025-11-05 14:07:30 - INFO - Total processado: 0 sucessos de 5 itens (0.00%)
+2025-11-05 14:07:30 - WARNING - Nenhum dado de detalhes retornado da API Steam.
+2025-11-05 14:07:30 - INFO - Número de AppIDs com dados incompletos: 1860
+2025-11-05 14:07:30 - INFO - === PROCESSAMENTO EM BATCHES (REVIEWS) ===
+2025-11-05 14:07:30 - INFO - Total de itens: 1,865
+2025-11-05 14:07:30 - INFO - Tamanho do batch: 500
+2025-11-05 14:07:30 - INFO - Total de batches: 4
+2025-11-05 14:07:30 - INFO - Delay entre batches: 60s
+2025-11-05 14:07:30 - INFO - Concorrência por batch: 3
+2025-11-05 14:07:30 - INFO - ==========================================
+
+2025-11-05 14:07:30 - INFO - Batch 1/4 - Processando itens 1 a 500 (500 itens)...
+2025-11-05 14:07:30 - INFO - Iniciando busca de 'REVIEWS' assíncrona para 500 AppIDs com concorrência 3...
+2025-11-05 14:08:46 - INFO - Busca assíncrona concluída.
+2025-11-05 14:08:46 - INFO - --- Busca concluída: ---
+2025-11-05 14:08:46 - INFO - 500 sucesso(s) (100.00%),
+2025-11-05 14:08:46 - INFO - 0 falha(s) (0.00%).
+2025-11-05 14:08:46 - INFO - --- Detalhamento dos erros: ---
+2025-11-05 14:08:46 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-05 14:08:46 - INFO - * Timeout: 0
+2025-11-05 14:08:46 - INFO - * Ausentes: 0
+2025-11-05 14:08:46 - INFO - * Outros: 0
+2025-11-05 14:08:46 - INFO - Aguardando 60s antes do próximo batch...
+
+2025-11-05 14:09:46 - INFO - Batch 2/4 - Processando itens 501 a 1000 (500 itens)...
+2025-11-05 14:09:46 - INFO - Iniciando busca de 'REVIEWS' assíncrona para 500 AppIDs com concorrência 3...
+2025-11-05 14:10:58 - INFO - Busca assíncrona concluída.
+2025-11-05 14:10:58 - INFO - --- Busca concluída: ---
+2025-11-05 14:10:58 - INFO - 500 sucesso(s) (100.00%),
+2025-11-05 14:10:58 - INFO - 0 falha(s) (0.00%).
+2025-11-05 14:10:58 - INFO - --- Detalhamento dos erros: ---
+2025-11-05 14:10:58 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-05 14:10:58 - INFO - * Timeout: 0
+2025-11-05 14:10:58 - INFO - * Ausentes: 0
+2025-11-05 14:10:58 - INFO - * Outros: 0
+2025-11-05 14:10:58 - INFO - Aguardando 60s antes do próximo batch...
+
+2025-11-05 14:11:58 - INFO - Batch 3/4 - Processando itens 1001 a 1500 (500 itens)...
+2025-11-05 14:11:58 - INFO - Iniciando busca de 'REVIEWS' assíncrona para 500 AppIDs com concorrência 3...
+2025-11-05 14:13:12 - INFO - Busca assíncrona concluída.
+2025-11-05 14:13:12 - INFO - --- Busca concluída: ---
+2025-11-05 14:13:12 - INFO - 500 sucesso(s) (100.00%),
+2025-11-05 14:13:12 - INFO - 0 falha(s) (0.00%).
+2025-11-05 14:13:12 - INFO - --- Detalhamento dos erros: ---
+2025-11-05 14:13:12 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-05 14:13:12 - INFO - * Timeout: 0
+2025-11-05 14:13:12 - INFO - * Ausentes: 0
+2025-11-05 14:13:12 - INFO - * Outros: 0
+2025-11-05 14:13:12 - INFO - Aguardando 60s antes do próximo batch...
+
+2025-11-05 14:14:12 - INFO - Batch 4/4 - Processando itens 1501 a 1865 (365 itens)...
+2025-11-05 14:14:12 - INFO - Iniciando busca de 'REVIEWS' assíncrona para 365 AppIDs com concorrência 3...
+2025-11-05 14:15:10 - INFO - Busca assíncrona concluída.
+2025-11-05 14:15:10 - INFO - --- Busca concluída: ---
+2025-11-05 14:15:10 - INFO - 365 sucesso(s) (100.00%),
+2025-11-05 14:15:10 - INFO - 0 falha(s) (0.00%).
+2025-11-05 14:15:10 - INFO - --- Detalhamento dos erros: ---
+2025-11-05 14:15:10 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-05 14:15:10 - INFO - * Timeout: 0
+2025-11-05 14:15:10 - INFO - * Ausentes: 0
+2025-11-05 14:15:10 - INFO - * Outros: 0
+2025-11-05 14:15:10 - INFO - 
+PROCESSAMENTO COMPLETO!
+2025-11-05 14:15:10 - INFO - Total processado: 1,865 sucessos de 1,865 itens (100.00%)
+2025-11-05 14:15:11 - WARNING - AppID 5585 não encontrado. Insira os detalhes primeiro antes de adicionar reviews.
+2025-11-05 14:15:11 - WARNING - AppID 5586 não encontrado. Insira os detalhes primeiro antes de adicionar reviews.
+2025-11-05 14:15:11 - WARNING - AppID 5587 não encontrado. Insira os detalhes primeiro antes de adicionar reviews.
+2025-11-05 14:15:11 - WARNING - AppID 5588 não encontrado. Insira os detalhes primeiro antes de adicionar reviews.
+2025-11-05 14:15:11 - WARNING - AppID 5589 não encontrado. Insira os detalhes primeiro antes de adicionar reviews.
+2025-11-05 14:30:38 - INFO - Dados de reviews inseridos com sucesso.
+2025-11-05 14:31:48 - INFO - Total de registros carregados de steam_raw: 20082
+2025-11-05 14:31:48 - INFO - Número de jogos pagos selecionados: 10090
+2025-11-05 14:31:49 - INFO - Inserindo registros de 1 a 3000 de 10090 na tabela steam_bd
+2025-11-05 14:34:32 - INFO - Dados processados salvos para 3000 registros.
+2025-11-05 14:34:32 - INFO - Inserindo registros de 3001 a 6000 de 10090 na tabela steam_bd
+2025-11-05 14:37:15 - INFO - Dados processados salvos para 3000 registros.
+2025-11-05 14:37:15 - INFO - Inserindo registros de 6001 a 9000 de 10090 na tabela steam_bd
+2025-11-05 14:39:56 - INFO - Dados processados salvos para 3000 registros.
+2025-11-05 14:39:56 - INFO - Inserindo registros de 9001 a 10090 de 10090 na tabela steam_bd
+2025-11-05 14:40:54 - ERROR - Erro ao inserir dados steam_bd: <ConnectionTerminated error_code:0, last_stream_id:19999, additional_data:None>
+2025-11-05 14:40:54 - ERROR - Erro ao inserir dados na tentativa 1: Erro ao inserir dados steam_bd: <ConnectionTerminated error_code:0, last_stream_id:19999, additional_data:None>
+2025-11-05 14:41:59 - INFO - Dados processados salvos para 1090 registros.
+2025-11-05 14:41:59 - INFO - Dados processados inseridos na tabela steam_bd com sucesso.
+2025-11-05 14:55:02 - INFO - Total de registros carregados de steam_bd: 10090
+2025-11-05 14:55:14 - ERROR - Erro ao alimentar o banco de dados ITAD: cannot access local variable 'var_listAppAtual' where it is not associated with a value
+2025-11-05 14:55:40 - INFO - Número total de aplicativos carregados: 273744
+2025-11-05 14:55:40 - INFO - Processando aplicativos de 1 a 5 de 5
+2025-11-05 14:55:41 - INFO - Conectado ao Supabase com sucesso
+2025-11-05 14:55:43 - INFO - Total de registros desatualizados de steam_raw: 0
+2025-11-05 14:55:43 - INFO - Total de registros incompletos de 'steam_raw': 0 (reviews obrigatórios)
+2025-11-05 14:55:43 - INFO - Número de AppIDs a processar: 5
+2025-11-05 14:55:43 - INFO - === PROCESSAMENTO EM BATCHES ===
+2025-11-05 14:55:43 - INFO - Total de itens: 5
+2025-11-05 14:55:43 - INFO - Tamanho do batch: 200
+2025-11-05 14:55:43 - INFO - Total de batches: 1
+2025-11-05 14:55:43 - INFO - Delay entre batches: 120s
+2025-11-05 14:55:43 - INFO - Concorrência por batch: 1
+2025-11-05 14:55:43 - INFO - ================================
+
+2025-11-05 14:55:43 - INFO - Batch 1/1 - Processando itens 1 a 5 (5 itens)...
+2025-11-05 14:55:43 - INFO - Iniciando busca de 'DETALHES' assíncrona para 5 AppIDs com concorrência 1...
+2025-11-05 14:55:45 - INFO - Busca assíncrona concluída.
+2025-11-05 14:55:45 - INFO - --- Busca concluída: ---
+2025-11-05 14:55:45 - INFO - 0 sucesso(s) (0.00%),
+2025-11-05 14:55:45 - INFO - 5 falha(s) (100.00%).
+2025-11-05 14:55:45 - INFO - --- Detalhamento dos erros: ---
+2025-11-05 14:55:45 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-05 14:55:45 - INFO - * Timeout: 0
+2025-11-05 14:55:45 - INFO - * Ausentes: 5
+2025-11-05 14:55:45 - INFO - * Outros: 0
+2025-11-05 14:55:45 - INFO - 
+PROCESSAMENTO COMPLETO!
+2025-11-05 14:55:45 - INFO - Total processado: 0 sucessos de 5 itens (0.00%)
+2025-11-05 14:55:45 - WARNING - Nenhum dado de detalhes retornado da API Steam.
+2025-11-05 14:55:45 - INFO - === PROCESSAMENTO EM BATCHES (REVIEWS) ===
+2025-11-05 14:55:45 - INFO - Total de itens: 5
+2025-11-05 14:55:45 - INFO - Tamanho do batch: 500
+2025-11-05 14:55:45 - INFO - Total de batches: 1
+2025-11-05 14:55:45 - INFO - Delay entre batches: 60s
+2025-11-05 14:55:45 - INFO - Concorrência por batch: 3
+2025-11-05 14:55:45 - INFO - ==========================================
+
+2025-11-05 14:55:45 - INFO - Batch 1/1 - Processando itens 1 a 5 (5 itens)...
+2025-11-05 14:55:45 - INFO - Iniciando busca de 'REVIEWS' assíncrona para 5 AppIDs com concorrência 3...
+2025-11-05 14:55:47 - INFO - Busca assíncrona concluída.
+2025-11-05 14:55:47 - INFO - --- Busca concluída: ---
+2025-11-05 14:55:47 - INFO - 5 sucesso(s) (100.00%),
+2025-11-05 14:55:47 - INFO - 0 falha(s) (0.00%).
+2025-11-05 14:55:47 - INFO - --- Detalhamento dos erros: ---
+2025-11-05 14:55:47 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-05 14:55:47 - INFO - * Timeout: 0
+2025-11-05 14:55:47 - INFO - * Ausentes: 0
+2025-11-05 14:55:47 - INFO - * Outros: 0
+2025-11-05 14:55:47 - INFO - 
+PROCESSAMENTO COMPLETO!
+2025-11-05 14:55:47 - INFO - Total processado: 5 sucessos de 5 itens (100.00%)
+2025-11-05 14:55:47 - WARNING - AppID 5585 não encontrado. Insira os detalhes primeiro antes de adicionar reviews.
+2025-11-05 14:55:47 - WARNING - AppID 5586 não encontrado. Insira os detalhes primeiro antes de adicionar reviews.
+2025-11-05 14:55:47 - WARNING - AppID 5587 não encontrado. Insira os detalhes primeiro antes de adicionar reviews.
+2025-11-05 14:55:47 - WARNING - AppID 5588 não encontrado. Insira os detalhes primeiro antes de adicionar reviews.
+2025-11-05 14:55:47 - WARNING - AppID 5589 não encontrado. Insira os detalhes primeiro antes de adicionar reviews.
+2025-11-05 14:55:47 - INFO - Dados de reviews inseridos com sucesso.
+2025-11-05 14:59:53 - ERROR - Erro ao buscar todos os dados steam_raw: <StreamReset stream_id:35, error_code:2, remote_reset:True>
+2025-11-05 14:59:53 - ERROR - Erro ao alimentar o banco de dados Steam BD: Erro ao buscar todos os dados steam_raw: <StreamReset stream_id:35, error_code:2, remote_reset:True>
+2025-11-05 14:59:53 - INFO - Processando aplicativos de 1 a 5 de 5
+2025-11-05 14:59:54 - INFO - Total de registros desatualizados de steam_raw: 0
+2025-11-05 14:59:54 - INFO - Total de registros incompletos de 'steam_raw': 0 (reviews obrigatórios)
+2025-11-05 14:59:54 - INFO - Número de AppIDs a processar: 5
+2025-11-05 14:59:54 - INFO - === PROCESSAMENTO EM BATCHES ===
+2025-11-05 14:59:54 - INFO - Total de itens: 5
+2025-11-05 14:59:54 - INFO - Tamanho do batch: 200
+2025-11-05 14:59:54 - INFO - Total de batches: 1
+2025-11-05 14:59:54 - INFO - Delay entre batches: 120s
+2025-11-05 14:59:54 - INFO - Concorrência por batch: 1
+2025-11-05 14:59:54 - INFO - ================================
+
+2025-11-05 14:59:54 - INFO - Batch 1/1 - Processando itens 1 a 5 (5 itens)...
+2025-11-05 14:59:54 - INFO - Iniciando busca de 'DETALHES' assíncrona para 5 AppIDs com concorrência 1...
+2025-11-05 14:59:57 - INFO - Busca assíncrona concluída.
+2025-11-05 14:59:57 - INFO - --- Busca concluída: ---
+2025-11-05 14:59:57 - INFO - 0 sucesso(s) (0.00%),
+2025-11-05 14:59:57 - INFO - 5 falha(s) (100.00%).
+2025-11-05 14:59:57 - INFO - --- Detalhamento dos erros: ---
+2025-11-05 14:59:57 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-05 14:59:57 - INFO - * Timeout: 0
+2025-11-05 14:59:57 - INFO - * Ausentes: 5
+2025-11-05 14:59:57 - INFO - * Outros: 0
+2025-11-05 14:59:57 - INFO - 
+PROCESSAMENTO COMPLETO!
+2025-11-05 14:59:57 - INFO - Total processado: 0 sucessos de 5 itens (0.00%)
+2025-11-05 14:59:57 - WARNING - Nenhum dado de detalhes retornado da API Steam.
+2025-11-05 14:59:57 - INFO - === PROCESSAMENTO EM BATCHES (REVIEWS) ===
+2025-11-05 14:59:57 - INFO - Total de itens: 5
+2025-11-05 14:59:57 - INFO - Tamanho do batch: 500
+2025-11-05 14:59:57 - INFO - Total de batches: 1
+2025-11-05 14:59:57 - INFO - Delay entre batches: 60s
+2025-11-05 14:59:57 - INFO - Concorrência por batch: 3
+2025-11-05 14:59:57 - INFO - ==========================================
+
+2025-11-05 14:59:57 - INFO - Batch 1/1 - Processando itens 1 a 5 (5 itens)...
+2025-11-05 14:59:57 - INFO - Iniciando busca de 'REVIEWS' assíncrona para 5 AppIDs com concorrência 3...
+2025-11-05 14:59:59 - INFO - Busca assíncrona concluída.
+2025-11-05 14:59:59 - INFO - --- Busca concluída: ---
+2025-11-05 14:59:59 - INFO - 5 sucesso(s) (100.00%),
+2025-11-05 14:59:59 - INFO - 0 falha(s) (0.00%).
+2025-11-05 14:59:59 - INFO - --- Detalhamento dos erros: ---
+2025-11-05 14:59:59 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-05 14:59:59 - INFO - * Timeout: 0
+2025-11-05 14:59:59 - INFO - * Ausentes: 0
+2025-11-05 14:59:59 - INFO - * Outros: 0
+2025-11-05 14:59:59 - INFO - 
+PROCESSAMENTO COMPLETO!
+2025-11-05 14:59:59 - INFO - Total processado: 5 sucessos de 5 itens (100.00%)
+2025-11-05 14:59:59 - WARNING - AppID 5585 não encontrado. Insira os detalhes primeiro antes de adicionar reviews.
+2025-11-05 15:00:00 - WARNING - AppID 5586 não encontrado. Insira os detalhes primeiro antes de adicionar reviews.
+2025-11-05 15:00:00 - WARNING - AppID 5587 não encontrado. Insira os detalhes primeiro antes de adicionar reviews.
+2025-11-05 15:00:00 - WARNING - AppID 5588 não encontrado. Insira os detalhes primeiro antes de adicionar reviews.
+2025-11-05 15:00:00 - WARNING - AppID 5589 não encontrado. Insira os detalhes primeiro antes de adicionar reviews.
+2025-11-05 15:00:00 - INFO - Dados de reviews inseridos com sucesso.
+2025-11-05 15:00:55 - INFO - Total de registros carregados de steam_raw: 20082
+2025-11-05 15:00:55 - INFO - Número de jogos pagos selecionados: 10090
+2025-11-05 15:00:56 - INFO - Inserindo registros de 1 a 3000 de 10090 na tabela steam_bd
+2025-11-05 15:03:35 - INFO - Dados processados salvos para 3000 registros.
+2025-11-05 15:03:35 - INFO - Inserindo registros de 3001 a 6000 de 10090 na tabela steam_bd
+2025-11-05 15:06:13 - INFO - Dados processados salvos para 3000 registros.
+2025-11-05 15:06:13 - INFO - Inserindo registros de 6001 a 9000 de 10090 na tabela steam_bd
+2025-11-05 15:09:11 - INFO - Dados processados salvos para 3000 registros.
+2025-11-05 15:09:11 - INFO - Inserindo registros de 9001 a 10090 de 10090 na tabela steam_bd
+2025-11-05 15:10:04 - ERROR - Erro ao inserir dados steam_bd: <ConnectionTerminated error_code:0, last_stream_id:19999, additional_data:None>
+2025-11-05 15:10:04 - ERROR - Erro ao inserir dados na tentativa 1: Erro ao inserir dados steam_bd: <ConnectionTerminated error_code:0, last_stream_id:19999, additional_data:None>
+2025-11-05 15:11:09 - INFO - Dados processados salvos para 1090 registros.
+2025-11-05 15:11:09 - INFO - Dados processados inseridos na tabela steam_bd com sucesso.
+2025-11-05 15:11:12 - INFO - Total de registros carregados de steam_bd: 10090
+2025-11-05 15:14:59 - INFO - Processando aplicativos de 1 a 2000 de 10090
+2025-11-05 15:16:00 - INFO - Total de registros desatualizados de steam_raw: 0
+2025-11-05 15:16:07 - INFO - Número de IDs a processar: 5
+2025-11-05 15:20:19 - INFO - Número total de aplicativos carregados: 273744
+2025-11-05 15:20:19 - INFO - Processando aplicativos de 1 a 5 de 5
+2025-11-05 15:20:19 - INFO - Conectado ao Supabase com sucesso
+2025-11-05 15:20:21 - INFO - Total de registros desatualizados de steam_raw: 0
+2025-11-05 15:20:21 - INFO - Total de registros incompletos de 'steam_raw': 0 (reviews obrigatórios)
+2025-11-05 15:20:21 - INFO - Número de AppIDs a processar: 5
+2025-11-05 15:20:21 - INFO - === PROCESSAMENTO EM BATCHES ===
+2025-11-05 15:20:21 - INFO - Total de itens: 5
+2025-11-05 15:20:21 - INFO - Tamanho do batch: 200
+2025-11-05 15:20:21 - INFO - Total de batches: 1
+2025-11-05 15:20:21 - INFO - Delay entre batches: 120s
+2025-11-05 15:20:21 - INFO - Concorrência por batch: 1
+2025-11-05 15:20:21 - INFO - ================================
+
+2025-11-05 15:20:21 - INFO - Batch 1/1 - Processando itens 1 a 5 (5 itens)...
+2025-11-05 15:20:21 - INFO - Iniciando busca de 'DETALHES' assíncrona para 5 AppIDs com concorrência 1...
+2025-11-05 15:20:23 - INFO - Busca assíncrona concluída.
+2025-11-05 15:20:23 - INFO - --- Busca concluída: ---
+2025-11-05 15:20:23 - INFO - 0 sucesso(s) (0.00%),
+2025-11-05 15:20:23 - INFO - 5 falha(s) (100.00%).
+2025-11-05 15:20:23 - INFO - --- Detalhamento dos erros: ---
+2025-11-05 15:20:23 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-05 15:20:23 - INFO - * Timeout: 0
+2025-11-05 15:20:23 - INFO - * Ausentes: 5
+2025-11-05 15:20:23 - INFO - * Outros: 0
+2025-11-05 15:20:23 - INFO - 
+PROCESSAMENTO COMPLETO!
+2025-11-05 15:20:23 - INFO - Total processado: 0 sucessos de 5 itens (0.00%)
+2025-11-05 15:20:23 - WARNING - Nenhum dado de detalhes retornado da API Steam.
+2025-11-05 15:20:23 - INFO - === PROCESSAMENTO EM BATCHES (REVIEWS) ===
+2025-11-05 15:20:23 - INFO - Total de itens: 5
+2025-11-05 15:20:23 - INFO - Tamanho do batch: 500
+2025-11-05 15:20:23 - INFO - Total de batches: 1
+2025-11-05 15:20:23 - INFO - Delay entre batches: 60s
+2025-11-05 15:20:23 - INFO - Concorrência por batch: 3
+2025-11-05 15:20:23 - INFO - ==========================================
+
+2025-11-05 15:20:23 - INFO - Batch 1/1 - Processando itens 1 a 5 (5 itens)...
+2025-11-05 15:20:23 - INFO - Iniciando busca de 'REVIEWS' assíncrona para 5 AppIDs com concorrência 3...
+2025-11-05 15:20:24 - INFO - Busca assíncrona concluída.
+2025-11-05 15:20:24 - INFO - --- Busca concluída: ---
+2025-11-05 15:20:24 - INFO - 5 sucesso(s) (100.00%),
+2025-11-05 15:20:24 - INFO - 0 falha(s) (0.00%).
+2025-11-05 15:20:24 - INFO - --- Detalhamento dos erros: ---
+2025-11-05 15:20:24 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-05 15:20:24 - INFO - * Timeout: 0
+2025-11-05 15:20:24 - INFO - * Ausentes: 0
+2025-11-05 15:20:24 - INFO - * Outros: 0
+2025-11-05 15:20:24 - INFO - 
+PROCESSAMENTO COMPLETO!
+2025-11-05 15:20:24 - INFO - Total processado: 5 sucessos de 5 itens (100.00%)
+2025-11-05 15:20:24 - WARNING - AppID 5585 não encontrado. Insira os detalhes primeiro antes de adicionar reviews.
+2025-11-05 15:20:24 - WARNING - AppID 5586 não encontrado. Insira os detalhes primeiro antes de adicionar reviews.
+2025-11-05 15:20:24 - WARNING - AppID 5587 não encontrado. Insira os detalhes primeiro antes de adicionar reviews.
+2025-11-05 15:20:24 - WARNING - AppID 5588 não encontrado. Insira os detalhes primeiro antes de adicionar reviews.
+2025-11-05 15:20:24 - WARNING - AppID 5589 não encontrado. Insira os detalhes primeiro antes de adicionar reviews.
+2025-11-05 15:20:24 - INFO - Dados de reviews inseridos com sucesso.
+2025-11-05 15:20:53 - INFO - Total de registros carregados de steam_raw: 20082
+2025-11-05 15:20:53 - INFO - Número de jogos pagos selecionados: 10090
+2025-11-05 15:20:54 - INFO - Inserindo registros de 1 a 3000 de 10090 na tabela steam_bd
+2025-11-05 15:23:33 - INFO - Dados processados salvos para 3000 registros.
+2025-11-05 15:23:33 - INFO - Inserindo registros de 3001 a 6000 de 10090 na tabela steam_bd
+2025-11-05 15:26:15 - INFO - Dados processados salvos para 3000 registros.
+2025-11-05 15:26:15 - INFO - Inserindo registros de 6001 a 9000 de 10090 na tabela steam_bd
+2025-11-05 15:29:10 - INFO - Dados processados salvos para 3000 registros.
+2025-11-05 15:29:10 - INFO - Inserindo registros de 9001 a 10090 de 10090 na tabela steam_bd
+2025-11-05 15:30:16 - ERROR - Erro ao inserir dados steam_bd: <ConnectionTerminated error_code:0, last_stream_id:19999, additional_data:None>
+2025-11-05 15:30:16 - ERROR - Erro ao inserir dados na tentativa 1: Erro ao inserir dados steam_bd: <ConnectionTerminated error_code:0, last_stream_id:19999, additional_data:None>
+2025-11-05 15:31:19 - INFO - Dados processados salvos para 1090 registros.
+2025-11-05 15:31:19 - INFO - Dados processados inseridos na tabela steam_bd com sucesso.
+2025-11-05 15:31:22 - INFO - Total de registros carregados de steam_bd: 10090
+2025-11-05 15:31:22 - INFO - Processando aplicativos de 1 a 5 de 5
+2025-11-05 15:31:22 - INFO - Total de registros desatualizados de steam_raw: 0
+2025-11-05 15:31:22 - INFO - Número de IDs a processar: 5
+2025-11-05 15:35:01 - INFO - Número total de aplicativos carregados: 273744
+2025-11-05 15:35:01 - INFO - Processando aplicativos de 1 a 5 de 5
+2025-11-05 15:35:02 - INFO - Conectado ao Supabase com sucesso
+2025-11-05 15:35:03 - INFO - Total de registros desatualizados de steam_raw: 0
+2025-11-05 15:35:03 - INFO - Total de registros incompletos de 'steam_raw': 0 (reviews obrigatórios)
+2025-11-05 15:35:03 - INFO - Número de AppIDs a processar: 5
+2025-11-05 15:35:03 - INFO - === PROCESSAMENTO EM BATCHES ===
+2025-11-05 15:35:03 - INFO - Total de itens: 5
+2025-11-05 15:35:03 - INFO - Tamanho do batch: 200
+2025-11-05 15:35:03 - INFO - Total de batches: 1
+2025-11-05 15:35:03 - INFO - Delay entre batches: 120s
+2025-11-05 15:35:03 - INFO - Concorrência por batch: 1
+2025-11-05 15:35:03 - INFO - ================================
+
+2025-11-05 15:35:03 - INFO - Batch 1/1 - Processando itens 1 a 5 (5 itens)...
+2025-11-05 15:35:03 - INFO - Iniciando busca de 'DETALHES' assíncrona para 5 AppIDs com concorrência 1...
+2025-11-05 15:35:05 - INFO - Busca assíncrona concluída.
+2025-11-05 15:35:05 - INFO - --- Busca concluída: ---
+2025-11-05 15:35:05 - INFO - 0 sucesso(s) (0.00%),
+2025-11-05 15:35:05 - INFO - 5 falha(s) (100.00%).
+2025-11-05 15:35:05 - INFO - --- Detalhamento dos erros: ---
+2025-11-05 15:35:05 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-05 15:35:05 - INFO - * Timeout: 0
+2025-11-05 15:35:05 - INFO - * Ausentes: 5
+2025-11-05 15:35:05 - INFO - * Outros: 0
+2025-11-05 15:35:05 - INFO - 
+PROCESSAMENTO COMPLETO!
+2025-11-05 15:35:05 - INFO - Total processado: 0 sucessos de 5 itens (0.00%)
+2025-11-05 15:35:05 - WARNING - Nenhum dado de detalhes retornado da API Steam.
+2025-11-05 15:35:05 - INFO - === PROCESSAMENTO EM BATCHES (REVIEWS) ===
+2025-11-05 15:35:05 - INFO - Total de itens: 5
+2025-11-05 15:35:05 - INFO - Tamanho do batch: 500
+2025-11-05 15:35:05 - INFO - Total de batches: 1
+2025-11-05 15:35:05 - INFO - Delay entre batches: 60s
+2025-11-05 15:35:05 - INFO - Concorrência por batch: 3
+2025-11-05 15:35:05 - INFO - ==========================================
+
+2025-11-05 15:35:05 - INFO - Batch 1/1 - Processando itens 1 a 5 (5 itens)...
+2025-11-05 15:35:05 - INFO - Iniciando busca de 'REVIEWS' assíncrona para 5 AppIDs com concorrência 3...
+2025-11-05 15:35:07 - INFO - Busca assíncrona concluída.
+2025-11-05 15:35:07 - INFO - --- Busca concluída: ---
+2025-11-05 15:35:07 - INFO - 5 sucesso(s) (100.00%),
+2025-11-05 15:35:07 - INFO - 0 falha(s) (0.00%).
+2025-11-05 15:35:07 - INFO - --- Detalhamento dos erros: ---
+2025-11-05 15:35:07 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-05 15:35:07 - INFO - * Timeout: 0
+2025-11-05 15:35:07 - INFO - * Ausentes: 0
+2025-11-05 15:35:07 - INFO - * Outros: 0
+2025-11-05 15:35:07 - INFO - 
+PROCESSAMENTO COMPLETO!
+2025-11-05 15:35:07 - INFO - Total processado: 5 sucessos de 5 itens (100.00%)
+2025-11-05 15:35:07 - WARNING - AppID 5585 não encontrado. Insira os detalhes primeiro antes de adicionar reviews.
+2025-11-05 15:35:07 - WARNING - AppID 5586 não encontrado. Insira os detalhes primeiro antes de adicionar reviews.
+2025-11-05 15:35:07 - WARNING - AppID 5587 não encontrado. Insira os detalhes primeiro antes de adicionar reviews.
+2025-11-05 15:35:07 - WARNING - AppID 5588 não encontrado. Insira os detalhes primeiro antes de adicionar reviews.
+2025-11-05 15:35:07 - WARNING - AppID 5589 não encontrado. Insira os detalhes primeiro antes de adicionar reviews.
+2025-11-05 15:35:07 - INFO - Dados de reviews inseridos com sucesso.
+2025-11-05 15:36:13 - INFO - Total de registros carregados de steam_raw: 20082
+2025-11-05 15:36:13 - INFO - Número de jogos pagos selecionados: 10090
+2025-11-05 15:36:14 - INFO - Inserindo registros de 1 a 3000 de 10090 na tabela steam_bd
+2025-11-05 15:38:56 - INFO - Dados processados salvos para 3000 registros.
+2025-11-05 15:38:56 - INFO - Inserindo registros de 3001 a 6000 de 10090 na tabela steam_bd
+2025-11-05 15:41:34 - INFO - Dados processados salvos para 3000 registros.
+2025-11-05 15:41:34 - INFO - Inserindo registros de 6001 a 9000 de 10090 na tabela steam_bd
+2025-11-05 15:44:24 - INFO - Dados processados salvos para 3000 registros.
+2025-11-05 15:44:24 - INFO - Inserindo registros de 9001 a 10090 de 10090 na tabela steam_bd
+2025-11-05 15:45:16 - ERROR - Erro ao inserir dados steam_bd: <ConnectionTerminated error_code:0, last_stream_id:19999, additional_data:None>
+2025-11-05 15:45:16 - ERROR - Erro ao inserir dados na tentativa 1: Erro ao inserir dados steam_bd: <ConnectionTerminated error_code:0, last_stream_id:19999, additional_data:None>
+2025-11-05 15:46:16 - INFO - Dados processados salvos para 1090 registros.
+2025-11-05 15:46:16 - INFO - Dados processados inseridos na tabela steam_bd com sucesso.
+2025-11-05 15:46:18 - INFO - Total de registros carregados de steam_bd: 10090
+2025-11-05 15:46:18 - INFO - Processando aplicativos de 1 a 5 de 5
+2025-11-05 15:46:18 - INFO - Total de registros desatualizados de steam_raw: 0
+2025-11-05 15:46:18 - INFO - Número de IDs a processar: 5
+2025-11-05 17:10:39 - INFO - 
+============================================================
+2025-11-05 17:10:39 - INFO - TESTE: ITAD Lookup Assíncrono
+2025-11-05 17:10:39 - INFO - ============================================================
+
+2025-11-05 17:10:39 - INFO - Testando com 10 AppIDs...
+2025-11-05 17:10:39 - INFO - 
+--- TESTE 1: Lookup simples (todos de uma vez) ---
+2025-11-05 17:10:39 - INFO - Iniciando busca de 'ITAD LOOKUP' assíncrona para 10 AppIDs com concorrência 3...
+2025-11-05 17:10:42 - INFO - Busca assíncrona concluída.
+2025-11-05 17:10:42 - INFO - --- Busca concluída: ---
+2025-11-05 17:10:42 - INFO - 10 sucesso(s) (100.00%),
+2025-11-05 17:10:42 - INFO - 0 falha(s) (0.00%).
+2025-11-05 17:10:42 - INFO - --- Detalhamento dos erros: ---
+2025-11-05 17:10:42 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-05 17:10:42 - INFO - * Timeout: 0
+2025-11-05 17:10:42 - INFO - * Não encontrados no ITAD: 0
+2025-11-05 17:10:42 - INFO - * Outros: 0
+2025-11-05 17:10:42 - INFO - 
+Resultados encontrados: 10/10
+2025-11-05 17:10:42 - INFO - 
+============================================================
+2025-11-05 17:10:42 - INFO - AMOSTRA DE RESULTADOS:
+2025-11-05 17:10:42 - INFO - ============================================================
+
+2025-11-05 17:10:42 - INFO - 
+AppID 570:
+2025-11-05 17:10:42 - INFO -   ID ITAD: 018d937f-19a5-7057-bb6d-314d586e6dbc
+2025-11-05 17:10:42 - INFO -   Title: Dota 2
+2025-11-05 17:10:42 - INFO -   Type: game
+2025-11-05 17:10:42 - INFO - 
+AppID 730:
+2025-11-05 17:10:42 - INFO -   ID ITAD: 018d937f-7851-7004-b780-3f657a301f9a
+2025-11-05 17:10:42 - INFO -   Title: Counter-Strike 2
+2025-11-05 17:10:42 - INFO -   Type: game
+2025-11-05 17:10:42 - INFO - 
+AppID 440:
+2025-11-05 17:10:42 - INFO -   ID ITAD: 018d937e-fde4-72ff-a7af-45e4955a8dd6
+2025-11-05 17:10:42 - INFO -   Title: Team Fortress 2
+2025-11-05 17:10:42 - INFO -   Type: game
+2025-11-05 17:10:42 - INFO - 
+AppID 578080:
+2025-11-05 17:10:42 - INFO -   ID ITAD: 018d937f-57ce-723f-b7e7-7c7b5df93471
+2025-11-05 17:10:42 - INFO -   Title: PUBG: BATTLEGROUNDS
+2025-11-05 17:10:42 - INFO -   Type: game
+2025-11-05 17:10:42 - INFO - 
+AppID 271590:
+2025-11-05 17:10:42 - INFO -   ID ITAD: 018d937f-03e2-7281-a961-037a2d279a92
+2025-11-05 17:10:42 - INFO -   Title: Grand Theft Auto V
+2025-11-05 17:10:42 - INFO -   Type: game
+2025-11-05 17:10:42 - INFO - 
+
+--- TESTE 2: Lookup com batches ---
+2025-11-05 17:10:42 - INFO - Testando com 50 AppIDs em batches...
+2025-11-05 17:10:42 - INFO - === PROCESSAMENTO EM BATCHES (ITAD LOOKUP) ===
+2025-11-05 17:10:42 - INFO - Total de itens: 50
+2025-11-05 17:10:42 - INFO - Tamanho do batch: 10
+2025-11-05 17:10:42 - INFO - Total de batches: 5
+2025-11-05 17:10:42 - INFO - Delay entre batches: 2s
+2025-11-05 17:10:42 - INFO - Concorrência por batch: 3
+2025-11-05 17:10:42 - INFO - ===============================================
+
+2025-11-05 17:10:42 - INFO - Batch 1/5 - Processando itens 1 a 10 (10 itens)...
+2025-11-05 17:10:42 - INFO - Iniciando busca de 'ITAD LOOKUP' assíncrona para 10 AppIDs com concorrência 3...
+2025-11-05 17:10:43 - INFO - Busca assíncrona concluída.
+2025-11-05 17:10:43 - INFO - --- Busca concluída: ---
+2025-11-05 17:10:43 - INFO - 10 sucesso(s) (100.00%),
+2025-11-05 17:10:43 - INFO - 0 falha(s) (0.00%).
+2025-11-05 17:10:43 - INFO - --- Detalhamento dos erros: ---
+2025-11-05 17:10:43 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-05 17:10:43 - INFO - * Timeout: 0
+2025-11-05 17:10:43 - INFO - * Não encontrados no ITAD: 0
+2025-11-05 17:10:43 - INFO - * Outros: 0
+2025-11-05 17:10:43 - INFO - Aguardando 2s antes do próximo batch...
+
+2025-11-05 17:10:45 - INFO - Batch 2/5 - Processando itens 11 a 20 (10 itens)...
+2025-11-05 17:10:45 - INFO - Iniciando busca de 'ITAD LOOKUP' assíncrona para 10 AppIDs com concorrência 3...
+2025-11-05 17:10:46 - INFO - Busca assíncrona concluída.
+2025-11-05 17:10:46 - INFO - --- Busca concluída: ---
+2025-11-05 17:10:46 - INFO - 10 sucesso(s) (100.00%),
+2025-11-05 17:10:46 - INFO - 0 falha(s) (0.00%).
+2025-11-05 17:10:46 - INFO - --- Detalhamento dos erros: ---
+2025-11-05 17:10:46 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-05 17:10:46 - INFO - * Timeout: 0
+2025-11-05 17:10:46 - INFO - * Não encontrados no ITAD: 0
+2025-11-05 17:10:46 - INFO - * Outros: 0
+2025-11-05 17:10:46 - INFO - Aguardando 2s antes do próximo batch...
+
+2025-11-05 17:10:48 - INFO - Batch 3/5 - Processando itens 21 a 30 (10 itens)...
+2025-11-05 17:10:48 - INFO - Iniciando busca de 'ITAD LOOKUP' assíncrona para 10 AppIDs com concorrência 3...
+2025-11-05 17:10:50 - INFO - Busca assíncrona concluída.
+2025-11-05 17:10:50 - INFO - --- Busca concluída: ---
+2025-11-05 17:10:50 - INFO - 10 sucesso(s) (100.00%),
+2025-11-05 17:10:50 - INFO - 0 falha(s) (0.00%).
+2025-11-05 17:10:50 - INFO - --- Detalhamento dos erros: ---
+2025-11-05 17:10:50 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-05 17:10:50 - INFO - * Timeout: 0
+2025-11-05 17:10:50 - INFO - * Não encontrados no ITAD: 0
+2025-11-05 17:10:50 - INFO - * Outros: 0
+2025-11-05 17:10:50 - INFO - Aguardando 2s antes do próximo batch...
+
+2025-11-05 17:10:52 - INFO - Batch 4/5 - Processando itens 31 a 40 (10 itens)...
+2025-11-05 17:10:52 - INFO - Iniciando busca de 'ITAD LOOKUP' assíncrona para 10 AppIDs com concorrência 3...
+2025-11-05 17:10:53 - INFO - Busca assíncrona concluída.
+2025-11-05 17:10:53 - INFO - --- Busca concluída: ---
+2025-11-05 17:10:53 - INFO - 10 sucesso(s) (100.00%),
+2025-11-05 17:10:53 - INFO - 0 falha(s) (0.00%).
+2025-11-05 17:10:53 - INFO - --- Detalhamento dos erros: ---
+2025-11-05 17:10:53 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-05 17:10:53 - INFO - * Timeout: 0
+2025-11-05 17:10:53 - INFO - * Não encontrados no ITAD: 0
+2025-11-05 17:10:53 - INFO - * Outros: 0
+2025-11-05 17:10:53 - INFO - Aguardando 2s antes do próximo batch...
+
+2025-11-05 17:10:55 - INFO - Batch 5/5 - Processando itens 41 a 50 (10 itens)...
+2025-11-05 17:10:55 - INFO - Iniciando busca de 'ITAD LOOKUP' assíncrona para 10 AppIDs com concorrência 3...
+2025-11-05 17:10:56 - INFO - Busca assíncrona concluída.
+2025-11-05 17:10:56 - INFO - --- Busca concluída: ---
+2025-11-05 17:10:56 - INFO - 10 sucesso(s) (100.00%),
+2025-11-05 17:10:56 - INFO - 0 falha(s) (0.00%).
+2025-11-05 17:10:56 - INFO - --- Detalhamento dos erros: ---
+2025-11-05 17:10:56 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-05 17:10:56 - INFO - * Timeout: 0
+2025-11-05 17:10:56 - INFO - * Não encontrados no ITAD: 0
+2025-11-05 17:10:56 - INFO - * Outros: 0
+2025-11-05 17:10:56 - INFO - 
+PROCESSAMENTO COMPLETO!
+2025-11-05 17:10:56 - INFO - Total processado: 10 sucessos de 50 itens (20.00%)
+2025-11-05 17:10:56 - INFO - 
+Resultados encontrados: 10/10
+2025-11-05 17:10:56 - INFO - 
+============================================================
+2025-11-05 17:10:56 - INFO - TESTE CONCLUÍDO COM SUCESSO!
+2025-11-05 17:10:56 - INFO - ============================================================
+
