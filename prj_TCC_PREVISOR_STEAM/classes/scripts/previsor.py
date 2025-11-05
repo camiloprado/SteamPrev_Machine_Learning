@@ -139,43 +139,6 @@ class Previsor:
             return []
         
     @classmethod
-    def selecionar_dados_velhos(cls, arg_listDados: list, arg_strNomeTabela: str) -> dict:
-        """
-        Seleciona os dados que tiveram sua última atualização anterior a um determinado período.
-
-        Parâmetros:
-        - arg_listDados (list): Lista de dados a serem processados.
-        - arg_strNomeTabela (str): Nome da tabela para verificação de última atualização.
-
-        Retorna:
-        - var_listDados (list): Lista contendo os dados processados.
-        """
-        try:
-            var_listDados = []
-
-            for var_dictApp in arg_listDados:
-                if var_dictApp.get("appid"):
-                    if cls._var_boolUseSupabase:
-                        var_dateUltimaAtualizacao = SupabaseDB.buscar_jogos_por_ID(arg_intAppid=var_dictApp.get("appid"), arg_strNomeTabela=arg_strNomeTabela)
-                    
-                    
-                    if var_dateUltimaAtualizacao:
-                        var_intDiasDesdeAtualizacao = (datetime.now().replace(tzinfo=None) - var_dateUltimaAtualizacao.replace(tzinfo=None)).days
-                    else:
-                        var_intDiasDesdeAtualizacao = Settings._var_dictSettings["dias_para_atualizacao"] + 1
-
-                    if var_intDiasDesdeAtualizacao < Settings._var_dictSettings["dias_para_atualizacao"]:
-                        continue
-                    var_listDados.append(var_dictApp.get("appid"))
-            if not var_listDados:
-                logger.info("Nenhum dado antigo encontrado para atualização.")
-            return var_listDados
-        
-        except Exception as e:
-            logger.error(f"Erro ao selecionar dados antigos: {e}")
-            return []
-        
-    @classmethod
     def alimentar_banco_dados_raw(cls):
         """
         Alimenta o banco de dados raiz com os dados coletados da API.
@@ -189,7 +152,7 @@ class Previsor:
             var_listApp = GetTask.load_task_queue()
             cls._var_intTamanhoTotalFila = len(var_listApp)
             var_intRange = 2000  # Processa x AppIDs por vez (ajustável)
-            # var_listApp = var_listApp[5000:5050]  # Copia a lista para evitar modificação durante a iteração
+            
             # Itera sobre os aplicativos em lotes
             for i in range(0, len(var_listApp), var_intRange):
                 logger.info(f"Processando aplicativos de {i + 1} a {min(i + var_intRange, len(var_listApp))} de {len(var_listApp)}")
@@ -198,16 +161,8 @@ class Previsor:
                 
                 # Verifica quais AppIDs já estão no banco de dados
                 var_listAppIDnoBD = SupabaseDB.buscar_jogos_por_ID(arg_listAppIDs=var_listAppIDAtual, arg_strNomeTabel="steam_raw")
-                var_listAppIDDesatualizado = SupabaseDB.buscar_jogos_desatualizados(arg_intLimite=var_intRange)
+                var_listAppIDDesatualizado = SupabaseDB.buscar_jogos_desatualizados()
                 var_listAppIDIncompleto = SupabaseDB.buscar_jogos_incompletos()
-
-                if var_listAppIDIncompleto:
-                    logger.info(f"Número de AppIDs com dados incompletos: {len(var_listAppIDIncompleto)}")
-                    for var_dictAppID in var_listAppIDIncompleto:
-                        var_intAppID = var_dictAppID['appid']
-                        if var_dictAppID.get('detalhes') is None:
-                            if var_intAppID not in var_listAppIDAtual:
-                                var_listAppIDAtual.append(var_intAppID)
 
                 for var_dictAppID in var_listAppIDnoBD:
                     var_intAppID = var_dictAppID['appid']
@@ -218,6 +173,13 @@ class Previsor:
                     var_intAppID = var_dictAppID['appid']
                     if var_intAppID not in var_listAppIDAtual:
                         var_listAppIDAtual.append(var_intAppID)
+                
+                if var_listAppIDIncompleto:
+                    for var_dictAppID in var_listAppIDIncompleto:
+                        var_intAppID = var_dictAppID['appid']
+                        if var_dictAppID.get('detalhes') is None:
+                            if var_intAppID not in var_listAppIDAtual:
+                                var_listAppIDAtual.append(var_intAppID)
 
                 if not var_listAppIDAtual:
                     logger.info("Nenhum AppID encontrado para atualização nesta iteração.")
@@ -239,7 +201,7 @@ class Previsor:
                         SupabaseDB.inserir_dadosSteamRaw(var_dictRawData)    
                     logger.info("Dados de detalhes inseridos com sucesso.")
 
-                    # sleep(1800)  # Espera 30 minutos entre os testes para evitar bloqueios
+                    sleep(1800)  # Espera 30 minutos entre os testes para evitar bloqueios
 
                 if var_listAppIDIncompleto:
                     logger.info(f"Número de AppIDs com dados incompletos: {len(var_listAppIDIncompleto)}")
@@ -296,3 +258,21 @@ class Previsor:
         except Exception as e:
             logger.error(f"Erro ao alimentar o banco de dados Steam BD: {e}")
             raise Exception(f"Erro ao alimentar o banco de dados Steam BD: {e}")
+        
+    @classmethod
+    def alimentar_banco_dados_ITAD(cls):
+        """
+        Alimenta o banco de dados com dados do ITAD.
+        
+        Parâmetros:
+        
+        Retorna:
+        - None
+        """
+        try:
+            # Implementar a lógica para alimentar o banco de dados com dados do ITAD
+            pass
+        
+        except Exception as e:
+            logger.error(f"Erro ao alimentar o banco de dados ITAD: {e}")
+            raise Exception(f"Erro ao alimentar o banco de dados ITAD: {e}")

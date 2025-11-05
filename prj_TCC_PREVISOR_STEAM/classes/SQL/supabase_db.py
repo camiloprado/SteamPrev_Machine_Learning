@@ -252,7 +252,7 @@ class SupabaseDB:
                 if var_apiResult.error:
                     logger.error(f"Erro ao inserir/atualizar AppID {var_intAppid}: {var_apiResult.error}")
                     continue
-                
+
             logger.info(f"Dados processados salvos para {len(arg_listDados)} registros.")
             
         except Exception as e:
@@ -334,12 +334,13 @@ class SupabaseDB:
     
     # ========== MÉTODOS UTILITÁRIOS ==========
     @classmethod
-    def buscar_jogos_desatualizados(cls, arg_intLimite: int = 100) -> List[Dict[str, Any]]:
+    def buscar_jogos_desatualizados(cls, arg_strNomeTabela: str = "steam_raw", arg_intLimite: int = None) -> List[Dict[str, Any]]:
         """
-        Busca jogos na tabela steam_raw que não foram atualizados recentemente.
+        Busca jogos na tabela escolhida que não foram atualizados recentemente.
         
         Parâmetros:
-        - arg_intLimite (int): Número máximo de registros a retornar (padrão: 100)
+        - arg_strNomeTabela (str): Nome da tabela ('steam_raw' ou 'steam_bd') (padrão: "steam_raw")
+        - arg_intLimite (int): Número máximo de registros a retornar (padrão: None)
             
         Retorna:
         - Lista de jogos desatualizados
@@ -351,15 +352,43 @@ class SupabaseDB:
             var_intDataLimite = Settings._var_dictSettings.get("dias_atualizacao", 30)
             # Define data de corte, jogos com ultima_atualizacao menor que dias_atualizacao serão retornados
             var_dataCorte = datetime.utcnow().replace(hour=0, minute=0, second=0, microsecond=0) - timedelta(days=var_intDataLimite)
-            var_apiResult = cls._var_botClient.table("steam_raw").select("*").lt(
-                "ultima_atualizacao", var_dataCorte.isoformat()
-            ).limit(arg_intLimite).execute()
             
-            return var_apiResult.data if var_apiResult.data else []
+            if arg_intLimite is not None:
+                # Com limite específico
+                var_apiResult = cls._var_botClient.table(arg_strNomeTabela).select("*").lt(
+                    "ultima_atualizacao", var_dataCorte.isoformat()
+                ).limit(arg_intLimite).execute()
+                return var_apiResult.data if var_apiResult.data else []
+            else:
+                # Sem limite - busca todos com paginação
+                var_listTodosDados = []
+                var_intOffset = 0
+                var_intPageSize = 1000  # Tamanho da página
+                
+                while True:
+                    var_apiResult = cls._var_botClient.table(arg_strNomeTabela).select("*").range(
+                        var_intOffset, var_intOffset + var_intPageSize - 1
+                    ).lt(
+                        "ultima_atualizacao", var_dataCorte.isoformat()
+                    ).execute()
+                    
+                    if not var_apiResult.data or len(var_apiResult.data) == 0:
+                        break
+                    
+                    var_listTodosDados.extend(var_apiResult.data)
+                    
+                    # Se retornou menos que o page size, chegou no fim
+                    if len(var_apiResult.data) < var_intPageSize:
+                        break
+                    
+                    var_intOffset += var_intPageSize
 
+                logger.info(f"Total de registros desatualizados de steam_raw: {len(var_listTodosDados)}")
+                return var_listTodosDados
+        
         except Exception as e:
             logger.error(f"Erro ao buscar jogos antigos: {e}")
-            raise
+            raise Exception(f"Erro ao buscar jogos antigos: {e}")
         
     @classmethod
     def buscar_jogos_incompletos(cls) -> List[Dict[str, Any]]:
@@ -373,15 +402,35 @@ class SupabaseDB:
         cls._garantir_conexao()
         
         try:
-            var_apiResult = cls._var_botClient.table("steam_raw").select("*").or_(
-                "detalhes.is.null,reviews.is.null"
-            ).execute()
+            # Sem limite - busca todos com paginação
+            var_listTodosDados = []
+            var_intOffset = 0
+            var_intPageSize = 1000  # Tamanho da página
             
-            return var_apiResult.data if var_apiResult.data else []
+            while True:
+                var_apiResult = cls._var_botClient.table("steam_raw").select("*").range(
+                    var_intOffset, var_intOffset + var_intPageSize - 1
+                ).or_(
+                    "detalhes.is.null,reviews.is.null"
+                ).execute()
+                
+                if not var_apiResult.data or len(var_apiResult.data) == 0:
+                    break
+                
+                var_listTodosDados.extend(var_apiResult.data)
+                
+                # Se retornou menos que o page size, chegou no fim
+                if len(var_apiResult.data) < var_intPageSize:
+                    break
+                
+                var_intOffset += var_intPageSize
 
+            logger.info(f"Total de registros incompletos de 'steam_raw': {len(var_listTodosDados)}")
+            return var_listTodosDados
+            
         except Exception as e:
             logger.error(f"Erro ao buscar jogos incompletos: {e}")
-            raise
+            raise Exception(f"Erro ao buscar jogos incompletos: {e}")
     
     @classmethod
     def buscar_jogos_por_ID(cls, arg_listAppIDs: List[int], arg_strNomeTabel: str = 'steam_raw') -> List[Dict[str, Any]]:
@@ -390,7 +439,7 @@ class SupabaseDB:
         
         Parâmetros:
         - arg_listAppIDs (List[int]): Lista de IDs dos aplicativos Steam
-        - arg_strNomeTabel (str): Nome da tabela ('steam_raw' ou 'steam_bd')
+        - arg_strNomeTabel (str): Nome da tabela ('steam_raw' ou 'steam_bd') (padrão: 'steam_raw')
             
         Retorna:
         - Lista de jogos encontrados
@@ -406,15 +455,16 @@ class SupabaseDB:
 
         except Exception as e:
             logger.error(f"Erro ao buscar jogos por AppIDs: {e}")
-            raise
+            raise Exception(f"Erro ao buscar jogos por AppIDs: {e}")
 
     @classmethod
-    def buscar_jogos_por_nome(cls, arg_strNome: str) -> List[Dict[str, Any]]:
+    def buscar_jogos_por_nome(cls, arg_strNome: str, arg_strNomeTabela: str = "steam_bd") -> List[Dict[str, Any]]:
         """
         Busca jogos por nome (pesquisa parcial, case-insensitive).
         
         Parâmetros:
         - arg_strNome (str): Nome ou parte do nome do jogo
+        - arg_strNomeTabela (str): Nome da tabela ('steam_raw' ou 'steam_bd') (padrão: "steam_bd")
             
         Retorna:
         - Lista de jogos encontrados
@@ -422,15 +472,15 @@ class SupabaseDB:
         cls._garantir_conexao()
         
         try:
-            var_apiResult = cls._var_botClient.table("steam_bd").select("*").ilike(
+            var_apiResult = cls._var_botClient.table(arg_strNomeTabela).select("*").ilike(
                 "nome", f"%{arg_strNome}%"
             ).execute()
 
             return var_apiResult.data if var_apiResult.data else []
 
         except Exception as e:
-            logger.error(f"Erro ao buscar jogos por nome: {e}")
-            raise
+            logger.error(f"Erro ao buscar jogos por nome na tabela {arg_strNomeTabela}: {e}")
+            raise Exception(f"Erro ao buscar jogos por nome: {e}")
     
     @classmethod
     def obter_estatisticas(cls) -> Dict[str, int]:
@@ -466,7 +516,7 @@ class SupabaseDB:
             
         except Exception as e:
             logger.error(f"Erro ao obter estatísticas: {e}")
-            raise
+            raise Exception(f"Erro ao obter estatísticas: {e}")
     
     @classmethod
     def deletar_jogo(cls, arg_intAppid: int, arg_strTabela: str = "steam_raw") -> bool:
@@ -475,7 +525,7 @@ class SupabaseDB:
         
         Parâmetros:
         - arg_intAppid (int): ID do aplicativo Steam
-        - arg_strTabela (str): Nome da tabela ('steam_raw' ou 'steam_bd')
+        - arg_strTabela (str): Nome da tabela ('steam_raw' ou 'steam_bd') (padrão: "steam_raw")
 
         Retorna:
         - True se deletado com sucesso, False caso contrário
@@ -487,7 +537,7 @@ class SupabaseDB:
                 "appid", arg_intAppid
             ).execute()
             
-            logger.info(f"Retorna:AppID {arg_intAppid} deletado de {arg_strTabela}")
+            logger.info(f"AppID {arg_intAppid} deletado de {arg_strTabela}")
             return True
             
         except Exception as e:

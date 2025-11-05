@@ -77991,3 +77991,2480 @@ PROCESSAMENTO COMPLETO!
 2025-11-04 17:41:20 - INFO - Total de registros carregados de steam_raw: 15578
 2025-11-04 17:42:03 - INFO - Número de jogos pagos selecionados: 7856
 2025-11-04 17:49:31 - INFO - Dados processados salvos para 7856 registros.
+2025-11-04 17:51:57 - INFO - Número total de aplicativos carregados: 273744
+2025-11-04 17:51:57 - INFO - Processando aplicativos de 1 a 2000 de 273744
+2025-11-04 17:51:57 - INFO - Conectado ao Supabase com sucesso
+2025-11-04 17:52:02 - INFO - Número de AppIDs com dados incompletos: 1000
+2025-11-04 17:52:02 - INFO - Número de AppIDs a processar: 1513
+2025-11-04 17:52:02 - INFO - === PROCESSAMENTO EM BATCHES ===
+2025-11-04 17:52:02 - INFO - Total de itens: 1,513
+2025-11-04 17:52:02 - INFO - Tamanho do batch: 200
+2025-11-04 17:52:02 - INFO - Total de batches: 8
+2025-11-04 17:52:02 - INFO - Delay entre batches: 120s
+2025-11-04 17:52:02 - INFO - Concorrência por batch: 1
+2025-11-04 17:52:02 - INFO - ================================
+
+2025-11-04 17:52:02 - INFO - Batch 1/8 - Processando itens 1 a 200 (200 itens)...
+2025-11-04 17:52:02 - INFO - Iniciando busca de 'DETALHES' assíncrona para 200 AppIDs com concorrência 1...
+2025-11-04 17:53:37 - INFO - Número total de aplicativos carregados: 273744
+2025-11-04 17:53:37 - INFO - Processando aplicativos de 1 a 2000 de 273744
+2025-11-04 17:53:37 - INFO - Conectado ao Supabase com sucesso
+2025-11-04 17:53:39 - INFO - Número de AppIDs com dados incompletos: 1000
+2025-11-04 17:53:39 - INFO - Número de AppIDs a processar: 1513
+2025-11-04 17:53:39 - INFO - === PROCESSAMENTO EM BATCHES ===
+2025-11-04 17:53:39 - INFO - Total de itens: 1,513
+2025-11-04 17:53:39 - INFO - Tamanho do batch: 200
+2025-11-04 17:53:39 - INFO - Total de batches: 8
+2025-11-04 17:53:39 - INFO - Delay entre batches: 120s
+2025-11-04 17:53:39 - INFO - Concorrência por batch: 1
+2025-11-04 17:53:39 - INFO - ================================
+
+2025-11-04 17:53:39 - INFO - Batch 1/8 - Processando itens 1 a 200 (200 itens)...
+2025-11-04 17:53:39 - INFO - Iniciando busca de 'DETALHES' assíncrona para 200 AppIDs com concorrência 1...
+2025-11-04 17:55:01 - INFO - Busca assíncrona concluída.
+2025-11-04 17:55:01 - INFO - --- Busca concluída: ---
+2025-11-04 17:55:01 - INFO - 0 sucesso(s) (0.00%),
+2025-11-04 17:55:01 - INFO - 200 falha(s) (100.00%).
+2025-11-04 17:55:01 - INFO - --- Detalhamento dos erros: ---
+2025-11-04 17:55:01 - INFO - * HTTP: 146 (403 Forbidden: 0, 429 Too Many Requests: 146)
+2025-11-04 17:55:01 - INFO - * Timeout: 0
+2025-11-04 17:55:01 - INFO - * Ausentes: 54
+2025-11-04 17:55:01 - INFO - * Outros: 0
+2025-11-04 17:55:01 - INFO - Aguardando 120s antes do próximo batch...
+
+2025-11-04 17:57:01 - INFO - Batch 2/8 - Processando itens 201 a 400 (200 itens)...
+2025-11-04 17:57:01 - INFO - Iniciando busca de 'DETALHES' assíncrona para 200 AppIDs com concorrência 1...
+2025-11-04 17:58:23 - INFO - Busca assíncrona concluída.
+2025-11-04 17:58:23 - INFO - --- Busca concluída: ---
+2025-11-04 17:58:23 - INFO - 54 sucesso(s) (27.00%),
+2025-11-04 17:58:23 - INFO - 146 falha(s) (73.00%).
+2025-11-04 17:58:23 - INFO - --- Detalhamento dos erros: ---
+2025-11-04 17:58:23 - INFO - * HTTP: 3 (403 Forbidden: 0, 429 Too Many Requests: 3)
+2025-11-04 17:58:23 - INFO - * Timeout: 0
+2025-11-04 17:58:23 - INFO - * Ausentes: 143
+2025-11-04 17:58:23 - INFO - * Outros: 0
+2025-11-04 17:58:23 - INFO - Aguardando 120s antes do próximo batch...
+
+2025-11-04 18:00:23 - INFO - Batch 3/8 - Processando itens 401 a 600 (200 itens)...
+2025-11-04 18:00:23 - INFO - Iniciando busca de 'DETALHES' assíncrona para 200 AppIDs com concorrência 1...
+2025-11-04 18:01:47 - INFO - Busca assíncrona concluída.
+2025-11-04 18:01:47 - INFO - --- Busca concluída: ---
+2025-11-04 18:01:47 - INFO - 0 sucesso(s) (0.00%),
+2025-11-04 18:01:47 - INFO - 200 falha(s) (100.00%).
+2025-11-04 18:01:47 - INFO - --- Detalhamento dos erros: ---
+2025-11-04 18:01:47 - INFO - * HTTP: 197 (403 Forbidden: 0, 429 Too Many Requests: 197)
+2025-11-04 18:01:47 - INFO - * Timeout: 0
+2025-11-04 18:01:47 - INFO - * Ausentes: 3
+2025-11-04 18:01:47 - INFO - * Outros: 0
+2025-11-04 18:01:47 - INFO - Aguardando 120s antes do próximo batch...
+
+2025-11-04 18:03:47 - INFO - Batch 4/8 - Processando itens 601 a 800 (200 itens)...
+2025-11-04 18:03:47 - INFO - Iniciando busca de 'DETALHES' assíncrona para 200 AppIDs com concorrência 1...
+2025-11-04 18:05:11 - INFO - Busca assíncrona concluída.
+2025-11-04 18:05:11 - INFO - --- Busca concluída: ---
+2025-11-04 18:05:11 - INFO - 0 sucesso(s) (0.00%),
+2025-11-04 18:05:11 - INFO - 200 falha(s) (100.00%).
+2025-11-04 18:05:11 - INFO - --- Detalhamento dos erros: ---
+2025-11-04 18:05:11 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-04 18:05:11 - INFO - * Timeout: 0
+2025-11-04 18:05:11 - INFO - * Ausentes: 200
+2025-11-04 18:05:11 - INFO - * Outros: 0
+2025-11-04 18:05:11 - INFO - Aguardando 120s antes do próximo batch...
+
+2025-11-04 18:07:11 - INFO - Batch 5/8 - Processando itens 801 a 1000 (200 itens)...
+2025-11-04 18:07:11 - INFO - Iniciando busca de 'DETALHES' assíncrona para 200 AppIDs com concorrência 1...
+2025-11-04 18:08:32 - INFO - Busca assíncrona concluída.
+2025-11-04 18:08:32 - INFO - --- Busca concluída: ---
+2025-11-04 18:08:32 - INFO - 0 sucesso(s) (0.00%),
+2025-11-04 18:08:32 - INFO - 200 falha(s) (100.00%).
+2025-11-04 18:08:32 - INFO - --- Detalhamento dos erros: ---
+2025-11-04 18:08:32 - INFO - * HTTP: 200 (403 Forbidden: 0, 429 Too Many Requests: 200)
+2025-11-04 18:08:32 - INFO - * Timeout: 0
+2025-11-04 18:08:32 - INFO - * Ausentes: 0
+2025-11-04 18:08:32 - INFO - * Outros: 0
+2025-11-04 18:08:32 - INFO - Aguardando 120s antes do próximo batch...
+
+2025-11-04 18:10:32 - INFO - Batch 6/8 - Processando itens 1001 a 1200 (200 itens)...
+2025-11-04 18:10:32 - INFO - Iniciando busca de 'DETALHES' assíncrona para 200 AppIDs com concorrência 1...
+2025-11-04 18:11:56 - INFO - Busca assíncrona concluída.
+2025-11-04 18:11:56 - INFO - --- Busca concluída: ---
+2025-11-04 18:11:56 - INFO - 0 sucesso(s) (0.00%),
+2025-11-04 18:11:56 - INFO - 200 falha(s) (100.00%).
+2025-11-04 18:11:56 - INFO - --- Detalhamento dos erros: ---
+2025-11-04 18:11:56 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-04 18:11:56 - INFO - * Timeout: 0
+2025-11-04 18:11:56 - INFO - * Ausentes: 200
+2025-11-04 18:11:56 - INFO - * Outros: 0
+2025-11-04 18:11:56 - INFO - Aguardando 120s antes do próximo batch...
+
+2025-11-04 18:13:56 - INFO - Batch 7/8 - Processando itens 1201 a 1400 (200 itens)...
+2025-11-04 18:13:56 - INFO - Iniciando busca de 'DETALHES' assíncrona para 200 AppIDs com concorrência 1...
+2025-11-04 18:15:14 - INFO - Busca assíncrona concluída.
+2025-11-04 18:15:14 - INFO - --- Busca concluída: ---
+2025-11-04 18:15:14 - INFO - 0 sucesso(s) (0.00%),
+2025-11-04 18:15:14 - INFO - 200 falha(s) (100.00%).
+2025-11-04 18:15:14 - INFO - --- Detalhamento dos erros: ---
+2025-11-04 18:15:14 - INFO - * HTTP: 200 (403 Forbidden: 0, 429 Too Many Requests: 200)
+2025-11-04 18:15:14 - INFO - * Timeout: 0
+2025-11-04 18:15:14 - INFO - * Ausentes: 0
+2025-11-04 18:15:14 - INFO - * Outros: 0
+2025-11-04 18:15:14 - INFO - Aguardando 120s antes do próximo batch...
+
+2025-11-04 18:17:14 - INFO - Batch 8/8 - Processando itens 1401 a 1513 (113 itens)...
+2025-11-04 18:17:14 - INFO - Iniciando busca de 'DETALHES' assíncrona para 113 AppIDs com concorrência 1...
+2025-11-04 18:18:01 - INFO - Busca assíncrona concluída.
+2025-11-04 18:18:01 - INFO - --- Busca concluída: ---
+2025-11-04 18:18:01 - INFO - 73 sucesso(s) (64.60%),
+2025-11-04 18:18:01 - INFO - 40 falha(s) (35.40%).
+2025-11-04 18:18:01 - INFO - --- Detalhamento dos erros: ---
+2025-11-04 18:18:01 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-04 18:18:01 - INFO - * Timeout: 0
+2025-11-04 18:18:01 - INFO - * Ausentes: 40
+2025-11-04 18:18:01 - INFO - * Outros: 0
+2025-11-04 18:18:01 - INFO - 
+PROCESSAMENTO COMPLETO!
+2025-11-04 18:18:01 - INFO - Total processado: 127 sucessos de 1,513 itens (8.39%)
+2025-11-04 18:18:10 - INFO - Dados de detalhes inseridos com sucesso.
+2025-11-04 18:48:10 - INFO - Número de AppIDs com dados incompletos: 1000
+2025-11-04 18:48:10 - INFO - === PROCESSAMENTO EM BATCHES (REVIEWS) ===
+2025-11-04 18:48:10 - INFO - Total de itens: 2,513
+2025-11-04 18:48:10 - INFO - Tamanho do batch: 500
+2025-11-04 18:48:10 - INFO - Total de batches: 6
+2025-11-04 18:48:10 - INFO - Delay entre batches: 60s
+2025-11-04 18:48:10 - INFO - Concorrência por batch: 3
+2025-11-04 18:48:10 - INFO - ==========================================
+
+2025-11-04 18:48:10 - INFO - Batch 1/6 - Processando itens 1 a 500 (500 itens)...
+2025-11-04 18:48:10 - INFO - Iniciando busca de 'REVIEWS' assíncrona para 500 AppIDs com concorrência 3...
+2025-11-04 18:49:29 - INFO - Busca assíncrona concluída.
+2025-11-04 18:49:29 - INFO - --- Busca concluída: ---
+2025-11-04 18:49:29 - INFO - 55 sucesso(s) (11.00%),
+2025-11-04 18:49:29 - INFO - 445 falha(s) (89.00%).
+2025-11-04 18:49:29 - INFO - --- Detalhamento dos erros: ---
+2025-11-04 18:49:29 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-04 18:49:29 - INFO - * Timeout: 0
+2025-11-04 18:49:29 - INFO - * Ausentes: 445
+2025-11-04 18:49:29 - INFO - * Outros: 0
+2025-11-04 18:49:29 - INFO - Aguardando 60s antes do próximo batch...
+
+2025-11-04 18:50:29 - INFO - Batch 2/6 - Processando itens 501 a 1000 (500 itens)...
+2025-11-04 18:50:29 - INFO - Iniciando busca de 'REVIEWS' assíncrona para 500 AppIDs com concorrência 3...
+2025-11-04 18:51:46 - INFO - Busca assíncrona concluída.
+2025-11-04 18:51:46 - INFO - --- Busca concluída: ---
+2025-11-04 18:51:46 - INFO - 0 sucesso(s) (0.00%),
+2025-11-04 18:51:46 - INFO - 500 falha(s) (100.00%).
+2025-11-04 18:51:46 - INFO - --- Detalhamento dos erros: ---
+2025-11-04 18:51:46 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-04 18:51:46 - INFO - * Timeout: 0
+2025-11-04 18:51:46 - INFO - * Ausentes: 500
+2025-11-04 18:51:46 - INFO - * Outros: 0
+2025-11-04 18:51:46 - INFO - Aguardando 60s antes do próximo batch...
+
+2025-11-04 18:52:46 - INFO - Batch 3/6 - Processando itens 1001 a 1500 (500 itens)...
+2025-11-04 18:52:46 - INFO - Iniciando busca de 'REVIEWS' assíncrona para 500 AppIDs com concorrência 3...
+2025-11-04 18:54:02 - INFO - Busca assíncrona concluída.
+2025-11-04 18:54:02 - INFO - --- Busca concluída: ---
+2025-11-04 18:54:02 - INFO - 89 sucesso(s) (17.80%),
+2025-11-04 18:54:02 - INFO - 411 falha(s) (82.20%).
+2025-11-04 18:54:02 - INFO - --- Detalhamento dos erros: ---
+2025-11-04 18:54:02 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-04 18:54:02 - INFO - * Timeout: 0
+2025-11-04 18:54:02 - INFO - * Ausentes: 411
+2025-11-04 18:54:02 - INFO - * Outros: 0
+2025-11-04 18:54:02 - INFO - Aguardando 60s antes do próximo batch...
+
+2025-11-04 18:55:02 - INFO - Batch 4/6 - Processando itens 1501 a 2000 (500 itens)...
+2025-11-04 18:55:02 - INFO - Iniciando busca de 'REVIEWS' assíncrona para 500 AppIDs com concorrência 3...
+2025-11-04 18:56:23 - INFO - Busca assíncrona concluída.
+2025-11-04 18:56:23 - INFO - --- Busca concluída: ---
+2025-11-04 18:56:23 - INFO - 263 sucesso(s) (52.60%),
+2025-11-04 18:56:23 - INFO - 237 falha(s) (47.40%).
+2025-11-04 18:56:23 - INFO - --- Detalhamento dos erros: ---
+2025-11-04 18:56:23 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-04 18:56:23 - INFO - * Timeout: 0
+2025-11-04 18:56:23 - INFO - * Ausentes: 237
+2025-11-04 18:56:23 - INFO - * Outros: 0
+2025-11-04 18:56:23 - INFO - Aguardando 60s antes do próximo batch...
+
+2025-11-04 18:57:23 - INFO - Batch 5/6 - Processando itens 2001 a 2500 (500 itens)...
+2025-11-04 18:57:23 - INFO - Iniciando busca de 'REVIEWS' assíncrona para 500 AppIDs com concorrência 3...
+2025-11-04 18:58:42 - INFO - Busca assíncrona concluída.
+2025-11-04 18:58:42 - INFO - --- Busca concluída: ---
+2025-11-04 18:58:42 - INFO - 415 sucesso(s) (83.00%),
+2025-11-04 18:58:42 - INFO - 85 falha(s) (17.00%).
+2025-11-04 18:58:42 - INFO - --- Detalhamento dos erros: ---
+2025-11-04 18:58:42 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-04 18:58:42 - INFO - * Timeout: 0
+2025-11-04 18:58:42 - INFO - * Ausentes: 85
+2025-11-04 18:58:42 - INFO - * Outros: 0
+2025-11-04 18:58:42 - INFO - Aguardando 60s antes do próximo batch...
+
+2025-11-04 18:59:42 - INFO - Batch 6/6 - Processando itens 2501 a 2513 (13 itens)...
+2025-11-04 18:59:42 - INFO - Iniciando busca de 'REVIEWS' assíncrona para 13 AppIDs com concorrência 3...
+2025-11-04 18:59:45 - INFO - Busca assíncrona concluída.
+2025-11-04 18:59:45 - INFO - --- Busca concluída: ---
+2025-11-04 18:59:45 - INFO - 11 sucesso(s) (84.62%),
+2025-11-04 18:59:45 - INFO - 2 falha(s) (15.38%).
+2025-11-04 18:59:45 - INFO - --- Detalhamento dos erros: ---
+2025-11-04 18:59:45 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-04 18:59:45 - INFO - * Timeout: 0
+2025-11-04 18:59:45 - INFO - * Ausentes: 2
+2025-11-04 18:59:45 - INFO - * Outros: 0
+2025-11-04 18:59:45 - INFO - 
+PROCESSAMENTO COMPLETO!
+2025-11-04 18:59:45 - INFO - Total processado: 833 sucessos de 2,513 itens (33.15%)
+2025-11-04 18:59:53 - INFO - Dados de reviews inseridos com sucesso.
+2025-11-04 18:59:53 - INFO - Processando aplicativos de 2001 a 4000 de 273744
+2025-11-04 18:59:57 - INFO - Número de AppIDs com dados incompletos: 1000
+2025-11-04 18:59:57 - INFO - Número de AppIDs a processar: 1074
+2025-11-04 18:59:57 - INFO - === PROCESSAMENTO EM BATCHES ===
+2025-11-04 18:59:57 - INFO - Total de itens: 1,074
+2025-11-04 18:59:57 - INFO - Tamanho do batch: 200
+2025-11-04 18:59:57 - INFO - Total de batches: 6
+2025-11-04 18:59:57 - INFO - Delay entre batches: 120s
+2025-11-04 18:59:57 - INFO - Concorrência por batch: 1
+2025-11-04 18:59:57 - INFO - ================================
+
+2025-11-04 18:59:57 - INFO - Batch 1/6 - Processando itens 1 a 200 (200 itens)...
+2025-11-04 18:59:57 - INFO - Iniciando busca de 'DETALHES' assíncrona para 200 AppIDs com concorrência 1...
+2025-11-04 19:01:25 - INFO - Busca assíncrona concluída.
+2025-11-04 19:01:25 - INFO - --- Busca concluída: ---
+2025-11-04 19:01:25 - INFO - 8 sucesso(s) (4.00%),
+2025-11-04 19:01:25 - INFO - 192 falha(s) (96.00%).
+2025-11-04 19:01:25 - INFO - --- Detalhamento dos erros: ---
+2025-11-04 19:01:25 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-04 19:01:25 - INFO - * Timeout: 0
+2025-11-04 19:01:25 - INFO - * Ausentes: 188
+2025-11-04 19:01:25 - INFO - * Outros: 0
+2025-11-04 19:01:25 - INFO - Aguardando 120s antes do próximo batch...
+
+2025-11-04 19:03:25 - INFO - Batch 2/6 - Processando itens 201 a 400 (200 itens)...
+2025-11-04 19:03:25 - INFO - Iniciando busca de 'DETALHES' assíncrona para 200 AppIDs com concorrência 1...
+2025-11-04 19:04:42 - INFO - Busca assíncrona concluída.
+2025-11-04 19:04:42 - INFO - --- Busca concluída: ---
+2025-11-04 19:04:42 - INFO - 0 sucesso(s) (0.00%),
+2025-11-04 19:04:42 - INFO - 200 falha(s) (100.00%).
+2025-11-04 19:04:42 - INFO - --- Detalhamento dos erros: ---
+2025-11-04 19:04:42 - INFO - * HTTP: 200 (403 Forbidden: 0, 429 Too Many Requests: 200)
+2025-11-04 19:04:42 - INFO - * Timeout: 0
+2025-11-04 19:04:42 - INFO - * Ausentes: 0
+2025-11-04 19:04:42 - INFO - * Outros: 0
+2025-11-04 19:04:42 - INFO - Aguardando 120s antes do próximo batch...
+
+2025-11-04 19:06:42 - INFO - Batch 3/6 - Processando itens 401 a 600 (200 itens)...
+2025-11-04 19:06:42 - INFO - Iniciando busca de 'DETALHES' assíncrona para 200 AppIDs com concorrência 1...
+2025-11-04 19:08:06 - INFO - Busca assíncrona concluída.
+2025-11-04 19:08:06 - INFO - --- Busca concluída: ---
+2025-11-04 19:08:06 - INFO - 24 sucesso(s) (12.00%),
+2025-11-04 19:08:06 - INFO - 176 falha(s) (88.00%).
+2025-11-04 19:08:06 - INFO - --- Detalhamento dos erros: ---
+2025-11-04 19:08:06 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-04 19:08:06 - INFO - * Timeout: 0
+2025-11-04 19:08:06 - INFO - * Ausentes: 172
+2025-11-04 19:08:06 - INFO - * Outros: 0
+2025-11-04 19:08:06 - INFO - Aguardando 120s antes do próximo batch...
+
+2025-11-04 19:10:06 - INFO - Batch 4/6 - Processando itens 601 a 800 (200 itens)...
+2025-11-04 19:10:07 - INFO - Iniciando busca de 'DETALHES' assíncrona para 200 AppIDs com concorrência 1...
+2025-11-04 19:11:22 - INFO - Busca assíncrona concluída.
+2025-11-04 19:11:22 - INFO - --- Busca concluída: ---
+2025-11-04 19:11:22 - INFO - 0 sucesso(s) (0.00%),
+2025-11-04 19:11:22 - INFO - 200 falha(s) (100.00%).
+2025-11-04 19:11:22 - INFO - --- Detalhamento dos erros: ---
+2025-11-04 19:11:22 - INFO - * HTTP: 200 (403 Forbidden: 0, 429 Too Many Requests: 200)
+2025-11-04 19:11:22 - INFO - * Timeout: 0
+2025-11-04 19:11:22 - INFO - * Ausentes: 0
+2025-11-04 19:11:22 - INFO - * Outros: 0
+2025-11-04 19:11:22 - INFO - Aguardando 120s antes do próximo batch...
+
+2025-11-04 19:13:22 - INFO - Batch 5/6 - Processando itens 801 a 1000 (200 itens)...
+2025-11-04 19:13:22 - INFO - Iniciando busca de 'DETALHES' assíncrona para 200 AppIDs com concorrência 1...
+2025-11-04 19:14:48 - INFO - Busca assíncrona concluída.
+2025-11-04 19:14:48 - INFO - --- Busca concluída: ---
+2025-11-04 19:14:48 - INFO - 75 sucesso(s) (37.50%),
+2025-11-04 19:14:48 - INFO - 125 falha(s) (62.50%).
+2025-11-04 19:14:48 - INFO - --- Detalhamento dos erros: ---
+2025-11-04 19:14:48 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-04 19:14:48 - INFO - * Timeout: 0
+2025-11-04 19:14:48 - INFO - * Ausentes: 123
+2025-11-04 19:14:48 - INFO - * Outros: 0
+2025-11-04 19:14:48 - INFO - Aguardando 120s antes do próximo batch...
+
+2025-11-04 19:16:48 - INFO - Batch 6/6 - Processando itens 1001 a 1074 (74 itens)...
+2025-11-04 19:16:48 - INFO - Iniciando busca de 'DETALHES' assíncrona para 74 AppIDs com concorrência 1...
+2025-11-04 19:17:16 - INFO - Busca assíncrona concluída.
+2025-11-04 19:17:16 - INFO - --- Busca concluída: ---
+2025-11-04 19:17:16 - INFO - 0 sucesso(s) (0.00%),
+2025-11-04 19:17:16 - INFO - 74 falha(s) (100.00%).
+2025-11-04 19:17:16 - INFO - --- Detalhamento dos erros: ---
+2025-11-04 19:17:16 - INFO - * HTTP: 74 (403 Forbidden: 0, 429 Too Many Requests: 74)
+2025-11-04 19:17:16 - INFO - * Timeout: 0
+2025-11-04 19:17:16 - INFO - * Ausentes: 0
+2025-11-04 19:17:16 - INFO - * Outros: 0
+2025-11-04 19:17:16 - INFO - 
+PROCESSAMENTO COMPLETO!
+2025-11-04 19:17:16 - INFO - Total processado: 107 sucessos de 1,074 itens (9.96%)
+2025-11-04 19:17:23 - INFO - Dados de detalhes inseridos com sucesso.
+2025-11-04 19:47:23 - INFO - Número de AppIDs com dados incompletos: 1000
+2025-11-04 19:47:23 - INFO - === PROCESSAMENTO EM BATCHES (REVIEWS) ===
+2025-11-04 19:47:23 - INFO - Total de itens: 2,074
+2025-11-04 19:47:23 - INFO - Tamanho do batch: 500
+2025-11-04 19:47:23 - INFO - Total de batches: 5
+2025-11-04 19:47:23 - INFO - Delay entre batches: 60s
+2025-11-04 19:47:23 - INFO - Concorrência por batch: 3
+2025-11-04 19:47:23 - INFO - ==========================================
+
+2025-11-04 19:47:23 - INFO - Batch 1/5 - Processando itens 1 a 500 (500 itens)...
+2025-11-04 19:47:23 - INFO - Iniciando busca de 'REVIEWS' assíncrona para 500 AppIDs com concorrência 3...
+2025-11-04 19:48:40 - INFO - Busca assíncrona concluída.
+2025-11-04 19:48:40 - INFO - --- Busca concluída: ---
+2025-11-04 19:48:40 - INFO - 100 sucesso(s) (20.00%),
+2025-11-04 19:48:40 - INFO - 400 falha(s) (80.00%).
+2025-11-04 19:48:40 - INFO - --- Detalhamento dos erros: ---
+2025-11-04 19:48:40 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-04 19:48:40 - INFO - * Timeout: 0
+2025-11-04 19:48:40 - INFO - * Ausentes: 400
+2025-11-04 19:48:40 - INFO - * Outros: 0
+2025-11-04 19:48:40 - INFO - Aguardando 60s antes do próximo batch...
+
+2025-11-04 19:49:40 - INFO - Batch 2/5 - Processando itens 501 a 1000 (500 itens)...
+2025-11-04 19:49:40 - INFO - Iniciando busca de 'REVIEWS' assíncrona para 500 AppIDs com concorrência 3...
+2025-11-04 19:50:55 - INFO - Busca assíncrona concluída.
+2025-11-04 19:50:55 - INFO - --- Busca concluída: ---
+2025-11-04 19:50:55 - INFO - 181 sucesso(s) (36.20%),
+2025-11-04 19:50:55 - INFO - 319 falha(s) (63.80%).
+2025-11-04 19:50:55 - INFO - --- Detalhamento dos erros: ---
+2025-11-04 19:50:55 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-04 19:50:55 - INFO - * Timeout: 0
+2025-11-04 19:50:55 - INFO - * Ausentes: 319
+2025-11-04 19:50:55 - INFO - * Outros: 0
+2025-11-04 19:50:55 - INFO - Aguardando 60s antes do próximo batch...
+
+2025-11-04 19:51:55 - INFO - Batch 3/5 - Processando itens 1001 a 1500 (500 itens)...
+2025-11-04 19:51:55 - INFO - Iniciando busca de 'REVIEWS' assíncrona para 500 AppIDs com concorrência 3...
+2025-11-04 19:53:13 - INFO - Busca assíncrona concluída.
+2025-11-04 19:53:13 - INFO - --- Busca concluída: ---
+2025-11-04 19:53:13 - INFO - 237 sucesso(s) (47.40%),
+2025-11-04 19:53:13 - INFO - 263 falha(s) (52.60%).
+2025-11-04 19:53:13 - INFO - --- Detalhamento dos erros: ---
+2025-11-04 19:53:13 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-04 19:53:13 - INFO - * Timeout: 0
+2025-11-04 19:53:13 - INFO - * Ausentes: 263
+2025-11-04 19:53:13 - INFO - * Outros: 0
+2025-11-04 19:53:13 - INFO - Aguardando 60s antes do próximo batch...
+
+2025-11-04 19:54:13 - INFO - Batch 4/5 - Processando itens 1501 a 2000 (500 itens)...
+2025-11-04 19:54:13 - INFO - Iniciando busca de 'REVIEWS' assíncrona para 500 AppIDs com concorrência 3...
+2025-11-04 19:55:28 - INFO - Busca assíncrona concluída.
+2025-11-04 19:55:28 - INFO - --- Busca concluída: ---
+2025-11-04 19:55:28 - INFO - 412 sucesso(s) (82.40%),
+2025-11-04 19:55:28 - INFO - 88 falha(s) (17.60%).
+2025-11-04 19:55:28 - INFO - --- Detalhamento dos erros: ---
+2025-11-04 19:55:28 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-04 19:55:28 - INFO - * Timeout: 0
+2025-11-04 19:55:28 - INFO - * Ausentes: 88
+2025-11-04 19:55:28 - INFO - * Outros: 0
+2025-11-04 19:55:28 - INFO - Aguardando 60s antes do próximo batch...
+
+2025-11-04 19:56:28 - INFO - Batch 5/5 - Processando itens 2001 a 2074 (74 itens)...
+2025-11-04 19:56:28 - INFO - Iniciando busca de 'REVIEWS' assíncrona para 74 AppIDs com concorrência 3...
+2025-11-04 19:56:40 - INFO - Busca assíncrona concluída.
+2025-11-04 19:56:40 - INFO - --- Busca concluída: ---
+2025-11-04 19:56:40 - INFO - 58 sucesso(s) (78.38%),
+2025-11-04 19:56:40 - INFO - 16 falha(s) (21.62%).
+2025-11-04 19:56:40 - INFO - --- Detalhamento dos erros: ---
+2025-11-04 19:56:40 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-04 19:56:40 - INFO - * Timeout: 0
+2025-11-04 19:56:40 - INFO - * Ausentes: 16
+2025-11-04 19:56:40 - INFO - * Outros: 0
+2025-11-04 19:56:40 - INFO - 
+PROCESSAMENTO COMPLETO!
+2025-11-04 19:56:40 - INFO - Total processado: 988 sucessos de 2,074 itens (47.64%)
+2025-11-04 19:56:49 - INFO - Dados de reviews inseridos com sucesso.
+2025-11-04 19:56:49 - INFO - Processando aplicativos de 4001 a 6000 de 273744
+2025-11-04 19:56:52 - INFO - Número de AppIDs com dados incompletos: 1000
+2025-11-04 19:56:52 - INFO - Número de AppIDs a processar: 1883
+2025-11-04 19:56:52 - INFO - === PROCESSAMENTO EM BATCHES ===
+2025-11-04 19:56:52 - INFO - Total de itens: 1,883
+2025-11-04 19:56:52 - INFO - Tamanho do batch: 200
+2025-11-04 19:56:52 - INFO - Total de batches: 10
+2025-11-04 19:56:52 - INFO - Delay entre batches: 120s
+2025-11-04 19:56:52 - INFO - Concorrência por batch: 1
+2025-11-04 19:56:52 - INFO - ================================
+
+2025-11-04 19:56:52 - INFO - Batch 1/10 - Processando itens 1 a 200 (200 itens)...
+2025-11-04 19:56:52 - INFO - Iniciando busca de 'DETALHES' assíncrona para 200 AppIDs com concorrência 1...
+2025-11-04 19:58:10 - INFO - Busca assíncrona concluída.
+2025-11-04 19:58:10 - INFO - --- Busca concluída: ---
+2025-11-04 19:58:10 - INFO - 61 sucesso(s) (30.50%),
+2025-11-04 19:58:10 - INFO - 139 falha(s) (69.50%).
+2025-11-04 19:58:10 - INFO - --- Detalhamento dos erros: ---
+2025-11-04 19:58:10 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-04 19:58:10 - INFO - * Timeout: 0
+2025-11-04 19:58:10 - INFO - * Ausentes: 139
+2025-11-04 19:58:10 - INFO - * Outros: 0
+2025-11-04 19:58:10 - INFO - Aguardando 120s antes do próximo batch...
+
+2025-11-04 20:00:10 - INFO - Batch 2/10 - Processando itens 201 a 400 (200 itens)...
+2025-11-04 20:00:10 - INFO - Iniciando busca de 'DETALHES' assíncrona para 200 AppIDs com concorrência 1...
+2025-11-04 20:01:28 - INFO - Busca assíncrona concluída.
+2025-11-04 20:01:28 - INFO - --- Busca concluída: ---
+2025-11-04 20:01:28 - INFO - 0 sucesso(s) (0.00%),
+2025-11-04 20:01:28 - INFO - 200 falha(s) (100.00%).
+2025-11-04 20:01:28 - INFO - --- Detalhamento dos erros: ---
+2025-11-04 20:01:28 - INFO - * HTTP: 200 (403 Forbidden: 0, 429 Too Many Requests: 200)
+2025-11-04 20:01:28 - INFO - * Timeout: 0
+2025-11-04 20:01:28 - INFO - * Ausentes: 0
+2025-11-04 20:01:28 - INFO - * Outros: 0
+2025-11-04 20:01:28 - INFO - Aguardando 120s antes do próximo batch...
+
+2025-11-04 20:03:28 - INFO - Batch 3/10 - Processando itens 401 a 600 (200 itens)...
+2025-11-04 20:03:28 - INFO - Iniciando busca de 'DETALHES' assíncrona para 200 AppIDs com concorrência 1...
+2025-11-04 20:05:00 - INFO - Busca assíncrona concluída.
+2025-11-04 20:05:00 - INFO - --- Busca concluída: ---
+2025-11-04 20:05:00 - INFO - 0 sucesso(s) (0.00%),
+2025-11-04 20:05:00 - INFO - 200 falha(s) (100.00%).
+2025-11-04 20:05:00 - INFO - --- Detalhamento dos erros: ---
+2025-11-04 20:05:00 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-04 20:05:00 - INFO - * Timeout: 0
+2025-11-04 20:05:00 - INFO - * Ausentes: 200
+2025-11-04 20:05:00 - INFO - * Outros: 0
+2025-11-04 20:05:00 - INFO - Aguardando 120s antes do próximo batch...
+
+2025-11-04 20:07:00 - INFO - Batch 4/10 - Processando itens 601 a 800 (200 itens)...
+2025-11-04 20:07:00 - INFO - Iniciando busca de 'DETALHES' assíncrona para 200 AppIDs com concorrência 1...
+2025-11-04 20:08:20 - INFO - Busca assíncrona concluída.
+2025-11-04 20:08:20 - INFO - --- Busca concluída: ---
+2025-11-04 20:08:20 - INFO - 0 sucesso(s) (0.00%),
+2025-11-04 20:08:20 - INFO - 200 falha(s) (100.00%).
+2025-11-04 20:08:20 - INFO - --- Detalhamento dos erros: ---
+2025-11-04 20:08:20 - INFO - * HTTP: 200 (403 Forbidden: 0, 429 Too Many Requests: 200)
+2025-11-04 20:08:20 - INFO - * Timeout: 0
+2025-11-04 20:08:20 - INFO - * Ausentes: 0
+2025-11-04 20:08:20 - INFO - * Outros: 0
+2025-11-04 20:08:20 - INFO - Aguardando 120s antes do próximo batch...
+
+2025-11-04 20:10:20 - INFO - Batch 5/10 - Processando itens 801 a 1000 (200 itens)...
+2025-11-04 20:10:20 - INFO - Iniciando busca de 'DETALHES' assíncrona para 200 AppIDs com concorrência 1...
+2025-11-04 20:11:40 - INFO - Busca assíncrona concluída.
+2025-11-04 20:11:40 - INFO - --- Busca concluída: ---
+2025-11-04 20:11:40 - INFO - 0 sucesso(s) (0.00%),
+2025-11-04 20:11:40 - INFO - 200 falha(s) (100.00%).
+2025-11-04 20:11:40 - INFO - --- Detalhamento dos erros: ---
+2025-11-04 20:11:40 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-04 20:11:40 - INFO - * Timeout: 0
+2025-11-04 20:11:40 - INFO - * Ausentes: 200
+2025-11-04 20:11:40 - INFO - * Outros: 0
+2025-11-04 20:11:40 - INFO - Aguardando 120s antes do próximo batch...
+
+2025-11-04 20:13:40 - INFO - Batch 6/10 - Processando itens 1001 a 1200 (200 itens)...
+2025-11-04 20:13:40 - INFO - Iniciando busca de 'DETALHES' assíncrona para 200 AppIDs com concorrência 1...
+2025-11-04 20:14:56 - INFO - Busca assíncrona concluída.
+2025-11-04 20:14:56 - INFO - --- Busca concluída: ---
+2025-11-04 20:14:56 - INFO - 0 sucesso(s) (0.00%),
+2025-11-04 20:14:56 - INFO - 200 falha(s) (100.00%).
+2025-11-04 20:14:56 - INFO - --- Detalhamento dos erros: ---
+2025-11-04 20:14:56 - INFO - * HTTP: 200 (403 Forbidden: 0, 429 Too Many Requests: 200)
+2025-11-04 20:14:56 - INFO - * Timeout: 0
+2025-11-04 20:14:56 - INFO - * Ausentes: 0
+2025-11-04 20:14:56 - INFO - * Outros: 0
+2025-11-04 20:14:56 - INFO - Aguardando 120s antes do próximo batch...
+
+2025-11-04 20:16:56 - INFO - Batch 7/10 - Processando itens 1201 a 1400 (200 itens)...
+2025-11-04 20:16:56 - INFO - Iniciando busca de 'DETALHES' assíncrona para 200 AppIDs com concorrência 1...
+2025-11-04 20:18:14 - INFO - Busca assíncrona concluída.
+2025-11-04 20:18:14 - INFO - --- Busca concluída: ---
+2025-11-04 20:18:14 - INFO - 0 sucesso(s) (0.00%),
+2025-11-04 20:18:14 - INFO - 200 falha(s) (100.00%).
+2025-11-04 20:18:14 - INFO - --- Detalhamento dos erros: ---
+2025-11-04 20:18:14 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-04 20:18:14 - INFO - * Timeout: 0
+2025-11-04 20:18:14 - INFO - * Ausentes: 200
+2025-11-04 20:18:14 - INFO - * Outros: 0
+2025-11-04 20:18:14 - INFO - Aguardando 120s antes do próximo batch...
+
+2025-11-04 20:20:14 - INFO - Batch 8/10 - Processando itens 1401 a 1600 (200 itens)...
+2025-11-04 20:20:14 - INFO - Iniciando busca de 'DETALHES' assíncrona para 200 AppIDs com concorrência 1...
+2025-11-04 20:21:34 - INFO - Busca assíncrona concluída.
+2025-11-04 20:21:34 - INFO - --- Busca concluída: ---
+2025-11-04 20:21:34 - INFO - 0 sucesso(s) (0.00%),
+2025-11-04 20:21:34 - INFO - 200 falha(s) (100.00%).
+2025-11-04 20:21:34 - INFO - --- Detalhamento dos erros: ---
+2025-11-04 20:21:34 - INFO - * HTTP: 200 (403 Forbidden: 0, 429 Too Many Requests: 200)
+2025-11-04 20:21:34 - INFO - * Timeout: 0
+2025-11-04 20:21:34 - INFO - * Ausentes: 0
+2025-11-04 20:21:34 - INFO - * Outros: 0
+2025-11-04 20:21:34 - INFO - Aguardando 120s antes do próximo batch...
+
+2025-11-04 20:23:34 - INFO - Batch 9/10 - Processando itens 1601 a 1800 (200 itens)...
+2025-11-04 20:23:34 - INFO - Iniciando busca de 'DETALHES' assíncrona para 200 AppIDs com concorrência 1...
+2025-11-04 20:24:54 - INFO - Busca assíncrona concluída.
+2025-11-04 20:24:54 - INFO - --- Busca concluída: ---
+2025-11-04 20:24:54 - INFO - 0 sucesso(s) (0.00%),
+2025-11-04 20:24:54 - INFO - 200 falha(s) (100.00%).
+2025-11-04 20:24:54 - INFO - --- Detalhamento dos erros: ---
+2025-11-04 20:24:54 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-04 20:24:54 - INFO - * Timeout: 0
+2025-11-04 20:24:54 - INFO - * Ausentes: 200
+2025-11-04 20:24:54 - INFO - * Outros: 0
+2025-11-04 20:24:54 - INFO - Aguardando 120s antes do próximo batch...
+
+2025-11-04 20:26:54 - INFO - Batch 10/10 - Processando itens 1801 a 1883 (83 itens)...
+2025-11-04 20:26:54 - INFO - Iniciando busca de 'DETALHES' assíncrona para 83 AppIDs com concorrência 1...
+2025-11-04 20:27:27 - INFO - Busca assíncrona concluída.
+2025-11-04 20:27:27 - INFO - --- Busca concluída: ---
+2025-11-04 20:27:27 - INFO - 0 sucesso(s) (0.00%),
+2025-11-04 20:27:27 - INFO - 83 falha(s) (100.00%).
+2025-11-04 20:27:27 - INFO - --- Detalhamento dos erros: ---
+2025-11-04 20:27:27 - INFO - * HTTP: 83 (403 Forbidden: 0, 429 Too Many Requests: 83)
+2025-11-04 20:27:27 - INFO - * Timeout: 0
+2025-11-04 20:27:27 - INFO - * Ausentes: 0
+2025-11-04 20:27:27 - INFO - * Outros: 0
+2025-11-04 20:27:27 - INFO - 
+PROCESSAMENTO COMPLETO!
+2025-11-04 20:27:27 - INFO - Total processado: 61 sucessos de 1,883 itens (3.24%)
+2025-11-04 20:27:32 - INFO - Dados de detalhes inseridos com sucesso.
+2025-11-04 20:57:32 - INFO - Número de AppIDs com dados incompletos: 1000
+2025-11-04 20:57:32 - INFO - === PROCESSAMENTO EM BATCHES (REVIEWS) ===
+2025-11-04 20:57:32 - INFO - Total de itens: 2,883
+2025-11-04 20:57:32 - INFO - Tamanho do batch: 500
+2025-11-04 20:57:32 - INFO - Total de batches: 6
+2025-11-04 20:57:32 - INFO - Delay entre batches: 60s
+2025-11-04 20:57:32 - INFO - Concorrência por batch: 3
+2025-11-04 20:57:32 - INFO - ==========================================
+
+2025-11-04 20:57:32 - INFO - Batch 1/6 - Processando itens 1 a 500 (500 itens)...
+2025-11-04 20:57:32 - INFO - Iniciando busca de 'REVIEWS' assíncrona para 500 AppIDs com concorrência 3...
+2025-11-04 20:58:54 - INFO - Busca assíncrona concluída.
+2025-11-04 20:58:54 - INFO - --- Busca concluída: ---
+2025-11-04 20:58:54 - INFO - 73 sucesso(s) (14.60%),
+2025-11-04 20:58:54 - INFO - 427 falha(s) (85.40%).
+2025-11-04 20:58:54 - INFO - --- Detalhamento dos erros: ---
+2025-11-04 20:58:54 - INFO - * HTTP: 7 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-04 20:58:54 - INFO - * Timeout: 0
+2025-11-04 20:58:54 - INFO - * Ausentes: 420
+2025-11-04 20:58:54 - INFO - * Outros: 0
+2025-11-04 20:58:54 - INFO - Aguardando 60s antes do próximo batch...
+
+2025-11-04 20:59:54 - INFO - Batch 2/6 - Processando itens 501 a 1000 (500 itens)...
+2025-11-04 20:59:54 - INFO - Iniciando busca de 'REVIEWS' assíncrona para 500 AppIDs com concorrência 3...
+2025-11-04 21:01:04 - INFO - Busca assíncrona concluída.
+2025-11-04 21:01:04 - INFO - --- Busca concluída: ---
+2025-11-04 21:01:04 - INFO - 0 sucesso(s) (0.00%),
+2025-11-04 21:01:04 - INFO - 500 falha(s) (100.00%).
+2025-11-04 21:01:04 - INFO - --- Detalhamento dos erros: ---
+2025-11-04 21:01:04 - INFO - * HTTP: 169 (403 Forbidden: 82, 429 Too Many Requests: 0)
+2025-11-04 21:01:04 - INFO - * Timeout: 0
+2025-11-04 21:01:04 - INFO - * Ausentes: 331
+2025-11-04 21:01:04 - INFO - * Outros: 0
+2025-11-04 21:01:04 - INFO - Aguardando 60s antes do próximo batch...
+
+2025-11-04 21:02:04 - INFO - Batch 3/6 - Processando itens 1001 a 1500 (500 itens)...
+2025-11-04 21:02:04 - INFO - Iniciando busca de 'REVIEWS' assíncrona para 500 AppIDs com concorrência 3...
+2025-11-04 21:03:23 - INFO - Busca assíncrona concluída.
+2025-11-04 21:03:23 - INFO - --- Busca concluída: ---
+2025-11-04 21:03:23 - INFO - 0 sucesso(s) (0.00%),
+2025-11-04 21:03:23 - INFO - 500 falha(s) (100.00%).
+2025-11-04 21:03:23 - INFO - --- Detalhamento dos erros: ---
+2025-11-04 21:03:23 - INFO - * HTTP: 87 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-04 21:03:23 - INFO - * Timeout: 0
+2025-11-04 21:03:23 - INFO - * Ausentes: 413
+2025-11-04 21:03:23 - INFO - * Outros: 0
+2025-11-04 21:03:23 - INFO - Aguardando 60s antes do próximo batch...
+
+2025-11-04 21:04:23 - INFO - Batch 4/6 - Processando itens 1501 a 2000 (500 itens)...
+2025-11-04 21:04:23 - INFO - Iniciando busca de 'REVIEWS' assíncrona para 500 AppIDs com concorrência 3...
+2025-11-04 21:05:40 - INFO - Busca assíncrona concluída.
+2025-11-04 21:05:40 - INFO - --- Busca concluída: ---
+2025-11-04 21:05:40 - INFO - 18 sucesso(s) (3.60%),
+2025-11-04 21:05:40 - INFO - 482 falha(s) (96.40%).
+2025-11-04 21:05:40 - INFO - --- Detalhamento dos erros: ---
+2025-11-04 21:05:40 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-04 21:05:40 - INFO - * Timeout: 0
+2025-11-04 21:05:40 - INFO - * Ausentes: 482
+2025-11-04 21:05:40 - INFO - * Outros: 0
+2025-11-04 21:05:40 - INFO - Aguardando 60s antes do próximo batch...
+
+2025-11-04 21:06:40 - INFO - Batch 5/6 - Processando itens 2001 a 2500 (500 itens)...
+2025-11-04 21:06:40 - INFO - Iniciando busca de 'REVIEWS' assíncrona para 500 AppIDs com concorrência 3...
+2025-11-04 21:07:59 - INFO - Busca assíncrona concluída.
+2025-11-04 21:07:59 - INFO - --- Busca concluída: ---
+2025-11-04 21:07:59 - INFO - 358 sucesso(s) (71.60%),
+2025-11-04 21:07:59 - INFO - 142 falha(s) (28.40%).
+2025-11-04 21:07:59 - INFO - --- Detalhamento dos erros: ---
+2025-11-04 21:07:59 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-04 21:07:59 - INFO - * Timeout: 0
+2025-11-04 21:07:59 - INFO - * Ausentes: 142
+2025-11-04 21:07:59 - INFO - * Outros: 0
+2025-11-04 21:07:59 - INFO - Aguardando 60s antes do próximo batch...
+
+2025-11-04 21:08:59 - INFO - Batch 6/6 - Processando itens 2501 a 2883 (383 itens)...
+2025-11-04 21:08:59 - INFO - Iniciando busca de 'REVIEWS' assíncrona para 383 AppIDs com concorrência 3...
+2025-11-04 21:10:05 - INFO - Busca assíncrona concluída.
+2025-11-04 21:10:05 - INFO - --- Busca concluída: ---
+2025-11-04 21:10:05 - INFO - 308 sucesso(s) (80.42%),
+2025-11-04 21:10:05 - INFO - 75 falha(s) (19.58%).
+2025-11-04 21:10:05 - INFO - --- Detalhamento dos erros: ---
+2025-11-04 21:10:05 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-04 21:10:05 - INFO - * Timeout: 0
+2025-11-04 21:10:05 - INFO - * Ausentes: 75
+2025-11-04 21:10:05 - INFO - * Outros: 0
+2025-11-04 21:10:05 - INFO - 
+PROCESSAMENTO COMPLETO!
+2025-11-04 21:10:05 - INFO - Total processado: 757 sucessos de 2,883 itens (26.26%)
+2025-11-04 21:10:11 - INFO - Dados de reviews inseridos com sucesso.
+2025-11-04 21:10:11 - INFO - Processando aplicativos de 6001 a 8000 de 273744
+2025-11-04 21:10:16 - INFO - Número de AppIDs com dados incompletos: 1000
+2025-11-04 21:10:16 - INFO - Número de AppIDs a processar: 1410
+2025-11-04 21:10:16 - INFO - === PROCESSAMENTO EM BATCHES ===
+2025-11-04 21:10:16 - INFO - Total de itens: 1,410
+2025-11-04 21:10:16 - INFO - Tamanho do batch: 200
+2025-11-04 21:10:16 - INFO - Total de batches: 8
+2025-11-04 21:10:16 - INFO - Delay entre batches: 120s
+2025-11-04 21:10:16 - INFO - Concorrência por batch: 1
+2025-11-04 21:10:16 - INFO - ================================
+
+2025-11-04 21:10:16 - INFO - Batch 1/8 - Processando itens 1 a 200 (200 itens)...
+2025-11-04 21:10:16 - INFO - Iniciando busca de 'DETALHES' assíncrona para 200 AppIDs com concorrência 1...
+2025-11-04 21:11:20 - INFO - Busca assíncrona concluída.
+2025-11-04 21:11:20 - INFO - --- Busca concluída: ---
+2025-11-04 21:11:20 - INFO - 50 sucesso(s) (25.00%),
+2025-11-04 21:11:20 - INFO - 150 falha(s) (75.00%).
+2025-11-04 21:11:20 - INFO - --- Detalhamento dos erros: ---
+2025-11-04 21:11:20 - INFO - * HTTP: 94 (403 Forbidden: 94, 429 Too Many Requests: 0)
+2025-11-04 21:11:20 - INFO - * Timeout: 0
+2025-11-04 21:11:20 - INFO - * Ausentes: 55
+2025-11-04 21:11:20 - INFO - * Outros: 0
+2025-11-04 21:11:20 - INFO - Aguardando 120s antes do próximo batch...
+
+2025-11-04 21:13:20 - INFO - Batch 2/8 - Processando itens 201 a 400 (200 itens)...
+2025-11-04 21:13:20 - INFO - Iniciando busca de 'DETALHES' assíncrona para 200 AppIDs com concorrência 1...
+2025-11-04 21:14:38 - INFO - Busca assíncrona concluída.
+2025-11-04 21:14:38 - INFO - --- Busca concluída: ---
+2025-11-04 21:14:38 - INFO - 59 sucesso(s) (29.50%),
+2025-11-04 21:14:38 - INFO - 141 falha(s) (70.50%).
+2025-11-04 21:14:38 - INFO - --- Detalhamento dos erros: ---
+2025-11-04 21:14:38 - INFO - * HTTP: 106 (403 Forbidden: 0, 429 Too Many Requests: 106)
+2025-11-04 21:14:38 - INFO - * Timeout: 0
+2025-11-04 21:14:38 - INFO - * Ausentes: 35
+2025-11-04 21:14:38 - INFO - * Outros: 0
+2025-11-04 21:14:38 - INFO - Aguardando 120s antes do próximo batch...
+
+2025-11-04 21:16:38 - INFO - Batch 3/8 - Processando itens 401 a 600 (200 itens)...
+2025-11-04 21:16:38 - INFO - Iniciando busca de 'DETALHES' assíncrona para 200 AppIDs com concorrência 1...
+2025-11-04 21:18:07 - INFO - Busca assíncrona concluída.
+2025-11-04 21:18:07 - INFO - --- Busca concluída: ---
+2025-11-04 21:18:07 - INFO - 136 sucesso(s) (68.00%),
+2025-11-04 21:18:07 - INFO - 64 falha(s) (32.00%).
+2025-11-04 21:18:07 - INFO - --- Detalhamento dos erros: ---
+2025-11-04 21:18:07 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-04 21:18:07 - INFO - * Timeout: 0
+2025-11-04 21:18:07 - INFO - * Ausentes: 64
+2025-11-04 21:18:07 - INFO - * Outros: 0
+2025-11-04 21:18:07 - INFO - Aguardando 120s antes do próximo batch...
+
+2025-11-04 21:20:07 - INFO - Batch 4/8 - Processando itens 601 a 800 (200 itens)...
+2025-11-04 21:20:07 - INFO - Iniciando busca de 'DETALHES' assíncrona para 200 AppIDs com concorrência 1...
+2025-11-04 21:21:24 - INFO - Busca assíncrona concluída.
+2025-11-04 21:21:24 - INFO - --- Busca concluída: ---
+2025-11-04 21:21:24 - INFO - 0 sucesso(s) (0.00%),
+2025-11-04 21:21:24 - INFO - 200 falha(s) (100.00%).
+2025-11-04 21:21:24 - INFO - --- Detalhamento dos erros: ---
+2025-11-04 21:21:24 - INFO - * HTTP: 200 (403 Forbidden: 0, 429 Too Many Requests: 200)
+2025-11-04 21:21:24 - INFO - * Timeout: 0
+2025-11-04 21:21:24 - INFO - * Ausentes: 0
+2025-11-04 21:21:24 - INFO - * Outros: 0
+2025-11-04 21:21:24 - INFO - Aguardando 120s antes do próximo batch...
+
+2025-11-04 21:23:24 - INFO - Batch 5/8 - Processando itens 801 a 1000 (200 itens)...
+2025-11-04 21:23:24 - INFO - Iniciando busca de 'DETALHES' assíncrona para 200 AppIDs com concorrência 1...
+2025-11-04 21:24:49 - INFO - Busca assíncrona concluída.
+2025-11-04 21:24:49 - INFO - --- Busca concluída: ---
+2025-11-04 21:24:49 - INFO - 77 sucesso(s) (38.50%),
+2025-11-04 21:24:49 - INFO - 123 falha(s) (61.50%).
+2025-11-04 21:24:49 - INFO - --- Detalhamento dos erros: ---
+2025-11-04 21:24:49 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-04 21:24:49 - INFO - * Timeout: 0
+2025-11-04 21:24:49 - INFO - * Ausentes: 120
+2025-11-04 21:24:49 - INFO - * Outros: 0
+2025-11-04 21:24:49 - INFO - Aguardando 120s antes do próximo batch...
+
+2025-11-04 21:26:49 - INFO - Batch 6/8 - Processando itens 1001 a 1200 (200 itens)...
+2025-11-04 21:26:49 - INFO - Iniciando busca de 'DETALHES' assíncrona para 200 AppIDs com concorrência 1...
+2025-11-04 21:28:11 - INFO - Busca assíncrona concluída.
+2025-11-04 21:28:11 - INFO - --- Busca concluída: ---
+2025-11-04 21:28:11 - INFO - 0 sucesso(s) (0.00%),
+2025-11-04 21:28:11 - INFO - 200 falha(s) (100.00%).
+2025-11-04 21:28:11 - INFO - --- Detalhamento dos erros: ---
+2025-11-04 21:28:11 - INFO - * HTTP: 200 (403 Forbidden: 0, 429 Too Many Requests: 200)
+2025-11-04 21:28:11 - INFO - * Timeout: 0
+2025-11-04 21:28:11 - INFO - * Ausentes: 0
+2025-11-04 21:28:11 - INFO - * Outros: 0
+2025-11-04 21:28:11 - INFO - Aguardando 120s antes do próximo batch...
+
+2025-11-04 21:30:11 - INFO - Batch 7/8 - Processando itens 1201 a 1400 (200 itens)...
+2025-11-04 21:30:11 - INFO - Iniciando busca de 'DETALHES' assíncrona para 200 AppIDs com concorrência 1...
+2025-11-04 21:31:39 - INFO - Busca assíncrona concluída.
+2025-11-04 21:31:39 - INFO - --- Busca concluída: ---
+2025-11-04 21:31:39 - INFO - 120 sucesso(s) (60.00%),
+2025-11-04 21:31:39 - INFO - 80 falha(s) (40.00%).
+2025-11-04 21:31:39 - INFO - --- Detalhamento dos erros: ---
+2025-11-04 21:31:39 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-04 21:31:39 - INFO - * Timeout: 0
+2025-11-04 21:31:39 - INFO - * Ausentes: 80
+2025-11-04 21:31:39 - INFO - * Outros: 0
+2025-11-04 21:31:39 - INFO - Aguardando 120s antes do próximo batch...
+
+2025-11-04 21:33:40 - INFO - Batch 8/8 - Processando itens 1401 a 1410 (10 itens)...
+2025-11-04 21:33:40 - INFO - Iniciando busca de 'DETALHES' assíncrona para 10 AppIDs com concorrência 1...
+2025-11-04 21:33:44 - INFO - Busca assíncrona concluída.
+2025-11-04 21:33:44 - INFO - --- Busca concluída: ---
+2025-11-04 21:33:44 - INFO - 0 sucesso(s) (0.00%),
+2025-11-04 21:33:44 - INFO - 10 falha(s) (100.00%).
+2025-11-04 21:33:44 - INFO - --- Detalhamento dos erros: ---
+2025-11-04 21:33:44 - INFO - * HTTP: 10 (403 Forbidden: 0, 429 Too Many Requests: 10)
+2025-11-04 21:33:44 - INFO - * Timeout: 0
+2025-11-04 21:33:44 - INFO - * Ausentes: 0
+2025-11-04 21:33:44 - INFO - * Outros: 0
+2025-11-04 21:33:44 - INFO - 
+PROCESSAMENTO COMPLETO!
+2025-11-04 21:33:44 - INFO - Total processado: 442 sucessos de 1,410 itens (31.35%)
+2025-11-04 21:34:12 - INFO - Dados de detalhes inseridos com sucesso.
+2025-11-04 22:04:12 - INFO - Número de AppIDs com dados incompletos: 1000
+2025-11-04 22:04:12 - INFO - === PROCESSAMENTO EM BATCHES (REVIEWS) ===
+2025-11-04 22:04:12 - INFO - Total de itens: 2,410
+2025-11-04 22:04:12 - INFO - Tamanho do batch: 500
+2025-11-04 22:04:12 - INFO - Total de batches: 5
+2025-11-04 22:04:12 - INFO - Delay entre batches: 60s
+2025-11-04 22:04:12 - INFO - Concorrência por batch: 3
+2025-11-04 22:04:12 - INFO - ==========================================
+
+2025-11-04 22:04:12 - INFO - Batch 1/5 - Processando itens 1 a 500 (500 itens)...
+2025-11-04 22:04:12 - INFO - Iniciando busca de 'REVIEWS' assíncrona para 500 AppIDs com concorrência 3...
+2025-11-04 22:05:30 - INFO - Busca assíncrona concluída.
+2025-11-04 22:05:30 - INFO - --- Busca concluída: ---
+2025-11-04 22:05:30 - INFO - 228 sucesso(s) (45.60%),
+2025-11-04 22:05:30 - INFO - 272 falha(s) (54.40%).
+2025-11-04 22:05:30 - INFO - --- Detalhamento dos erros: ---
+2025-11-04 22:05:30 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-04 22:05:30 - INFO - * Timeout: 0
+2025-11-04 22:05:30 - INFO - * Ausentes: 272
+2025-11-04 22:05:30 - INFO - * Outros: 0
+2025-11-04 22:05:30 - INFO - Aguardando 60s antes do próximo batch...
+
+2025-11-04 22:06:30 - INFO - Batch 2/5 - Processando itens 501 a 1000 (500 itens)...
+2025-11-04 22:06:30 - INFO - Iniciando busca de 'REVIEWS' assíncrona para 500 AppIDs com concorrência 3...
+2025-11-04 22:07:47 - INFO - Busca assíncrona concluída.
+2025-11-04 22:07:47 - INFO - --- Busca concluída: ---
+2025-11-04 22:07:47 - INFO - 243 sucesso(s) (48.60%),
+2025-11-04 22:07:47 - INFO - 257 falha(s) (51.40%).
+2025-11-04 22:07:47 - INFO - --- Detalhamento dos erros: ---
+2025-11-04 22:07:47 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-04 22:07:47 - INFO - * Timeout: 0
+2025-11-04 22:07:47 - INFO - * Ausentes: 257
+2025-11-04 22:07:47 - INFO - * Outros: 0
+2025-11-04 22:07:47 - INFO - Aguardando 60s antes do próximo batch...
+
+2025-11-04 22:08:47 - INFO - Batch 3/5 - Processando itens 1001 a 1500 (500 itens)...
+2025-11-04 22:08:47 - INFO - Iniciando busca de 'REVIEWS' assíncrona para 500 AppIDs com concorrência 3...
+2025-11-04 22:10:04 - INFO - Busca assíncrona concluída.
+2025-11-04 22:10:04 - INFO - --- Busca concluída: ---
+2025-11-04 22:10:04 - INFO - 237 sucesso(s) (47.40%),
+2025-11-04 22:10:04 - INFO - 263 falha(s) (52.60%).
+2025-11-04 22:10:04 - INFO - --- Detalhamento dos erros: ---
+2025-11-04 22:10:04 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-04 22:10:04 - INFO - * Timeout: 0
+2025-11-04 22:10:04 - INFO - * Ausentes: 263
+2025-11-04 22:10:04 - INFO - * Outros: 0
+2025-11-04 22:10:04 - INFO - Aguardando 60s antes do próximo batch...
+
+2025-11-04 22:11:04 - INFO - Batch 4/5 - Processando itens 1501 a 2000 (500 itens)...
+2025-11-04 22:11:04 - INFO - Iniciando busca de 'REVIEWS' assíncrona para 500 AppIDs com concorrência 3...
+2025-11-04 22:12:23 - INFO - Busca assíncrona concluída.
+2025-11-04 22:12:23 - INFO - --- Busca concluída: ---
+2025-11-04 22:12:23 - INFO - 333 sucesso(s) (66.60%),
+2025-11-04 22:12:23 - INFO - 167 falha(s) (33.40%).
+2025-11-04 22:12:23 - INFO - --- Detalhamento dos erros: ---
+2025-11-04 22:12:23 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-04 22:12:23 - INFO - * Timeout: 0
+2025-11-04 22:12:23 - INFO - * Ausentes: 167
+2025-11-04 22:12:23 - INFO - * Outros: 0
+2025-11-04 22:12:23 - INFO - Aguardando 60s antes do próximo batch...
+
+2025-11-04 22:13:23 - INFO - Batch 5/5 - Processando itens 2001 a 2410 (410 itens)...
+2025-11-04 22:13:23 - INFO - Iniciando busca de 'REVIEWS' assíncrona para 410 AppIDs com concorrência 3...
+2025-11-04 22:14:30 - INFO - Busca assíncrona concluída.
+2025-11-04 22:14:30 - INFO - --- Busca concluída: ---
+2025-11-04 22:14:30 - INFO - 333 sucesso(s) (81.22%),
+2025-11-04 22:14:30 - INFO - 77 falha(s) (18.78%).
+2025-11-04 22:14:30 - INFO - --- Detalhamento dos erros: ---
+2025-11-04 22:14:30 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-04 22:14:30 - INFO - * Timeout: 0
+2025-11-04 22:14:30 - INFO - * Ausentes: 77
+2025-11-04 22:14:30 - INFO - * Outros: 0
+2025-11-04 22:14:30 - INFO - 
+PROCESSAMENTO COMPLETO!
+2025-11-04 22:14:30 - INFO - Total processado: 1,374 sucessos de 2,410 itens (57.01%)
+2025-11-04 22:15:10 - INFO - Dados de reviews inseridos com sucesso.
+2025-11-04 22:15:10 - INFO - Processando aplicativos de 8001 a 10000 de 273744
+2025-11-04 22:15:15 - INFO - Número de AppIDs com dados incompletos: 1000
+2025-11-04 22:15:15 - INFO - Número de AppIDs a processar: 1299
+2025-11-04 22:15:15 - INFO - === PROCESSAMENTO EM BATCHES ===
+2025-11-04 22:15:15 - INFO - Total de itens: 1,299
+2025-11-04 22:15:15 - INFO - Tamanho do batch: 200
+2025-11-04 22:15:15 - INFO - Total de batches: 7
+2025-11-04 22:15:15 - INFO - Delay entre batches: 120s
+2025-11-04 22:15:15 - INFO - Concorrência por batch: 1
+2025-11-04 22:15:15 - INFO - ================================
+
+2025-11-04 22:15:15 - INFO - Batch 1/7 - Processando itens 1 a 200 (200 itens)...
+2025-11-04 22:15:15 - INFO - Iniciando busca de 'DETALHES' assíncrona para 200 AppIDs com concorrência 1...
+2025-11-04 22:16:41 - INFO - Busca assíncrona concluída.
+2025-11-04 22:16:41 - INFO - --- Busca concluída: ---
+2025-11-04 22:16:41 - INFO - 100 sucesso(s) (50.00%),
+2025-11-04 22:16:41 - INFO - 100 falha(s) (50.00%).
+2025-11-04 22:16:41 - INFO - --- Detalhamento dos erros: ---
+2025-11-04 22:16:41 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-04 22:16:41 - INFO - * Timeout: 0
+2025-11-04 22:16:41 - INFO - * Ausentes: 100
+2025-11-04 22:16:41 - INFO - * Outros: 0
+2025-11-04 22:16:41 - INFO - Aguardando 120s antes do próximo batch...
+
+2025-11-04 22:18:41 - INFO - Batch 2/7 - Processando itens 201 a 400 (200 itens)...
+2025-11-04 22:18:41 - INFO - Iniciando busca de 'DETALHES' assíncrona para 200 AppIDs com concorrência 1...
+2025-11-04 22:20:03 - INFO - Busca assíncrona concluída.
+2025-11-04 22:20:03 - INFO - --- Busca concluída: ---
+2025-11-04 22:20:03 - INFO - 0 sucesso(s) (0.00%),
+2025-11-04 22:20:03 - INFO - 200 falha(s) (100.00%).
+2025-11-04 22:20:03 - INFO - --- Detalhamento dos erros: ---
+2025-11-04 22:20:03 - INFO - * HTTP: 200 (403 Forbidden: 0, 429 Too Many Requests: 200)
+2025-11-04 22:20:03 - INFO - * Timeout: 0
+2025-11-04 22:20:03 - INFO - * Ausentes: 0
+2025-11-04 22:20:03 - INFO - * Outros: 0
+2025-11-04 22:20:03 - INFO - Aguardando 120s antes do próximo batch...
+
+2025-11-04 22:22:03 - INFO - Batch 3/7 - Processando itens 401 a 600 (200 itens)...
+2025-11-04 22:22:03 - INFO - Iniciando busca de 'DETALHES' assíncrona para 200 AppIDs com concorrência 1...
+2025-11-04 22:23:30 - INFO - Busca assíncrona concluída.
+2025-11-04 22:23:30 - INFO - --- Busca concluída: ---
+2025-11-04 22:23:30 - INFO - 85 sucesso(s) (42.50%),
+2025-11-04 22:23:30 - INFO - 115 falha(s) (57.50%).
+2025-11-04 22:23:30 - INFO - --- Detalhamento dos erros: ---
+2025-11-04 22:23:30 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-04 22:23:30 - INFO - * Timeout: 0
+2025-11-04 22:23:30 - INFO - * Ausentes: 115
+2025-11-04 22:23:30 - INFO - * Outros: 0
+2025-11-04 22:23:30 - INFO - Aguardando 120s antes do próximo batch...
+
+2025-11-04 22:25:30 - INFO - Batch 4/7 - Processando itens 601 a 800 (200 itens)...
+2025-11-04 22:25:30 - INFO - Iniciando busca de 'DETALHES' assíncrona para 200 AppIDs com concorrência 1...
+2025-11-04 22:26:49 - INFO - Busca assíncrona concluída.
+2025-11-04 22:26:49 - INFO - --- Busca concluída: ---
+2025-11-04 22:26:49 - INFO - 0 sucesso(s) (0.00%),
+2025-11-04 22:26:49 - INFO - 200 falha(s) (100.00%).
+2025-11-04 22:26:49 - INFO - --- Detalhamento dos erros: ---
+2025-11-04 22:26:49 - INFO - * HTTP: 200 (403 Forbidden: 0, 429 Too Many Requests: 200)
+2025-11-04 22:26:49 - INFO - * Timeout: 0
+2025-11-04 22:26:49 - INFO - * Ausentes: 0
+2025-11-04 22:26:49 - INFO - * Outros: 0
+2025-11-04 22:26:49 - INFO - Aguardando 120s antes do próximo batch...
+
+2025-11-04 22:28:49 - INFO - Batch 5/7 - Processando itens 801 a 1000 (200 itens)...
+2025-11-04 22:28:49 - INFO - Iniciando busca de 'DETALHES' assíncrona para 200 AppIDs com concorrência 1...
+2025-11-04 22:30:21 - INFO - Busca assíncrona concluída.
+2025-11-04 22:30:21 - INFO - --- Busca concluída: ---
+2025-11-04 22:30:21 - INFO - 136 sucesso(s) (68.00%),
+2025-11-04 22:30:21 - INFO - 64 falha(s) (32.00%).
+2025-11-04 22:30:21 - INFO - --- Detalhamento dos erros: ---
+2025-11-04 22:30:21 - INFO - * HTTP: 1 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-04 22:30:21 - INFO - * Timeout: 0
+2025-11-04 22:30:21 - INFO - * Ausentes: 63
+2025-11-04 22:30:21 - INFO - * Outros: 0
+2025-11-04 22:30:21 - INFO - Aguardando 120s antes do próximo batch...
+
+2025-11-04 22:32:21 - INFO - Batch 6/7 - Processando itens 1001 a 1200 (200 itens)...
+2025-11-04 22:32:21 - INFO - Iniciando busca de 'DETALHES' assíncrona para 200 AppIDs com concorrência 1...
+2025-11-04 22:33:41 - INFO - Busca assíncrona concluída.
+2025-11-04 22:33:41 - INFO - --- Busca concluída: ---
+2025-11-04 22:33:41 - INFO - 0 sucesso(s) (0.00%),
+2025-11-04 22:33:41 - INFO - 200 falha(s) (100.00%).
+2025-11-04 22:33:41 - INFO - --- Detalhamento dos erros: ---
+2025-11-04 22:33:41 - INFO - * HTTP: 200 (403 Forbidden: 0, 429 Too Many Requests: 200)
+2025-11-04 22:33:41 - INFO - * Timeout: 0
+2025-11-04 22:33:41 - INFO - * Ausentes: 0
+2025-11-04 22:33:41 - INFO - * Outros: 0
+2025-11-04 22:33:41 - INFO - Aguardando 120s antes do próximo batch...
+
+2025-11-04 22:35:41 - INFO - Batch 7/7 - Processando itens 1201 a 1299 (99 itens)...
+2025-11-04 22:35:41 - INFO - Iniciando busca de 'DETALHES' assíncrona para 99 AppIDs com concorrência 1...
+2025-11-04 22:36:23 - INFO - Busca assíncrona concluída.
+2025-11-04 22:36:23 - INFO - --- Busca concluída: ---
+2025-11-04 22:36:23 - INFO - 57 sucesso(s) (57.58%),
+2025-11-04 22:36:23 - INFO - 42 falha(s) (42.42%).
+2025-11-04 22:36:23 - INFO - --- Detalhamento dos erros: ---
+2025-11-04 22:36:23 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-04 22:36:23 - INFO - * Timeout: 0
+2025-11-04 22:36:23 - INFO - * Ausentes: 42
+2025-11-04 22:36:23 - INFO - * Outros: 0
+2025-11-04 22:36:23 - INFO - 
+PROCESSAMENTO COMPLETO!
+2025-11-04 22:36:23 - INFO - Total processado: 378 sucessos de 1,299 itens (29.10%)
+2025-11-04 22:36:45 - INFO - Dados de detalhes inseridos com sucesso.
+2025-11-04 23:06:45 - INFO - Número de AppIDs com dados incompletos: 1000
+2025-11-04 23:06:45 - INFO - === PROCESSAMENTO EM BATCHES (REVIEWS) ===
+2025-11-04 23:06:45 - INFO - Total de itens: 2,299
+2025-11-04 23:06:45 - INFO - Tamanho do batch: 500
+2025-11-04 23:06:45 - INFO - Total de batches: 5
+2025-11-04 23:06:45 - INFO - Delay entre batches: 60s
+2025-11-04 23:06:45 - INFO - Concorrência por batch: 3
+2025-11-04 23:06:45 - INFO - ==========================================
+
+2025-11-04 23:06:45 - INFO - Batch 1/5 - Processando itens 1 a 500 (500 itens)...
+2025-11-04 23:06:45 - INFO - Iniciando busca de 'REVIEWS' assíncrona para 500 AppIDs com concorrência 3...
+2025-11-04 23:08:03 - INFO - Busca assíncrona concluída.
+2025-11-04 23:08:03 - INFO - --- Busca concluída: ---
+2025-11-04 23:08:03 - INFO - 310 sucesso(s) (62.00%),
+2025-11-04 23:08:03 - INFO - 190 falha(s) (38.00%).
+2025-11-04 23:08:03 - INFO - --- Detalhamento dos erros: ---
+2025-11-04 23:08:03 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-04 23:08:03 - INFO - * Timeout: 0
+2025-11-04 23:08:03 - INFO - * Ausentes: 190
+2025-11-04 23:08:03 - INFO - * Outros: 0
+2025-11-04 23:08:03 - INFO - Aguardando 60s antes do próximo batch...
+
+2025-11-04 23:09:03 - INFO - Batch 2/5 - Processando itens 501 a 1000 (500 itens)...
+2025-11-04 23:09:03 - INFO - Iniciando busca de 'REVIEWS' assíncrona para 500 AppIDs com concorrência 3...
+2025-11-04 23:10:19 - INFO - Busca assíncrona concluída.
+2025-11-04 23:10:19 - INFO - --- Busca concluída: ---
+2025-11-04 23:10:19 - INFO - 313 sucesso(s) (62.60%),
+2025-11-04 23:10:19 - INFO - 187 falha(s) (37.40%).
+2025-11-04 23:10:19 - INFO - --- Detalhamento dos erros: ---
+2025-11-04 23:10:19 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-04 23:10:19 - INFO - * Timeout: 0
+2025-11-04 23:10:19 - INFO - * Ausentes: 187
+2025-11-04 23:10:19 - INFO - * Outros: 0
+2025-11-04 23:10:19 - INFO - Aguardando 60s antes do próximo batch...
+
+2025-11-04 23:11:19 - INFO - Batch 3/5 - Processando itens 1001 a 1500 (500 itens)...
+2025-11-04 23:11:19 - INFO - Iniciando busca de 'REVIEWS' assíncrona para 500 AppIDs com concorrência 3...
+2025-11-04 23:12:35 - INFO - Busca assíncrona concluída.
+2025-11-04 23:12:35 - INFO - --- Busca concluída: ---
+2025-11-04 23:12:35 - INFO - 200 sucesso(s) (40.00%),
+2025-11-04 23:12:35 - INFO - 300 falha(s) (60.00%).
+2025-11-04 23:12:35 - INFO - --- Detalhamento dos erros: ---
+2025-11-04 23:12:35 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-04 23:12:35 - INFO - * Timeout: 0
+2025-11-04 23:12:35 - INFO - * Ausentes: 300
+2025-11-04 23:12:35 - INFO - * Outros: 0
+2025-11-04 23:12:35 - INFO - Aguardando 60s antes do próximo batch...
+
+2025-11-04 23:13:35 - INFO - Batch 4/5 - Processando itens 1501 a 2000 (500 itens)...
+2025-11-04 23:13:35 - INFO - Iniciando busca de 'REVIEWS' assíncrona para 500 AppIDs com concorrência 3...
+2025-11-04 23:14:55 - INFO - Busca assíncrona concluída.
+2025-11-04 23:14:55 - INFO - --- Busca concluída: ---
+2025-11-04 23:14:55 - INFO - 418 sucesso(s) (83.60%),
+2025-11-04 23:14:55 - INFO - 82 falha(s) (16.40%).
+2025-11-04 23:14:55 - INFO - --- Detalhamento dos erros: ---
+2025-11-04 23:14:55 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-04 23:14:55 - INFO - * Timeout: 0
+2025-11-04 23:14:55 - INFO - * Ausentes: 82
+2025-11-04 23:14:55 - INFO - * Outros: 0
+2025-11-04 23:14:55 - INFO - Aguardando 60s antes do próximo batch...
+
+2025-11-04 23:15:55 - INFO - Batch 5/5 - Processando itens 2001 a 2299 (299 itens)...
+2025-11-04 23:15:55 - INFO - Iniciando busca de 'REVIEWS' assíncrona para 299 AppIDs com concorrência 3...
+2025-11-04 23:16:45 - INFO - Busca assíncrona concluída.
+2025-11-04 23:16:45 - INFO - --- Busca concluída: ---
+2025-11-04 23:16:45 - INFO - 233 sucesso(s) (77.93%),
+2025-11-04 23:16:45 - INFO - 66 falha(s) (22.07%).
+2025-11-04 23:16:45 - INFO - --- Detalhamento dos erros: ---
+2025-11-04 23:16:45 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-04 23:16:45 - INFO - * Timeout: 0
+2025-11-04 23:16:45 - INFO - * Ausentes: 66
+2025-11-04 23:16:45 - INFO - * Outros: 0
+2025-11-04 23:16:45 - INFO - 
+PROCESSAMENTO COMPLETO!
+2025-11-04 23:16:45 - INFO - Total processado: 1,474 sucessos de 2,299 itens (64.11%)
+2025-11-04 23:17:16 - INFO - Dados de reviews inseridos com sucesso.
+2025-11-04 23:17:16 - INFO - Processando aplicativos de 10001 a 12000 de 273744
+2025-11-04 23:17:21 - INFO - Número de AppIDs com dados incompletos: 1000
+2025-11-04 23:17:21 - INFO - Número de AppIDs a processar: 1000
+2025-11-04 23:17:21 - INFO - === PROCESSAMENTO EM BATCHES ===
+2025-11-04 23:17:21 - INFO - Total de itens: 1,000
+2025-11-04 23:17:21 - INFO - Tamanho do batch: 200
+2025-11-04 23:17:21 - INFO - Total de batches: 5
+2025-11-04 23:17:21 - INFO - Delay entre batches: 120s
+2025-11-04 23:17:21 - INFO - Concorrência por batch: 1
+2025-11-04 23:17:21 - INFO - ================================
+
+2025-11-04 23:17:21 - INFO - Batch 1/5 - Processando itens 1 a 200 (200 itens)...
+2025-11-04 23:17:21 - INFO - Iniciando busca de 'DETALHES' assíncrona para 200 AppIDs com concorrência 1...
+2025-11-04 23:18:41 - INFO - Busca assíncrona concluída.
+2025-11-04 23:18:41 - INFO - --- Busca concluída: ---
+2025-11-04 23:18:41 - INFO - 13 sucesso(s) (6.50%),
+2025-11-04 23:18:41 - INFO - 187 falha(s) (93.50%).
+2025-11-04 23:18:41 - INFO - --- Detalhamento dos erros: ---
+2025-11-04 23:18:41 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-04 23:18:41 - INFO - * Timeout: 0
+2025-11-04 23:18:41 - INFO - * Ausentes: 187
+2025-11-04 23:18:41 - INFO - * Outros: 0
+2025-11-04 23:18:41 - INFO - Aguardando 120s antes do próximo batch...
+
+2025-11-04 23:20:41 - INFO - Batch 2/5 - Processando itens 201 a 400 (200 itens)...
+2025-11-04 23:20:41 - INFO - Iniciando busca de 'DETALHES' assíncrona para 200 AppIDs com concorrência 1...
+2025-11-04 23:22:02 - INFO - Busca assíncrona concluída.
+2025-11-04 23:22:02 - INFO - --- Busca concluída: ---
+2025-11-04 23:22:02 - INFO - 0 sucesso(s) (0.00%),
+2025-11-04 23:22:02 - INFO - 200 falha(s) (100.00%).
+2025-11-04 23:22:02 - INFO - --- Detalhamento dos erros: ---
+2025-11-04 23:22:02 - INFO - * HTTP: 200 (403 Forbidden: 0, 429 Too Many Requests: 200)
+2025-11-04 23:22:02 - INFO - * Timeout: 0
+2025-11-04 23:22:02 - INFO - * Ausentes: 0
+2025-11-04 23:22:02 - INFO - * Outros: 0
+2025-11-04 23:22:02 - INFO - Aguardando 120s antes do próximo batch...
+
+2025-11-04 23:24:02 - INFO - Batch 3/5 - Processando itens 401 a 600 (200 itens)...
+2025-11-04 23:24:02 - INFO - Iniciando busca de 'DETALHES' assíncrona para 200 AppIDs com concorrência 1...
+2025-11-04 23:25:27 - INFO - Busca assíncrona concluída.
+2025-11-04 23:25:27 - INFO - --- Busca concluída: ---
+2025-11-04 23:25:27 - INFO - 128 sucesso(s) (64.00%),
+2025-11-04 23:25:27 - INFO - 72 falha(s) (36.00%).
+2025-11-04 23:25:27 - INFO - --- Detalhamento dos erros: ---
+2025-11-04 23:25:27 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-04 23:25:27 - INFO - * Timeout: 0
+2025-11-04 23:25:27 - INFO - * Ausentes: 72
+2025-11-04 23:25:27 - INFO - * Outros: 0
+2025-11-04 23:25:27 - INFO - Aguardando 120s antes do próximo batch...
+
+2025-11-04 23:27:27 - INFO - Batch 4/5 - Processando itens 601 a 800 (200 itens)...
+2025-11-04 23:27:27 - INFO - Iniciando busca de 'DETALHES' assíncrona para 200 AppIDs com concorrência 1...
+2025-11-04 23:28:48 - INFO - Busca assíncrona concluída.
+2025-11-04 23:28:48 - INFO - --- Busca concluída: ---
+2025-11-04 23:28:48 - INFO - 0 sucesso(s) (0.00%),
+2025-11-04 23:28:48 - INFO - 200 falha(s) (100.00%).
+2025-11-04 23:28:48 - INFO - --- Detalhamento dos erros: ---
+2025-11-04 23:28:48 - INFO - * HTTP: 200 (403 Forbidden: 0, 429 Too Many Requests: 200)
+2025-11-04 23:28:48 - INFO - * Timeout: 0
+2025-11-04 23:28:48 - INFO - * Ausentes: 0
+2025-11-04 23:28:48 - INFO - * Outros: 0
+2025-11-04 23:28:48 - INFO - Aguardando 120s antes do próximo batch...
+
+2025-11-04 23:30:48 - INFO - Batch 5/5 - Processando itens 801 a 1000 (200 itens)...
+2025-11-04 23:30:48 - INFO - Iniciando busca de 'DETALHES' assíncrona para 200 AppIDs com concorrência 1...
+2025-11-04 23:32:16 - INFO - Busca assíncrona concluída.
+2025-11-04 23:32:16 - INFO - --- Busca concluída: ---
+2025-11-04 23:32:16 - INFO - 167 sucesso(s) (83.50%),
+2025-11-04 23:32:16 - INFO - 33 falha(s) (16.50%).
+2025-11-04 23:32:16 - INFO - --- Detalhamento dos erros: ---
+2025-11-04 23:32:16 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-04 23:32:16 - INFO - * Timeout: 0
+2025-11-04 23:32:16 - INFO - * Ausentes: 33
+2025-11-04 23:32:16 - INFO - * Outros: 0
+2025-11-04 23:32:16 - INFO - 
+PROCESSAMENTO COMPLETO!
+2025-11-04 23:32:16 - INFO - Total processado: 308 sucessos de 1,000 itens (30.80%)
+2025-11-04 23:32:32 - INFO - Dados de detalhes inseridos com sucesso.
+2025-11-05 00:02:32 - INFO - Número de AppIDs com dados incompletos: 1000
+2025-11-05 00:02:32 - INFO - === PROCESSAMENTO EM BATCHES (REVIEWS) ===
+2025-11-05 00:02:32 - INFO - Total de itens: 1,983
+2025-11-05 00:02:32 - INFO - Tamanho do batch: 500
+2025-11-05 00:02:32 - INFO - Total de batches: 4
+2025-11-05 00:02:32 - INFO - Delay entre batches: 60s
+2025-11-05 00:02:32 - INFO - Concorrência por batch: 3
+2025-11-05 00:02:32 - INFO - ==========================================
+
+2025-11-05 00:02:32 - INFO - Batch 1/4 - Processando itens 1 a 500 (500 itens)...
+2025-11-05 00:02:32 - INFO - Iniciando busca de 'REVIEWS' assíncrona para 500 AppIDs com concorrência 3...
+2025-11-05 00:03:46 - INFO - Busca assíncrona concluída.
+2025-11-05 00:03:46 - INFO - --- Busca concluída: ---
+2025-11-05 00:03:46 - INFO - 225 sucesso(s) (45.00%),
+2025-11-05 00:03:46 - INFO - 275 falha(s) (55.00%).
+2025-11-05 00:03:46 - INFO - --- Detalhamento dos erros: ---
+2025-11-05 00:03:46 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-05 00:03:46 - INFO - * Timeout: 0
+2025-11-05 00:03:46 - INFO - * Ausentes: 275
+2025-11-05 00:03:46 - INFO - * Outros: 0
+2025-11-05 00:03:46 - INFO - Aguardando 60s antes do próximo batch...
+
+2025-11-05 00:04:46 - INFO - Batch 2/4 - Processando itens 501 a 1000 (500 itens)...
+2025-11-05 00:04:46 - INFO - Iniciando busca de 'REVIEWS' assíncrona para 500 AppIDs com concorrência 3...
+2025-11-05 00:06:03 - INFO - Busca assíncrona concluída.
+2025-11-05 00:06:03 - INFO - --- Busca concluída: ---
+2025-11-05 00:06:03 - INFO - 399 sucesso(s) (79.80%),
+2025-11-05 00:06:03 - INFO - 101 falha(s) (20.20%).
+2025-11-05 00:06:03 - INFO - --- Detalhamento dos erros: ---
+2025-11-05 00:06:03 - INFO - * HTTP: 1 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-05 00:06:03 - INFO - * Timeout: 0
+2025-11-05 00:06:03 - INFO - * Ausentes: 100
+2025-11-05 00:06:03 - INFO - * Outros: 0
+2025-11-05 00:06:03 - INFO - Aguardando 60s antes do próximo batch...
+
+2025-11-05 00:07:03 - INFO - Batch 3/4 - Processando itens 1001 a 1500 (500 itens)...
+2025-11-05 00:07:03 - INFO - Iniciando busca de 'REVIEWS' assíncrona para 500 AppIDs com concorrência 3...
+2025-11-05 00:08:16 - INFO - Busca assíncrona concluída.
+2025-11-05 00:08:16 - INFO - --- Busca concluída: ---
+2025-11-05 00:08:16 - INFO - 284 sucesso(s) (56.80%),
+2025-11-05 00:08:16 - INFO - 216 falha(s) (43.20%).
+2025-11-05 00:08:16 - INFO - --- Detalhamento dos erros: ---
+2025-11-05 00:08:16 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-05 00:08:16 - INFO - * Timeout: 0
+2025-11-05 00:08:16 - INFO - * Ausentes: 216
+2025-11-05 00:08:16 - INFO - * Outros: 0
+2025-11-05 00:08:16 - INFO - Aguardando 60s antes do próximo batch...
+
+2025-11-05 00:09:16 - INFO - Batch 4/4 - Processando itens 1501 a 1983 (483 itens)...
+2025-11-05 00:09:16 - INFO - Iniciando busca de 'REVIEWS' assíncrona para 483 AppIDs com concorrência 3...
+2025-11-05 00:10:28 - INFO - Busca assíncrona concluída.
+2025-11-05 00:10:28 - INFO - --- Busca concluída: ---
+2025-11-05 00:10:28 - INFO - 399 sucesso(s) (82.61%),
+2025-11-05 00:10:28 - INFO - 84 falha(s) (17.39%).
+2025-11-05 00:10:28 - INFO - --- Detalhamento dos erros: ---
+2025-11-05 00:10:28 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-05 00:10:28 - INFO - * Timeout: 0
+2025-11-05 00:10:28 - INFO - * Ausentes: 84
+2025-11-05 00:10:28 - INFO - * Outros: 0
+2025-11-05 00:10:28 - INFO - 
+PROCESSAMENTO COMPLETO!
+2025-11-05 00:10:28 - INFO - Total processado: 1,307 sucessos de 1,983 itens (65.91%)
+2025-11-05 00:10:52 - INFO - Dados de reviews inseridos com sucesso.
+2025-11-05 00:10:52 - INFO - Processando aplicativos de 12001 a 14000 de 273744
+2025-11-05 00:10:57 - INFO - Número de AppIDs com dados incompletos: 1000
+2025-11-05 00:10:57 - INFO - Número de AppIDs a processar: 1000
+2025-11-05 00:10:57 - INFO - === PROCESSAMENTO EM BATCHES ===
+2025-11-05 00:10:57 - INFO - Total de itens: 1,000
+2025-11-05 00:10:57 - INFO - Tamanho do batch: 200
+2025-11-05 00:10:57 - INFO - Total de batches: 5
+2025-11-05 00:10:57 - INFO - Delay entre batches: 120s
+2025-11-05 00:10:57 - INFO - Concorrência por batch: 1
+2025-11-05 00:10:57 - INFO - ================================
+
+2025-11-05 00:10:57 - INFO - Batch 1/5 - Processando itens 1 a 200 (200 itens)...
+2025-11-05 00:10:57 - INFO - Iniciando busca de 'DETALHES' assíncrona para 200 AppIDs com concorrência 1...
+2025-11-05 00:12:22 - INFO - Busca assíncrona concluída.
+2025-11-05 00:12:22 - INFO - --- Busca concluída: ---
+2025-11-05 00:12:22 - INFO - 110 sucesso(s) (55.00%),
+2025-11-05 00:12:22 - INFO - 90 falha(s) (45.00%).
+2025-11-05 00:12:22 - INFO - --- Detalhamento dos erros: ---
+2025-11-05 00:12:22 - INFO - * HTTP: 1 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-05 00:12:22 - INFO - * Timeout: 0
+2025-11-05 00:12:22 - INFO - * Ausentes: 89
+2025-11-05 00:12:22 - INFO - * Outros: 0
+2025-11-05 00:12:22 - INFO - Aguardando 120s antes do próximo batch...
+
+2025-11-05 00:14:22 - INFO - Batch 2/5 - Processando itens 201 a 400 (200 itens)...
+2025-11-05 00:14:22 - INFO - Iniciando busca de 'DETALHES' assíncrona para 200 AppIDs com concorrência 1...
+2025-11-05 00:15:38 - INFO - Busca assíncrona concluída.
+2025-11-05 00:15:38 - INFO - --- Busca concluída: ---
+2025-11-05 00:15:38 - INFO - 1 sucesso(s) (0.50%),
+2025-11-05 00:15:38 - INFO - 199 falha(s) (99.50%).
+2025-11-05 00:15:38 - INFO - --- Detalhamento dos erros: ---
+2025-11-05 00:15:38 - INFO - * HTTP: 199 (403 Forbidden: 0, 429 Too Many Requests: 199)
+2025-11-05 00:15:38 - INFO - * Timeout: 0
+2025-11-05 00:15:38 - INFO - * Ausentes: 0
+2025-11-05 00:15:38 - INFO - * Outros: 0
+2025-11-05 00:15:38 - INFO - Aguardando 120s antes do próximo batch...
+
+2025-11-05 00:17:38 - INFO - Batch 3/5 - Processando itens 401 a 600 (200 itens)...
+2025-11-05 00:17:38 - INFO - Iniciando busca de 'DETALHES' assíncrona para 200 AppIDs com concorrência 1...
+2025-11-05 00:18:57 - INFO - Busca assíncrona concluída.
+2025-11-05 00:18:57 - INFO - --- Busca concluída: ---
+2025-11-05 00:18:57 - INFO - 104 sucesso(s) (52.00%),
+2025-11-05 00:18:57 - INFO - 96 falha(s) (48.00%).
+2025-11-05 00:18:57 - INFO - --- Detalhamento dos erros: ---
+2025-11-05 00:18:57 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-05 00:18:57 - INFO - * Timeout: 0
+2025-11-05 00:18:57 - INFO - * Ausentes: 96
+2025-11-05 00:18:57 - INFO - * Outros: 0
+2025-11-05 00:18:57 - INFO - Aguardando 120s antes do próximo batch...
+
+2025-11-05 00:20:57 - INFO - Batch 4/5 - Processando itens 601 a 800 (200 itens)...
+2025-11-05 00:20:57 - INFO - Iniciando busca de 'DETALHES' assíncrona para 200 AppIDs com concorrência 1...
+2025-11-05 00:22:16 - INFO - Busca assíncrona concluída.
+2025-11-05 00:22:16 - INFO - --- Busca concluída: ---
+2025-11-05 00:22:16 - INFO - 0 sucesso(s) (0.00%),
+2025-11-05 00:22:16 - INFO - 200 falha(s) (100.00%).
+2025-11-05 00:22:16 - INFO - --- Detalhamento dos erros: ---
+2025-11-05 00:22:16 - INFO - * HTTP: 200 (403 Forbidden: 0, 429 Too Many Requests: 200)
+2025-11-05 00:22:16 - INFO - * Timeout: 0
+2025-11-05 00:22:16 - INFO - * Ausentes: 0
+2025-11-05 00:22:16 - INFO - * Outros: 0
+2025-11-05 00:22:16 - INFO - Aguardando 120s antes do próximo batch...
+
+2025-11-05 00:24:16 - INFO - Batch 5/5 - Processando itens 801 a 1000 (200 itens)...
+2025-11-05 00:24:16 - INFO - Iniciando busca de 'DETALHES' assíncrona para 200 AppIDs com concorrência 1...
+2025-11-05 00:25:41 - INFO - Busca assíncrona concluída.
+2025-11-05 00:25:41 - INFO - --- Busca concluída: ---
+2025-11-05 00:25:41 - INFO - 152 sucesso(s) (76.00%),
+2025-11-05 00:25:41 - INFO - 48 falha(s) (24.00%).
+2025-11-05 00:25:41 - INFO - --- Detalhamento dos erros: ---
+2025-11-05 00:25:41 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-05 00:25:41 - INFO - * Timeout: 0
+2025-11-05 00:25:41 - INFO - * Ausentes: 48
+2025-11-05 00:25:41 - INFO - * Outros: 0
+2025-11-05 00:25:41 - INFO - 
+PROCESSAMENTO COMPLETO!
+2025-11-05 00:25:41 - INFO - Total processado: 367 sucessos de 1,000 itens (36.70%)
+2025-11-05 00:25:59 - INFO - Dados de detalhes inseridos com sucesso.
+2025-11-05 00:55:59 - INFO - Número de AppIDs com dados incompletos: 1000
+2025-11-05 00:55:59 - INFO - === PROCESSAMENTO EM BATCHES (REVIEWS) ===
+2025-11-05 00:55:59 - INFO - Total de itens: 2,000
+2025-11-05 00:55:59 - INFO - Tamanho do batch: 500
+2025-11-05 00:55:59 - INFO - Total de batches: 4
+2025-11-05 00:55:59 - INFO - Delay entre batches: 60s
+2025-11-05 00:55:59 - INFO - Concorrência por batch: 3
+2025-11-05 00:55:59 - INFO - ==========================================
+
+2025-11-05 00:55:59 - INFO - Batch 1/4 - Processando itens 1 a 500 (500 itens)...
+2025-11-05 00:55:59 - INFO - Iniciando busca de 'REVIEWS' assíncrona para 500 AppIDs com concorrência 3...
+2025-11-05 00:57:16 - INFO - Busca assíncrona concluída.
+2025-11-05 00:57:16 - INFO - --- Busca concluída: ---
+2025-11-05 00:57:16 - INFO - 328 sucesso(s) (65.60%),
+2025-11-05 00:57:16 - INFO - 172 falha(s) (34.40%).
+2025-11-05 00:57:16 - INFO - --- Detalhamento dos erros: ---
+2025-11-05 00:57:16 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-05 00:57:16 - INFO - * Timeout: 0
+2025-11-05 00:57:16 - INFO - * Ausentes: 172
+2025-11-05 00:57:16 - INFO - * Outros: 0
+2025-11-05 00:57:16 - INFO - Aguardando 60s antes do próximo batch...
+
+2025-11-05 00:58:16 - INFO - Batch 2/4 - Processando itens 501 a 1000 (500 itens)...
+2025-11-05 00:58:16 - INFO - Iniciando busca de 'REVIEWS' assíncrona para 500 AppIDs com concorrência 3...
+2025-11-05 00:59:32 - INFO - Busca assíncrona concluída.
+2025-11-05 00:59:32 - INFO - --- Busca concluída: ---
+2025-11-05 00:59:32 - INFO - 353 sucesso(s) (70.60%),
+2025-11-05 00:59:32 - INFO - 147 falha(s) (29.40%).
+2025-11-05 00:59:32 - INFO - --- Detalhamento dos erros: ---
+2025-11-05 00:59:32 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-05 00:59:32 - INFO - * Timeout: 0
+2025-11-05 00:59:32 - INFO - * Ausentes: 147
+2025-11-05 00:59:32 - INFO - * Outros: 0
+2025-11-05 00:59:32 - INFO - Aguardando 60s antes do próximo batch...
+
+2025-11-05 01:00:32 - INFO - Batch 3/4 - Processando itens 1001 a 1500 (500 itens)...
+2025-11-05 01:00:32 - INFO - Iniciando busca de 'REVIEWS' assíncrona para 500 AppIDs com concorrência 3...
+2025-11-05 01:01:48 - INFO - Busca assíncrona concluída.
+2025-11-05 01:01:48 - INFO - --- Busca concluída: ---
+2025-11-05 01:01:48 - INFO - 273 sucesso(s) (54.60%),
+2025-11-05 01:01:48 - INFO - 227 falha(s) (45.40%).
+2025-11-05 01:01:48 - INFO - --- Detalhamento dos erros: ---
+2025-11-05 01:01:48 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-05 01:01:48 - INFO - * Timeout: 0
+2025-11-05 01:01:48 - INFO - * Ausentes: 227
+2025-11-05 01:01:48 - INFO - * Outros: 0
+2025-11-05 01:01:48 - INFO - Aguardando 60s antes do próximo batch...
+
+2025-11-05 01:02:48 - INFO - Batch 4/4 - Processando itens 1501 a 2000 (500 itens)...
+2025-11-05 01:02:48 - INFO - Iniciando busca de 'REVIEWS' assíncrona para 500 AppIDs com concorrência 3...
+2025-11-05 01:04:05 - INFO - Busca assíncrona concluída.
+2025-11-05 01:04:05 - INFO - --- Busca concluída: ---
+2025-11-05 01:04:05 - INFO - 412 sucesso(s) (82.40%),
+2025-11-05 01:04:05 - INFO - 88 falha(s) (17.60%).
+2025-11-05 01:04:05 - INFO - --- Detalhamento dos erros: ---
+2025-11-05 01:04:05 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-05 01:04:05 - INFO - * Timeout: 0
+2025-11-05 01:04:05 - INFO - * Ausentes: 88
+2025-11-05 01:04:05 - INFO - * Outros: 0
+2025-11-05 01:04:05 - INFO - 
+PROCESSAMENTO COMPLETO!
+2025-11-05 01:04:05 - INFO - Total processado: 1,366 sucessos de 2,000 itens (68.30%)
+2025-11-05 01:04:32 - INFO - Dados de reviews inseridos com sucesso.
+2025-11-05 01:04:32 - INFO - Processando aplicativos de 14001 a 16000 de 273744
+2025-11-05 01:04:36 - INFO - Número de AppIDs com dados incompletos: 1000
+2025-11-05 01:04:36 - INFO - Número de AppIDs a processar: 1173
+2025-11-05 01:04:36 - INFO - === PROCESSAMENTO EM BATCHES ===
+2025-11-05 01:04:36 - INFO - Total de itens: 1,173
+2025-11-05 01:04:36 - INFO - Tamanho do batch: 200
+2025-11-05 01:04:36 - INFO - Total de batches: 6
+2025-11-05 01:04:36 - INFO - Delay entre batches: 120s
+2025-11-05 01:04:36 - INFO - Concorrência por batch: 1
+2025-11-05 01:04:36 - INFO - ================================
+
+2025-11-05 01:04:36 - INFO - Batch 1/6 - Processando itens 1 a 200 (200 itens)...
+2025-11-05 01:04:36 - INFO - Iniciando busca de 'DETALHES' assíncrona para 200 AppIDs com concorrência 1...
+2025-11-05 01:05:57 - INFO - Busca assíncrona concluída.
+2025-11-05 01:05:57 - INFO - --- Busca concluída: ---
+2025-11-05 01:05:57 - INFO - 114 sucesso(s) (57.00%),
+2025-11-05 01:05:57 - INFO - 86 falha(s) (43.00%).
+2025-11-05 01:05:57 - INFO - --- Detalhamento dos erros: ---
+2025-11-05 01:05:57 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-05 01:05:57 - INFO - * Timeout: 0
+2025-11-05 01:05:57 - INFO - * Ausentes: 86
+2025-11-05 01:05:57 - INFO - * Outros: 0
+2025-11-05 01:05:57 - INFO - Aguardando 120s antes do próximo batch...
+
+2025-11-05 01:07:57 - INFO - Batch 2/6 - Processando itens 201 a 400 (200 itens)...
+2025-11-05 01:07:57 - INFO - Iniciando busca de 'DETALHES' assíncrona para 200 AppIDs com concorrência 1...
+2025-11-05 01:09:14 - INFO - Busca assíncrona concluída.
+2025-11-05 01:09:14 - INFO - --- Busca concluída: ---
+2025-11-05 01:09:14 - INFO - 0 sucesso(s) (0.00%),
+2025-11-05 01:09:14 - INFO - 200 falha(s) (100.00%).
+2025-11-05 01:09:14 - INFO - --- Detalhamento dos erros: ---
+2025-11-05 01:09:14 - INFO - * HTTP: 200 (403 Forbidden: 0, 429 Too Many Requests: 200)
+2025-11-05 01:09:14 - INFO - * Timeout: 0
+2025-11-05 01:09:14 - INFO - * Ausentes: 0
+2025-11-05 01:09:14 - INFO - * Outros: 0
+2025-11-05 01:09:14 - INFO - Aguardando 120s antes do próximo batch...
+
+2025-11-05 01:11:14 - INFO - Batch 3/6 - Processando itens 401 a 600 (200 itens)...
+2025-11-05 01:11:14 - INFO - Iniciando busca de 'DETALHES' assíncrona para 200 AppIDs com concorrência 1...
+2025-11-05 01:12:34 - INFO - Busca assíncrona concluída.
+2025-11-05 01:12:34 - INFO - --- Busca concluída: ---
+2025-11-05 01:12:34 - INFO - 158 sucesso(s) (79.00%),
+2025-11-05 01:12:34 - INFO - 42 falha(s) (21.00%).
+2025-11-05 01:12:34 - INFO - --- Detalhamento dos erros: ---
+2025-11-05 01:12:34 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-05 01:12:34 - INFO - * Timeout: 0
+2025-11-05 01:12:34 - INFO - * Ausentes: 42
+2025-11-05 01:12:34 - INFO - * Outros: 0
+2025-11-05 01:12:34 - INFO - Aguardando 120s antes do próximo batch...
+
+2025-11-05 01:14:34 - INFO - Batch 4/6 - Processando itens 601 a 800 (200 itens)...
+2025-11-05 01:14:34 - INFO - Iniciando busca de 'DETALHES' assíncrona para 200 AppIDs com concorrência 1...
+2025-11-05 01:15:50 - INFO - Busca assíncrona concluída.
+2025-11-05 01:15:50 - INFO - --- Busca concluída: ---
+2025-11-05 01:15:50 - INFO - 0 sucesso(s) (0.00%),
+2025-11-05 01:15:50 - INFO - 200 falha(s) (100.00%).
+2025-11-05 01:15:50 - INFO - --- Detalhamento dos erros: ---
+2025-11-05 01:15:50 - INFO - * HTTP: 200 (403 Forbidden: 0, 429 Too Many Requests: 200)
+2025-11-05 01:15:50 - INFO - * Timeout: 0
+2025-11-05 01:15:50 - INFO - * Ausentes: 0
+2025-11-05 01:15:50 - INFO - * Outros: 0
+2025-11-05 01:15:50 - INFO - Aguardando 120s antes do próximo batch...
+
+2025-11-05 01:17:50 - INFO - Batch 5/6 - Processando itens 801 a 1000 (200 itens)...
+2025-11-05 01:17:50 - INFO - Iniciando busca de 'DETALHES' assíncrona para 200 AppIDs com concorrência 1...
+2025-11-05 01:19:14 - INFO - Busca assíncrona concluída.
+2025-11-05 01:19:14 - INFO - --- Busca concluída: ---
+2025-11-05 01:19:14 - INFO - 142 sucesso(s) (71.00%),
+2025-11-05 01:19:14 - INFO - 58 falha(s) (29.00%).
+2025-11-05 01:19:14 - INFO - --- Detalhamento dos erros: ---
+2025-11-05 01:19:14 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-05 01:19:14 - INFO - * Timeout: 0
+2025-11-05 01:19:14 - INFO - * Ausentes: 58
+2025-11-05 01:19:14 - INFO - * Outros: 0
+2025-11-05 01:19:14 - INFO - Aguardando 120s antes do próximo batch...
+
+2025-11-05 01:21:14 - INFO - Batch 6/6 - Processando itens 1001 a 1173 (173 itens)...
+2025-11-05 01:21:14 - INFO - Iniciando busca de 'DETALHES' assíncrona para 173 AppIDs com concorrência 1...
+2025-11-05 01:22:19 - INFO - Busca assíncrona concluída.
+2025-11-05 01:22:19 - INFO - --- Busca concluída: ---
+2025-11-05 01:22:19 - INFO - 0 sucesso(s) (0.00%),
+2025-11-05 01:22:19 - INFO - 173 falha(s) (100.00%).
+2025-11-05 01:22:19 - INFO - --- Detalhamento dos erros: ---
+2025-11-05 01:22:19 - INFO - * HTTP: 173 (403 Forbidden: 0, 429 Too Many Requests: 173)
+2025-11-05 01:22:19 - INFO - * Timeout: 0
+2025-11-05 01:22:19 - INFO - * Ausentes: 0
+2025-11-05 01:22:19 - INFO - * Outros: 0
+2025-11-05 01:22:19 - INFO - 
+PROCESSAMENTO COMPLETO!
+2025-11-05 01:22:19 - INFO - Total processado: 414 sucessos de 1,173 itens (35.29%)
+2025-11-05 01:22:39 - INFO - Dados de detalhes inseridos com sucesso.
+2025-11-05 01:52:39 - INFO - Número de AppIDs com dados incompletos: 1000
+2025-11-05 01:52:39 - INFO - === PROCESSAMENTO EM BATCHES (REVIEWS) ===
+2025-11-05 01:52:39 - INFO - Total de itens: 2,173
+2025-11-05 01:52:39 - INFO - Tamanho do batch: 500
+2025-11-05 01:52:39 - INFO - Total de batches: 5
+2025-11-05 01:52:39 - INFO - Delay entre batches: 60s
+2025-11-05 01:52:39 - INFO - Concorrência por batch: 3
+2025-11-05 01:52:39 - INFO - ==========================================
+
+2025-11-05 01:52:39 - INFO - Batch 1/5 - Processando itens 1 a 500 (500 itens)...
+2025-11-05 01:52:39 - INFO - Iniciando busca de 'REVIEWS' assíncrona para 500 AppIDs com concorrência 3...
+2025-11-05 01:53:52 - INFO - Busca assíncrona concluída.
+2025-11-05 01:53:52 - INFO - --- Busca concluída: ---
+2025-11-05 01:53:52 - INFO - 333 sucesso(s) (66.60%),
+2025-11-05 01:53:52 - INFO - 167 falha(s) (33.40%).
+2025-11-05 01:53:52 - INFO - --- Detalhamento dos erros: ---
+2025-11-05 01:53:52 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-05 01:53:52 - INFO - * Timeout: 0
+2025-11-05 01:53:52 - INFO - * Ausentes: 167
+2025-11-05 01:53:52 - INFO - * Outros: 0
+2025-11-05 01:53:52 - INFO - Aguardando 60s antes do próximo batch...
+
+2025-11-05 01:54:52 - INFO - Batch 2/5 - Processando itens 501 a 1000 (500 itens)...
+2025-11-05 01:54:52 - INFO - Iniciando busca de 'REVIEWS' assíncrona para 500 AppIDs com concorrência 3...
+2025-11-05 01:56:06 - INFO - Busca assíncrona concluída.
+2025-11-05 01:56:06 - INFO - --- Busca concluída: ---
+2025-11-05 01:56:06 - INFO - 330 sucesso(s) (66.00%),
+2025-11-05 01:56:06 - INFO - 170 falha(s) (34.00%).
+2025-11-05 01:56:06 - INFO - --- Detalhamento dos erros: ---
+2025-11-05 01:56:06 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-05 01:56:06 - INFO - * Timeout: 0
+2025-11-05 01:56:06 - INFO - * Ausentes: 170
+2025-11-05 01:56:06 - INFO - * Outros: 0
+2025-11-05 01:56:06 - INFO - Aguardando 60s antes do próximo batch...
+
+2025-11-05 01:57:06 - INFO - Batch 3/5 - Processando itens 1001 a 1500 (500 itens)...
+2025-11-05 01:57:06 - INFO - Iniciando busca de 'REVIEWS' assíncrona para 500 AppIDs com concorrência 3...
+2025-11-05 01:58:20 - INFO - Busca assíncrona concluída.
+2025-11-05 01:58:20 - INFO - --- Busca concluída: ---
+2025-11-05 01:58:20 - INFO - 250 sucesso(s) (50.00%),
+2025-11-05 01:58:20 - INFO - 250 falha(s) (50.00%).
+2025-11-05 01:58:20 - INFO - --- Detalhamento dos erros: ---
+2025-11-05 01:58:20 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-05 01:58:20 - INFO - * Timeout: 0
+2025-11-05 01:58:20 - INFO - * Ausentes: 250
+2025-11-05 01:58:20 - INFO - * Outros: 0
+2025-11-05 01:58:20 - INFO - Aguardando 60s antes do próximo batch...
+
+2025-11-05 01:59:20 - INFO - Batch 4/5 - Processando itens 1501 a 2000 (500 itens)...
+2025-11-05 01:59:20 - INFO - Iniciando busca de 'REVIEWS' assíncrona para 500 AppIDs com concorrência 3...
+2025-11-05 02:00:35 - INFO - Busca assíncrona concluída.
+2025-11-05 02:00:35 - INFO - --- Busca concluída: ---
+2025-11-05 02:00:35 - INFO - 420 sucesso(s) (84.00%),
+2025-11-05 02:00:35 - INFO - 80 falha(s) (16.00%).
+2025-11-05 02:00:35 - INFO - --- Detalhamento dos erros: ---
+2025-11-05 02:00:35 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-05 02:00:35 - INFO - * Timeout: 0
+2025-11-05 02:00:35 - INFO - * Ausentes: 80
+2025-11-05 02:00:35 - INFO - * Outros: 0
+2025-11-05 02:00:35 - INFO - Aguardando 60s antes do próximo batch...
+
+2025-11-05 02:01:35 - INFO - Batch 5/5 - Processando itens 2001 a 2173 (173 itens)...
+2025-11-05 02:01:35 - INFO - Iniciando busca de 'REVIEWS' assíncrona para 173 AppIDs com concorrência 3...
+2025-11-05 02:02:00 - INFO - Busca assíncrona concluída.
+2025-11-05 02:02:00 - INFO - --- Busca concluída: ---
+2025-11-05 02:02:00 - INFO - 141 sucesso(s) (81.50%),
+2025-11-05 02:02:00 - INFO - 32 falha(s) (18.50%).
+2025-11-05 02:02:00 - INFO - --- Detalhamento dos erros: ---
+2025-11-05 02:02:00 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-05 02:02:00 - INFO - * Timeout: 0
+2025-11-05 02:02:00 - INFO - * Ausentes: 32
+2025-11-05 02:02:00 - INFO - * Outros: 0
+2025-11-05 02:02:00 - INFO - 
+PROCESSAMENTO COMPLETO!
+2025-11-05 02:02:00 - INFO - Total processado: 1,474 sucessos de 2,173 itens (67.83%)
+2025-11-05 02:02:28 - INFO - Dados de reviews inseridos com sucesso.
+2025-11-05 02:02:28 - INFO - Processando aplicativos de 16001 a 18000 de 273744
+2025-11-05 02:02:32 - INFO - Número de AppIDs com dados incompletos: 1000
+2025-11-05 02:02:32 - INFO - Número de AppIDs a processar: 1131
+2025-11-05 02:02:32 - INFO - === PROCESSAMENTO EM BATCHES ===
+2025-11-05 02:02:32 - INFO - Total de itens: 1,131
+2025-11-05 02:02:32 - INFO - Tamanho do batch: 200
+2025-11-05 02:02:32 - INFO - Total de batches: 6
+2025-11-05 02:02:32 - INFO - Delay entre batches: 120s
+2025-11-05 02:02:32 - INFO - Concorrência por batch: 1
+2025-11-05 02:02:32 - INFO - ================================
+
+2025-11-05 02:02:32 - INFO - Batch 1/6 - Processando itens 1 a 200 (200 itens)...
+2025-11-05 02:02:32 - INFO - Iniciando busca de 'DETALHES' assíncrona para 200 AppIDs com concorrência 1...
+2025-11-05 02:03:51 - INFO - Busca assíncrona concluída.
+2025-11-05 02:03:51 - INFO - --- Busca concluída: ---
+2025-11-05 02:03:51 - INFO - 161 sucesso(s) (80.50%),
+2025-11-05 02:03:51 - INFO - 39 falha(s) (19.50%).
+2025-11-05 02:03:51 - INFO - --- Detalhamento dos erros: ---
+2025-11-05 02:03:51 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-05 02:03:51 - INFO - * Timeout: 0
+2025-11-05 02:03:51 - INFO - * Ausentes: 39
+2025-11-05 02:03:51 - INFO - * Outros: 0
+2025-11-05 02:03:51 - INFO - Aguardando 120s antes do próximo batch...
+
+2025-11-05 02:05:51 - INFO - Batch 2/6 - Processando itens 201 a 400 (200 itens)...
+2025-11-05 02:05:51 - INFO - Iniciando busca de 'DETALHES' assíncrona para 200 AppIDs com concorrência 1...
+2025-11-05 02:07:05 - INFO - Busca assíncrona concluída.
+2025-11-05 02:07:05 - INFO - --- Busca concluída: ---
+2025-11-05 02:07:05 - INFO - 0 sucesso(s) (0.00%),
+2025-11-05 02:07:05 - INFO - 200 falha(s) (100.00%).
+2025-11-05 02:07:05 - INFO - --- Detalhamento dos erros: ---
+2025-11-05 02:07:05 - INFO - * HTTP: 200 (403 Forbidden: 0, 429 Too Many Requests: 200)
+2025-11-05 02:07:05 - INFO - * Timeout: 0
+2025-11-05 02:07:05 - INFO - * Ausentes: 0
+2025-11-05 02:07:05 - INFO - * Outros: 0
+2025-11-05 02:07:05 - INFO - Aguardando 120s antes do próximo batch...
+
+2025-11-05 02:09:05 - INFO - Batch 3/6 - Processando itens 401 a 600 (200 itens)...
+2025-11-05 02:09:05 - INFO - Iniciando busca de 'DETALHES' assíncrona para 200 AppIDs com concorrência 1...
+2025-11-05 02:10:26 - INFO - Busca assíncrona concluída.
+2025-11-05 02:10:26 - INFO - --- Busca concluída: ---
+2025-11-05 02:10:26 - INFO - 155 sucesso(s) (77.50%),
+2025-11-05 02:10:26 - INFO - 45 falha(s) (22.50%).
+2025-11-05 02:10:26 - INFO - --- Detalhamento dos erros: ---
+2025-11-05 02:10:26 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-05 02:10:26 - INFO - * Timeout: 0
+2025-11-05 02:10:26 - INFO - * Ausentes: 45
+2025-11-05 02:10:26 - INFO - * Outros: 0
+2025-11-05 02:10:26 - INFO - Aguardando 120s antes do próximo batch...
+
+2025-11-05 02:12:26 - INFO - Batch 4/6 - Processando itens 601 a 800 (200 itens)...
+2025-11-05 02:12:26 - INFO - Iniciando busca de 'DETALHES' assíncrona para 200 AppIDs com concorrência 1...
+2025-11-05 02:13:42 - INFO - Busca assíncrona concluída.
+2025-11-05 02:13:42 - INFO - --- Busca concluída: ---
+2025-11-05 02:13:42 - INFO - 0 sucesso(s) (0.00%),
+2025-11-05 02:13:42 - INFO - 200 falha(s) (100.00%).
+2025-11-05 02:13:42 - INFO - --- Detalhamento dos erros: ---
+2025-11-05 02:13:42 - INFO - * HTTP: 200 (403 Forbidden: 0, 429 Too Many Requests: 200)
+2025-11-05 02:13:42 - INFO - * Timeout: 0
+2025-11-05 02:13:42 - INFO - * Ausentes: 0
+2025-11-05 02:13:42 - INFO - * Outros: 0
+2025-11-05 02:13:42 - INFO - Aguardando 120s antes do próximo batch...
+
+2025-11-05 02:15:42 - INFO - Batch 5/6 - Processando itens 801 a 1000 (200 itens)...
+2025-11-05 02:15:42 - INFO - Iniciando busca de 'DETALHES' assíncrona para 200 AppIDs com concorrência 1...
+2025-11-05 02:17:07 - INFO - Busca assíncrona concluída.
+2025-11-05 02:17:07 - INFO - --- Busca concluída: ---
+2025-11-05 02:17:07 - INFO - 150 sucesso(s) (75.00%),
+2025-11-05 02:17:07 - INFO - 50 falha(s) (25.00%).
+2025-11-05 02:17:07 - INFO - --- Detalhamento dos erros: ---
+2025-11-05 02:17:07 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-05 02:17:07 - INFO - * Timeout: 0
+2025-11-05 02:17:07 - INFO - * Ausentes: 50
+2025-11-05 02:17:07 - INFO - * Outros: 0
+2025-11-05 02:17:07 - INFO - Aguardando 120s antes do próximo batch...
+
+2025-11-05 02:19:07 - INFO - Batch 6/6 - Processando itens 1001 a 1131 (131 itens)...
+2025-11-05 02:19:07 - INFO - Iniciando busca de 'DETALHES' assíncrona para 131 AppIDs com concorrência 1...
+2025-11-05 02:19:56 - INFO - Busca assíncrona concluída.
+2025-11-05 02:19:56 - INFO - --- Busca concluída: ---
+2025-11-05 02:19:56 - INFO - 0 sucesso(s) (0.00%),
+2025-11-05 02:19:56 - INFO - 131 falha(s) (100.00%).
+2025-11-05 02:19:56 - INFO - --- Detalhamento dos erros: ---
+2025-11-05 02:19:56 - INFO - * HTTP: 131 (403 Forbidden: 0, 429 Too Many Requests: 131)
+2025-11-05 02:19:56 - INFO - * Timeout: 0
+2025-11-05 02:19:56 - INFO - * Ausentes: 0
+2025-11-05 02:19:56 - INFO - * Outros: 0
+2025-11-05 02:19:56 - INFO - 
+PROCESSAMENTO COMPLETO!
+2025-11-05 02:19:56 - INFO - Total processado: 466 sucessos de 1,131 itens (41.20%)
+2025-11-05 02:20:17 - INFO - Dados de detalhes inseridos com sucesso.
+2025-11-05 02:50:17 - INFO - Número de AppIDs com dados incompletos: 1000
+2025-11-05 02:50:17 - INFO - === PROCESSAMENTO EM BATCHES (REVIEWS) ===
+2025-11-05 02:50:17 - INFO - Total de itens: 2,131
+2025-11-05 02:50:17 - INFO - Tamanho do batch: 500
+2025-11-05 02:50:17 - INFO - Total de batches: 5
+2025-11-05 02:50:17 - INFO - Delay entre batches: 60s
+2025-11-05 02:50:17 - INFO - Concorrência por batch: 3
+2025-11-05 02:50:17 - INFO - ==========================================
+
+2025-11-05 02:50:17 - INFO - Batch 1/5 - Processando itens 1 a 500 (500 itens)...
+2025-11-05 02:50:17 - INFO - Iniciando busca de 'REVIEWS' assíncrona para 500 AppIDs com concorrência 3...
+2025-11-05 02:51:30 - INFO - Busca assíncrona concluída.
+2025-11-05 02:51:30 - INFO - --- Busca concluída: ---
+2025-11-05 02:51:30 - INFO - 345 sucesso(s) (69.00%),
+2025-11-05 02:51:30 - INFO - 155 falha(s) (31.00%).
+2025-11-05 02:51:30 - INFO - --- Detalhamento dos erros: ---
+2025-11-05 02:51:30 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-05 02:51:30 - INFO - * Timeout: 0
+2025-11-05 02:51:30 - INFO - * Ausentes: 155
+2025-11-05 02:51:30 - INFO - * Outros: 0
+2025-11-05 02:51:30 - INFO - Aguardando 60s antes do próximo batch...
+
+2025-11-05 02:52:30 - INFO - Batch 2/5 - Processando itens 501 a 1000 (500 itens)...
+2025-11-05 02:52:30 - INFO - Iniciando busca de 'REVIEWS' assíncrona para 500 AppIDs com concorrência 3...
+2025-11-05 02:53:43 - INFO - Busca assíncrona concluída.
+2025-11-05 02:53:43 - INFO - --- Busca concluída: ---
+2025-11-05 02:53:43 - INFO - 318 sucesso(s) (63.60%),
+2025-11-05 02:53:43 - INFO - 182 falha(s) (36.40%).
+2025-11-05 02:53:43 - INFO - --- Detalhamento dos erros: ---
+2025-11-05 02:53:43 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-05 02:53:43 - INFO - * Timeout: 0
+2025-11-05 02:53:43 - INFO - * Ausentes: 182
+2025-11-05 02:53:43 - INFO - * Outros: 0
+2025-11-05 02:53:43 - INFO - Aguardando 60s antes do próximo batch...
+
+2025-11-05 02:54:43 - INFO - Batch 3/5 - Processando itens 1001 a 1500 (500 itens)...
+2025-11-05 02:54:43 - INFO - Iniciando busca de 'REVIEWS' assíncrona para 500 AppIDs com concorrência 3...
+2025-11-05 02:55:57 - INFO - Busca assíncrona concluída.
+2025-11-05 02:55:57 - INFO - --- Busca concluída: ---
+2025-11-05 02:55:57 - INFO - 262 sucesso(s) (52.40%),
+2025-11-05 02:55:57 - INFO - 238 falha(s) (47.60%).
+2025-11-05 02:55:57 - INFO - --- Detalhamento dos erros: ---
+2025-11-05 02:55:57 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-05 02:55:57 - INFO - * Timeout: 0
+2025-11-05 02:55:57 - INFO - * Ausentes: 238
+2025-11-05 02:55:57 - INFO - * Outros: 0
+2025-11-05 02:55:57 - INFO - Aguardando 60s antes do próximo batch...
+
+2025-11-05 02:56:57 - INFO - Batch 4/5 - Processando itens 1501 a 2000 (500 itens)...
+2025-11-05 02:56:57 - INFO - Iniciando busca de 'REVIEWS' assíncrona para 500 AppIDs com concorrência 3...
+2025-11-05 02:58:12 - INFO - Busca assíncrona concluída.
+2025-11-05 02:58:12 - INFO - --- Busca concluída: ---
+2025-11-05 02:58:12 - INFO - 412 sucesso(s) (82.40%),
+2025-11-05 02:58:12 - INFO - 88 falha(s) (17.60%).
+2025-11-05 02:58:12 - INFO - --- Detalhamento dos erros: ---
+2025-11-05 02:58:12 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-05 02:58:12 - INFO - * Timeout: 0
+2025-11-05 02:58:12 - INFO - * Ausentes: 88
+2025-11-05 02:58:12 - INFO - * Outros: 0
+2025-11-05 02:58:12 - INFO - Aguardando 60s antes do próximo batch...
+
+2025-11-05 02:59:12 - INFO - Batch 5/5 - Processando itens 2001 a 2131 (131 itens)...
+2025-11-05 02:59:12 - INFO - Iniciando busca de 'REVIEWS' assíncrona para 131 AppIDs com concorrência 3...
+2025-11-05 02:59:32 - INFO - Busca assíncrona concluída.
+2025-11-05 02:59:32 - INFO - --- Busca concluída: ---
+2025-11-05 02:59:32 - INFO - 109 sucesso(s) (83.21%),
+2025-11-05 02:59:32 - INFO - 22 falha(s) (16.79%).
+2025-11-05 02:59:32 - INFO - --- Detalhamento dos erros: ---
+2025-11-05 02:59:32 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-05 02:59:32 - INFO - * Timeout: 0
+2025-11-05 02:59:32 - INFO - * Ausentes: 22
+2025-11-05 02:59:32 - INFO - * Outros: 0
+2025-11-05 02:59:32 - INFO - 
+PROCESSAMENTO COMPLETO!
+2025-11-05 02:59:32 - INFO - Total processado: 1,446 sucessos de 2,131 itens (67.86%)
+2025-11-05 03:00:01 - INFO - Dados de reviews inseridos com sucesso.
+2025-11-05 03:00:01 - INFO - Processando aplicativos de 18001 a 20000 de 273744
+2025-11-05 03:00:05 - INFO - Número de AppIDs com dados incompletos: 1000
+2025-11-05 03:00:05 - INFO - Número de AppIDs a processar: 1123
+2025-11-05 03:00:05 - INFO - === PROCESSAMENTO EM BATCHES ===
+2025-11-05 03:00:05 - INFO - Total de itens: 1,123
+2025-11-05 03:00:05 - INFO - Tamanho do batch: 200
+2025-11-05 03:00:05 - INFO - Total de batches: 6
+2025-11-05 03:00:05 - INFO - Delay entre batches: 120s
+2025-11-05 03:00:05 - INFO - Concorrência por batch: 1
+2025-11-05 03:00:05 - INFO - ================================
+
+2025-11-05 03:00:05 - INFO - Batch 1/6 - Processando itens 1 a 200 (200 itens)...
+2025-11-05 03:00:05 - INFO - Iniciando busca de 'DETALHES' assíncrona para 200 AppIDs com concorrência 1...
+2025-11-05 03:01:23 - INFO - Busca assíncrona concluída.
+2025-11-05 03:01:23 - INFO - --- Busca concluída: ---
+2025-11-05 03:01:23 - INFO - 115 sucesso(s) (57.50%),
+2025-11-05 03:01:23 - INFO - 85 falha(s) (42.50%).
+2025-11-05 03:01:23 - INFO - --- Detalhamento dos erros: ---
+2025-11-05 03:01:23 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-05 03:01:23 - INFO - * Timeout: 0
+2025-11-05 03:01:23 - INFO - * Ausentes: 85
+2025-11-05 03:01:23 - INFO - * Outros: 0
+2025-11-05 03:01:23 - INFO - Aguardando 120s antes do próximo batch...
+
+2025-11-05 03:03:23 - INFO - Batch 2/6 - Processando itens 201 a 400 (200 itens)...
+2025-11-05 03:03:23 - INFO - Iniciando busca de 'DETALHES' assíncrona para 200 AppIDs com concorrência 1...
+2025-11-05 03:04:36 - INFO - Busca assíncrona concluída.
+2025-11-05 03:04:36 - INFO - --- Busca concluída: ---
+2025-11-05 03:04:36 - INFO - 0 sucesso(s) (0.00%),
+2025-11-05 03:04:36 - INFO - 200 falha(s) (100.00%).
+2025-11-05 03:04:36 - INFO - --- Detalhamento dos erros: ---
+2025-11-05 03:04:36 - INFO - * HTTP: 200 (403 Forbidden: 0, 429 Too Many Requests: 200)
+2025-11-05 03:04:36 - INFO - * Timeout: 0
+2025-11-05 03:04:36 - INFO - * Ausentes: 0
+2025-11-05 03:04:36 - INFO - * Outros: 0
+2025-11-05 03:04:36 - INFO - Aguardando 120s antes do próximo batch...
+
+2025-11-05 03:06:36 - INFO - Batch 3/6 - Processando itens 401 a 600 (200 itens)...
+2025-11-05 03:06:36 - INFO - Iniciando busca de 'DETALHES' assíncrona para 200 AppIDs com concorrência 1...
+2025-11-05 03:08:00 - INFO - Busca assíncrona concluída.
+2025-11-05 03:08:00 - INFO - --- Busca concluída: ---
+2025-11-05 03:08:00 - INFO - 164 sucesso(s) (82.00%),
+2025-11-05 03:08:00 - INFO - 36 falha(s) (18.00%).
+2025-11-05 03:08:00 - INFO - --- Detalhamento dos erros: ---
+2025-11-05 03:08:00 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-05 03:08:00 - INFO - * Timeout: 0
+2025-11-05 03:08:00 - INFO - * Ausentes: 36
+2025-11-05 03:08:00 - INFO - * Outros: 0
+2025-11-05 03:08:00 - INFO - Aguardando 120s antes do próximo batch...
+
+2025-11-05 03:10:00 - INFO - Batch 4/6 - Processando itens 601 a 800 (200 itens)...
+2025-11-05 03:10:00 - INFO - Iniciando busca de 'DETALHES' assíncrona para 200 AppIDs com concorrência 1...
+2025-11-05 03:11:13 - INFO - Busca assíncrona concluída.
+2025-11-05 03:11:13 - INFO - --- Busca concluída: ---
+2025-11-05 03:11:13 - INFO - 0 sucesso(s) (0.00%),
+2025-11-05 03:11:13 - INFO - 200 falha(s) (100.00%).
+2025-11-05 03:11:13 - INFO - --- Detalhamento dos erros: ---
+2025-11-05 03:11:13 - INFO - * HTTP: 200 (403 Forbidden: 0, 429 Too Many Requests: 200)
+2025-11-05 03:11:13 - INFO - * Timeout: 0
+2025-11-05 03:11:13 - INFO - * Ausentes: 0
+2025-11-05 03:11:13 - INFO - * Outros: 0
+2025-11-05 03:11:13 - INFO - Aguardando 120s antes do próximo batch...
+
+2025-11-05 03:13:13 - INFO - Batch 5/6 - Processando itens 801 a 1000 (200 itens)...
+2025-11-05 03:13:13 - INFO - Iniciando busca de 'DETALHES' assíncrona para 200 AppIDs com concorrência 1...
+2025-11-05 03:14:35 - INFO - Busca assíncrona concluída.
+2025-11-05 03:14:35 - INFO - --- Busca concluída: ---
+2025-11-05 03:14:35 - INFO - 80 sucesso(s) (40.00%),
+2025-11-05 03:14:35 - INFO - 120 falha(s) (60.00%).
+2025-11-05 03:14:35 - INFO - --- Detalhamento dos erros: ---
+2025-11-05 03:14:35 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-05 03:14:35 - INFO - * Timeout: 0
+2025-11-05 03:14:35 - INFO - * Ausentes: 120
+2025-11-05 03:14:35 - INFO - * Outros: 0
+2025-11-05 03:14:35 - INFO - Aguardando 120s antes do próximo batch...
+
+2025-11-05 03:16:35 - INFO - Batch 6/6 - Processando itens 1001 a 1123 (123 itens)...
+2025-11-05 03:16:35 - INFO - Iniciando busca de 'DETALHES' assíncrona para 123 AppIDs com concorrência 1...
+2025-11-05 03:17:20 - INFO - Busca assíncrona concluída.
+2025-11-05 03:17:20 - INFO - --- Busca concluída: ---
+2025-11-05 03:17:20 - INFO - 0 sucesso(s) (0.00%),
+2025-11-05 03:17:20 - INFO - 123 falha(s) (100.00%).
+2025-11-05 03:17:20 - INFO - --- Detalhamento dos erros: ---
+2025-11-05 03:17:20 - INFO - * HTTP: 123 (403 Forbidden: 0, 429 Too Many Requests: 123)
+2025-11-05 03:17:20 - INFO - * Timeout: 0
+2025-11-05 03:17:20 - INFO - * Ausentes: 0
+2025-11-05 03:17:20 - INFO - * Outros: 0
+2025-11-05 03:17:20 - INFO - 
+PROCESSAMENTO COMPLETO!
+2025-11-05 03:17:20 - INFO - Total processado: 359 sucessos de 1,123 itens (31.97%)
+2025-11-05 03:17:37 - INFO - Dados de detalhes inseridos com sucesso.
+2025-11-05 03:47:37 - INFO - Número de AppIDs com dados incompletos: 1000
+2025-11-05 03:47:37 - INFO - === PROCESSAMENTO EM BATCHES (REVIEWS) ===
+2025-11-05 03:47:37 - INFO - Total de itens: 2,123
+2025-11-05 03:47:37 - INFO - Tamanho do batch: 500
+2025-11-05 03:47:37 - INFO - Total de batches: 5
+2025-11-05 03:47:37 - INFO - Delay entre batches: 60s
+2025-11-05 03:47:37 - INFO - Concorrência por batch: 3
+2025-11-05 03:47:37 - INFO - ==========================================
+
+2025-11-05 03:47:37 - INFO - Batch 1/5 - Processando itens 1 a 500 (500 itens)...
+2025-11-05 03:47:37 - INFO - Iniciando busca de 'REVIEWS' assíncrona para 500 AppIDs com concorrência 3...
+2025-11-05 03:48:51 - INFO - Busca assíncrona concluída.
+2025-11-05 03:48:51 - INFO - --- Busca concluída: ---
+2025-11-05 03:48:51 - INFO - 328 sucesso(s) (65.60%),
+2025-11-05 03:48:51 - INFO - 172 falha(s) (34.40%).
+2025-11-05 03:48:51 - INFO - --- Detalhamento dos erros: ---
+2025-11-05 03:48:51 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-05 03:48:51 - INFO - * Timeout: 0
+2025-11-05 03:48:51 - INFO - * Ausentes: 172
+2025-11-05 03:48:51 - INFO - * Outros: 0
+2025-11-05 03:48:51 - INFO - Aguardando 60s antes do próximo batch...
+
+2025-11-05 03:49:51 - INFO - Batch 2/5 - Processando itens 501 a 1000 (500 itens)...
+2025-11-05 03:49:51 - INFO - Iniciando busca de 'REVIEWS' assíncrona para 500 AppIDs com concorrência 3...
+2025-11-05 03:51:07 - INFO - Busca assíncrona concluída.
+2025-11-05 03:51:07 - INFO - --- Busca concluída: ---
+2025-11-05 03:51:07 - INFO - 259 sucesso(s) (51.80%),
+2025-11-05 03:51:07 - INFO - 241 falha(s) (48.20%).
+2025-11-05 03:51:07 - INFO - --- Detalhamento dos erros: ---
+2025-11-05 03:51:07 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-05 03:51:07 - INFO - * Timeout: 0
+2025-11-05 03:51:07 - INFO - * Ausentes: 241
+2025-11-05 03:51:07 - INFO - * Outros: 0
+2025-11-05 03:51:07 - INFO - Aguardando 60s antes do próximo batch...
+
+2025-11-05 03:52:07 - INFO - Batch 3/5 - Processando itens 1001 a 1500 (500 itens)...
+2025-11-05 03:52:07 - INFO - Iniciando busca de 'REVIEWS' assíncrona para 500 AppIDs com concorrência 3...
+2025-11-05 03:53:24 - INFO - Busca assíncrona concluída.
+2025-11-05 03:53:24 - INFO - --- Busca concluída: ---
+2025-11-05 03:53:24 - INFO - 230 sucesso(s) (46.00%),
+2025-11-05 03:53:24 - INFO - 270 falha(s) (54.00%).
+2025-11-05 03:53:24 - INFO - --- Detalhamento dos erros: ---
+2025-11-05 03:53:24 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-05 03:53:24 - INFO - * Timeout: 0
+2025-11-05 03:53:24 - INFO - * Ausentes: 270
+2025-11-05 03:53:24 - INFO - * Outros: 0
+2025-11-05 03:53:24 - INFO - Aguardando 60s antes do próximo batch...
+
+2025-11-05 03:54:24 - INFO - Batch 4/5 - Processando itens 1501 a 2000 (500 itens)...
+2025-11-05 03:54:24 - INFO - Iniciando busca de 'REVIEWS' assíncrona para 500 AppIDs com concorrência 3...
+2025-11-05 03:55:41 - INFO - Busca assíncrona concluída.
+2025-11-05 03:55:41 - INFO - --- Busca concluída: ---
+2025-11-05 03:55:41 - INFO - 411 sucesso(s) (82.20%),
+2025-11-05 03:55:41 - INFO - 89 falha(s) (17.80%).
+2025-11-05 03:55:41 - INFO - --- Detalhamento dos erros: ---
+2025-11-05 03:55:41 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-05 03:55:41 - INFO - * Timeout: 0
+2025-11-05 03:55:41 - INFO - * Ausentes: 89
+2025-11-05 03:55:41 - INFO - * Outros: 0
+2025-11-05 03:55:41 - INFO - Aguardando 60s antes do próximo batch...
+
+2025-11-05 03:56:41 - INFO - Batch 5/5 - Processando itens 2001 a 2123 (123 itens)...
+2025-11-05 03:56:41 - INFO - Iniciando busca de 'REVIEWS' assíncrona para 123 AppIDs com concorrência 3...
+2025-11-05 03:56:59 - INFO - Busca assíncrona concluída.
+2025-11-05 03:56:59 - INFO - --- Busca concluída: ---
+2025-11-05 03:56:59 - INFO - 102 sucesso(s) (82.93%),
+2025-11-05 03:56:59 - INFO - 21 falha(s) (17.07%).
+2025-11-05 03:56:59 - INFO - --- Detalhamento dos erros: ---
+2025-11-05 03:56:59 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-05 03:56:59 - INFO - * Timeout: 0
+2025-11-05 03:56:59 - INFO - * Ausentes: 21
+2025-11-05 03:56:59 - INFO - * Outros: 0
+2025-11-05 03:56:59 - INFO - 
+PROCESSAMENTO COMPLETO!
+2025-11-05 03:56:59 - INFO - Total processado: 1,330 sucessos de 2,123 itens (62.65%)
+2025-11-05 03:57:25 - INFO - Dados de reviews inseridos com sucesso.
+2025-11-05 03:57:25 - INFO - Processando aplicativos de 20001 a 22000 de 273744
+2025-11-05 03:57:29 - INFO - Número de AppIDs com dados incompletos: 1000
+2025-11-05 03:57:29 - INFO - Número de AppIDs a processar: 1198
+2025-11-05 03:57:29 - INFO - === PROCESSAMENTO EM BATCHES ===
+2025-11-05 03:57:29 - INFO - Total de itens: 1,198
+2025-11-05 03:57:29 - INFO - Tamanho do batch: 200
+2025-11-05 03:57:29 - INFO - Total de batches: 6
+2025-11-05 03:57:29 - INFO - Delay entre batches: 120s
+2025-11-05 03:57:29 - INFO - Concorrência por batch: 1
+2025-11-05 03:57:29 - INFO - ================================
+
+2025-11-05 03:57:29 - INFO - Batch 1/6 - Processando itens 1 a 200 (200 itens)...
+2025-11-05 03:57:29 - INFO - Iniciando busca de 'DETALHES' assíncrona para 200 AppIDs com concorrência 1...
+2025-11-05 03:58:50 - INFO - Busca assíncrona concluída.
+2025-11-05 03:58:50 - INFO - --- Busca concluída: ---
+2025-11-05 03:58:50 - INFO - 145 sucesso(s) (72.50%),
+2025-11-05 03:58:50 - INFO - 55 falha(s) (27.50%).
+2025-11-05 03:58:50 - INFO - --- Detalhamento dos erros: ---
+2025-11-05 03:58:50 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-05 03:58:50 - INFO - * Timeout: 0
+2025-11-05 03:58:50 - INFO - * Ausentes: 52
+2025-11-05 03:58:50 - INFO - * Outros: 0
+2025-11-05 03:58:50 - INFO - Aguardando 120s antes do próximo batch...
+
+2025-11-05 04:00:50 - INFO - Batch 2/6 - Processando itens 201 a 400 (200 itens)...
+2025-11-05 04:00:50 - INFO - Iniciando busca de 'DETALHES' assíncrona para 200 AppIDs com concorrência 1...
+2025-11-05 04:02:04 - INFO - Busca assíncrona concluída.
+2025-11-05 04:02:04 - INFO - --- Busca concluída: ---
+2025-11-05 04:02:04 - INFO - 0 sucesso(s) (0.00%),
+2025-11-05 04:02:04 - INFO - 200 falha(s) (100.00%).
+2025-11-05 04:02:04 - INFO - --- Detalhamento dos erros: ---
+2025-11-05 04:02:04 - INFO - * HTTP: 200 (403 Forbidden: 0, 429 Too Many Requests: 200)
+2025-11-05 04:02:04 - INFO - * Timeout: 0
+2025-11-05 04:02:04 - INFO - * Ausentes: 0
+2025-11-05 04:02:04 - INFO - * Outros: 0
+2025-11-05 04:02:04 - INFO - Aguardando 120s antes do próximo batch...
+
+2025-11-05 04:04:04 - INFO - Batch 3/6 - Processando itens 401 a 600 (200 itens)...
+2025-11-05 04:04:04 - INFO - Iniciando busca de 'DETALHES' assíncrona para 200 AppIDs com concorrência 1...
+2025-11-05 04:05:25 - INFO - Busca assíncrona concluída.
+2025-11-05 04:05:25 - INFO - --- Busca concluída: ---
+2025-11-05 04:05:25 - INFO - 123 sucesso(s) (61.50%),
+2025-11-05 04:05:25 - INFO - 77 falha(s) (38.50%).
+2025-11-05 04:05:25 - INFO - --- Detalhamento dos erros: ---
+2025-11-05 04:05:25 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-05 04:05:25 - INFO - * Timeout: 0
+2025-11-05 04:05:25 - INFO - * Ausentes: 77
+2025-11-05 04:05:25 - INFO - * Outros: 0
+2025-11-05 04:05:25 - INFO - Aguardando 120s antes do próximo batch...
+
+2025-11-05 04:07:25 - INFO - Batch 4/6 - Processando itens 601 a 800 (200 itens)...
+2025-11-05 04:07:25 - INFO - Iniciando busca de 'DETALHES' assíncrona para 200 AppIDs com concorrência 1...
+2025-11-05 04:08:40 - INFO - Busca assíncrona concluída.
+2025-11-05 04:08:40 - INFO - --- Busca concluída: ---
+2025-11-05 04:08:40 - INFO - 0 sucesso(s) (0.00%),
+2025-11-05 04:08:40 - INFO - 200 falha(s) (100.00%).
+2025-11-05 04:08:40 - INFO - --- Detalhamento dos erros: ---
+2025-11-05 04:08:40 - INFO - * HTTP: 200 (403 Forbidden: 0, 429 Too Many Requests: 200)
+2025-11-05 04:08:40 - INFO - * Timeout: 0
+2025-11-05 04:08:40 - INFO - * Ausentes: 0
+2025-11-05 04:08:40 - INFO - * Outros: 0
+2025-11-05 04:08:40 - INFO - Aguardando 120s antes do próximo batch...
+
+2025-11-05 04:10:40 - INFO - Batch 5/6 - Processando itens 801 a 1000 (200 itens)...
+2025-11-05 04:10:40 - INFO - Iniciando busca de 'DETALHES' assíncrona para 200 AppIDs com concorrência 1...
+2025-11-05 04:12:06 - INFO - Busca assíncrona concluída.
+2025-11-05 04:12:06 - INFO - --- Busca concluída: ---
+2025-11-05 04:12:06 - INFO - 142 sucesso(s) (71.00%),
+2025-11-05 04:12:06 - INFO - 58 falha(s) (29.00%).
+2025-11-05 04:12:06 - INFO - --- Detalhamento dos erros: ---
+2025-11-05 04:12:06 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-05 04:12:06 - INFO - * Timeout: 0
+2025-11-05 04:12:06 - INFO - * Ausentes: 57
+2025-11-05 04:12:06 - INFO - * Outros: 0
+2025-11-05 04:12:06 - INFO - Aguardando 120s antes do próximo batch...
+
+2025-11-05 04:14:06 - INFO - Batch 6/6 - Processando itens 1001 a 1198 (198 itens)...
+2025-11-05 04:14:06 - INFO - Iniciando busca de 'DETALHES' assíncrona para 198 AppIDs com concorrência 1...
+2025-11-05 04:15:19 - INFO - Busca assíncrona concluída.
+2025-11-05 04:15:19 - INFO - --- Busca concluída: ---
+2025-11-05 04:15:19 - INFO - 0 sucesso(s) (0.00%),
+2025-11-05 04:15:19 - INFO - 198 falha(s) (100.00%).
+2025-11-05 04:15:19 - INFO - --- Detalhamento dos erros: ---
+2025-11-05 04:15:19 - INFO - * HTTP: 198 (403 Forbidden: 0, 429 Too Many Requests: 198)
+2025-11-05 04:15:19 - INFO - * Timeout: 0
+2025-11-05 04:15:19 - INFO - * Ausentes: 0
+2025-11-05 04:15:19 - INFO - * Outros: 0
+2025-11-05 04:15:19 - INFO - 
+PROCESSAMENTO COMPLETO!
+2025-11-05 04:15:19 - INFO - Total processado: 410 sucessos de 1,198 itens (34.22%)
+2025-11-05 04:15:36 - INFO - Dados de detalhes inseridos com sucesso.
+2025-11-05 04:45:36 - INFO - Número de AppIDs com dados incompletos: 1000
+2025-11-05 04:45:36 - INFO - === PROCESSAMENTO EM BATCHES (REVIEWS) ===
+2025-11-05 04:45:36 - INFO - Total de itens: 2,198
+2025-11-05 04:45:36 - INFO - Tamanho do batch: 500
+2025-11-05 04:45:36 - INFO - Total de batches: 5
+2025-11-05 04:45:36 - INFO - Delay entre batches: 60s
+2025-11-05 04:45:36 - INFO - Concorrência por batch: 3
+2025-11-05 04:45:36 - INFO - ==========================================
+
+2025-11-05 04:45:36 - INFO - Batch 1/5 - Processando itens 1 a 500 (500 itens)...
+2025-11-05 04:45:36 - INFO - Iniciando busca de 'REVIEWS' assíncrona para 500 AppIDs com concorrência 3...
+2025-11-05 04:46:50 - INFO - Busca assíncrona concluída.
+2025-11-05 04:46:50 - INFO - --- Busca concluída: ---
+2025-11-05 04:46:50 - INFO - 302 sucesso(s) (60.40%),
+2025-11-05 04:46:50 - INFO - 198 falha(s) (39.60%).
+2025-11-05 04:46:50 - INFO - --- Detalhamento dos erros: ---
+2025-11-05 04:46:50 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-05 04:46:50 - INFO - * Timeout: 0
+2025-11-05 04:46:50 - INFO - * Ausentes: 198
+2025-11-05 04:46:50 - INFO - * Outros: 0
+2025-11-05 04:46:50 - INFO - Aguardando 60s antes do próximo batch...
+
+2025-11-05 04:47:50 - INFO - Batch 2/5 - Processando itens 501 a 1000 (500 itens)...
+2025-11-05 04:47:50 - INFO - Iniciando busca de 'REVIEWS' assíncrona para 500 AppIDs com concorrência 3...
+2025-11-05 04:49:03 - INFO - Busca assíncrona concluída.
+2025-11-05 04:49:03 - INFO - --- Busca concluída: ---
+2025-11-05 04:49:03 - INFO - 280 sucesso(s) (56.00%),
+2025-11-05 04:49:03 - INFO - 220 falha(s) (44.00%).
+2025-11-05 04:49:03 - INFO - --- Detalhamento dos erros: ---
+2025-11-05 04:49:03 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-05 04:49:03 - INFO - * Timeout: 0
+2025-11-05 04:49:03 - INFO - * Ausentes: 220
+2025-11-05 04:49:03 - INFO - * Outros: 0
+2025-11-05 04:49:03 - INFO - Aguardando 60s antes do próximo batch...
+
+2025-11-05 04:50:03 - INFO - Batch 3/5 - Processando itens 1001 a 1500 (500 itens)...
+2025-11-05 04:50:03 - INFO - Iniciando busca de 'REVIEWS' assíncrona para 500 AppIDs com concorrência 3...
+2025-11-05 04:51:18 - INFO - Busca assíncrona concluída.
+2025-11-05 04:51:18 - INFO - --- Busca concluída: ---
+2025-11-05 04:51:18 - INFO - 261 sucesso(s) (52.20%),
+2025-11-05 04:51:18 - INFO - 239 falha(s) (47.80%).
+2025-11-05 04:51:18 - INFO - --- Detalhamento dos erros: ---
+2025-11-05 04:51:18 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-05 04:51:18 - INFO - * Timeout: 0
+2025-11-05 04:51:18 - INFO - * Ausentes: 239
+2025-11-05 04:51:18 - INFO - * Outros: 0
+2025-11-05 04:51:18 - INFO - Aguardando 60s antes do próximo batch...
+
+2025-11-05 04:52:18 - INFO - Batch 4/5 - Processando itens 1501 a 2000 (500 itens)...
+2025-11-05 04:52:18 - INFO - Iniciando busca de 'REVIEWS' assíncrona para 500 AppIDs com concorrência 3...
+2025-11-05 04:53:43 - INFO - Busca assíncrona concluída.
+2025-11-05 04:53:43 - INFO - --- Busca concluída: ---
+2025-11-05 04:53:43 - INFO - 423 sucesso(s) (84.60%),
+2025-11-05 04:53:43 - INFO - 77 falha(s) (15.40%).
+2025-11-05 04:53:43 - INFO - --- Detalhamento dos erros: ---
+2025-11-05 04:53:43 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-05 04:53:43 - INFO - * Timeout: 0
+2025-11-05 04:53:43 - INFO - * Ausentes: 77
+2025-11-05 04:53:43 - INFO - * Outros: 0
+2025-11-05 04:53:43 - INFO - Aguardando 60s antes do próximo batch...
+
+2025-11-05 04:54:43 - INFO - Batch 5/5 - Processando itens 2001 a 2198 (198 itens)...
+2025-11-05 04:54:43 - INFO - Iniciando busca de 'REVIEWS' assíncrona para 198 AppIDs com concorrência 3...
+2025-11-05 04:55:11 - INFO - Busca assíncrona concluída.
+2025-11-05 04:55:11 - INFO - --- Busca concluída: ---
+2025-11-05 04:55:11 - INFO - 161 sucesso(s) (81.31%),
+2025-11-05 04:55:11 - INFO - 37 falha(s) (18.69%).
+2025-11-05 04:55:11 - INFO - --- Detalhamento dos erros: ---
+2025-11-05 04:55:11 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-05 04:55:11 - INFO - * Timeout: 0
+2025-11-05 04:55:11 - INFO - * Ausentes: 37
+2025-11-05 04:55:11 - INFO - * Outros: 0
+2025-11-05 04:55:11 - INFO - 
+PROCESSAMENTO COMPLETO!
+2025-11-05 04:55:11 - INFO - Total processado: 1,427 sucessos de 2,198 itens (64.92%)
+2025-11-05 04:55:36 - INFO - Dados de reviews inseridos com sucesso.
+2025-11-05 04:55:36 - INFO - Processando aplicativos de 22001 a 24000 de 273744
+2025-11-05 04:55:41 - INFO - Número de AppIDs com dados incompletos: 1000
+2025-11-05 04:55:41 - INFO - Número de AppIDs a processar: 1125
+2025-11-05 04:55:41 - INFO - === PROCESSAMENTO EM BATCHES ===
+2025-11-05 04:55:41 - INFO - Total de itens: 1,125
+2025-11-05 04:55:41 - INFO - Tamanho do batch: 200
+2025-11-05 04:55:41 - INFO - Total de batches: 6
+2025-11-05 04:55:41 - INFO - Delay entre batches: 120s
+2025-11-05 04:55:41 - INFO - Concorrência por batch: 1
+2025-11-05 04:55:41 - INFO - ================================
+
+2025-11-05 04:55:41 - INFO - Batch 1/6 - Processando itens 1 a 200 (200 itens)...
+2025-11-05 04:55:41 - INFO - Iniciando busca de 'DETALHES' assíncrona para 200 AppIDs com concorrência 1...
+2025-11-05 04:57:01 - INFO - Busca assíncrona concluída.
+2025-11-05 04:57:01 - INFO - --- Busca concluída: ---
+2025-11-05 04:57:01 - INFO - 181 sucesso(s) (90.50%),
+2025-11-05 04:57:01 - INFO - 19 falha(s) (9.50%).
+2025-11-05 04:57:01 - INFO - --- Detalhamento dos erros: ---
+2025-11-05 04:57:01 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-05 04:57:01 - INFO - * Timeout: 0
+2025-11-05 04:57:01 - INFO - * Ausentes: 19
+2025-11-05 04:57:01 - INFO - * Outros: 0
+2025-11-05 04:57:01 - INFO - Aguardando 120s antes do próximo batch...
+
+2025-11-05 04:59:01 - INFO - Batch 2/6 - Processando itens 201 a 400 (200 itens)...
+2025-11-05 04:59:01 - INFO - Iniciando busca de 'DETALHES' assíncrona para 200 AppIDs com concorrência 1...
+2025-11-05 05:00:13 - INFO - Busca assíncrona concluída.
+2025-11-05 05:00:13 - INFO - --- Busca concluída: ---
+2025-11-05 05:00:13 - INFO - 0 sucesso(s) (0.00%),
+2025-11-05 05:00:13 - INFO - 200 falha(s) (100.00%).
+2025-11-05 05:00:13 - INFO - --- Detalhamento dos erros: ---
+2025-11-05 05:00:13 - INFO - * HTTP: 200 (403 Forbidden: 0, 429 Too Many Requests: 200)
+2025-11-05 05:00:13 - INFO - * Timeout: 0
+2025-11-05 05:00:13 - INFO - * Ausentes: 0
+2025-11-05 05:00:13 - INFO - * Outros: 0
+2025-11-05 05:00:13 - INFO - Aguardando 120s antes do próximo batch...
+
+2025-11-05 05:02:13 - INFO - Batch 3/6 - Processando itens 401 a 600 (200 itens)...
+2025-11-05 05:02:13 - INFO - Iniciando busca de 'DETALHES' assíncrona para 200 AppIDs com concorrência 1...
+2025-11-05 05:04:00 - INFO - Busca assíncrona concluída.
+2025-11-05 05:04:00 - INFO - --- Busca concluída: ---
+2025-11-05 05:04:00 - INFO - 145 sucesso(s) (72.50%),
+2025-11-05 05:04:00 - INFO - 55 falha(s) (27.50%).
+2025-11-05 05:04:00 - INFO - --- Detalhamento dos erros: ---
+2025-11-05 05:04:00 - INFO - * HTTP: 1 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-05 05:04:00 - INFO - * Timeout: 0
+2025-11-05 05:04:00 - INFO - * Ausentes: 54
+2025-11-05 05:04:00 - INFO - * Outros: 0
+2025-11-05 05:04:00 - INFO - Aguardando 120s antes do próximo batch...
+
+2025-11-05 05:06:00 - INFO - Batch 4/6 - Processando itens 601 a 800 (200 itens)...
+2025-11-05 05:06:00 - INFO - Iniciando busca de 'DETALHES' assíncrona para 200 AppIDs com concorrência 1...
+2025-11-05 05:07:12 - INFO - Busca assíncrona concluída.
+2025-11-05 05:07:12 - INFO - --- Busca concluída: ---
+2025-11-05 05:07:12 - INFO - 0 sucesso(s) (0.00%),
+2025-11-05 05:07:12 - INFO - 200 falha(s) (100.00%).
+2025-11-05 05:07:12 - INFO - --- Detalhamento dos erros: ---
+2025-11-05 05:07:12 - INFO - * HTTP: 199 (403 Forbidden: 0, 429 Too Many Requests: 199)
+2025-11-05 05:07:12 - INFO - * Timeout: 0
+2025-11-05 05:07:12 - INFO - * Ausentes: 1
+2025-11-05 05:07:12 - INFO - * Outros: 0
+2025-11-05 05:07:12 - INFO - Aguardando 120s antes do próximo batch...
+
+2025-11-05 05:09:12 - INFO - Batch 5/6 - Processando itens 801 a 1000 (200 itens)...
+2025-11-05 05:09:12 - INFO - Iniciando busca de 'DETALHES' assíncrona para 200 AppIDs com concorrência 1...
+2025-11-05 05:10:31 - INFO - Busca assíncrona concluída.
+2025-11-05 05:10:31 - INFO - --- Busca concluída: ---
+2025-11-05 05:10:31 - INFO - 164 sucesso(s) (82.00%),
+2025-11-05 05:10:31 - INFO - 36 falha(s) (18.00%).
+2025-11-05 05:10:31 - INFO - --- Detalhamento dos erros: ---
+2025-11-05 05:10:31 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-05 05:10:31 - INFO - * Timeout: 0
+2025-11-05 05:10:31 - INFO - * Ausentes: 36
+2025-11-05 05:10:31 - INFO - * Outros: 0
+2025-11-05 05:10:31 - INFO - Aguardando 120s antes do próximo batch...
+
+2025-11-05 05:12:31 - INFO - Batch 6/6 - Processando itens 1001 a 1125 (125 itens)...
+2025-11-05 05:12:31 - INFO - Iniciando busca de 'DETALHES' assíncrona para 125 AppIDs com concorrência 1...
+2025-11-05 05:13:17 - INFO - Busca assíncrona concluída.
+2025-11-05 05:13:17 - INFO - --- Busca concluída: ---
+2025-11-05 05:13:17 - INFO - 0 sucesso(s) (0.00%),
+2025-11-05 05:13:17 - INFO - 125 falha(s) (100.00%).
+2025-11-05 05:13:17 - INFO - --- Detalhamento dos erros: ---
+2025-11-05 05:13:17 - INFO - * HTTP: 125 (403 Forbidden: 0, 429 Too Many Requests: 125)
+2025-11-05 05:13:17 - INFO - * Timeout: 0
+2025-11-05 05:13:17 - INFO - * Ausentes: 0
+2025-11-05 05:13:17 - INFO - * Outros: 0
+2025-11-05 05:13:17 - INFO - 
+PROCESSAMENTO COMPLETO!
+2025-11-05 05:13:17 - INFO - Total processado: 490 sucessos de 1,125 itens (43.56%)
+2025-11-05 05:13:44 - INFO - Dados de detalhes inseridos com sucesso.
+2025-11-05 05:43:44 - INFO - Número de AppIDs com dados incompletos: 1000
+2025-11-05 05:43:44 - INFO - === PROCESSAMENTO EM BATCHES (REVIEWS) ===
+2025-11-05 05:43:44 - INFO - Total de itens: 2,125
+2025-11-05 05:43:44 - INFO - Tamanho do batch: 500
+2025-11-05 05:43:44 - INFO - Total de batches: 5
+2025-11-05 05:43:44 - INFO - Delay entre batches: 60s
+2025-11-05 05:43:44 - INFO - Concorrência por batch: 3
+2025-11-05 05:43:44 - INFO - ==========================================
+
+2025-11-05 05:43:44 - INFO - Batch 1/5 - Processando itens 1 a 500 (500 itens)...
+2025-11-05 05:43:44 - INFO - Iniciando busca de 'REVIEWS' assíncrona para 500 AppIDs com concorrência 3...
+2025-11-05 05:44:56 - INFO - Busca assíncrona concluída.
+2025-11-05 05:44:56 - INFO - --- Busca concluída: ---
+2025-11-05 05:44:56 - INFO - 277 sucesso(s) (55.40%),
+2025-11-05 05:44:56 - INFO - 223 falha(s) (44.60%).
+2025-11-05 05:44:56 - INFO - --- Detalhamento dos erros: ---
+2025-11-05 05:44:56 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-05 05:44:56 - INFO - * Timeout: 0
+2025-11-05 05:44:56 - INFO - * Ausentes: 223
+2025-11-05 05:44:56 - INFO - * Outros: 0
+2025-11-05 05:44:56 - INFO - Aguardando 60s antes do próximo batch...
+
+2025-11-05 05:45:56 - INFO - Batch 2/5 - Processando itens 501 a 1000 (500 itens)...
+2025-11-05 05:45:56 - INFO - Iniciando busca de 'REVIEWS' assíncrona para 500 AppIDs com concorrência 3...
+2025-11-05 05:47:08 - INFO - Busca assíncrona concluída.
+2025-11-05 05:47:08 - INFO - --- Busca concluída: ---
+2025-11-05 05:47:08 - INFO - 399 sucesso(s) (79.80%),
+2025-11-05 05:47:08 - INFO - 101 falha(s) (20.20%).
+2025-11-05 05:47:08 - INFO - --- Detalhamento dos erros: ---
+2025-11-05 05:47:08 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-05 05:47:08 - INFO - * Timeout: 0
+2025-11-05 05:47:08 - INFO - * Ausentes: 101
+2025-11-05 05:47:08 - INFO - * Outros: 0
+2025-11-05 05:47:08 - INFO - Aguardando 60s antes do próximo batch...
+
+2025-11-05 05:48:08 - INFO - Batch 3/5 - Processando itens 1001 a 1500 (500 itens)...
+2025-11-05 05:48:08 - INFO - Iniciando busca de 'REVIEWS' assíncrona para 500 AppIDs com concorrência 3...
+2025-11-05 05:49:22 - INFO - Busca assíncrona concluída.
+2025-11-05 05:49:22 - INFO - --- Busca concluída: ---
+2025-11-05 05:49:22 - INFO - 261 sucesso(s) (52.20%),
+2025-11-05 05:49:22 - INFO - 239 falha(s) (47.80%).
+2025-11-05 05:49:22 - INFO - --- Detalhamento dos erros: ---
+2025-11-05 05:49:22 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-05 05:49:22 - INFO - * Timeout: 0
+2025-11-05 05:49:22 - INFO - * Ausentes: 239
+2025-11-05 05:49:22 - INFO - * Outros: 0
+2025-11-05 05:49:22 - INFO - Aguardando 60s antes do próximo batch...
+
+2025-11-05 05:50:22 - INFO - Batch 4/5 - Processando itens 1501 a 2000 (500 itens)...
+2025-11-05 05:50:22 - INFO - Iniciando busca de 'REVIEWS' assíncrona para 500 AppIDs com concorrência 3...
+2025-11-05 05:51:37 - INFO - Busca assíncrona concluída.
+2025-11-05 05:51:37 - INFO - --- Busca concluída: ---
+2025-11-05 05:51:37 - INFO - 407 sucesso(s) (81.40%),
+2025-11-05 05:51:37 - INFO - 93 falha(s) (18.60%).
+2025-11-05 05:51:37 - INFO - --- Detalhamento dos erros: ---
+2025-11-05 05:51:37 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-05 05:51:37 - INFO - * Timeout: 0
+2025-11-05 05:51:37 - INFO - * Ausentes: 93
+2025-11-05 05:51:37 - INFO - * Outros: 0
+2025-11-05 05:51:37 - INFO - Aguardando 60s antes do próximo batch...
+
+2025-11-05 05:52:37 - INFO - Batch 5/5 - Processando itens 2001 a 2125 (125 itens)...
+2025-11-05 05:52:37 - INFO - Iniciando busca de 'REVIEWS' assíncrona para 125 AppIDs com concorrência 3...
+2025-11-05 05:52:55 - INFO - Busca assíncrona concluída.
+2025-11-05 05:52:55 - INFO - --- Busca concluída: ---
+2025-11-05 05:52:55 - INFO - 103 sucesso(s) (82.40%),
+2025-11-05 05:52:55 - INFO - 22 falha(s) (17.60%).
+2025-11-05 05:52:55 - INFO - --- Detalhamento dos erros: ---
+2025-11-05 05:52:55 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-05 05:52:55 - INFO - * Timeout: 0
+2025-11-05 05:52:55 - INFO - * Ausentes: 22
+2025-11-05 05:52:55 - INFO - * Outros: 0
+2025-11-05 05:52:55 - INFO - 
+PROCESSAMENTO COMPLETO!
+2025-11-05 05:52:55 - INFO - Total processado: 1,447 sucessos de 2,125 itens (68.09%)
+2025-11-05 05:53:24 - INFO - Dados de reviews inseridos com sucesso.
+2025-11-05 05:53:24 - INFO - Processando aplicativos de 24001 a 26000 de 273744
+2025-11-05 05:53:28 - INFO - Número de AppIDs com dados incompletos: 1000
+2025-11-05 05:53:28 - INFO - Número de AppIDs a processar: 1085
+2025-11-05 05:53:28 - INFO - === PROCESSAMENTO EM BATCHES ===
+2025-11-05 05:53:28 - INFO - Total de itens: 1,085
+2025-11-05 05:53:28 - INFO - Tamanho do batch: 200
+2025-11-05 05:53:28 - INFO - Total de batches: 6
+2025-11-05 05:53:28 - INFO - Delay entre batches: 120s
+2025-11-05 05:53:28 - INFO - Concorrência por batch: 1
+2025-11-05 05:53:28 - INFO - ================================
+
+2025-11-05 05:53:28 - INFO - Batch 1/6 - Processando itens 1 a 200 (200 itens)...
+2025-11-05 05:53:28 - INFO - Iniciando busca de 'DETALHES' assíncrona para 200 AppIDs com concorrência 1...
+2025-11-05 05:54:48 - INFO - Busca assíncrona concluída.
+2025-11-05 05:54:48 - INFO - --- Busca concluída: ---
+2025-11-05 05:54:48 - INFO - 181 sucesso(s) (90.50%),
+2025-11-05 05:54:48 - INFO - 19 falha(s) (9.50%).
+2025-11-05 05:54:48 - INFO - --- Detalhamento dos erros: ---
+2025-11-05 05:54:48 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-05 05:54:48 - INFO - * Timeout: 0
+2025-11-05 05:54:48 - INFO - * Ausentes: 19
+2025-11-05 05:54:48 - INFO - * Outros: 0
+2025-11-05 05:54:48 - INFO - Aguardando 120s antes do próximo batch...
+
+2025-11-05 05:56:48 - INFO - Batch 2/6 - Processando itens 201 a 400 (200 itens)...
+2025-11-05 05:56:48 - INFO - Iniciando busca de 'DETALHES' assíncrona para 200 AppIDs com concorrência 1...
+2025-11-05 05:58:01 - INFO - Busca assíncrona concluída.
+2025-11-05 05:58:01 - INFO - --- Busca concluída: ---
+2025-11-05 05:58:01 - INFO - 0 sucesso(s) (0.00%),
+2025-11-05 05:58:01 - INFO - 200 falha(s) (100.00%).
+2025-11-05 05:58:01 - INFO - --- Detalhamento dos erros: ---
+2025-11-05 05:58:01 - INFO - * HTTP: 200 (403 Forbidden: 0, 429 Too Many Requests: 200)
+2025-11-05 05:58:01 - INFO - * Timeout: 0
+2025-11-05 05:58:01 - INFO - * Ausentes: 0
+2025-11-05 05:58:01 - INFO - * Outros: 0
+2025-11-05 05:58:01 - INFO - Aguardando 120s antes do próximo batch...
+
+2025-11-05 06:00:01 - INFO - Batch 3/6 - Processando itens 401 a 600 (200 itens)...
+2025-11-05 06:00:01 - INFO - Iniciando busca de 'DETALHES' assíncrona para 200 AppIDs com concorrência 1...
+2025-11-05 06:01:19 - INFO - Busca assíncrona concluída.
+2025-11-05 06:01:19 - INFO - --- Busca concluída: ---
+2025-11-05 06:01:19 - INFO - 158 sucesso(s) (79.00%),
+2025-11-05 06:01:19 - INFO - 42 falha(s) (21.00%).
+2025-11-05 06:01:19 - INFO - --- Detalhamento dos erros: ---
+2025-11-05 06:01:19 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-05 06:01:19 - INFO - * Timeout: 0
+2025-11-05 06:01:19 - INFO - * Ausentes: 42
+2025-11-05 06:01:19 - INFO - * Outros: 0
+2025-11-05 06:01:19 - INFO - Aguardando 120s antes do próximo batch...
+
+2025-11-05 06:03:19 - INFO - Batch 4/6 - Processando itens 601 a 800 (200 itens)...
+2025-11-05 06:03:19 - INFO - Iniciando busca de 'DETALHES' assíncrona para 200 AppIDs com concorrência 1...
+2025-11-05 06:04:34 - INFO - Busca assíncrona concluída.
+2025-11-05 06:04:34 - INFO - --- Busca concluída: ---
+2025-11-05 06:04:34 - INFO - 0 sucesso(s) (0.00%),
+2025-11-05 06:04:34 - INFO - 200 falha(s) (100.00%).
+2025-11-05 06:04:34 - INFO - --- Detalhamento dos erros: ---
+2025-11-05 06:04:34 - INFO - * HTTP: 200 (403 Forbidden: 0, 429 Too Many Requests: 200)
+2025-11-05 06:04:34 - INFO - * Timeout: 0
+2025-11-05 06:04:34 - INFO - * Ausentes: 0
+2025-11-05 06:04:34 - INFO - * Outros: 0
+2025-11-05 06:04:34 - INFO - Aguardando 120s antes do próximo batch...
+
+2025-11-05 06:06:34 - INFO - Batch 5/6 - Processando itens 801 a 1000 (200 itens)...
+2025-11-05 06:06:34 - INFO - Iniciando busca de 'DETALHES' assíncrona para 200 AppIDs com concorrência 1...
+2025-11-05 06:07:54 - INFO - Busca assíncrona concluída.
+2025-11-05 06:07:54 - INFO - --- Busca concluída: ---
+2025-11-05 06:07:54 - INFO - 165 sucesso(s) (82.50%),
+2025-11-05 06:07:54 - INFO - 35 falha(s) (17.50%).
+2025-11-05 06:07:54 - INFO - --- Detalhamento dos erros: ---
+2025-11-05 06:07:54 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-05 06:07:54 - INFO - * Timeout: 0
+2025-11-05 06:07:54 - INFO - * Ausentes: 35
+2025-11-05 06:07:54 - INFO - * Outros: 0
+2025-11-05 06:07:54 - INFO - Aguardando 120s antes do próximo batch...
+
+2025-11-05 06:09:54 - INFO - Batch 6/6 - Processando itens 1001 a 1085 (85 itens)...
+2025-11-05 06:09:54 - INFO - Iniciando busca de 'DETALHES' assíncrona para 85 AppIDs com concorrência 1...
+2025-11-05 06:10:25 - INFO - Busca assíncrona concluída.
+2025-11-05 06:10:25 - INFO - --- Busca concluída: ---
+2025-11-05 06:10:25 - INFO - 0 sucesso(s) (0.00%),
+2025-11-05 06:10:25 - INFO - 85 falha(s) (100.00%).
+2025-11-05 06:10:25 - INFO - --- Detalhamento dos erros: ---
+2025-11-05 06:10:25 - INFO - * HTTP: 85 (403 Forbidden: 0, 429 Too Many Requests: 85)
+2025-11-05 06:10:25 - INFO - * Timeout: 0
+2025-11-05 06:10:25 - INFO - * Ausentes: 0
+2025-11-05 06:10:25 - INFO - * Outros: 0
+2025-11-05 06:10:25 - INFO - 
+PROCESSAMENTO COMPLETO!
+2025-11-05 06:10:25 - INFO - Total processado: 504 sucessos de 1,085 itens (46.45%)
+2025-11-05 06:10:49 - INFO - Dados de detalhes inseridos com sucesso.
+2025-11-05 06:40:49 - INFO - Número de AppIDs com dados incompletos: 1000
+2025-11-05 06:40:49 - INFO - === PROCESSAMENTO EM BATCHES (REVIEWS) ===
+2025-11-05 06:40:49 - INFO - Total de itens: 2,085
+2025-11-05 06:40:49 - INFO - Tamanho do batch: 500
+2025-11-05 06:40:49 - INFO - Total de batches: 5
+2025-11-05 06:40:49 - INFO - Delay entre batches: 60s
+2025-11-05 06:40:49 - INFO - Concorrência por batch: 3
+2025-11-05 06:40:49 - INFO - ==========================================
+
+2025-11-05 06:40:49 - INFO - Batch 1/5 - Processando itens 1 a 500 (500 itens)...
+2025-11-05 06:40:49 - INFO - Iniciando busca de 'REVIEWS' assíncrona para 500 AppIDs com concorrência 3...
+2025-11-05 06:42:04 - INFO - Busca assíncrona concluída.
+2025-11-05 06:42:04 - INFO - --- Busca concluída: ---
+2025-11-05 06:42:04 - INFO - 383 sucesso(s) (76.60%),
+2025-11-05 06:42:04 - INFO - 117 falha(s) (23.40%).
+2025-11-05 06:42:04 - INFO - --- Detalhamento dos erros: ---
+2025-11-05 06:42:04 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-05 06:42:04 - INFO - * Timeout: 0
+2025-11-05 06:42:04 - INFO - * Ausentes: 117
+2025-11-05 06:42:04 - INFO - * Outros: 0
+2025-11-05 06:42:04 - INFO - Aguardando 60s antes do próximo batch...
+
+2025-11-05 06:43:04 - INFO - Batch 2/5 - Processando itens 501 a 1000 (500 itens)...
+2025-11-05 06:43:04 - INFO - Iniciando busca de 'REVIEWS' assíncrona para 500 AppIDs com concorrência 3...
+2025-11-05 06:44:17 - INFO - Busca assíncrona concluída.
+2025-11-05 06:44:17 - INFO - --- Busca concluída: ---
+2025-11-05 06:44:17 - INFO - 355 sucesso(s) (71.00%),
+2025-11-05 06:44:17 - INFO - 145 falha(s) (29.00%).
+2025-11-05 06:44:17 - INFO - --- Detalhamento dos erros: ---
+2025-11-05 06:44:17 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-05 06:44:17 - INFO - * Timeout: 0
+2025-11-05 06:44:17 - INFO - * Ausentes: 145
+2025-11-05 06:44:17 - INFO - * Outros: 0
+2025-11-05 06:44:17 - INFO - Aguardando 60s antes do próximo batch...
+
+2025-11-05 06:45:17 - INFO - Batch 3/5 - Processando itens 1001 a 1500 (500 itens)...
+2025-11-05 06:45:17 - INFO - Iniciando busca de 'REVIEWS' assíncrona para 500 AppIDs com concorrência 3...
+2025-11-05 06:46:29 - INFO - Busca assíncrona concluída.
+2025-11-05 06:46:29 - INFO - --- Busca concluída: ---
+2025-11-05 06:46:29 - INFO - 269 sucesso(s) (53.80%),
+2025-11-05 06:46:29 - INFO - 231 falha(s) (46.20%).
+2025-11-05 06:46:29 - INFO - --- Detalhamento dos erros: ---
+2025-11-05 06:46:29 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-05 06:46:29 - INFO - * Timeout: 0
+2025-11-05 06:46:29 - INFO - * Ausentes: 231
+2025-11-05 06:46:29 - INFO - * Outros: 0
+2025-11-05 06:46:29 - INFO - Aguardando 60s antes do próximo batch...
+
+2025-11-05 06:47:29 - INFO - Batch 4/5 - Processando itens 1501 a 2000 (500 itens)...
+2025-11-05 06:47:29 - INFO - Iniciando busca de 'REVIEWS' assíncrona para 500 AppIDs com concorrência 3...
+2025-11-05 06:48:47 - INFO - Busca assíncrona concluída.
+2025-11-05 06:48:47 - INFO - --- Busca concluída: ---
+2025-11-05 06:48:47 - INFO - 403 sucesso(s) (80.60%),
+2025-11-05 06:48:47 - INFO - 97 falha(s) (19.40%).
+2025-11-05 06:48:47 - INFO - --- Detalhamento dos erros: ---
+2025-11-05 06:48:47 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-05 06:48:47 - INFO - * Timeout: 0
+2025-11-05 06:48:47 - INFO - * Ausentes: 97
+2025-11-05 06:48:47 - INFO - * Outros: 0
+2025-11-05 06:48:47 - INFO - Aguardando 60s antes do próximo batch...
+
+2025-11-05 06:49:47 - INFO - Batch 5/5 - Processando itens 2001 a 2085 (85 itens)...
+2025-11-05 06:49:47 - INFO - Iniciando busca de 'REVIEWS' assíncrona para 85 AppIDs com concorrência 3...
+2025-11-05 06:50:00 - INFO - Busca assíncrona concluída.
+2025-11-05 06:50:00 - INFO - --- Busca concluída: ---
+2025-11-05 06:50:00 - INFO - 67 sucesso(s) (78.82%),
+2025-11-05 06:50:00 - INFO - 18 falha(s) (21.18%).
+2025-11-05 06:50:00 - INFO - --- Detalhamento dos erros: ---
+2025-11-05 06:50:00 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-05 06:50:00 - INFO - * Timeout: 0
+2025-11-05 06:50:00 - INFO - * Ausentes: 18
+2025-11-05 06:50:00 - INFO - * Outros: 0
+2025-11-05 06:50:00 - INFO - 
+PROCESSAMENTO COMPLETO!
+2025-11-05 06:50:00 - INFO - Total processado: 1,477 sucessos de 2,085 itens (70.84%)
+2025-11-05 06:50:33 - INFO - Dados de reviews inseridos com sucesso.
+2025-11-05 06:50:33 - INFO - Processando aplicativos de 26001 a 28000 de 273744
+2025-11-05 06:50:36 - INFO - Número de AppIDs com dados incompletos: 1000
+2025-11-05 06:50:36 - INFO - Número de AppIDs a processar: 1053
+2025-11-05 06:50:36 - INFO - === PROCESSAMENTO EM BATCHES ===
+2025-11-05 06:50:36 - INFO - Total de itens: 1,053
+2025-11-05 06:50:36 - INFO - Tamanho do batch: 200
+2025-11-05 06:50:36 - INFO - Total de batches: 6
+2025-11-05 06:50:36 - INFO - Delay entre batches: 120s
+2025-11-05 06:50:36 - INFO - Concorrência por batch: 1
+2025-11-05 06:50:36 - INFO - ================================
+
+2025-11-05 06:50:36 - INFO - Batch 1/6 - Processando itens 1 a 200 (200 itens)...
+2025-11-05 06:50:36 - INFO - Iniciando busca de 'DETALHES' assíncrona para 200 AppIDs com concorrência 1...
+2025-11-05 06:51:57 - INFO - Busca assíncrona concluída.
+2025-11-05 06:51:57 - INFO - --- Busca concluída: ---
+2025-11-05 06:51:57 - INFO - 157 sucesso(s) (78.50%),
+2025-11-05 06:51:57 - INFO - 43 falha(s) (21.50%).
+2025-11-05 06:51:57 - INFO - --- Detalhamento dos erros: ---
+2025-11-05 06:51:57 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-05 06:51:57 - INFO - * Timeout: 0
+2025-11-05 06:51:57 - INFO - * Ausentes: 43
+2025-11-05 06:51:57 - INFO - * Outros: 0
+2025-11-05 06:51:57 - INFO - Aguardando 120s antes do próximo batch...
+
+2025-11-05 06:53:57 - INFO - Batch 2/6 - Processando itens 201 a 400 (200 itens)...
+2025-11-05 06:53:57 - INFO - Iniciando busca de 'DETALHES' assíncrona para 200 AppIDs com concorrência 1...
+2025-11-05 06:55:12 - INFO - Busca assíncrona concluída.
+2025-11-05 06:55:12 - INFO - --- Busca concluída: ---
+2025-11-05 06:55:12 - INFO - 0 sucesso(s) (0.00%),
+2025-11-05 06:55:12 - INFO - 200 falha(s) (100.00%).
+2025-11-05 06:55:12 - INFO - --- Detalhamento dos erros: ---
+2025-11-05 06:55:12 - INFO - * HTTP: 200 (403 Forbidden: 0, 429 Too Many Requests: 200)
+2025-11-05 06:55:12 - INFO - * Timeout: 0
+2025-11-05 06:55:12 - INFO - * Ausentes: 0
+2025-11-05 06:55:12 - INFO - * Outros: 0
+2025-11-05 06:55:12 - INFO - Aguardando 120s antes do próximo batch...
+
+2025-11-05 06:57:12 - INFO - Batch 3/6 - Processando itens 401 a 600 (200 itens)...
+2025-11-05 06:57:12 - INFO - Iniciando busca de 'DETALHES' assíncrona para 200 AppIDs com concorrência 1...
+2025-11-05 06:58:33 - INFO - Busca assíncrona concluída.
+2025-11-05 06:58:33 - INFO - --- Busca concluída: ---
+2025-11-05 06:58:33 - INFO - 177 sucesso(s) (88.50%),
+2025-11-05 06:58:33 - INFO - 23 falha(s) (11.50%).
+2025-11-05 06:58:33 - INFO - --- Detalhamento dos erros: ---
+2025-11-05 06:58:33 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-05 06:58:33 - INFO - * Timeout: 0
+2025-11-05 06:58:33 - INFO - * Ausentes: 23
+2025-11-05 06:58:33 - INFO - * Outros: 0
+2025-11-05 06:58:33 - INFO - Aguardando 120s antes do próximo batch...
+
+2025-11-05 07:00:33 - INFO - Batch 4/6 - Processando itens 601 a 800 (200 itens)...
+2025-11-05 07:00:33 - INFO - Iniciando busca de 'DETALHES' assíncrona para 200 AppIDs com concorrência 1...
+2025-11-05 07:01:47 - INFO - Busca assíncrona concluída.
+2025-11-05 07:01:47 - INFO - --- Busca concluída: ---
+2025-11-05 07:01:47 - INFO - 0 sucesso(s) (0.00%),
+2025-11-05 07:01:47 - INFO - 200 falha(s) (100.00%).
+2025-11-05 07:01:47 - INFO - --- Detalhamento dos erros: ---
+2025-11-05 07:01:47 - INFO - * HTTP: 200 (403 Forbidden: 0, 429 Too Many Requests: 200)
+2025-11-05 07:01:47 - INFO - * Timeout: 0
+2025-11-05 07:01:47 - INFO - * Ausentes: 0
+2025-11-05 07:01:47 - INFO - * Outros: 0
+2025-11-05 07:01:47 - INFO - Aguardando 120s antes do próximo batch...
+
+2025-11-05 07:03:47 - INFO - Batch 5/6 - Processando itens 801 a 1000 (200 itens)...
+2025-11-05 07:03:47 - INFO - Iniciando busca de 'DETALHES' assíncrona para 200 AppIDs com concorrência 1...
+2025-11-05 07:05:05 - INFO - Busca assíncrona concluída.
+2025-11-05 07:05:05 - INFO - --- Busca concluída: ---
+2025-11-05 07:05:05 - INFO - 146 sucesso(s) (73.00%),
+2025-11-05 07:05:05 - INFO - 54 falha(s) (27.00%).
+2025-11-05 07:05:05 - INFO - --- Detalhamento dos erros: ---
+2025-11-05 07:05:05 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-05 07:05:05 - INFO - * Timeout: 0
+2025-11-05 07:05:05 - INFO - * Ausentes: 54
+2025-11-05 07:05:05 - INFO - * Outros: 0
+2025-11-05 07:05:05 - INFO - Aguardando 120s antes do próximo batch...
+
+2025-11-05 07:07:05 - INFO - Batch 6/6 - Processando itens 1001 a 1053 (53 itens)...
+2025-11-05 07:07:05 - INFO - Iniciando busca de 'DETALHES' assíncrona para 53 AppIDs com concorrência 1...
+2025-11-05 07:07:25 - INFO - Busca assíncrona concluída.
+2025-11-05 07:07:25 - INFO - --- Busca concluída: ---
+2025-11-05 07:07:25 - INFO - 0 sucesso(s) (0.00%),
+2025-11-05 07:07:25 - INFO - 53 falha(s) (100.00%).
+2025-11-05 07:07:25 - INFO - --- Detalhamento dos erros: ---
+2025-11-05 07:07:25 - INFO - * HTTP: 53 (403 Forbidden: 0, 429 Too Many Requests: 53)
+2025-11-05 07:07:25 - INFO - * Timeout: 0
+2025-11-05 07:07:25 - INFO - * Ausentes: 0
+2025-11-05 07:07:25 - INFO - * Outros: 0
+2025-11-05 07:07:25 - INFO - 
+PROCESSAMENTO COMPLETO!
+2025-11-05 07:07:25 - INFO - Total processado: 480 sucessos de 1,053 itens (45.58%)
+2025-11-05 07:07:47 - INFO - Dados de detalhes inseridos com sucesso.
+2025-11-05 07:08:15 - INFO - Número total de aplicativos carregados: 273744
+2025-11-05 07:08:15 - INFO - Processando aplicativos de 1 a 2000 de 273744
+2025-11-05 07:08:20 - INFO - Conectado ao Supabase com sucesso
+2025-11-05 07:10:17 - INFO - Total de registros desatualizados de steam_raw: 6859
+2025-11-05 07:11:21 - INFO - Número de AppIDs com dados incompletos: 6859
+2025-11-05 07:11:55 - INFO - Número de AppIDs a processar: 1390
+2025-11-05 07:11:55 - INFO - === PROCESSAMENTO EM BATCHES ===
+2025-11-05 07:11:55 - INFO - Total de itens: 1,390
+2025-11-05 07:11:55 - INFO - Tamanho do batch: 200
+2025-11-05 07:11:55 - INFO - Total de batches: 7
+2025-11-05 07:11:55 - INFO - Delay entre batches: 120s
+2025-11-05 07:11:55 - INFO - Concorrência por batch: 1
+2025-11-05 07:11:55 - INFO - ================================
+
+2025-11-05 07:11:55 - INFO - Batch 1/7 - Processando itens 1 a 200 (200 itens)...
+2025-11-05 07:11:55 - INFO - Iniciando busca de 'DETALHES' assíncrona para 200 AppIDs com concorrência 1...
+2025-11-05 07:13:15 - INFO - Busca assíncrona concluída.
+2025-11-05 07:13:15 - INFO - --- Busca concluída: ---
+2025-11-05 07:13:15 - INFO - 5 sucesso(s) (2.50%),
+2025-11-05 07:13:15 - INFO - 195 falha(s) (97.50%).
+2025-11-05 07:13:15 - INFO - --- Detalhamento dos erros: ---
+2025-11-05 07:13:15 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-05 07:13:15 - INFO - * Timeout: 0
+2025-11-05 07:13:15 - INFO - * Ausentes: 194
+2025-11-05 07:13:15 - INFO - * Outros: 0
+2025-11-05 07:13:15 - INFO - Aguardando 120s antes do próximo batch...
+
+2025-11-05 07:15:15 - INFO - Batch 2/7 - Processando itens 201 a 400 (200 itens)...
+2025-11-05 07:15:15 - INFO - Iniciando busca de 'DETALHES' assíncrona para 200 AppIDs com concorrência 1...
+2025-11-05 07:16:31 - INFO - Busca assíncrona concluída.
+2025-11-05 07:16:31 - INFO - --- Busca concluída: ---
+2025-11-05 07:16:31 - INFO - 0 sucesso(s) (0.00%),
+2025-11-05 07:16:31 - INFO - 200 falha(s) (100.00%).
+2025-11-05 07:16:31 - INFO - --- Detalhamento dos erros: ---
+2025-11-05 07:16:31 - INFO - * HTTP: 200 (403 Forbidden: 0, 429 Too Many Requests: 200)
+2025-11-05 07:16:31 - INFO - * Timeout: 0
+2025-11-05 07:16:31 - INFO - * Ausentes: 0
+2025-11-05 07:16:31 - INFO - * Outros: 0
+2025-11-05 07:16:31 - INFO - Aguardando 120s antes do próximo batch...
+
+2025-11-05 07:18:31 - INFO - Batch 3/7 - Processando itens 401 a 600 (200 itens)...
+2025-11-05 07:18:31 - INFO - Iniciando busca de 'DETALHES' assíncrona para 200 AppIDs com concorrência 1...
+2025-11-05 07:19:50 - INFO - Busca assíncrona concluída.
+2025-11-05 07:19:50 - INFO - --- Busca concluída: ---
+2025-11-05 07:19:50 - INFO - 0 sucesso(s) (0.00%),
+2025-11-05 07:19:50 - INFO - 200 falha(s) (100.00%).
+2025-11-05 07:19:50 - INFO - --- Detalhamento dos erros: ---
+2025-11-05 07:19:50 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-05 07:19:50 - INFO - * Timeout: 0
+2025-11-05 07:19:50 - INFO - * Ausentes: 200
+2025-11-05 07:19:50 - INFO - * Outros: 0
+2025-11-05 07:19:50 - INFO - Aguardando 120s antes do próximo batch...
+
+2025-11-05 07:21:50 - INFO - Batch 4/7 - Processando itens 601 a 800 (200 itens)...
+2025-11-05 07:21:50 - INFO - Iniciando busca de 'DETALHES' assíncrona para 200 AppIDs com concorrência 1...
+2025-11-05 07:23:05 - INFO - Busca assíncrona concluída.
+2025-11-05 07:23:05 - INFO - --- Busca concluída: ---
+2025-11-05 07:23:05 - INFO - 0 sucesso(s) (0.00%),
+2025-11-05 07:23:05 - INFO - 200 falha(s) (100.00%).
+2025-11-05 07:23:05 - INFO - --- Detalhamento dos erros: ---
+2025-11-05 07:23:05 - INFO - * HTTP: 200 (403 Forbidden: 0, 429 Too Many Requests: 200)
+2025-11-05 07:23:05 - INFO - * Timeout: 0
+2025-11-05 07:23:05 - INFO - * Ausentes: 0
+2025-11-05 07:23:05 - INFO - * Outros: 0
+2025-11-05 07:23:05 - INFO - Aguardando 120s antes do próximo batch...
+
+2025-11-05 07:25:05 - INFO - Batch 5/7 - Processando itens 801 a 1000 (200 itens)...
+2025-11-05 07:25:05 - INFO - Iniciando busca de 'DETALHES' assíncrona para 200 AppIDs com concorrência 1...
+2025-11-05 07:26:22 - INFO - Busca assíncrona concluída.
+2025-11-05 07:26:22 - INFO - --- Busca concluída: ---
+2025-11-05 07:26:22 - INFO - 0 sucesso(s) (0.00%),
+2025-11-05 07:26:22 - INFO - 200 falha(s) (100.00%).
+2025-11-05 07:26:22 - INFO - --- Detalhamento dos erros: ---
+2025-11-05 07:26:22 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-05 07:26:22 - INFO - * Timeout: 0
+2025-11-05 07:26:22 - INFO - * Ausentes: 200
+2025-11-05 07:26:22 - INFO - * Outros: 0
+2025-11-05 07:26:22 - INFO - Aguardando 120s antes do próximo batch...
+
+2025-11-05 07:28:22 - INFO - Batch 6/7 - Processando itens 1001 a 1200 (200 itens)...
+2025-11-05 07:28:22 - INFO - Iniciando busca de 'DETALHES' assíncrona para 200 AppIDs com concorrência 1...
+2025-11-05 07:29:38 - INFO - Busca assíncrona concluída.
+2025-11-05 07:29:38 - INFO - --- Busca concluída: ---
+2025-11-05 07:29:38 - INFO - 0 sucesso(s) (0.00%),
+2025-11-05 07:29:38 - INFO - 200 falha(s) (100.00%).
+2025-11-05 07:29:38 - INFO - --- Detalhamento dos erros: ---
+2025-11-05 07:29:38 - INFO - * HTTP: 200 (403 Forbidden: 0, 429 Too Many Requests: 200)
+2025-11-05 07:29:38 - INFO - * Timeout: 0
+2025-11-05 07:29:38 - INFO - * Ausentes: 0
+2025-11-05 07:29:38 - INFO - * Outros: 0
+2025-11-05 07:29:38 - INFO - Aguardando 120s antes do próximo batch...
+
+2025-11-05 07:31:38 - INFO - Batch 7/7 - Processando itens 1201 a 1390 (190 itens)...
+2025-11-05 07:31:38 - INFO - Iniciando busca de 'DETALHES' assíncrona para 190 AppIDs com concorrência 1...
+2025-11-05 07:32:53 - INFO - Busca assíncrona concluída.
+2025-11-05 07:32:53 - INFO - --- Busca concluída: ---
+2025-11-05 07:32:53 - INFO - 6 sucesso(s) (3.16%),
+2025-11-05 07:32:53 - INFO - 184 falha(s) (96.84%).
+2025-11-05 07:32:53 - INFO - --- Detalhamento dos erros: ---
+2025-11-05 07:32:53 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-05 07:32:53 - INFO - * Timeout: 0
+2025-11-05 07:32:53 - INFO - * Ausentes: 183
+2025-11-05 07:32:53 - INFO - * Outros: 0
+2025-11-05 07:32:53 - INFO - 
+PROCESSAMENTO COMPLETO!
+2025-11-05 07:32:53 - INFO - Total processado: 11 sucessos de 1,390 itens (0.79%)
+2025-11-05 07:32:55 - INFO - Dados de detalhes inseridos com sucesso.
