@@ -16,4 +16,5 @@ class Initialization:
             InitApplication.execute(arg_boolFirstRun=True)
 
         except Exception as e:
-            raise Exception(f"Erro na inicialização: {e}")
+            var_strTraceback = e.__traceback__
+            raise Exception(f"Erro na inicialização: {var_strTraceback}")

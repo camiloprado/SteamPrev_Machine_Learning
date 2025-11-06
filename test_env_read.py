@@ -1,0 +1,8 @@
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
+
+print('STEAM_BATCH_SIZE_DETAILS:', os.getenv('STEAM_BATCH_SIZE_DETAILS'))
+print('STEAM_DELAY_BETWEEN_BATCHES_DETAILS:', os.getenv('STEAM_DELAY_BETWEEN_BATCHES_DETAILS'))
+print('STEAM_ASYNC_CONCURRENCY_DETAILS:', os.getenv('STEAM_ASYNC_CONCURRENCY_DETAILS'))

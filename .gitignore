@@ -1,6 +1,12 @@
-/.venv
+/.venv/
+/.env
+/.vscode/
 /prj_TCC_PREVISOR_STEAM.egg-info
-/__pycache__
+*__pycache__/
+/.pytest_cache/
+/.mypy_cache
 *.pyc
 .DS_Store
-.env
+*.log
+*.temp
+*temp_

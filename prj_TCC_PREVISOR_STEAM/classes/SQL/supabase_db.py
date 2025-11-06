@@ -1,4 +1,5 @@
 from prj_TCC_PREVISOR_STEAM.classes.framework.AllSettings import Settings
+from prj_TCC_PREVISOR_STEAM.classes.api.steam_api import SteamClient
 
 import os
 import logging
@@ -73,6 +74,124 @@ class SupabaseDB:
         if not cls._var_boolConnected or cls._var_botClient is None:
             cls.conectar()
     
+    # ========== MÉTODOS para steam_generico ==========
+    @classmethod
+    def inserir_dadosSteamGenerico(cls) -> None:
+        """
+        Insere ou atualiza dados na tabela steam_generico.
+        """
+        
+        cls._garantir_conexao()
+        
+        try:
+            var_listDesatualizados = cls.buscar_jogos_desatualizados(arg_strNomeTabela="steam_generico")
+
+            if var_listDesatualizados:
+                var_listDados = SteamClient.find_app_list()
+            else:
+                logger.info("Nenhum dado desatualizado em steam_generico.")
+                return False
+            
+            for var_dictDados in var_listDados:
+                var_intAppid = var_dictDados.get("appid")
+                if not var_intAppid:
+                    raise ValueError("appid é obrigatório")
+
+                # Prepara dados para inserção
+                var_dictDadosInsert = {
+                    "appid": var_intAppid,
+                    "name": var_dictDados.get("name"),
+                    "ultima_atualizacao": datetime.utcnow().isoformat()
+                }
+                # Upsert: insere se não existe, atualiza se existe
+                var_apiResult = cls._var_botClient.table("steam_generico").upsert(
+                    var_dictDadosInsert,
+                    on_conflict="appid"
+                ).execute()
+
+                if not var_apiResult:
+                    logger.error(f"Erro ao inserir/atualizar AppID {var_intAppid}: {var_apiResult.error}")
+                    continue
+
+            logger.info(f"Dados de gênero salvos para {len(var_listDados)} registros.")
+            
+        except Exception as e:
+            logger.error(f"Erro ao inserir dados steam_generico: {e}")
+            raise Exception(f"Erro ao inserir dados steam_generico: {e}")
+
+    @classmethod
+    def buscar_dadosSteamGenerico(cls, arg_intAppid: int) -> Optional[Dict[str, Any]]:
+        """
+        Busca um jogo específico na tabela steam_generico.
+
+        Parâmetros:
+        - arg_intAppid (int): ID do aplicativo Steam
+
+        Retorna:
+        - Dicionário com os dados ou None se não encontrado
+        """
+        cls._garantir_conexao()
+        
+        try:
+            var_apiResult = cls._var_botClient.table("steam_generico").select("*").eq(
+                "appid", arg_intAppid
+            ).execute()
+
+            if var_apiResult.data and len(var_apiResult.data) > 0:
+                return var_apiResult.data[0]
+            return None
+            
+        except Exception as e:
+            logger.error(f"Erro ao buscar dados steam_generico: {e}")
+            raise Exception(f"Erro ao buscar dados steam_generico: {e}")
+
+    @classmethod
+    def buscar_todos_dadosSteamGenerico(cls, arg_intLimit: int = None) -> List[Dict[str, Any]]:
+        """
+        Busca todos os jogos da tabela steam_generico.
+
+        Parâmetros:
+        - arg_intLimit (int): Número máximo de registros. Se None, busca todos com paginação. (padrão: None)
+            
+        Retorna:
+        - Lista de dicionários com os dados
+        """
+        cls._garantir_conexao()
+        
+        try:
+            if arg_intLimit is not None:
+                # Com limite específico
+                var_apiResult = cls._var_botClient.table("steam_generico").select("*").limit(arg_intLimit).execute()
+                return var_apiResult.data if var_apiResult.data else []
+            else:
+                # Sem limite - busca todos com paginação
+                var_listTodosDados = []
+                var_intOffset = 0
+                var_intPageSize = 1000  # Tamanho da página
+                
+                while True:
+                    var_apiResult = cls._var_botClient.table("steam_generico").select("*").range(
+                        var_intOffset, var_intOffset + var_intPageSize - 1
+                    ).execute()
+                    
+                    if not var_apiResult.data or len(var_apiResult.data) == 0:
+                        break
+                    
+                    var_listTodosDados.extend(var_apiResult.data)
+                    
+                    # Se retornou menos que o page size, chegou no fim
+                    if len(var_apiResult.data) < var_intPageSize:
+                        break
+                    
+                    var_intOffset += var_intPageSize
+
+                logger.info(f"Total de registros carregados de steam_generico: {len(var_listTodosDados)}")
+                return var_listTodosDados
+
+        except Exception as e:
+            logger.error(f"Erro ao buscar todos os dados steam_generico: {e}")
+            raise Exception(f"Erro ao buscar todos os dados steam_generico: {e}")
+        
     # ========== MÉTODOS PARA steam_raw ==========
     
     @classmethod
@@ -104,7 +223,8 @@ class SupabaseDB:
             if var_dictDetalhes is not None:
                 var_dictDadosInsert = {
                     "appid": var_intAppid,
-                    "detalhes": var_dictDetalhes
+                    "detalhes": var_dictDetalhes,
+                    "ultima_atualizacao": datetime.utcnow().isoformat()
                 }
                 
                 # Upsert: insere se não existe, atualiza se existe
@@ -121,10 +241,11 @@ class SupabaseDB:
                 if var_apiRegistro.data and len(var_apiRegistro.data) > 0:
                     # Atualiza apenas o campo reviews
                     var_apiResult = cls._var_botClient.table("steam_raw").update({
-                        "reviews": var_dictReviews
+                        "reviews": var_dictReviews,
+                        "ultima_atualizacao": datetime.utcnow().isoformat()
                     }).eq("appid", var_intAppid).execute()
                 else:
-                    logger.warning(
+                    logger.debug(
                         f"AppID {var_intAppid} não encontrado. "
                         f"Insira os detalhes primeiro antes de adicionar reviews."
                     )
@@ -242,6 +363,7 @@ class SupabaseDB:
                     "total_negative": var_dictDados.get("total_negative"),
                     "total_positive": var_dictDados.get("total_positive"),
                     "review_score_desc": var_dictDados.get("review_score_desc"),
+                    "ultima_atualizacao": datetime.utcnow().isoformat()
                 }
                 # Upsert: insere se não existe, atualiza se existe
                 var_apiResult = cls._var_botClient.table("steam_bd").upsert(
@@ -332,6 +454,105 @@ class SupabaseDB:
             logger.error(f"Erro ao buscar todos os dados steam_bd: {e}")
             raise Exception(f"Erro ao buscar todos os dados steam_bd: {e}")
     
+    # ================= ITAD ==================
+    @classmethod
+    def inserir_dados_ITAD_Raw(cls, arg_dictDados: Dict[str, Any]) -> None:
+        """
+        Insere ou atualiza dados na tabela itad_raw.
+
+        Parâmetros:
+        - arg_dictDados (dict): Dicionário com os dados do ITAD
+        """
+        cls._garantir_conexao()
+        
+        try:
+            var_strid = arg_dictDados.get("id_itad")
+            if not var_strid:
+                raise ValueError("ID é obrigatório")
+
+            # Upsert: insere se não existe, atualiza se existe
+            var_apiResult = cls._var_botClient.table("itad_raw").upsert(
+                arg_dictDados,
+                on_conflict="id_itad"
+            ).execute()
+            
+        except Exception as e:
+            logger.error(f"Erro ao inserir dados ITAD: {e}")
+            raise Exception(f"Erro ao inserir dados ITAD: {e}")
+        
+    @classmethod
+    def buscar_dados_ITAD_Raw(cls, arg_strIdITAD: str) -> Optional[Dict[str, Any]]:
+        """
+        Busca um jogo específico na tabela itad_raw.
+        
+        Parâmetros:
+        - arg_strIdITAD (str): ID do jogo
+            
+        Retorna:
+        - Dicionário com os dados ou None se não encontrado
+        """
+        cls._garantir_conexao()
+        
+        try:
+            var_apiResult = cls._var_botClient.table("itad_raw").select("*").eq(
+                "id_itad", arg_strIdITAD
+            ).execute()
+
+            if var_apiResult.data and len(var_apiResult.data) > 0:
+                return var_apiResult.data[0]
+            return None
+            
+        except Exception as e:
+            logger.error(f"Erro ao buscar dados ITAD: {e}")
+            raise Exception(f"Erro ao buscar dados ITAD: {e}")
+        
+    @classmethod
+    def buscar_todos_dados_ITAD_Raw(cls, arg_intLimit: int = None) -> List[Dict[str, Any]]:
+        """
+        Busca todos os jogos da tabela itad_raw.
+        
+        Parâmetros:
+        - arg_intLimit (int): Número máximo de registros. Se None, busca todos com paginação. (padrão: None)
+        
+        Retorna:
+        - Lista de dicionários com os dados
+        """
+        cls._garantir_conexao()
+        
+        try:
+            if arg_intLimit is not None:
+                # Com limite específico
+                var_apiResult = cls._var_botClient.table("itad_raw").select("*").limit(arg_intLimit).execute()
+                return var_apiResult.data if var_apiResult.data else []
+            else:
+                # Sem limite - busca todos com paginação
+                var_listTodosDados = []
+                var_intOffset = 0
+                var_intPageSize = 1000  # Tamanho da página
+                
+                while True:
+                    var_apiResult = cls._var_botClient.table("itad_raw").select("*").range(
+                        var_intOffset, var_intOffset + var_intPageSize - 1
+                    ).execute()
+                    
+                    if not var_apiResult.data or len(var_apiResult.data) == 0:
+                        break
+                    
+                    var_listTodosDados.extend(var_apiResult.data)
+                    
+                    # Se retornou menos que o page size, chegou no fim
+                    if len(var_apiResult.data) < var_intPageSize:
+                        break
+                    
+                    var_intOffset += var_intPageSize
+                
+                logger.info(f"Total de registros carregados de steam_bd: {len(var_listTodosDados)}")
+                return var_listTodosDados
+
+        except Exception as e:
+            logger.error(f"Erro ao buscar todos os dados steam_bd: {e}")
+            raise Exception(f"Erro ao buscar todos os dados steam_bd: {e}")
+        
     # ========== MÉTODOS UTILITÁRIOS ==========
     @classmethod
     def buscar_jogos_desatualizados(cls, arg_strNomeTabela: str = "steam_raw", arg_intLimite: int = None) -> List[Dict[str, Any]]:

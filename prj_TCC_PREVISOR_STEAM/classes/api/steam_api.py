@@ -54,6 +54,30 @@ class SteamClient:
             except Exception:
                 pass
 
+            try:
+                var_listData = cls.find_app_list()
+                # Salva no cache local
+                os.makedirs(os.path.dirname(var_strPath), exist_ok=True)
+
+                # Salva o arquivo
+                with open(var_strPath, "w", encoding="utf-8") as f:
+                    json.dump(var_listData, f)
+                Settings._var_boolAppListLoaded = True
+
+            except Exception as e:
+                Settings._var_listApp = []
+                return Settings._var_listApp
+
+    @classmethod
+    def find_app_list(cls) -> list[dict[str, Any]]:
+        """
+        Executa a requisição para obter a lista de aplicativos da Steam diretamente da API.
+
+        Parâmetros:
+
+        Retorna:
+        - var_listData (list): A lista de aplicativos da Steam.
+        """
         # Se não tiver cache ou for forçado, baixa da Steam
         try:
             # Faz a requisição para a Steam
@@ -65,17 +89,11 @@ class SteamClient:
             # Processa os dados recebidos
             var_listData = var_respResponse.json().get("applist", {}).get("apps", [])
             Settings._var_listApp = var_listData
-
-            # Salva no cache local
-            os.makedirs(os.path.dirname(var_strPath), exist_ok=True)
-
-            # Salva o arquivo
-            with open(var_strPath, "w", encoding="utf-8") as f:
-                json.dump(var_listData, f)
-            Settings._var_boolAppListLoaded = True
+            return var_listData
+            
         except Exception as e:
-            Settings._var_listApp = []
-        return Settings._var_listApp
+            logger.error(f"Erro ao buscar a lista de aplicativos da Steam: {e}")
+            raise Exception(f"Erro ao buscar a lista de aplicativos da Steam: {e}")
 
     # ------------------- Find appid -------------------
     @classmethod
@@ -178,7 +196,7 @@ class SteamClient:
                 logger.info(f"Aguardando {var_intDelay}s antes do próximo batch...\n")
                 await asyncio.sleep(var_intDelay)
         
-        logger.info(f"\nPROCESSAMENTO COMPLETO!")
+        logger.info(f"===========PROCESSAMENTO COMPLETO!==========")
         logger.info(f"Total processado: {len(var_dictAllResults):,} sucessos de {var_intTotalItems:,} itens ({len(var_dictAllResults)/var_intTotalItems:.2%})")
         
         return var_dictAllResults
@@ -197,6 +215,7 @@ class SteamClient:
         """
         try:
             var_dictConfigAPI = Settings.steam_api_details()
+            logger.info(f"Configuração Steam Details usada: {var_dictConfigAPI}")
             var_intAsyncConcurrency = var_dictConfigAPI.get("Concurrency", 1)
             # Controle de concorrência
             var_semSemaphore = asyncio.Semaphore(var_intAsyncConcurrency)
@@ -234,7 +253,7 @@ class SteamClient:
                             var_dictData = await var_respResponse.json()
 
                             # Verifica se os dados são válidos
-                            if var_dictData and str(arg_intAppid) in var_dictData and var_dictData[str(arg_intAppid)]["success"]:
+                            if var_dictData and var_dictData[str(arg_intAppid)]["success"]:
                                 var_dictDetails = var_dictData[str(arg_intAppid)]["data"]
                                 return var_dictDetails
                             
@@ -249,6 +268,8 @@ class SteamClient:
                                 var_intErrosForbidden += 1
                             elif e_http.status == 429:
                                 var_intErrosTooManyRequests += 1
+                            else:
+                                logger.warning(f"AppID {arg_intAppid}: Erro HTTP status {e_http.status}")
                         return None
                     except asyncio.TimeoutError:
                         # Captura erro de timeout.
@@ -334,7 +355,7 @@ class SteamClient:
                 logger.info(f"Aguardando {var_intDelay}s antes do próximo batch...\n")
                 await asyncio.sleep(var_intDelay)
 
-        logger.info(f"\nPROCESSAMENTO COMPLETO!")
+        logger.info(f"===========PROCESSAMENTO COMPLETO!==========")
         logger.info(f"Total processado: {len(var_dictAllResults):,} sucessos de {var_intTotalItems:,} itens ({len(var_dictAllResults)/var_intTotalItems:.2%})")
         
         return var_dictAllResults
@@ -499,7 +520,7 @@ class SteamClient:
                 logger.info(f"Aguardando {var_intDelay}s antes do próximo batch...\n")
                 await asyncio.sleep(var_intDelay)
         
-        logger.info(f"\nPROCESSAMENTO COMPLETO!")
+        logger.info(f"===========PROCESSAMENTO COMPLETO!==========")
         logger.info(f"Total processado: {len(var_dictAllResults):,} sucessos de {var_intTotalItems:,} itens ({len(var_dictAllResults)/var_intTotalItems:.2%})")
         
         return var_dictAllResults
@@ -731,7 +752,7 @@ class SteamClient:
                 logger.info(f"Aguardando {var_intDelay}s antes do próximo batch...\n")
                 await asyncio.sleep(var_intDelay)
         
-        logger.info(f"\nPROCESSAMENTO COMPLETO!")
+        logger.info(f"===========PROCESSAMENTO COMPLETO!==========")
         logger.info(f"Total processado: {len(var_dictAllResults):,} sucessos de {var_intTotalItems:,} itens ({len(var_dictAllResults)/var_intTotalItems:.2%})")
         
         return var_dictAllResults

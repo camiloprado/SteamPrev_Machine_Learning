@@ -18,7 +18,6 @@ class Previsor:
     Classe responsável por gerenciar módulos gerais do projeto.
     """
     _var_boolUseSupabase = os.getenv("USE_SUPABASE", "false").lower() == "true"
-    _var_intTamanhoTotalFila = 0
 
     @classmethod
     def seleciona_games(cls, arg_listDados: list) -> list:
@@ -150,64 +149,93 @@ class Previsor:
         - None
         """
         try:
-            var_listApp = GetTask.load_task_queue()
-            cls._var_intTamanhoTotalFila = len(var_listApp)
-            var_intRange = 2000  # Processa x AppIDs por vez (ajustável)
-            var_listApp = var_listApp[1000:1005]  # Para testes rápidos, remove essa linha na produção
-            # Itera sobre os aplicativos em lotes
-            for i in range(0, len(var_listApp), var_intRange):
-                logger.info(f"Processando aplicativos de {i + 1} a {min(i + var_intRange, len(var_listApp))} de {len(var_listApp)}")
-                var_listAppAtual = var_listApp[i:i+var_intRange]
-                var_listAppIDAtual = [var_listAppAtual[j]['appid'] for j in range(len(var_listAppAtual))]
-                
-                # Verifica quais AppIDs já estão no banco de dados
-                var_listAppIDnoBD = SupabaseDB.buscar_jogos_por_ID(arg_listAppIDs=var_listAppIDAtual, arg_strNomeTabel="steam_raw")
-                var_listAppIDDesatualizado = SupabaseDB.buscar_jogos_desatualizados()
-                var_listAppIDIncompleto = SupabaseDB.buscar_jogos_incompletos(arg_boolRequererReviews=True)
+            # Inicializa o contador de tentativas
+            var_intTentativaMaxima = Settings._var_dictSettings.get("max_tentativas", 3)
+            
+            # Define o range de processamento por vez pelo .env
+            var_intRange = int(os.getenv("RANGE_PROCESSAMENTO_APPIDS_RAW", 1000))
+            
+            # Carrega a lista de aplicativos
+            var_listApp = SupabaseDB.buscar_todos_dadosSteamGenerico()
+            var_listAppID = [var_listApp[j]['appid'] for j in range(len(var_listApp))]
+            var_intTamanhoTotalFila = len(var_listAppID)
 
+            # Loop criado por conta de ser muito grande a lista de apps para buscar de uma vez no BD
+            for var_intTamanho in range(0, var_intTamanhoTotalFila, var_intRange):
+                var_listAppIDSubset = var_listAppID[var_intTamanho:var_intTamanho + var_intRange]
+                # Verifica quais AppIDs já estão no banco de dados
+                var_listAppIDnoBD = SupabaseDB.buscar_jogos_por_ID(arg_listAppIDs=var_listAppIDSubset, arg_strNomeTabel="steam_raw")
                 for var_dictAppID in var_listAppIDnoBD:
                     var_intAppID = var_dictAppID['appid']
-                    if var_intAppID in var_listAppIDAtual:
-                        var_listAppIDAtual.remove(var_intAppID)
+                    # Remove os AppIDs que já estão no banco de dados
+                    if var_intAppID in var_listAppID:
+                        var_listAppID.remove(var_intAppID)
 
-                for var_dictAppID in var_listAppIDDesatualizado:
-                    var_intAppID = var_dictAppID['appid']
-                    if var_intAppID not in var_listAppIDAtual:
-                        var_listAppIDAtual.append(var_intAppID)
+            if len(var_listAppID) != var_intTamanhoTotalFila:
+                logger.info(f"Número total de AppIDs a processar após remoção: {len(var_listAppID)}. Removido: {var_intTamanhoTotalFila - len(var_listAppID)}")
+                var_intTamanhoTotalFila = len(var_listAppID)
+
+            # Verifica quais AppIDs estão desatualizados
+            var_listAppIDDesatualizado = SupabaseDB.buscar_jogos_desatualizados()
+            for var_dictAppID in var_listAppIDDesatualizado:
+                var_intAppID = var_dictAppID['appid']
+                # Adiciona os AppIDs desatualizados para reprocessamento
+                if var_intAppID not in var_listAppID:
+                    var_listAppID.append(var_intAppID)
+
+            if len(var_listAppID) != var_intTamanhoTotalFila:
+                logger.info(f"Número total de AppIDs a processar após verificação de desatualizados: {len(var_listAppID)}. Desatualizados adicionados: {len(var_listAppID) - var_intTamanhoTotalFila}")
+                var_intTamanhoTotalFila = len(var_listAppID)
+
+            # Itera sobre os aplicativos em lotes
+            for i in range(0, var_intTamanhoTotalFila, var_intRange):
+                logger.info(f"Processando aplicativos de {i + 1} a {min(i + var_intRange, var_intTamanhoTotalFila)} de {var_intTamanhoTotalFila}")
+                # Carrega os aplicativos atuais
+                var_listAppIDAtual = var_listAppID[i:i+var_intRange]
                 
+                # Verifica quais AppIDs estão incompletos
+                var_listAppIDIncompleto = SupabaseDB.buscar_jogos_incompletos(arg_boolRequererReviews=True)
                 if var_listAppIDIncompleto:
                     for var_dictAppID in var_listAppIDIncompleto:
                         var_intAppID = var_dictAppID['appid']
+                        # Adiciona os AppIDs com detalhes incompletos para reprocessamento
                         if var_dictAppID.get('detalhes') is None:
                             if var_intAppID not in var_listAppIDAtual:
                                 var_listAppIDAtual.append(var_intAppID)
 
-                if not var_listAppIDAtual:
-                    logger.info("Nenhum AppID encontrado para atualização nesta iteração.")
-                    continue
-
-                logger.info(f"Número de AppIDs a processar: {len(var_listAppIDAtual)}")
+                if len(var_listAppIDAtual) != var_intTamanhoTotalFila:
+                    logger.info(f"Número de AppIDs a processar após verificação de incompletos: {len(var_listAppIDAtual)}. Incompletos adicionados: {len(var_listAppIDAtual) - len(var_listAppID[i:i+var_intRange])}")
 
                 # Busca detalhes dos jogos
                 var_dictDetails = asyncio.run(SteamClient.fetch_details_bulk_batched(arg_seqAppids=var_listAppIDAtual))
                 if not var_dictDetails:
                     logger.warning("Nenhum dado de detalhes retornado da API Steam.")
                 else:
+                    # Combina detalhes dos jogos
                     for var_intAppid in var_dictDetails.keys():
                         var_dictRawData = {
                             "appid": var_intAppid,
                             "detalhes": var_dictDetails.get(var_intAppid),
                         }
-                        
-                        SupabaseDB.inserir_dadosSteamRaw(var_dictRawData)    
+                        # Tenta inserir os dados com múltiplas tentativas
+                        for var_intTentativa in range(var_intTentativaMaxima):
+                            try:
+                                SupabaseDB.inserir_dadosSteamRaw(var_dictRawData)    
+                                break  # Sai do loop se a inserção for bem-sucedida
+                            except Exception as e:
+                                logger.error(f"Erro ao inserir dados para AppID {var_intAppid} na tentativa {var_intTentativa + 1}: {e}")
+                                if var_intTentativa < var_intTentativaMaxima - 1:
+                                    sleep(5)  # Espera 5 segundos antes de tentar novamente
+                                else:
+                                    raise Exception(f"Erro ao inserir dados para AppID {var_intAppid} após {var_intTentativaMaxima} tentativas.")
                     logger.info("Dados de detalhes inseridos com sucesso.")
 
-                    sleep(1800)  # Espera 30 minutos entre os testes para evitar bloqueios
-
+                # Busca reviews dos jogos incompletos
                 if var_listAppIDIncompleto:
                     logger.info(f"Número de AppIDs com dados incompletos: {len(var_listAppIDIncompleto)}")
                     for var_dictAppID in var_listAppIDIncompleto:
                         var_intAppID = var_dictAppID['appid']
+                        # Adiciona os AppIDs com reviews incompletos para reprocessamento
                         if var_dictAppID.get('reviews') is None:
                             if var_intAppID not in var_listAppIDAtual:
                                 var_listAppIDAtual.append(var_intAppID)
@@ -217,14 +245,23 @@ class Previsor:
                 if not var_dictReview:
                     logger.warning("Nenhum dado de reviews retornado da API Steam.")
                 else:
-                    # Combina reviews
+                    # Combina reviews dos jogos
                     for var_intAppid in var_dictReview.keys():
                         var_dictRawData = {
                             "appid": var_intAppid,
                             "reviews": var_dictReview.get(var_intAppid)
                         }
-                        
-                        SupabaseDB.inserir_dadosSteamRaw(var_dictRawData)    
+                        # Tenta inserir os dados com múltiplas tentativas
+                        for var_intTentativa in range(var_intTentativaMaxima):
+                            try:
+                                SupabaseDB.inserir_dadosSteamRaw(var_dictRawData)
+                                break  # Sai do loop se a inserção for bem-sucedida
+                            except Exception as e:
+                                logger.error(f"Erro ao inserir reviews para AppID {var_intAppid} na tentativa {var_intTentativa + 1}: {e}")
+                                if var_intTentativa < var_intTentativaMaxima - 1:
+                                    sleep(5)  # Espera 5 segundos antes de tentar novamente
+                                else:
+                                    raise Exception(f"Erro ao inserir reviews para AppID {var_intAppid} após {var_intTentativaMaxima} tentativas.")
                     logger.info("Dados de reviews inseridos com sucesso.")
                 
         except Exception as e:
@@ -242,26 +279,34 @@ class Previsor:
         - None
         """
         try:
-            # Processa dados para steam_bd
+            var_intTentativaMaxima = Settings._var_dictSettings.get("max_tentativas", 3)
+            # Busca dados raw do Supabase da tabela steam_raw
             var_listDadosSteamRaw = SupabaseDB.buscar_todos_dadosSteamRaw()
+            # Seleciona apenas os jogos
             var_listGames = cls.seleciona_games(var_listDadosSteamRaw)
+
             if var_listGames:
+                # Seleciona os dados relevantes para a base de dados steam_bd
                 var_listDados = cls.selecionar_base_dadosSteamBD(var_listGames)
-                var_intRange = 3000  # Insere x registros por vez (ajustável)
+                # Define o range de processamento por vez pelo .env
+                var_intRange = int(os.getenv("RANGE_PROCESSAMENTO_APPIDS_BD", 3000))
+
                 # Insere em lotes
                 for i in range(0, len(var_listDados), var_intRange):
                     logger.info(f"Inserindo registros de {i + 1} a {min(i + var_intRange, len(var_listDados))} de {len(var_listDados)} na tabela steam_bd")
+                    # Pega o lote atual
                     var_listDadosParcial = var_listDados[i:i+var_intRange]
-                    for var_intTentativa in range(3):  # Tenta 3 vezes em caso de falha
+                    # Tenta inserir os dados com múltiplas tentativas
+                    for var_intTentativa in range(var_intTentativaMaxima):
                         try:
                             SupabaseDB.inserir_dadosSteamBD(var_listDadosParcial)
                             break  # Sai do loop se a inserção for bem-sucedida
                         except Exception as e:
                             logger.error(f"Erro ao inserir dados na tentativa {var_intTentativa + 1}: {e}")
-                            if var_intTentativa < 2:
+                            if var_intTentativa < var_intTentativaMaxima - 1:
                                 sleep(5)  # Espera 5 segundos antes de tentar novamente
                             else:
-                                raise  # Relevanta a exceção após 3 tentativas
+                                raise Exception(f"Erro {e} ao inserir dados na tabela steam_bd após {var_intTentativaMaxima} tentativas.")
 
                 logger.info("Dados processados inseridos na tabela steam_bd com sucesso.")
             else:
@@ -282,19 +327,33 @@ class Previsor:
         - None
         """
         try:
-            var_listDadosSteamRaw = SupabaseDB.buscar_todos_dadosSteamBD()
-            var_listDadosSteamRaw = var_listDadosSteamRaw[0:5]  # Para testes rápidos, remover na produção
-            var_intTamanhoTotalFila = len(var_listDadosSteamRaw)
-            var_intRange = 2000  # Processa x AppIDs por vez (ajustável)
+            # Inicializa o contador de tentativas
+            var_intTentativaMaxima = Settings._var_dictSettings.get("max_tentativas", 3)
+            # Busca dados do Supabase da tabela steam_bd
+            var_listDadosSteamBD = SupabaseDB.buscar_todos_dadosSteamBD()
+            # Define o tamanho total da fila
+            var_intTamanhoTotalFila = len(var_listDadosSteamBD)
+            # Define o range de processamento por vez pelo .env
+            var_intRange = int(os.getenv("RANGE_PROCESSAMENTO_ITAD_RAW", 5000))
             
             # Itera sobre os aplicativos em lotes
             for i in range(0, var_intTamanhoTotalFila, var_intRange):
                 logger.info(f"Processando aplicativos de {i + 1} a {min(i + var_intRange, var_intTamanhoTotalFila)} de {var_intTamanhoTotalFila}")
-                var_listAppAtual = var_listDadosSteamRaw[i:i+var_intRange]
+                # Carrega os aplicativos atuais
+                var_listAppAtual = var_listDadosSteamBD[i:i+var_intRange]
                 var_listAppIDAtual = [var_listAppAtual[j]['appid'] for j in range(len(var_listAppAtual))]
                 
+                # Verifica quais AppIDs já estão no banco de dados ITAD
+                var_listAppIDnoBD = SupabaseDB.buscar_jogos_por_ID(arg_listAppIDs=var_listAppIDAtual, arg_strNomeTabel="itad_raw")
+
+                # Verifica quais AppIDs estão desatualizados
                 var_listAppIDDesatualizado = SupabaseDB.buscar_jogos_desatualizados(arg_strNomeTabela="itad_raw")
-                
+                for var_dictAppID in var_listAppIDnoBD:
+                    var_intAppID = var_dictAppID['appid']
+                    # Remove os AppIDs que já estão no banco de dados
+                    if var_intAppID in var_listAppIDAtual:
+                        var_listAppIDAtual.remove(var_intAppID)
+
                 for var_dictAppID in var_listAppIDDesatualizado:
                     var_intAppID = var_dictAppID['appid']
                     if var_intAppID not in var_listAppIDAtual:
@@ -307,23 +366,31 @@ class Previsor:
                 logger.info(f"Número de IDs a processar: {len(var_listAppIDAtual)}")
 
                 # Busca detalhes dos jogos
-                var_listDetails = SteamClient.lookup_itad_ids(arg_seqAppids=var_listAppIDAtual)
-                if not var_listDetails:
+                var_dictITAD = asyncio.run(SteamClient.lookup_itad_ids_batched(arg_seqAppids=var_listAppIDAtual))
+                if not var_dictITAD:
                     logger.warning("Nenhum dado de detalhes retornado da API Steam.")
                 else:
-                    for var_dictITAD in var_listDetails:
-
+                    for var_dictITADValues in var_dictITAD.values():
                         var_dictRawData = {
-                            "id": var_dictITAD.get("id"),
-                            "slug": var_dictITAD.get("slug"),
-                            "title": var_dictITAD.get("title"),
-                            "type": var_dictITAD.get("type"),
-                            "mature": var_dictITAD.get("mature"),
-                            "assets": var_dictITAD.get("assets"),
+                            "id_itad": var_dictITADValues.get("id"),
+                            "slug": var_dictITADValues.get("slug"),
+                            "title": var_dictITADValues.get("title"),
+                            "type": var_dictITADValues.get("type"),
+                            "mature": var_dictITADValues.get("mature"),
+                            "assets": var_dictITADValues.get("assets"),
                             "ultima_atualizacao": datetime.now().isoformat(),
                         }
-                        
-                        SupabaseDB.inserir_dadosSteamRaw(var_dictRawData)    
+                        # Tenta inserir os dados com múltiplas tentativas
+                        for var_intTentativa in range(var_intTentativaMaxima):
+                            try:
+                                SupabaseDB.inserir_dados_ITAD_Raw(var_dictRawData)    
+                                break  # Sai do loop se a inserção for bem-sucedida
+                            except Exception as e:
+                                logger.error(f"Erro ao inserir dados ITAD para AppID {var_dictITADValues.get('id')} na tentativa {var_intTentativa + 1}: {e}")
+                                if var_intTentativa < var_intTentativaMaxima - 1:
+                                    sleep(5)  # Espera 5 segundos antes de tentar novamente
+                                else:
+                                    raise Exception(f"Erro ao inserir dados ITAD para AppID {var_dictITADValues.get('id')} após {var_intTentativaMaxima} tentativas.")
                     logger.info("Dados de detalhes inseridos com sucesso.")
         except Exception as e:
             logger.error(f"Erro ao alimentar o banco de dados ITAD: {e}")

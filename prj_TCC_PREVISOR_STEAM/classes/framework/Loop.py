@@ -31,8 +31,9 @@ class Loop:
                     var_listFila.pop(0)
                     logger.info(f"Tarefa concluída. Tarefas restantes: {len(var_listFila)}")
                 except Exception as e:
+                    var_strTraceback = e.__traceback__
                     if var_intTentativa == Settings._var_dictSettings["max_tentativas"] - 1:
-                        raise e
+                        raise Exception(f"Erro ao processar a tarefa após {Settings._var_dictSettings['max_tentativas']} tentativas: {e}\nTraceback: {var_strTraceback}")
                     InitApplication.execute(arg_boolFirstRun=False)
 
                 else:

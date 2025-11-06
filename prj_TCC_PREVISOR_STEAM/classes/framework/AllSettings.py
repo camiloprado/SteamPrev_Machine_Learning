@@ -112,7 +112,8 @@ class Settings:
         cls._var_boolAppListLoaded = False
         cls._var_dictConfigAPI = {
             "detalhes": cls.steam_api_details(),
-            "reviews": cls.steam_api_reviews()
+            "reviews": cls.steam_api_reviews(),
+            "itad": cls.steam_api_itad()
         }
 
     @classmethod
