@@ -1,7 +1,9 @@
+from prj_TCC_PREVISOR_STEAM.classes.SQL.supabase_db import SupabaseDB
 from prj_TCC_PREVISOR_STEAM.classes.framework.AllSettings import Settings
 
 from typing import Any, Sequence
 from datetime import datetime, timedelta, timezone
+from time import sleep
 import asyncio, random, json, logging, os, re, aiohttp, requests
 
 logger = logging.getLogger(__name__)
@@ -166,16 +168,17 @@ class SteamClient:
         var_intBatchSize = var_dictConfigAPI.get("BatchSize", 200)
         var_intDelay = var_dictConfigAPI.get("Delay", 120)
         var_intAsyncConcurrency = var_dictConfigAPI.get("Concurrency", 1)
-        
+        var_intTentativaMaxima = var_dictConfigAPI.get("max_tentativas", 3)
         var_intTotalItems = len(arg_seqAppids)
         var_intTotalBatches = (var_intTotalItems + var_intBatchSize - 1) // var_intBatchSize
-        
+        logger.info(f"")
         logger.info(f"=== PROCESSAMENTO EM BATCHES ===")
         logger.info(f"Total de itens: {var_intTotalItems:,}")
         logger.info(f"Tamanho do batch: {var_intBatchSize:,}")
         logger.info(f"Total de batches: {var_intTotalBatches}")
         logger.info(f"Delay entre batches: {var_intDelay}s")
         logger.info(f"Concorrência por batch: {var_intAsyncConcurrency}")
+        logger.info(f"Tempo Estimado para conclusão total do Batch: {(var_intTotalBatches * var_intDelay)/60:.1f} minutos")
         logger.info(f"================================\n")
         
         var_dictAllResults = {}
@@ -191,12 +194,32 @@ class SteamClient:
             var_dictBatchResults = await cls.fetch_details_bulk(var_listBatch)
             var_dictAllResults.update(var_dictBatchResults)
             
+            # Combina detalhes dos jogos
+            for var_intAppid in var_dictBatchResults.keys():
+                var_dictRawData = {
+                    "appid": var_intAppid,
+                    "detalhes": var_dictBatchResults.get(var_intAppid),
+                    "ultima_atualizacao": datetime.now(timezone.utc).isoformat()
+                }
+                # Tenta inserir os dados com múltiplas tentativas
+                for var_intTentativa in range(var_intTentativaMaxima):
+                    try:
+                        SupabaseDB.inserir_dadosSteamRaw(var_dictRawData)    
+                        break  # Sai do loop se a inserção for bem-sucedida
+                    except Exception as e:
+                        logger.error(f"Erro ao inserir dados para AppID {var_intAppid} na tentativa {var_intTentativa + 1}: {e}")
+                        if var_intTentativa < var_intTentativaMaxima - 1:
+                            sleep(5)  # Espera 5 segundos antes de tentar novamente
+                        else:
+                            raise Exception(f"Erro ao inserir dados para AppID {var_intAppid} após {var_intTentativaMaxima} tentativas.")
+            logger.info("Dados de detalhes inseridos com sucesso.")
+
             # Aguarda entre batches (exceto no último)
             if var_intBatchNum < var_intTotalBatches - 1:
                 logger.info(f"Aguardando {var_intDelay}s antes do próximo batch...\n")
                 await asyncio.sleep(var_intDelay)
-        
-        logger.info(f"===========PROCESSAMENTO COMPLETO!==========")
+
+        logger.info(f"===========PROCESSAMENTO COMPLETO! (Detalhes)==========")
         logger.info(f"Total processado: {len(var_dictAllResults):,} sucessos de {var_intTotalItems:,} itens ({len(var_dictAllResults)/var_intTotalItems:.2%})")
         
         return var_dictAllResults
@@ -215,7 +238,6 @@ class SteamClient:
         """
         try:
             var_dictConfigAPI = Settings.steam_api_details()
-            logger.info(f"Configuração Steam Details usada: {var_dictConfigAPI}")
             var_intAsyncConcurrency = var_dictConfigAPI.get("Concurrency", 1)
             # Controle de concorrência
             var_semSemaphore = asyncio.Semaphore(var_intAsyncConcurrency)
@@ -259,7 +281,9 @@ class SteamClient:
                             
                             # Caso não retorne dados válidos (success=False ou dados ausentes)
                             var_intAusentes += 1
-                            return None
+                            # Atribui os detalhes ausentes
+                            var_dictDetails = var_dictData
+                            return var_dictDetails
                     except aiohttp.ClientError as e_http:
                         # Captura erros específicos de HTTP (conexão, timeout, status).
                         var_intErrosHTTP += 1
@@ -293,12 +317,21 @@ class SteamClient:
             var_dictResults: dict = {}
             for var_dictOut in var_listOut:
                 if isinstance(var_dictOut, dict):
-                    var_dictResults[var_dictOut["steam_appid"]] = var_dictOut
+                    try:
+                        var_dictResults[var_dictOut["steam_appid"]] = var_dictOut
+                    except KeyError:
+                        # Busca a primeira chave do dicionário (que deve ser o appid como string)
+                        if len(var_dictOut) == 1:
+                            var_strAppid = next(iter(var_dictOut.keys()))
+                            var_dictResults[int(var_strAppid)] = "AUSENTE"
+                        else:
+                            # Se não conseguir identificar, ignora
+                            continue
 
             var_intFalha = len(arg_seqAppids) - len(var_dictResults)
             logger.info(f"--- Busca concluída: ---")
-            logger.info(f"{len(var_dictResults)} sucesso(s) ({len(var_dictResults)/(len(arg_seqAppids)):.2%}),")
-            logger.info(f"{var_intFalha} falha(s) ({var_intFalha/len(arg_seqAppids):.2%}).")
+            logger.info(f"{len(var_dictResults)-var_intAusentes} sucesso(s) ({len(var_dictResults)/(len(arg_seqAppids)):.2%}),")
+            logger.info(f"{var_intFalha+var_intAusentes} falha(s) ({var_intFalha/len(arg_seqAppids):.2%}).")
             logger.info(f"--- Detalhamento dos erros: ---")
             logger.info(f"* HTTP: {var_intErrosHTTP} (403 Forbidden: {var_intErrosForbidden}, 429 Too Many Requests: {var_intErrosTooManyRequests})")
             logger.info(f"* Timeout: {var_intErrosTimeout}")
@@ -328,13 +361,16 @@ class SteamClient:
         var_intAsyncConcurrency = var_dictConfigAPI.get("Concurrency", 1)
         var_intTotalItems = len(arg_seqAppids)
         var_intTotalBatches = (var_intTotalItems + var_intBatchSize - 1) // var_intBatchSize
-        
+        var_intTentativaMaxima = var_dictConfigAPI.get("max_tentativas", 3)
+
+        logger.info(f"")
         logger.info(f"=== PROCESSAMENTO EM BATCHES (REVIEWS) ===")
         logger.info(f"Total de itens: {var_intTotalItems:,}")
         logger.info(f"Tamanho do batch: {var_intBatchSize:,}")
         logger.info(f"Total de batches: {var_intTotalBatches}")
         logger.info(f"Delay entre batches: {var_intDelay}s")
         logger.info(f"Concorrência por batch: {var_intAsyncConcurrency}")
+        logger.info(f"Tempo Estimado para conclusão total do Batch: {(var_intTotalBatches * var_intDelay)/60:.1f} minutos")
         logger.info(f"==========================================\n")
         
         var_dictAllResults = {}
@@ -350,12 +386,32 @@ class SteamClient:
             var_dictBatchResults = await cls.fetch_reviews_summary(var_listBatch)
             var_dictAllResults.update(var_dictBatchResults)
             
+            # Combina reviews dos jogos
+            for var_intAppid in var_dictBatchResults.keys():
+                var_dictRawData = {
+                    "appid": var_intAppid,
+                    "reviews": var_dictBatchResults.get(var_intAppid),
+                    "ultima_atualizacao": datetime.now(timezone.utc).isoformat()
+                }
+                # Tenta inserir os dados com múltiplas tentativas
+                for var_intTentativa in range(var_intTentativaMaxima):
+                    try:
+                        SupabaseDB.inserir_dadosSteamRaw(var_dictRawData)
+                        break  # Sai do loop se a inserção for bem-sucedida
+                    except Exception as e:
+                        logger.error(f"Erro ao inserir reviews para AppID {var_intAppid} na tentativa {var_intTentativa + 1}: {e}")
+                        if var_intTentativa < var_intTentativaMaxima - 1:
+                            sleep(5)  # Espera 5 segundos antes de tentar novamente
+                        else:
+                            raise Exception(f"Erro ao inserir reviews para AppID {var_intAppid} após {var_intTentativaMaxima} tentativas.")
+            logger.info("Dados de reviews inseridos com sucesso.")
+
             # Aguarda entre batches (exceto no último)
             if var_intBatchNum < var_intTotalBatches - 1:
                 logger.info(f"Aguardando {var_intDelay}s antes do próximo batch...\n")
                 await asyncio.sleep(var_intDelay)
 
-        logger.info(f"===========PROCESSAMENTO COMPLETO!==========")
+        logger.info(f"===========PROCESSAMENTO COMPLETO! (Reviews)==========")
         logger.info(f"Total processado: {len(var_dictAllResults):,} sucessos de {var_intTotalItems:,} itens ({len(var_dictAllResults)/var_intTotalItems:.2%})")
         
         return var_dictAllResults

@@ -1,5 +1,4 @@
 from prj_TCC_PREVISOR_STEAM.classes.framework.AllSettings import Settings
-from prj_TCC_PREVISOR_STEAM.classes.api.steam_api import SteamClient
 
 import os
 import logging
@@ -75,24 +74,24 @@ class SupabaseDB:
             cls.conectar()
     
     # ========== MÉTODOS para steam_generico ==========
-    @classmethod
-    def inserir_dadosSteamGenerico(cls) -> None:
+    @staticmethod
+    def inserir_dadosSteamGenerico(arg_listDadosGerais: list) -> None:
         """
         Insere ou atualiza dados na tabela steam_generico.
+
+        Parâmetros:
+        - arg_listDadosGerais (list): Lista de dicionários com os dados gerais da Steam
         """
-        
-        cls._garantir_conexao()
+
+        SupabaseDB._garantir_conexao()
         
         try:
-            var_listDesatualizados = cls.buscar_jogos_desatualizados(arg_strNomeTabela="steam_generico")
+            var_listDesatualizados = SupabaseDB.buscar_jogos_desatualizados(arg_strNomeTabela="steam_generico")
 
-            if var_listDesatualizados:
-                var_listDados = SteamClient.find_app_list()
-            else:
-                logger.info("Nenhum dado desatualizado em steam_generico.")
+            if not var_listDesatualizados:
                 return False
-            
-            for var_dictDados in var_listDados:
+
+            for var_dictDados in arg_listDadosGerais:
                 var_intAppid = var_dictDados.get("appid")
                 if not var_intAppid:
                     raise ValueError("appid é obrigatório")
@@ -104,7 +103,7 @@ class SupabaseDB:
                     "ultima_atualizacao": datetime.utcnow().isoformat()
                 }
                 # Upsert: insere se não existe, atualiza se existe
-                var_apiResult = cls._var_botClient.table("steam_generico").upsert(
+                var_apiResult = SupabaseDB._var_botClient.table("steam_generico").upsert(
                     var_dictDadosInsert,
                     on_conflict="appid"
                 ).execute()
@@ -113,7 +112,7 @@ class SupabaseDB:
                     logger.error(f"Erro ao inserir/atualizar AppID {var_intAppid}: {var_apiResult.error}")
                     continue
 
-            logger.info(f"Dados de gênero salvos para {len(var_listDados)} registros.")
+            logger.info(f"Dados de gênero salvos para {len(arg_listDadosGerais)} registros.")
             
         except Exception as e:
             logger.error(f"Erro ao inserir dados steam_generico: {e}")
@@ -194,8 +193,8 @@ class SupabaseDB:
         
     # ========== MÉTODOS PARA steam_raw ==========
     
-    @classmethod
-    def inserir_dadosSteamRaw(cls, arg_dictDados: Dict[str, Any]) -> None:
+    @staticmethod
+    def inserir_dadosSteamRaw(arg_dictDados: Dict[str, Any]) -> None:
         """
         Insere ou atualiza dados na tabela steam_raw.
         
@@ -209,8 +208,8 @@ class SupabaseDB:
                 - detalhes (opcional): dados do jogo
                 - reviews (opcional): dados de avaliações
         """
-        cls._garantir_conexao()
-        
+        SupabaseDB._garantir_conexao()
+
         try:
             var_intAppid = arg_dictDados.get("appid")
             if not var_intAppid:
@@ -226,9 +225,9 @@ class SupabaseDB:
                     "detalhes": var_dictDetalhes,
                     "ultima_atualizacao": datetime.utcnow().isoformat()
                 }
-                
+            
                 # Upsert: insere se não existe, atualiza se existe
-                var_apiResult = cls._var_botClient.table("steam_raw").upsert(
+                var_apiResult = SupabaseDB._var_botClient.table("steam_raw").upsert(
                     var_dictDadosInsert,
                     on_conflict="appid"
                 ).execute()
@@ -236,11 +235,11 @@ class SupabaseDB:
             # Caso 2: Atualizar apenas REVIEWS (registro já deve existir)
             if var_dictReviews is not None:
                 # Busca o registro existente
-                var_apiRegistro = cls._var_botClient.table("steam_raw").select("appid").eq("appid", var_intAppid).execute()
-                
+                var_apiRegistro = SupabaseDB._var_botClient.table("steam_raw").select("appid").eq("appid", var_intAppid).execute()
+
                 if var_apiRegistro.data and len(var_apiRegistro.data) > 0:
                     # Atualiza apenas o campo reviews
-                    var_apiResult = cls._var_botClient.table("steam_raw").update({
+                    var_apiResult = SupabaseDB._var_botClient.table("steam_raw").update({
                         "reviews": var_dictReviews,
                         "ultima_atualizacao": datetime.utcnow().isoformat()
                     }).eq("appid", var_intAppid).execute()
@@ -249,7 +248,12 @@ class SupabaseDB:
                         f"AppID {var_intAppid} não encontrado. "
                         f"Insira os detalhes primeiro antes de adicionar reviews."
                     )
-            
+                    
+            if var_dictReviews is not None and var_dictDetalhes is None:
+                logger.debug(
+                    f"AppID {var_intAppid} não encontrado. "
+                    f"Insira os detalhes primeiro antes de adicionar reviews."
+                )
         except Exception as e:
             logger.error(f"Erro ao inserir dados steam_raw: {e}")
             raise Exception(f"Erro ao inserir dados steam_raw: {e}")
@@ -329,15 +333,15 @@ class SupabaseDB:
     
     # ========== MÉTODOS PARA steam_bd ==========
     
-    @classmethod
-    def inserir_dadosSteamBD(cls, arg_listDados: list) -> None:
+    @staticmethod
+    def inserir_dadosSteamBD(arg_listDados: list) -> None:
         """
         Insere ou atualiza dados processados na tabela steam_bd.
         
         Parâmetros:
         - arg_listDados (list): Dicionário com os dados processados do jogo
         """
-        cls._garantir_conexao()
+        SupabaseDB._garantir_conexao()
         
         try:
             for var_dictDados in arg_listDados:
@@ -366,7 +370,7 @@ class SupabaseDB:
                     "ultima_atualizacao": datetime.utcnow().isoformat()
                 }
                 # Upsert: insere se não existe, atualiza se existe
-                var_apiResult = cls._var_botClient.table("steam_bd").upsert(
+                var_apiResult = SupabaseDB._var_botClient.table("steam_bd").upsert(
                     var_dictDadosInsert,
                     on_conflict="appid"
                 ).execute()
@@ -455,23 +459,23 @@ class SupabaseDB:
             raise Exception(f"Erro ao buscar todos os dados steam_bd: {e}")
     
     # ================= ITAD ==================
-    @classmethod
-    def inserir_dados_ITAD_Raw(cls, arg_dictDados: Dict[str, Any]) -> None:
+    @staticmethod
+    def inserir_dados_ITAD_Raw(arg_dictDados: Dict[str, Any]) -> None:
         """
         Insere ou atualiza dados na tabela itad_raw.
 
         Parâmetros:
         - arg_dictDados (dict): Dicionário com os dados do ITAD
         """
-        cls._garantir_conexao()
-        
+        SupabaseDB._garantir_conexao()
+
         try:
             var_strid = arg_dictDados.get("id_itad")
             if not var_strid:
                 raise ValueError("ID é obrigatório")
 
             # Upsert: insere se não existe, atualiza se existe
-            var_apiResult = cls._var_botClient.table("itad_raw").upsert(
+            var_apiResult = SupabaseDB._var_botClient.table("itad_raw").upsert(
                 arg_dictDados,
                 on_conflict="id_itad"
             ).execute()

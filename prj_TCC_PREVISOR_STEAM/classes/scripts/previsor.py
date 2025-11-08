@@ -190,6 +190,8 @@ class Previsor:
             # Itera sobre os aplicativos em lotes
             for i in range(0, var_intTamanhoTotalFila, var_intRange):
                 logger.info(f"Processando aplicativos de {i + 1} a {min(i + var_intRange, var_intTamanhoTotalFila)} de {var_intTamanhoTotalFila}")
+                logger.info(f"Tempo estimado restante: {((var_intTamanhoTotalFila - i) / var_intRange) * 2} minutos")
+                logger.info(f"----------------------------------------")
                 # Carrega os aplicativos atuais
                 var_listAppIDAtual = var_listAppID[i:i+var_intRange]
                 
@@ -210,25 +212,6 @@ class Previsor:
                 var_dictDetails = asyncio.run(SteamClient.fetch_details_bulk_batched(arg_seqAppids=var_listAppIDAtual))
                 if not var_dictDetails:
                     logger.warning("Nenhum dado de detalhes retornado da API Steam.")
-                else:
-                    # Combina detalhes dos jogos
-                    for var_intAppid in var_dictDetails.keys():
-                        var_dictRawData = {
-                            "appid": var_intAppid,
-                            "detalhes": var_dictDetails.get(var_intAppid),
-                        }
-                        # Tenta inserir os dados com múltiplas tentativas
-                        for var_intTentativa in range(var_intTentativaMaxima):
-                            try:
-                                SupabaseDB.inserir_dadosSteamRaw(var_dictRawData)    
-                                break  # Sai do loop se a inserção for bem-sucedida
-                            except Exception as e:
-                                logger.error(f"Erro ao inserir dados para AppID {var_intAppid} na tentativa {var_intTentativa + 1}: {e}")
-                                if var_intTentativa < var_intTentativaMaxima - 1:
-                                    sleep(5)  # Espera 5 segundos antes de tentar novamente
-                                else:
-                                    raise Exception(f"Erro ao inserir dados para AppID {var_intAppid} após {var_intTentativaMaxima} tentativas.")
-                    logger.info("Dados de detalhes inseridos com sucesso.")
 
                 # Busca reviews dos jogos incompletos
                 if var_listAppIDIncompleto:
@@ -244,25 +227,6 @@ class Previsor:
                 var_dictReview = asyncio.run(SteamClient.fetch_reviews_summary_batched(arg_seqAppids=var_listAppIDAtual))
                 if not var_dictReview:
                     logger.warning("Nenhum dado de reviews retornado da API Steam.")
-                else:
-                    # Combina reviews dos jogos
-                    for var_intAppid in var_dictReview.keys():
-                        var_dictRawData = {
-                            "appid": var_intAppid,
-                            "reviews": var_dictReview.get(var_intAppid)
-                        }
-                        # Tenta inserir os dados com múltiplas tentativas
-                        for var_intTentativa in range(var_intTentativaMaxima):
-                            try:
-                                SupabaseDB.inserir_dadosSteamRaw(var_dictRawData)
-                                break  # Sai do loop se a inserção for bem-sucedida
-                            except Exception as e:
-                                logger.error(f"Erro ao inserir reviews para AppID {var_intAppid} na tentativa {var_intTentativa + 1}: {e}")
-                                if var_intTentativa < var_intTentativaMaxima - 1:
-                                    sleep(5)  # Espera 5 segundos antes de tentar novamente
-                                else:
-                                    raise Exception(f"Erro ao inserir reviews para AppID {var_intAppid} após {var_intTentativaMaxima} tentativas.")
-                    logger.info("Dados de reviews inseridos com sucesso.")
                 
         except Exception as e:
             logger.error(f"Erro ao alimentar o banco de dados: {e}")
