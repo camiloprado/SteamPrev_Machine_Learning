@@ -54,16 +54,28 @@ setup.py
 
 Configure as variáveis de conexão e API em `AllSettings.py`.
 
+
 ## Como executar
 
 1. Ative o ambiente virtual:
-   ```bash
-   .venv\Scripts\activate
-   ```
+	```bash
+	.venv\Scripts\activate
+	```
 2. Execute o bot principal:
-   ```bash
-   python prj_TCC_PREVISOR_STEAM/bot.py
-   ```
+	```bash
+	python prj_TCC_PREVISOR_STEAM/bot.py
+	```
+
+## Logs
+
+O sistema gera arquivos de log em `prj_TCC_PREVISOR_STEAM/resources/logs/` para registrar eventos, erros, progresso dos batches e estatísticas de execução. Os logs são úteis para:
+
+- Monitorar o andamento da coleta e processamento dos dados
+- Identificar falhas de conexão, limites de API ou dados ausentes
+- Auditar configurações utilizadas (.env, batch size, delays, etc.)
+- Depurar problemas e analisar resultados
+
+Você pode configurar o nível de detalhamento dos logs (INFO, WARNING, ERROR) em `AllSettings.py` ou diretamente no código principal. Para visualizar os logs, basta abrir os arquivos `.log` na pasta indicada.
 
 ## Banco de Dados
 
