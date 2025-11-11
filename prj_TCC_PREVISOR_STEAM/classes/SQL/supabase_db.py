@@ -90,7 +90,8 @@ class SupabaseDB:
 
             if not var_listDesatualizados:
                 return False
-
+            
+            var_listResults = []
             for var_dictDados in arg_listDadosGerais:
                 var_intAppid = var_dictDados.get("appid")
                 if not var_intAppid:
@@ -102,15 +103,14 @@ class SupabaseDB:
                     "name": var_dictDados.get("name"),
                     "ultima_atualizacao": datetime.utcnow().isoformat()
                 }
+                var_listResults.append(var_dictDadosInsert)
+
+            for var_intIndex in range(0, len(var_listResults), 5000):
                 # Upsert: insere se não existe, atualiza se existe
                 var_apiResult = SupabaseDB._var_botClient.table("steam_generico").upsert(
-                    var_dictDadosInsert,
+                    var_listResults[var_intIndex:var_intIndex + 5000],
                     on_conflict="appid"
                 ).execute()
-
-                if not var_apiResult:
-                    logger.error(f"Erro ao inserir/atualizar AppID {var_intAppid}: {var_apiResult.error}")
-                    continue
 
             logger.info(f"Dados de gênero salvos para {len(arg_listDadosGerais)} registros.")
             
@@ -483,7 +483,7 @@ class SupabaseDB:
             logger.error(f"Erro ao buscar todos os dados steam_bd: {e}")
             raise Exception(f"Erro ao buscar todos os dados steam_bd: {e}")
     
-    # ================= ITAD ==================
+    # ================= ITAD RAW ==================
     @staticmethod
     def inserir_dados_ITAD_Raw(arg_dictDados: Dict[str, Any]) -> None:
         """
@@ -581,6 +581,106 @@ class SupabaseDB:
         except Exception as e:
             logger.error(f"Erro ao buscar todos os dados steam_bd: {e}")
             raise Exception(f"Erro ao buscar todos os dados steam_bd: {e}")
+        
+    # ================ ITAD PRECO ================
+    @staticmethod
+    def inserir_dados_ITAD_Preco(arg_listDados: List[Dict[str, Any]]) -> None:
+        """
+        Insere ou atualiza dados na tabela itad_preco.
+
+        Parâmetros:
+        - arg_listDados (list): Lista de dicionários com os dados de preços do ITAD
+        """
+        SupabaseDB._garantir_conexao()
+
+        try:
+            for var_dictDados in arg_listDados:
+                var_strid = var_dictDados.get("id_itad")
+                if not var_strid:
+                    raise ValueError("ID é obrigatório")
+
+                # Upsert: insere se não existe, atualiza se existe
+                var_apiResult = SupabaseDB._var_botClient.table("itad_preco").upsert(
+                    var_dictDados,
+                    on_conflict="id_itad"
+                ).execute()
+            
+        except Exception as e:
+            logger.error(f"Erro ao inserir dados ITAD Preço: {e}")
+            raise Exception(f"Erro ao inserir dados ITAD Preço: {e}")
+    
+    @classmethod
+    def buscar_dados_ITAD_Preco(cls, arg_strIdITAD: str) -> Optional[Dict[str, Any]]:
+        """
+        Busca um jogo específico na tabela itad_preco.
+        
+        Parâmetros:
+        - arg_strIdITAD (str): ID do jogo
+            
+        Retorna:
+        - Dicionário com os dados ou None se não encontrado
+        """
+        cls._garantir_conexao()
+        
+        try:
+            var_apiResult = cls._var_botClient.table("itad_preco").select("*").eq(
+                "id_itad", arg_strIdITAD
+            ).execute()
+
+            if var_apiResult.data and len(var_apiResult.data) > 0:
+                return var_apiResult.data[0]
+            return None
+            
+        except Exception as e:
+            logger.error(f"Erro ao buscar dados ITAD Preço: {e}")
+            raise Exception(f"Erro ao buscar dados ITAD Preço: {e}")
+    
+    @classmethod
+    def buscar_todos_dados_ITAD_Preco(cls, arg_intLimit: int = None) -> List[Dict[str, Any]]:
+        """
+        Busca todos os jogos da tabela itad_preco.
+        
+        Parâmetros:
+        - arg_intLimit (int): Número máximo de registros. Se None, busca todos com paginação. (padrão: None)
+        
+        Retorna:
+        - Lista de dicionários com os dados
+        """
+        cls._garantir_conexao()
+        
+        try:
+            if arg_intLimit is not None:
+                # Com limite específico
+                var_apiResult = cls._var_botClient.table("itad_preco").select("*").limit(arg_intLimit).execute()
+                return var_apiResult.data if var_apiResult.data else []
+            else:
+                # Sem limite - busca todos com paginação
+                var_listTodosDados = []
+                var_intOffset = 0
+                var_intPageSize = 1000  # Tamanho da página
+                
+                while True:
+                    var_apiResult = cls._var_botClient.table("itad_preco").select("*").range(
+                        var_intOffset, var_intOffset + var_intPageSize - 1
+                    ).execute()
+                    
+                    if not var_apiResult.data or len(var_apiResult.data) == 0:
+                        break
+                    
+                    var_listTodosDados.extend(var_apiResult.data)
+                    
+                    # Se retornou menos que o page size, chegou no fim
+                    if len(var_apiResult.data) < var_intPageSize:
+                        break
+                    
+                    var_intOffset += var_intPageSize
+                
+                logger.info(f"Total de registros carregados de itad_preco: {len(var_listTodosDados)}")
+                return var_listTodosDados
+
+        except Exception as e:
+            logger.error(f"Erro ao buscar todos os dados itad_preco: {e}")
+            raise Exception(f"Erro ao buscar todos os dados itad_preco: {e}")
         
     # ========== MÉTODOS UTILITÁRIOS ==========
     @classmethod

@@ -210,7 +210,7 @@ class SteamClient:
                 await asyncio.sleep(var_intDelay)
 
         logger.info(f"===========PROCESSAMENTO COMPLETO! (Detalhes)==========")
-        logger.info(f"Total processado: {len(var_dictAllResults):,} sucessos de {var_intTotalItems:,} itens ({len(var_dictAllResults)/var_intTotalItems:.2%})")
+        logger.info(f"Total processado: {len(var_listDetails):,} sucessos de {var_intTotalItems:,} itens ({len(var_dictAllResults)/var_intTotalItems:.2%})")
 
     # ------------------- Async bulk details -------------------
     @classmethod

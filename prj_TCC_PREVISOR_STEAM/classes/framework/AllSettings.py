@@ -126,7 +126,8 @@ class Settings:
         var_strLogLevelSupabase = os.getenv("LOG_LEVEL_SUPABASE", "WARNING").upper()
         var_intLogLevel = getattr(logging, var_strLogLevel, logging.INFO)
         var_intLogLevelSupabase = getattr(logging, var_strLogLevelSupabase, logging.WARNING)
-        
+        var_logLogLevelSupabase = logging.WARNING
+
         # Cria o diretório de logs se não existir
         var_strLogDir = "resources/logs"
         os.makedirs(var_strLogDir, exist_ok=True)
@@ -148,8 +149,8 @@ class Settings:
         logging.getLogger("urllib3").setLevel(logging.WARNING)
         
         # Desabilita logs HTTP do httpx (usado pelo Supabase)
-        logging.getLogger("httpx").setLevel(var_intLogLevelSupabase)
-        logging.getLogger("httpcore").setLevel(var_intLogLevelSupabase)
+        logging.getLogger("httpx").setLevel(var_logLogLevelSupabase)
+        logging.getLogger("httpcore").setLevel(var_logLogLevelSupabase)
 
         cls._var_dictSettings["log_level"] = var_strLogLevel
 
@@ -158,6 +159,7 @@ class Settings:
         """
         Constrói as configurações iniciais do sistema.
         """
+        load_dotenv()
         cls.configure_logging()  # Configura o logging primeiro
         cls.steam_api_settings()
         cls.bd_settings_default()
