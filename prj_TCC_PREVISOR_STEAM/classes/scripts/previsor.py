@@ -160,16 +160,19 @@ class Previsor:
             var_listAppID = [var_listApp[j]['appid'] for j in range(len(var_listApp))]
             var_intTamanhoTotalFila = len(var_listAppID)
 
-            # Loop criado por conta de ser muito grande a lista de apps para buscar de uma vez no BD
-            for var_intTamanho in range(0, var_intTamanhoTotalFila, var_intRange):
-                var_listAppIDSubset = var_listAppID[var_intTamanho:var_intTamanho + var_intRange]
-                # Verifica quais AppIDs já estão no banco de dados
-                var_listAppIDnoBD = SupabaseDB.buscar_jogos_por_ID(arg_listAppIDs=var_listAppIDSubset, arg_strNomeTabel="steam_raw")
-                for var_dictAppID in var_listAppIDnoBD:
-                    var_intAppID = var_dictAppID['appid']
-                    # Remove os AppIDs que já estão no banco de dados
-                    if var_intAppID in var_listAppID:
-                        var_listAppID.remove(var_intAppID)
+            # Tamanho do lote de carga a mais, se aplicavel
+            var_intTamanhoaMais = int(os.getenv("TAMANHO_LOTE_CARGA_MAIS", 0))
+
+            # Carregamento de teste de carga
+            var_intAmbiente = os.getenv("AMBIENTE", "PROD").upper()
+
+            # Verifica quais AppIDs já estão no banco de dados
+            var_listDadosSteamBD = SupabaseDB.buscar_todos_dadosSteamRaw()
+            for var_dictAppID in var_listDadosSteamBD:
+                var_intAppID = var_dictAppID['appid']
+                # Remove os AppIDs que já estão no banco de dados
+                if var_intAppID in var_listAppID:
+                    var_listAppID.remove(var_intAppID)
 
             if len(var_listAppID) != var_intTamanhoTotalFila:
                 logger.info(f"Número total de AppIDs a processar após remoção: {len(var_listAppID)}. Removido: {var_intTamanhoTotalFila - len(var_listAppID)}")
@@ -193,7 +196,10 @@ class Previsor:
                 logger.info(f"Tempo estimado restante: {((var_intTamanhoTotalFila - i) / var_intRange) * 2} minutos")
                 logger.info(f"----------------------------------------")
                 # Carrega os aplicativos atuais
-                var_listAppIDAtual = var_listAppID[i:i+var_intRange]
+                if var_intAmbiente == "HML":
+                    var_listAppIDAtual = var_listAppID[i:i+int(os.getenv("BATCH_TESTE", 20))]
+                else:
+                    var_listAppIDAtual = var_listAppID[i:i+var_intRange]
                 
                 # Verifica quais AppIDs estão incompletos
                 var_listAppIDIncompleto = SupabaseDB.buscar_jogos_incompletos(arg_boolRequererReviews=True)
@@ -204,15 +210,10 @@ class Previsor:
                         if var_dictAppID.get('detalhes') is None:
                             if var_intAppID not in var_listAppIDAtual:
                                 var_listAppIDAtual.append(var_intAppID)
-
-                if len(var_listAppIDAtual) != var_intTamanhoTotalFila:
-                    logger.info(f"Número de AppIDs a processar após verificação de incompletos: {len(var_listAppIDAtual)}. Incompletos adicionados: {len(var_listAppIDAtual) - len(var_listAppID[i:i+var_intRange])}")
-
+                logger.info(f"Número de IDs a processar neste lote: {len(var_listAppIDAtual)}")
                 # Busca detalhes dos jogos
-                var_dictDetails = asyncio.run(SteamClient.fetch_details_bulk_batched(arg_seqAppids=var_listAppIDAtual))
-                if not var_dictDetails:
-                    logger.warning("Nenhum dado de detalhes retornado da API Steam.")
-
+                asyncio.run(SteamClient.fetch_details_bulk_batched(arg_seqAppids=var_listAppIDAtual))
+                
                 # Busca reviews dos jogos incompletos
                 if var_listAppIDIncompleto:
                     logger.info(f"Número de AppIDs com dados incompletos: {len(var_listAppIDIncompleto)}")
@@ -224,9 +225,7 @@ class Previsor:
                                 var_listAppIDAtual.append(var_intAppID)
 
                 # Busca reviews dos jogos
-                var_dictReview = asyncio.run(SteamClient.fetch_reviews_summary_batched(arg_seqAppids=var_listAppIDAtual))
-                if not var_dictReview:
-                    logger.warning("Nenhum dado de reviews retornado da API Steam.")
+                asyncio.run(SteamClient.fetch_reviews_summary_batched(arg_seqAppids=var_listAppIDAtual))
                 
         except Exception as e:
             logger.error(f"Erro ao alimentar o banco de dados: {e}")

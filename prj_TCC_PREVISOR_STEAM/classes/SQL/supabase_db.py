@@ -3,7 +3,7 @@ from prj_TCC_PREVISOR_STEAM.classes.framework.AllSettings import Settings
 import os
 import logging
 from typing import Dict, List, Any, Optional
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from dotenv import load_dotenv
 
 # Carrega variáveis de ambiente
@@ -194,7 +194,7 @@ class SupabaseDB:
     # ========== MÉTODOS PARA steam_raw ==========
     
     @staticmethod
-    def inserir_dadosSteamRaw(arg_dictDados: Dict[str, Any]) -> None:
+    def inserir_dadosSteamRaw(arg_listDados: List[Dict[str, Any]]) -> None:
         """
         Insere ou atualiza dados na tabela steam_raw.
         
@@ -203,7 +203,7 @@ class SupabaseDB:
         2. Se tem 'reviews': UPDATE apenas reviews (precisa existir registro)
         
         Parâmetros:
-        - arg_dictDados (dict): Dicionário com:
+        - arg_listDados (list): Lista de dicionários com:
                 - appid (obrigatório)
                 - detalhes (opcional): dados do jogo
                 - reviews (opcional): dados de avaliações
@@ -211,53 +211,78 @@ class SupabaseDB:
         SupabaseDB._garantir_conexao()
 
         try:
-            var_intAppid = arg_dictDados.get("appid")
-            if not var_intAppid:
-                raise ValueError("Appid é obrigatório")
-            
-            var_dictDetalhes = arg_dictDados.get("detalhes")
-            var_dictReviews = arg_dictDados.get("reviews")
-
-            # Caso 1: Inserir/atualizar DETALHES
-            if var_dictDetalhes is not None:
-                var_dictDadosInsert = {
-                    "appid": var_intAppid,
-                    "detalhes": var_dictDetalhes,
-                    "ultima_atualizacao": datetime.utcnow().isoformat()
+            for var_dictResult in arg_listDados:
+                var_dictRawData = {
+                    "appid": var_dictResult.get("steam_appid"),
+                    "detalhes": var_dictResult.get("detalhes", {}),
+                    "reviews": var_dictResult.get("reviews", {}),
+                    "ultima_atualizacao": datetime.now(timezone.utc).isoformat()
                 }
-            
-                # Upsert: insere se não existe, atualiza se existe
-                var_apiResult = SupabaseDB._var_botClient.table("steam_raw").upsert(
-                    var_dictDadosInsert,
-                    on_conflict="appid"
-                ).execute()
 
-            # Caso 2: Atualizar apenas REVIEWS (registro já deve existir)
-            if var_dictReviews is not None:
-                # Busca o registro existente
-                var_apiRegistro = SupabaseDB._var_botClient.table("steam_raw").select("appid").eq("appid", var_intAppid).execute()
+                var_intAppid = var_dictRawData.get("appid")
+                if not var_intAppid:
+                    raise ValueError("Appid é obrigatório")
 
-                if var_apiRegistro.data and len(var_apiRegistro.data) > 0:
-                    # Atualiza apenas o campo reviews
-                    var_apiResult = SupabaseDB._var_botClient.table("steam_raw").update({
-                        "reviews": var_dictReviews,
+                var_dictDetalhes = var_dictRawData.get("detalhes")
+                var_dictReviews = var_dictRawData.get("reviews")
+
+                # Caso 1: Inserir/atualizar DETALHES
+                if var_dictDetalhes is not None:
+                    var_dictDadosInsert = {
+                        "appid": var_intAppid,
+                        "detalhes": var_dictDetalhes,
                         "ultima_atualizacao": datetime.utcnow().isoformat()
-                    }).eq("appid", var_intAppid).execute()
-                else:
+                    }
+                    # Upsert: insere se não existe, atualiza se existe
+                    SupabaseDB._var_botClient.table("steam_raw").upsert(
+                        var_dictDadosInsert,
+                        on_conflict="appid"
+                    ).execute()
+
+                # Caso 2: Atualizar apenas REVIEWS (registro já deve existir)
+                if var_dictReviews is not None:
+                    var_apiRegistro = SupabaseDB._var_botClient.table("steam_raw").select("appid").eq("appid", var_intAppid).execute()
+                    if var_apiRegistro.data and len(var_apiRegistro.data) > 0:
+                        SupabaseDB._var_botClient.table("steam_raw").update({
+                            "reviews": var_dictReviews,
+                            "ultima_atualizacao": datetime.utcnow().isoformat()
+                        }).eq("appid", var_intAppid).execute()
+                    else:
+                        logger.debug(
+                            f"AppID {var_intAppid} não encontrado. "
+                            f"Insira os detalhes primeiro antes de adicionar reviews."
+                        )
+
+                if var_dictReviews is not None and var_dictDetalhes is None:
                     logger.debug(
                         f"AppID {var_intAppid} não encontrado. "
                         f"Insira os detalhes primeiro antes de adicionar reviews."
                     )
-                    
-            if var_dictReviews is not None and var_dictDetalhes is None:
-                logger.debug(
-                    f"AppID {var_intAppid} não encontrado. "
-                    f"Insira os detalhes primeiro antes de adicionar reviews."
-                )
         except Exception as e:
             logger.error(f"Erro ao inserir dados steam_raw: {e}")
             raise Exception(f"Erro ao inserir dados steam_raw: {e}")
     
+    @staticmethod
+    def inserir_dadosSteamRaw_Bulk(arg_listDados: List[Dict[str, Any]]) -> None:
+        """
+        Insere ou atualiza dados na tabela steam_raw.
+        
+        Parâmetros:
+        - arg_listDados (list): Lista de dicionários com:
+
+        """
+        SupabaseDB._garantir_conexao()
+
+        try:
+            SupabaseDB._var_botClient.table("steam_raw").upsert(
+                arg_listDados,
+                on_conflict="appid"
+            ).execute()
+
+        except Exception as e:
+            logger.error(f"Erro ao inserir dados em bulk em steam_raw: {e}")
+            raise Exception(f"Erro ao inserir dados em bulk em steam_raw: {e}")
+        
     @classmethod
     def buscar_dadosSteamRaw(cls, arg_intAppid: int) -> Optional[Dict[str, Any]]:
         """

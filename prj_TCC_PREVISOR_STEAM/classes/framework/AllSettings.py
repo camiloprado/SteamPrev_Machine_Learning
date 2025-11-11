@@ -123,7 +123,9 @@ class Settings:
         """
         # Obtém o nível de logging da variável de ambiente (padrão: INFO)
         var_strLogLevel = os.getenv("LOG_LEVEL", "INFO").upper()
+        var_strLogLevelSupabase = os.getenv("LOG_LEVEL_SUPABASE", "WARNING").upper()
         var_intLogLevel = getattr(logging, var_strLogLevel, logging.INFO)
+        var_intLogLevelSupabase = getattr(logging, var_strLogLevelSupabase, logging.WARNING)
         
         # Cria o diretório de logs se não existir
         var_strLogDir = "resources/logs"
@@ -146,8 +148,8 @@ class Settings:
         logging.getLogger("urllib3").setLevel(logging.WARNING)
         
         # Desabilita logs HTTP do httpx (usado pelo Supabase)
-        logging.getLogger("httpx").setLevel(logging.WARNING)
-        logging.getLogger("httpcore").setLevel(logging.WARNING)
+        logging.getLogger("httpx").setLevel(var_intLogLevelSupabase)
+        logging.getLogger("httpcore").setLevel(var_intLogLevelSupabase)
 
         cls._var_dictSettings["log_level"] = var_strLogLevel
 
