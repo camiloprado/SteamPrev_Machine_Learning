@@ -1,4 +1,6 @@
 from prj_TCC_PREVISOR_STEAM.classes.framework.AllSettings import Settings
+from prj_TCC_PREVISOR_STEAM.classes.scripts.ProcessadorETL import ProcessadorETL
+from prj_TCC_PREVISOR_STEAM.classes.SQL.postgre import PostgreSQL
 from prj_TCC_PREVISOR_STEAM.classes.scripts.previsor import Previsor
 
 class Process:
@@ -18,6 +20,7 @@ class Process:
         - Resultado do processamento da tarefa.
         """
         # Lógica para processar a tarefa
-        Previsor.alimentar_banco_dados_raw()
-        Previsor.alimentar_banco_dados_Steam()
+        Previsor.alimentar_banco_dados_raw_docker()
+        var_listAppids = PostgreSQL.buscar_appids_nao_processados()
+        ProcessadorETL.processar_lote(var_listAppids)
         Previsor.alimentar_banco_dados_ITAD()

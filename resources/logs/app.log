@@ -126567,3 +126567,745 @@ Traceback: <traceback object at 0x000001AAE1443EC0>
 2025-11-11 07:21:57 - INFO - Busca assíncrona concluída.
 2025-11-11 07:21:57 - CRITICAL - Falha crítica ao buscar detalhes em bulk: 'NoneType' object has no attribute 'get'
 2025-11-11 07:21:57 - ERROR - Erro ao alimentar o banco de dados: Falha ao buscar detalhes em bulk: 'NoneType' object has no attribute 'get'
+2025-11-12 06:28:13 - INFO - Conectado ao Supabase com sucesso
+2025-11-12 06:28:13 - ERROR - Erro ao inserir dados steam_raw: Appid é obrigatório
+2025-11-12 06:28:40 - INFO - Conectado ao Supabase com sucesso
+2025-11-12 06:28:41 - INFO - Conexão com o banco de dados estabelecida com sucesso.
+2025-11-12 06:28:41 - INFO - Já existe uma conexão ativa com o banco de dados.
+2025-11-12 06:28:41 - WARNING - AppID ausente em dados steam_raw
+2025-11-12 06:29:18 - INFO - Conectado ao Supabase com sucesso
+2025-11-12 06:29:20 - INFO - Conexão com o banco de dados estabelecida com sucesso.
+2025-11-12 06:29:20 - INFO - Já existe uma conexão ativa com o banco de dados.
+2025-11-12 06:29:20 - INFO - Dados steam_raw inseridos/atualizados para o AppID 999999
+2025-11-12 06:32:16 - INFO - Conectado ao Supabase com sucesso
+2025-11-12 06:32:18 - INFO - Conexão com o banco de dados estabelecida com sucesso.
+2025-11-12 06:32:18 - INFO - Já existe uma conexão ativa com o banco de dados.
+2025-11-12 06:32:18 - INFO - Dados steam_raw inseridos/atualizados para o AppID 999999
+2025-11-12 06:36:21 - INFO - Conectado ao Supabase com sucesso
+2025-11-12 06:36:23 - INFO - Conexão com o banco de dados estabelecida com sucesso.
+2025-11-12 06:36:23 - INFO - Já existe uma conexão ativa com o banco de dados.
+2025-11-12 06:36:23 - INFO - Dados steam_raw inseridos/atualizados para o AppID 999999
+2025-11-12 06:37:19 - INFO - Conectado ao Supabase com sucesso
+2025-11-12 06:37:21 - INFO - Conexão com o banco de dados estabelecida com sucesso: postgres@db.norphjcxnsgklyutnmin.supabase.co:5432/postgres
+2025-11-12 06:37:21 - INFO - Já existe uma conexão ativa com o banco de dados.
+2025-11-12 06:37:21 - INFO - Executando SQL INSERT/UPDATE para AppID 999999
+2025-11-12 06:37:21 - INFO - Valores: detalhes={'name': 'Jogo Teste', 'categoria': 'Ação'}, reviews={'total': 10, 'positivos': 8}
+2025-11-12 06:37:21 - INFO - Dados steam_raw inseridos/atualizados para o AppID 999999 (linhas afetadas: 1)
+2025-11-12 06:37:55 - INFO - Conectado ao Supabase com sucesso
+2025-11-12 06:37:56 - ERROR - Erro ao inserir dados steam_raw: {'message': 'Expected 3 parts in JWT; got 1', 'code': 'PGRST301', 'hint': None, 'details': None}
+2025-11-12 06:38:54 - ERROR - Erro ao conectar ao banco de dados: connection to server at "localhost" (::1), port 5432 failed: Connection refused (0x0000274D/10061)
+	Is the server running on that host and accepting TCP/IP connections?
+connection to server at "localhost" (127.0.0.1), port 5432 failed: Connection refused (0x0000274D/10061)
+	Is the server running on that host and accepting TCP/IP connections?
+
+2025-11-12 06:38:58 - ERROR - Erro ao conectar ao banco de dados: connection to server at "localhost" (::1), port 5432 failed: Connection refused (0x0000274D/10061)
+	Is the server running on that host and accepting TCP/IP connections?
+connection to server at "localhost" (127.0.0.1), port 5432 failed: Connection refused (0x0000274D/10061)
+	Is the server running on that host and accepting TCP/IP connections?
+
+2025-11-12 06:38:58 - ERROR - Erro ao inserir dados steam_raw: 'NoneType' object has no attribute 'cursor'
+2025-11-12 06:38:58 - ERROR - Erro ao inserir dados em bulk em steam_raw: Erro ao inserir dados steam_raw: 'NoneType' object has no attribute 'cursor'
+2025-11-12 06:42:34 - ERROR - Erro ao conectar ao banco de dados: connection to server at "localhost" (::1), port 5432 failed: FATAL:  password authentication failed for user "postgres"
+
+2025-11-12 06:42:34 - ERROR - Erro ao conectar ao banco de dados: connection to server at "localhost" (::1), port 5432 failed: FATAL:  password authentication failed for user "postgres"
+
+2025-11-12 06:42:34 - ERROR - Erro ao inserir dados steam_raw: 'NoneType' object has no attribute 'cursor'
+2025-11-12 06:42:34 - ERROR - Erro ao inserir dados em bulk em steam_raw: Erro ao inserir dados steam_raw: 'NoneType' object has no attribute 'cursor'
+2025-11-12 06:44:00 - INFO - Conexão com o banco de dados estabelecida com sucesso: postgres@localhost:5432/postgres
+2025-11-12 06:44:00 - INFO - Já existe uma conexão ativa com o banco de dados.
+2025-11-12 06:44:00 - ERROR - Erro ao inserir dados steam_raw: relation "steam_raw" does not exist
+LINE 1: SELECT detalhes, reviews FROM steam_raw WHERE appid = 999999...
+                                      ^
+
+2025-11-12 06:44:00 - ERROR - Erro ao inserir dados em bulk em steam_raw: Erro ao inserir dados steam_raw: relation "steam_raw" does not exist
+LINE 1: SELECT detalhes, reviews FROM steam_raw WHERE appid = 999999...
+                                      ^
+
+2025-11-12 06:49:04 - INFO - Conexão com o banco de dados estabelecida com sucesso: postgres@localhost:5432/postgres
+2025-11-12 06:49:04 - INFO - Já existe uma conexão ativa com o banco de dados.
+2025-11-12 06:49:04 - INFO - Executando SQL INSERT/UPDATE para AppID 999999
+2025-11-12 06:49:04 - INFO - Valores: detalhes={'name': 'Jogo Teste', 'categoria': 'Ação'}, reviews={'total': 10, 'positivos': 8}
+2025-11-12 06:49:04 - INFO - Dados steam_raw inseridos/atualizados para o AppID 999999 (linhas afetadas: 1)
+2025-11-12 07:13:32 - INFO - Conexão com o banco de dados estabelecida com sucesso: postgres@db.norphjcxnsgklyutnmin.supabase.co:5432/postgres
+2025-11-12 07:13:32 - INFO - Já existe uma conexão ativa com o banco de dados.
+2025-11-12 07:13:33 - INFO - Executando SQL INSERT/UPDATE para AppID 888888
+2025-11-12 07:13:33 - INFO - Valores: detalhes={'type': 'game', 'name': 'Test Game - Hybrid Architecture', 'steam_appid': 888888, 'required_age': 0, 'is_free': False, 'detailed_description': 'Este é um jogo de teste para validar a arquitetura híbrida...', 'short_description': 'Jogo de teste', 'supported_languages': 'English, Portuguese-Brazil', 'developers': ['Test Studio'], 'publishers': ['Test Publisher'], 'price_overview': {'currency': 'BRL', 'initial': 4999, 'final': 4999, 'discount_percent': 0}, 'metacritic': {'score': 85}, 'categories': [{'id': 2, 'description': 'Single-player'}, {'id': 22, 'description': 'Steam Achievements'}], 'genres': [{'id': '1', 'description': 'Action'}, {'id': '25', 'description': 'Adventure'}], 'release_date': {'coming_soon': False, 'date': '12 Nov, 2025'}}, reviews={'query_summary': {'total_reviews': 1500, 'total_positive': 1200, 'total_negative': 300, 'review_score': 80, 'review_score_desc': 'Very Positive'}}
+2025-11-12 07:13:33 - INFO - Dados steam_raw inseridos/atualizados para o AppID 888888 (linhas afetadas: 1)
+2025-11-12 07:13:34 - INFO - Conectado ao Supabase com sucesso
+2025-11-12 07:13:34 - INFO - Dados processados salvos para 1 registros.
+2025-11-12 07:18:34 - ERROR - Erro ao buscar dados para o AppID 999999: 'NoneType' object has no attribute 'cursor'
+2025-11-12 07:18:34 - ERROR - Erro ao buscar dados para o AppID 888888: 'NoneType' object has no attribute 'cursor'
+2025-11-12 07:18:59 - INFO - Conexão com o banco de dados estabelecida com sucesso: postgres@db.norphjcxnsgklyutnmin.supabase.co:5432/postgres
+2025-11-12 07:19:00 - INFO - Conectado ao Supabase com sucesso
+2025-11-12 07:19:01 - INFO - Dados processados salvos para 2 registros.
+2025-11-12 07:57:51 - INFO - Conexão com o banco de dados estabelecida com sucesso: postgres@db.norphjcxnsgklyutnmin.supabase.co:5432/postgres
+2025-11-12 07:57:51 - INFO - Já existe uma conexão ativa com o banco de dados.
+2025-11-12 07:57:54 - INFO - Encontrados 71106 AppIDs na tabela 'steam_raw'.
+2025-11-12 07:57:54 - INFO - Já existe uma conexão ativa com o banco de dados.
+2025-11-12 07:57:54 - INFO - Encontrados 10092 AppIDs na tabela 'steam_bd'.
+2025-11-12 07:57:54 - INFO - Já existe uma conexão ativa com o banco de dados.
+2025-11-12 07:57:55 - INFO - Encontrados 20 AppIDs não processados.
+2025-11-12 07:57:55 - INFO - Conexão com o banco de dados encerrada.
+2025-11-12 08:11:16 - INFO - Conectado ao Supabase com sucesso
+2025-11-12 08:11:20 - ERROR - Erro ao buscar jogos antigos: {'code': '57014', 'details': None, 'hint': None, 'message': 'canceling statement due to statement timeout'}
+2025-11-12 08:11:20 - ERROR - Erro ao inserir dados steam_generico: Erro ao buscar jogos antigos: {'code': '57014', 'details': None, 'hint': None, 'message': 'canceling statement due to statement timeout'}
+2025-11-12 08:11:20 - ERROR - Erro ao criar a fila de tarefas: Erro ao inserir dados steam_generico: Erro ao buscar jogos antigos: {'code': '57014', 'details': None, 'hint': None, 'message': 'canceling statement due to statement timeout'}
+2025-11-12 08:11:20 - ERROR - Erro ao iniciar o bot: Erro na inicialização: <traceback object at 0x0000024E43C02AC0>
+2025-11-12 08:20:10 - INFO - Nenhuma conexão ativa para encerrar.
+2025-11-12 08:20:40 - INFO - Conexão com o banco de dados estabelecida com sucesso: postgres@db.norphjcxnsgklyutnmin.supabase.co:5432/postgres
+2025-11-12 08:20:40 - INFO - Já existe uma conexão ativa com o banco de dados.
+2025-11-12 08:20:43 - INFO - Encontrados 0 jogos desatualizados na tabela 'steam_generico'.
+2025-11-12 08:20:43 - INFO - Já existe uma conexão ativa com o banco de dados.
+2025-11-12 08:20:43 - INFO - Já existe uma conexão ativa com o banco de dados.
+2025-11-12 08:20:43 - INFO - Encontrados 0 jogos desatualizados na tabela 'steam_generico'.
+2025-11-12 08:20:43 - INFO - Nenhum jogo desatualizado encontrado em steam_generico.
+2025-11-12 08:20:43 - WARNING - Nenhum dado encontrado para o AppID 100001.
+2025-11-12 08:20:43 - WARNING - Nenhum dado encontrado para o AppID 100002.
+2025-11-12 08:20:43 - WARNING - Nenhum dado encontrado para o AppID 100003.
+2025-11-12 08:20:43 - WARNING - Nenhum dado encontrado para o AppID 888888.
+2025-11-12 08:20:43 - WARNING - Nenhum dado encontrado para o AppID 999999.
+2025-11-12 08:20:43 - INFO - Já existe uma conexão ativa com o banco de dados.
+2025-11-12 08:20:45 - INFO - Encontrados 276513 AppIDs na tabela 'steam_generico'.
+2025-11-12 08:20:45 - INFO - Conexão com o banco de dados encerrada.
+2025-11-12 08:23:57 - INFO - Conexão com o banco de dados estabelecida com sucesso: postgres@localhost:5432/postgres
+2025-11-12 08:24:01 - INFO - Já existe uma conexão ativa com o banco de dados.
+2025-11-12 08:24:34 - INFO - Conexão com o banco de dados estabelecida com sucesso: postgres@localhost:5432/postgres
+2025-11-12 08:24:34 - INFO - Já existe uma conexão ativa com o banco de dados.
+2025-11-12 08:25:42 - INFO - Encontrados 0 jogos desatualizados na tabela 'steam_generico'.
+2025-11-12 08:25:57 - INFO - Nenhum jogo desatualizado encontrado em steam_generico.
+2025-11-12 08:26:10 - INFO - Processando 3 jogos...
+2025-11-12 08:26:10 - INFO - Já existe uma conexão ativa com o banco de dados.
+2025-11-12 08:26:31 - WARNING - Nenhum dado encontrado para o AppID 123.
+2025-11-12 08:26:51 - WARNING - Nenhum dado encontrado para o AppID 789.
+2025-11-12 08:26:55 - INFO - 1 jogos encontrados no Docker
+2025-11-12 08:31:23 - INFO - Conexão com o banco de dados estabelecida com sucesso: postgres@localhost:5432/postgres
+2025-11-12 08:31:23 - INFO - Já existe uma conexão ativa com o banco de dados.
+2025-11-12 08:31:26 - INFO - Encontrados 0 jogos desatualizados na tabela 'steam_generico'.
+2025-11-12 08:31:26 - INFO - Nenhum jogo desatualizado encontrado em steam_generico.
+2025-11-12 08:31:26 - INFO - Processando 3 jogos...
+2025-11-12 08:31:26 - INFO - Já existe uma conexão ativa com o banco de dados.
+2025-11-12 08:31:33 - WARNING - Nenhum dado encontrado para o AppID 123.
+2025-11-12 08:31:38 - WARNING - Nenhum dado encontrado para o AppID 789.
+2025-11-12 08:31:38 - INFO - 1 jogos encontrados no Docker
+2025-11-12 08:31:45 - ERROR - Erro ao processar AppID 456: Detalhes ausentes para AppID None
+2025-11-12 08:31:45 - INFO - 0 jogos transformados com sucesso
+2025-11-12 08:31:45 - INFO - Conectado ao Supabase com sucesso
+2025-11-12 08:32:03 - INFO - Conexão com o banco de dados estabelecida com sucesso: postgres@localhost:5432/postgres
+2025-11-12 08:32:03 - INFO - Já existe uma conexão ativa com o banco de dados.
+2025-11-12 08:32:05 - INFO - Encontrados 0 jogos desatualizados na tabela 'steam_generico'.
+2025-11-12 08:32:05 - INFO - Nenhum jogo desatualizado encontrado em steam_generico.
+2025-11-12 08:32:05 - INFO - Processando 3 jogos...
+2025-11-12 08:32:05 - INFO - Já existe uma conexão ativa com o banco de dados.
+2025-11-12 08:32:05 - WARNING - Nenhum dado encontrado para o AppID 123.
+2025-11-12 08:32:05 - WARNING - Nenhum dado encontrado para o AppID 789.
+2025-11-12 08:32:05 - INFO - 1 jogos encontrados no Docker
+2025-11-12 08:32:06 - ERROR - Erro ao processar AppID 456: Detalhes ausentes para AppID None
+2025-11-12 08:32:06 - INFO - 0 jogos transformados com sucesso
+2025-11-12 08:32:06 - INFO - Conectado ao Supabase com sucesso
+2025-11-12 08:32:21 - INFO - Conexão com o banco de dados estabelecida com sucesso: postgres@localhost:5432/postgres
+2025-11-12 08:32:21 - INFO - Já existe uma conexão ativa com o banco de dados.
+2025-11-12 08:32:45 - INFO - Conexão com o banco de dados estabelecida com sucesso: postgres@localhost:5432/postgres
+2025-11-12 08:32:45 - INFO - Já existe uma conexão ativa com o banco de dados.
+2025-11-12 08:32:47 - INFO - Encontrados 0 jogos desatualizados na tabela 'steam_generico'.
+2025-11-12 08:32:47 - INFO - Nenhum jogo desatualizado encontrado em steam_generico.
+2025-11-12 08:32:47 - INFO - Processando 4 jogos...
+2025-11-12 08:32:47 - INFO - Já existe uma conexão ativa com o banco de dados.
+2025-11-12 08:32:48 - WARNING - Nenhum dado encontrado para o AppID 123.
+2025-11-12 08:32:48 - WARNING - Nenhum dado encontrado para o AppID 789.
+2025-11-12 08:32:48 - INFO - 2 jogos encontrados no Docker
+2025-11-12 08:39:19 - INFO - Conexão com o banco de dados estabelecida com sucesso: postgres@localhost:5432/postgres
+2025-11-12 08:39:19 - INFO - Já existe uma conexão ativa com o banco de dados.
+2025-11-12 08:39:22 - INFO - Encontrados 0 jogos desatualizados na tabela 'steam_generico'.
+2025-11-12 08:39:22 - INFO - Nenhum jogo desatualizado encontrado em steam_generico.
+2025-11-12 08:39:34 - INFO - Processando 4 jogos...
+2025-11-12 08:39:34 - INFO - Já existe uma conexão ativa com o banco de dados.
+2025-11-12 08:39:34 - WARNING - Nenhum dado encontrado para o AppID 123.
+2025-11-12 08:39:34 - WARNING - Nenhum dado encontrado para o AppID 789.
+2025-11-12 08:39:34 - INFO - 2 jogos encontrados no Docker
+2025-11-12 08:48:09 - WARNING - Formato de data não reconhecido: Invalid Date
+2025-11-12 08:48:36 - WARNING - Formato de data não reconhecido: Invalid Date
+2025-11-12 08:49:00 - WARNING - Formato de data não reconhecido: Invalid Date
+2025-11-12 08:50:48 - INFO - Conexão com o banco de dados estabelecida com sucesso: postgres@db.norphjcxnsgklyutnmin.supabase.co:5432/postgres
+2025-11-12 08:50:48 - WARNING - Formato de data não reconhecido: 1/nov./2000
+2025-11-12 08:50:49 - INFO - Conectado ao Supabase com sucesso
+2025-11-12 08:50:49 - ERROR - Erro ao inserir dados steam_bd: appid é obrigatório
+2025-11-12 08:50:49 - INFO - Conexão com o banco de dados encerrada.
+2025-11-12 08:51:44 - INFO - Conexão com o banco de dados estabelecida com sucesso: postgres@db.norphjcxnsgklyutnmin.supabase.co:5432/postgres
+2025-11-12 08:51:45 - INFO - Conectado ao Supabase com sucesso
+2025-11-12 08:51:46 - INFO - Dados processados salvos para 1 registros.
+2025-11-12 08:51:46 - INFO - Conexão com o banco de dados encerrada.
+2025-11-12 08:58:13 - INFO - Conexão com o banco de dados estabelecida com sucesso: postgres@db.norphjcxnsgklyutnmin.supabase.co:5432/postgres
+2025-11-12 08:58:14 - INFO - Conectado ao Supabase com sucesso
+2025-11-12 08:58:15 - INFO - Dados processados salvos para 1 registros.
+2025-11-12 08:58:15 - INFO - Já existe uma conexão ativa com o banco de dados.
+2025-11-12 08:58:15 - INFO - Já conectado ao Supabase
+2025-11-12 08:58:15 - INFO - Dados processados salvos para 1 registros.
+2025-11-12 08:58:15 - INFO - Conexão com o banco de dados encerrada.
+2025-11-12 09:00:10 - INFO - Nenhuma conexão ativa para encerrar.
+2025-11-12 09:05:57 - INFO - Conexão com o banco de dados estabelecida com sucesso: postgres@db.norphjcxnsgklyutnmin.supabase.co:5432/postgres
+2025-11-12 09:05:57 - INFO - Conexão com o banco de dados encerrada.
+2025-11-12 09:06:19 - INFO - Conexão com o banco de dados estabelecida com sucesso: postgres@db.norphjcxnsgklyutnmin.supabase.co:5432/postgres
+2025-11-12 09:06:20 - INFO - Conectado ao Supabase com sucesso
+2025-11-12 09:06:21 - INFO - Dados processados salvos para 1 registros.
+2025-11-12 09:06:21 - INFO - Já existe uma conexão ativa com o banco de dados.
+2025-11-12 09:06:21 - INFO - Já conectado ao Supabase
+2025-11-12 09:06:21 - INFO - Dados processados salvos para 1 registros.
+2025-11-12 09:06:21 - INFO - Conexão com o banco de dados encerrada.
+2025-11-12 09:06:56 - INFO - Conexão com o banco de dados estabelecida com sucesso: postgres@db.norphjcxnsgklyutnmin.supabase.co:5432/postgres
+2025-11-12 09:06:57 - INFO - Conectado ao Supabase com sucesso
+2025-11-12 09:06:58 - INFO - Dados processados salvos para 1 registros.
+2025-11-12 09:06:58 - INFO - Já existe uma conexão ativa com o banco de dados.
+2025-11-12 09:06:58 - INFO - Já conectado ao Supabase
+2025-11-12 09:06:58 - INFO - Dados processados salvos para 1 registros.
+2025-11-12 09:06:58 - INFO - Conexão com o banco de dados encerrada.
+2025-11-12 09:08:59 - INFO - Conexão com o banco de dados estabelecida com sucesso: postgres@db.norphjcxnsgklyutnmin.supabase.co:5432/postgres
+2025-11-12 09:09:00 - INFO - Conectado ao Supabase com sucesso
+2025-11-12 09:09:01 - INFO - Dados processados salvos para 1 registros.
+2025-11-12 09:09:01 - INFO - Já existe uma conexão ativa com o banco de dados.
+2025-11-12 09:09:01 - INFO - Já conectado ao Supabase
+2025-11-12 09:09:01 - INFO - Dados processados salvos para 1 registros.
+2025-11-12 09:09:01 - INFO - Conexão com o banco de dados encerrada.
+2025-11-12 09:12:44 - INFO - Conexão com o banco de dados estabelecida com sucesso: postgres@db.norphjcxnsgklyutnmin.supabase.co:5432/postgres
+2025-11-12 09:12:44 - INFO - Conexão com o banco de dados encerrada.
+2025-11-12 09:13:44 - INFO - Conexão com o banco de dados estabelecida com sucesso: postgres@db.norphjcxnsgklyutnmin.supabase.co:5432/postgres
+2025-11-12 09:13:44 - INFO - Já existe uma conexão ativa com o banco de dados.
+2025-11-12 09:13:45 - INFO - Encontrados 71106 AppIDs na tabela 'steam_raw'.
+2025-11-12 09:13:45 - INFO - Já existe uma conexão ativa com o banco de dados.
+2025-11-12 09:13:46 - WARNING - Formato de data não reconhecido: 22/mai./2018
+2025-11-12 09:13:46 - WARNING - Formato de data não reconhecido: 18/ago./2016
+2025-11-12 09:13:46 - WARNING - Formato de data não reconhecido: 19/dez./2018
+2025-11-12 09:13:46 - WARNING - Formato de data não reconhecido: 29/set./2015
+2025-11-12 09:13:46 - WARNING - Formato de data não reconhecido: 7/fev./2020
+2025-11-12 09:13:46 - WARNING - Formato de data não reconhecido: 27/mai./2014
+2025-11-12 09:13:46 - WARNING - Formato de data não reconhecido: 22/out./2013
+2025-11-12 09:13:46 - WARNING - Formato de data não reconhecido: 30/mai./2017
+2025-11-12 09:13:46 - WARNING - Formato de data não reconhecido: 20/abr./2018
+2025-11-12 09:13:47 - WARNING - Formato de data não reconhecido: 16/abr./2015
+2025-11-12 09:13:47 - WARNING - Formato de data não reconhecido: 1/mai./2007
+2025-11-12 09:18:07 - INFO - Conexão com o banco de dados encerrada.
+2025-11-12 09:19:13 - INFO - Conexão com o banco de dados estabelecida com sucesso: postgres@db.norphjcxnsgklyutnmin.supabase.co:5432/postgres
+2025-11-12 09:19:13 - INFO - Já existe uma conexão ativa com o banco de dados.
+2025-11-12 09:19:14 - INFO - Encontrados 71106 AppIDs na tabela 'steam_raw'.
+2025-11-12 09:19:14 - INFO - Já existe uma conexão ativa com o banco de dados.
+2025-11-12 09:19:15 - WARNING - Formato de data não reconhecido: 14/abr./2023
+2025-11-12 09:19:15 - WARNING - Formato de data não reconhecido: 6/set./2018
+2025-11-12 09:19:15 - WARNING - Formato de data não reconhecido: A ser anunciada
+2025-11-12 09:19:15 - WARNING - Formato de data não reconhecido: 4/set./2008
+2025-11-12 09:19:15 - WARNING - Formato de data não reconhecido: Em breve
+2025-11-12 09:19:15 - WARNING - Formato de data não reconhecido: 7/ago./2017
+2025-11-12 09:19:16 - WARNING - Formato de data não reconhecido: 24/ago./2016
+2025-11-12 09:19:16 - WARNING - Formato de data não reconhecido: 20/out./2015
+2025-11-12 09:19:16 - WARNING - Formato de data não reconhecido: 2/dez./2021
+2025-11-12 09:19:57 - INFO - Conexão com o banco de dados encerrada.
+2025-11-12 09:20:31 - INFO - Conexão com o banco de dados estabelecida com sucesso: postgres@db.norphjcxnsgklyutnmin.supabase.co:5432/postgres
+2025-11-12 09:20:31 - INFO - Já existe uma conexão ativa com o banco de dados.
+2025-11-12 09:20:32 - INFO - Encontrados 71106 AppIDs na tabela 'steam_raw'.
+2025-11-12 09:20:32 - INFO - Já existe uma conexão ativa com o banco de dados.
+2025-11-12 09:20:32 - WARNING - Formato de data não reconhecido: 22/fev./2018
+2025-11-12 09:20:32 - WARNING - Formato de data não reconhecido: 1/fev./2018
+2025-11-12 09:20:32 - WARNING - Formato de data não reconhecido: 1/mai./2017
+2025-11-12 09:20:33 - WARNING - Formato de data não reconhecido: 30/ago./2016
+2025-11-12 09:20:33 - WARNING - Formato de data não reconhecido: 18/abr./2021
+2025-11-12 09:20:33 - WARNING - Formato de data não reconhecido: 19/out./2017
+2025-11-12 09:20:33 - WARNING - Formato de data não reconhecido: 6/dez./2016
+2025-11-12 09:20:33 - WARNING - Formato de data não reconhecido: 16/abr./2019
+2025-11-12 09:20:33 - WARNING - Formato de data não reconhecido: 25/out./2016
+2025-11-12 09:20:33 - WARNING - Formato de data não reconhecido: 4º trimestre de 2026
+2025-11-12 09:20:33 - WARNING - Formato de data não reconhecido: 7/abr./2017
+2025-11-12 09:20:33 - WARNING - Formato de data não reconhecido: 5/abr./2016
+2025-11-12 09:20:34 - WARNING - Formato de data não reconhecido: 22/set./2016
+2025-11-12 09:20:34 - WARNING - Formato de data não reconhecido: 18/set./2017
+2025-11-12 09:20:34 - WARNING - Formato de data não reconhecido: 9/out./2017
+2025-11-12 09:20:34 - WARNING - Formato de data não reconhecido: 6/dez./2018
+2025-11-12 09:20:34 - WARNING - Formato de data não reconhecido: 10/dez./2018
+2025-11-12 09:20:34 - WARNING - Formato de data não reconhecido: 15/ago./2017
+2025-11-12 09:20:34 - WARNING - Formato de data não reconhecido: 4/mai./2018
+2025-11-12 09:20:35 - WARNING - Formato de data não reconhecido: 13/out./2025
+2025-11-12 09:20:35 - WARNING - Formato de data não reconhecido: 15/out./2015
+2025-11-12 09:20:35 - WARNING - Formato de data não reconhecido: 15/dez./2016
+2025-11-12 09:20:35 - WARNING - Formato de data não reconhecido: 9/dez./2016
+2025-11-12 09:20:35 - WARNING - Formato de data não reconhecido: 28/ago./2018
+2025-11-12 09:20:35 - WARNING - Formato de data não reconhecido: 3/out./2016
+2025-11-12 09:20:36 - WARNING - Formato de data não reconhecido: 22/set./2016
+2025-11-12 09:20:36 - WARNING - Formato de data não reconhecido: 25/abr./2025
+2025-11-12 09:20:36 - WARNING - Formato de data não reconhecido: 8/fev./2017
+2025-11-12 09:20:36 - WARNING - Formato de data não reconhecido: 8/ago./2017
+2025-11-12 09:20:36 - WARNING - Formato de data não reconhecido: 31/mai./2017
+2025-11-12 09:20:36 - WARNING - Formato de data não reconhecido: 24/mai./2017
+2025-11-12 09:20:36 - WARNING - Formato de data não reconhecido: 5/set./2017
+2025-11-12 09:20:36 - WARNING - Formato de data não reconhecido: 30/out./2015
+2025-11-12 09:20:36 - WARNING - Formato de data não reconhecido: 18/out./2016
+2025-11-12 09:20:37 - WARNING - Formato de data não reconhecido: 7/abr./2009
+2025-11-12 09:20:37 - WARNING - Formato de data não reconhecido: 22/fev./2018
+2025-11-12 09:20:37 - WARNING - Formato de data não reconhecido: 16/abr./2008
+2025-11-12 09:20:37 - WARNING - Formato de data não reconhecido: 7/dez./2015
+2025-11-12 09:20:37 - WARNING - Formato de data não reconhecido: 14/set./2021
+2025-11-12 09:20:37 - WARNING - Formato de data não reconhecido: 2/mai./2019
+2025-11-12 09:20:37 - WARNING - Formato de data não reconhecido: 9/set./2013
+2025-11-12 09:20:37 - WARNING - Formato de data não reconhecido: 7/mai./2013
+2025-11-12 09:20:38 - WARNING - Formato de data não reconhecido: 25/abr./2019
+2025-11-12 09:20:38 - WARNING - Formato de data não reconhecido: Em breve
+2025-11-12 09:20:38 - WARNING - Formato de data não reconhecido: 21/abr./2017
+2025-11-12 09:20:38 - WARNING - Formato de data não reconhecido: 9/fev./2018
+2025-11-12 09:20:38 - WARNING - Formato de data não reconhecido: 17/fev./2025
+2025-11-12 09:20:38 - WARNING - Formato de data não reconhecido: 21/abr./2011
+2025-11-12 09:20:38 - WARNING - Formato de data não reconhecido: 18/abr./2014
+2025-11-12 09:20:38 - WARNING - Formato de data não reconhecido: 12/ago./2015
+2025-11-12 09:20:38 - WARNING - Formato de data não reconhecido: 3/fev./2016
+2025-11-12 09:20:39 - WARNING - Formato de data não reconhecido: 4/abr./2018
+2025-11-12 09:20:39 - WARNING - Formato de data não reconhecido: 21/set./2010
+2025-11-12 09:20:39 - WARNING - Formato de data não reconhecido: 8/ago./2016
+2025-11-12 09:21:23 - INFO - Conexão com o banco de dados encerrada.
+2025-11-12 09:25:06 - WARNING - Formato de data não reconhecido: 22/fev./2018
+2025-11-12 09:25:06 - WARNING - Formato de data não reconhecido: 1/fev./2018
+2025-11-12 09:25:06 - WARNING - Formato de data não reconhecido: 1/mai./2017
+2025-11-12 09:25:06 - WARNING - Formato de data não reconhecido: 30/ago./2016
+2025-11-12 09:25:06 - WARNING - Formato de data não reconhecido: 18/abr./2021
+2025-11-12 09:25:06 - WARNING - Formato de data não reconhecido: 19/out./2017
+2025-11-12 09:25:06 - WARNING - Formato de data não reconhecido: 6/dez./2016
+2025-11-12 09:25:06 - WARNING - Formato de data não reconhecido: 16/abr./2019
+2025-11-12 09:25:06 - WARNING - Formato de data não reconhecido: 25/out./2016
+2025-11-12 09:25:06 - WARNING - Formato de data não reconhecido: 7/abr./2017
+2025-11-12 09:25:06 - WARNING - Formato de data não reconhecido: 5/abr./2016
+2025-11-12 09:25:06 - WARNING - Formato de data não reconhecido: 22/set./2016
+2025-11-12 09:25:06 - WARNING - Formato de data não reconhecido: Em breve
+2025-11-12 09:25:33 - WARNING - Formato de data não reconhecido: 22/fev./2018
+2025-11-12 09:25:33 - WARNING - Formato de data não reconhecido: 1/fev./2018
+2025-11-12 09:25:33 - WARNING - Formato de data não reconhecido: 1/mai./2017
+2025-11-12 09:25:33 - WARNING - Formato de data não reconhecido: 30/ago./2016
+2025-11-12 09:25:33 - WARNING - Formato de data não reconhecido: 18/abr./2021
+2025-11-12 09:25:33 - WARNING - Formato de data não reconhecido: 19/out./2017
+2025-11-12 09:25:33 - WARNING - Formato de data não reconhecido: 6/dez./2016
+2025-11-12 09:25:33 - WARNING - Formato de data não reconhecido: 16/abr./2019
+2025-11-12 09:25:33 - WARNING - Formato de data não reconhecido: 25/out./2016
+2025-11-12 09:25:33 - WARNING - Formato de data não reconhecido: 7/abr./2017
+2025-11-12 09:25:33 - WARNING - Formato de data não reconhecido: 5/abr./2016
+2025-11-12 09:25:33 - WARNING - Formato de data não reconhecido: 22/set./2016
+2025-11-12 09:25:33 - WARNING - Formato de data não reconhecido: Em breve
+2025-11-12 09:27:00 - WARNING - Formato de data não reconhecido: Em breve
+2025-11-12 09:29:04 - INFO - Conexão com o banco de dados estabelecida com sucesso: postgres@db.norphjcxnsgklyutnmin.supabase.co:5432/postgres
+2025-11-12 09:29:04 - INFO - Já existe uma conexão ativa com o banco de dados.
+2025-11-12 09:29:05 - INFO - Encontrados 71106 AppIDs na tabela 'steam_raw'.
+2025-11-12 09:29:05 - INFO - Já existe uma conexão ativa com o banco de dados.
+2025-11-12 09:30:22 - INFO - Conexão com o banco de dados encerrada.
+2025-11-12 09:30:33 - INFO - Conexão com o banco de dados estabelecida com sucesso: postgres@db.norphjcxnsgklyutnmin.supabase.co:5432/postgres
+2025-11-12 09:30:33 - INFO - Já existe uma conexão ativa com o banco de dados.
+2025-11-12 09:30:34 - INFO - Encontrados 71106 AppIDs na tabela 'steam_raw'.
+2025-11-12 09:30:34 - INFO - Já existe uma conexão ativa com o banco de dados.
+2025-11-12 09:30:41 - INFO - Conexão com o banco de dados encerrada.
+2025-11-12 09:32:48 - INFO - Conexão com o banco de dados estabelecida com sucesso: postgres@localhost:5432/postgres
+2025-11-12 09:32:48 - INFO - Já existe uma conexão ativa com o banco de dados.
+2025-11-12 09:33:24 - INFO - Encontrados 0 jogos desatualizados na tabela 'steam_generico'.
+2025-11-12 09:33:24 - INFO - Nenhum jogo desatualizado encontrado em steam_generico.
+2025-11-12 09:33:24 - INFO - Processando 4 jogos...
+2025-11-12 09:33:24 - INFO - Já existe uma conexão ativa com o banco de dados.
+2025-11-12 09:33:24 - WARNING - Nenhum dado encontrado para o AppID 123.
+2025-11-12 09:33:24 - WARNING - Nenhum dado encontrado para o AppID 789.
+2025-11-12 09:33:24 - INFO - 2 jogos encontrados no Docker
+2025-11-12 09:35:09 - ERROR - Erro ao processar AppID 456: Detalhes ausentes para AppID None
+2025-11-12 09:35:17 - INFO - 1 jogos transformados com sucesso
+2025-11-12 09:35:32 - INFO - Conectado ao Supabase com sucesso
+2025-11-12 09:35:33 - INFO - Dados processados salvos para 1 registros.
+2025-11-12 09:35:36 - INFO - 1 jogos inseridos no Supabase!
+2025-11-12 09:52:08 - INFO - Conexão com o banco de dados estabelecida com sucesso: postgres@db.norphjcxnsgklyutnmin.supabase.co:5432/postgres
+2025-11-12 09:52:08 - INFO - Já existe uma conexão ativa com o banco de dados.
+2025-11-12 09:52:08 - INFO - Inserção em bulk concluída: 3 registros processados em steam_raw.
+2025-11-12 09:52:08 - INFO - Conexão com o banco de dados encerrada.
+2025-11-12 09:55:40 - INFO - Conexão com o banco de dados estabelecida com sucesso: postgres@db.norphjcxnsgklyutnmin.supabase.co:5432/postgres
+2025-11-12 09:55:40 - INFO - Já existe uma conexão ativa com o banco de dados.
+2025-11-12 09:55:40 - INFO - Inserção em bulk concluída: 2 registros processados em steam_raw.
+2025-11-12 09:55:41 - INFO - Já existe uma conexão ativa com o banco de dados.
+2025-11-12 09:55:41 - INFO - Inserção em bulk concluída: 2 registros processados em steam_raw.
+2025-11-12 09:55:41 - INFO - Já existe uma conexão ativa com o banco de dados.
+2025-11-12 09:55:41 - INFO - Inserção em bulk concluída: 1 registros processados em steam_raw.
+2025-11-12 09:55:41 - INFO - Conexão com o banco de dados encerrada.
+2025-11-12 09:56:45 - INFO - Conexão com o banco de dados estabelecida com sucesso: postgres@localhost:5432/postgres
+2025-11-12 09:57:11 - INFO - Já existe uma conexão ativa com o banco de dados.
+2025-11-12 09:57:11 - INFO - Encontrados 0 jogos desatualizados na tabela 'steam_generico'.
+2025-11-12 09:57:11 - INFO - Nenhum jogo desatualizado encontrado em steam_generico.
+2025-11-12 09:57:29 - INFO - Conectado ao Supabase com sucesso
+2025-11-12 09:57:52 - INFO - Total de registros carregados de steam_generico: 276513
+2025-11-12 09:58:21 - INFO - Conexão com o banco de dados estabelecida com sucesso: postgres@localhost:5432/postgres
+2025-11-12 09:58:21 - INFO - Já existe uma conexão ativa com o banco de dados.
+2025-11-12 09:58:21 - INFO - Encontrados 0 jogos desatualizados na tabela 'steam_generico'.
+2025-11-12 09:58:21 - INFO - Nenhum jogo desatualizado encontrado em steam_generico.
+2025-11-12 09:58:22 - INFO - Já existe uma conexão ativa com o banco de dados.
+2025-11-12 09:58:28 - INFO - Já existe uma conexão ativa com o banco de dados.
+2025-11-12 09:58:47 - INFO - Encontrados 276513 AppIDs na tabela 'steam_generico'.
+2025-11-12 09:59:05 - INFO - Total de 276513 AppIDs encontrados na tabela steam_generico
+2025-11-12 09:59:21 - INFO - Já existe uma conexão ativa com o banco de dados.
+2025-11-12 09:59:50 - INFO - Conexão com o banco de dados estabelecida com sucesso: postgres@localhost:5432/postgres
+2025-11-12 09:59:50 - INFO - Encontrados 0 jogos desatualizados na tabela 'steam_generico'.
+2025-11-12 09:59:50 - INFO - Nenhum jogo desatualizado encontrado em steam_generico.
+2025-11-12 09:59:50 - INFO - Encontrados 276513 AppIDs na tabela 'steam_generico'.
+2025-11-12 10:00:12 - INFO - Encontrados 71106 AppIDs na tabela 'steam_raw'.
+2025-11-12 10:00:54 - INFO - AppIDs já processados: 71106
+2025-11-12 10:00:57 - INFO - AppIDs novos para processar: 205456
+2025-11-12 10:03:12 - INFO - Conexão com o banco de dados estabelecida com sucesso: postgres@localhost:5432/postgres
+2025-11-12 10:03:12 - INFO - Encontrados 0 jogos desatualizados na tabela 'steam_generico'.
+2025-11-12 10:03:12 - INFO - Nenhum jogo desatualizado encontrado em steam_generico.
+2025-11-12 10:03:12 - INFO - Encontrados 276513 AppIDs na tabela 'steam_generico'.
+2025-11-12 10:03:12 - INFO - Encontrados 71106 AppIDs na tabela 'steam_raw'.
+2025-11-12 10:03:14 - INFO - ======== Detalhes dos AppIDs já processados e novos para processar: ========
+2025-11-12 10:03:14 - INFO - AppIDs já processados: 71106
+2025-11-12 10:03:14 - INFO - AppIDs novos para processar: 205456
+2025-11-12 10:03:14 - INFO - ========================================
+2025-11-12 10:04:20 - INFO - Conexão com o banco de dados estabelecida com sucesso: postgres@localhost:5432/postgres
+2025-11-12 10:04:21 - INFO - Encontrados 0 jogos desatualizados na tabela 'steam_generico'.
+2025-11-12 10:04:21 - INFO - Nenhum jogo desatualizado encontrado em steam_generico.
+2025-11-12 10:04:21 - INFO - Encontrados 276513 AppIDs na tabela 'steam_generico'.
+2025-11-12 10:04:21 - INFO - Encontrados 71106 AppIDs na tabela 'steam_raw'.
+2025-11-12 10:04:23 - INFO - ========== Detalhes dos AppIDs já processados e novos para processar: ========
+2025-11-12 10:04:23 - INFO - AppIDs já processados: 71106
+2025-11-12 10:04:23 - INFO - AppIDs novos para processar: 205456
+2025-11-12 10:04:23 - INFO - ==============================================================================
+2025-11-12 10:05:22 - INFO - Encontrados 0 jogos desatualizados na tabela 'steam_raw'.
+2025-11-12 10:05:45 - INFO - Total final de AppIDs a processar: 205456
+2025-11-12 10:05:54 - INFO - Processando aplicativos de 1 a 1000 de 205456
+2025-11-12 10:05:57 - INFO - Progresso: 0.0%
+2025-11-12 10:06:02 - INFO - Tempo estimado restante: 410.912 minutos
+2025-11-12 10:06:05 - INFO - ----------------------------------------
+2025-11-12 10:06:16 - INFO - Número de IDs a processar neste lote: 1000
+2025-11-12 10:06:33 - INFO - 
+2025-11-12 10:06:34 - INFO - === PROCESSAMENTO EM BATCHES ===
+2025-11-12 10:06:36 - INFO - Total de itens: 1,000
+2025-11-12 10:06:37 - INFO - Tamanho do batch: 100
+2025-11-12 10:06:39 - INFO - Total de batches: 10
+2025-11-12 10:06:40 - INFO - Delay entre batches: 120s
+2025-11-12 10:06:43 - INFO - Concorrência por batch: 1
+2025-11-12 10:06:44 - INFO - Tempo Estimado para conclusão total do Batch: 20.0 minutos
+2025-11-12 10:06:47 - INFO - ================================
+
+2025-11-12 10:06:51 - INFO - Batch 1/10 - Processando itens 1 a 100 (100 itens)...
+2025-11-12 10:06:52 - INFO - Iniciando busca de 'DETALHES' assíncrona para 100 AppIDs com concorrência 1...
+2025-11-12 10:07:37 - INFO - Busca assíncrona concluída.
+2025-11-12 10:07:37 - INFO - --- Busca concluída: ---
+2025-11-12 10:07:37 - INFO - 100 sucesso(s) (100.00%),
+2025-11-12 10:07:37 - INFO - 0 falha(s) (0.00%).
+2025-11-12 10:07:37 - INFO - --- Detalhamento dos erros: ---
+2025-11-12 10:07:37 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-12 10:07:37 - INFO - * Timeout: 0
+2025-11-12 10:07:37 - INFO - * Ausentes: 0
+2025-11-12 10:07:37 - INFO - * Outros: 0
+2025-11-12 10:09:42 - INFO - Inserção em bulk concluída: 100 registros processados em steam_raw.
+2025-11-12 10:09:51 - INFO - Dados de detalhes inseridos com sucesso no PostgreSQL.
+2025-11-12 10:09:55 - INFO - Aguardando 120s antes do próximo batch...
+
+2025-11-12 10:10:55 - INFO - Conexão com o banco de dados estabelecida com sucesso: postgres@db.norphjcxnsgklyutnmin.supabase.co:5432/postgres
+2025-11-12 10:10:57 - INFO - Conexão com o banco de dados encerrada.
+2025-11-12 10:13:11 - INFO - Conexão com o banco de dados estabelecida com sucesso: postgres@localhost:5432/postgres
+2025-11-12 10:13:11 - INFO - Encontrados 0 jogos desatualizados na tabela 'steam_generico'.
+2025-11-12 10:13:11 - INFO - Nenhum jogo desatualizado encontrado em steam_generico.
+2025-11-12 10:13:11 - INFO - Encontrados 276513 AppIDs na tabela 'steam_generico'.
+2025-11-12 10:13:11 - INFO - Encontrados 71206 AppIDs na tabela 'steam_raw'.
+2025-11-12 10:13:14 - INFO - ========== Detalhes dos AppIDs já processados e novos para processar ========
+2025-11-12 10:13:14 - INFO - AppIDs já processados: 71206
+2025-11-12 10:13:14 - INFO - AppIDs novos para processar: 205356
+2025-11-12 10:13:14 - INFO - =============================================================================
+2025-11-12 10:13:34 - INFO - Encontrados 0 jogos desatualizados na tabela 'steam_raw'.
+2025-11-12 10:13:37 - INFO - Total final de AppIDs a processar: 205356
+2025-11-12 10:13:38 - INFO - Processando aplicativos de 1 a 1000 de 205356
+2025-11-12 10:13:38 - INFO - Progresso: 0.0%
+2025-11-12 10:13:39 - INFO - Tempo estimado restante: 410.712 minutos
+2025-11-12 10:13:42 - INFO - ----------------------------------------
+2025-11-12 10:13:43 - INFO - Número de IDs a processar neste lote: 1000
+2025-11-12 10:13:52 - INFO - 
+2025-11-12 10:13:52 - INFO - === PROCESSAMENTO EM BATCHES ===
+2025-11-12 10:13:52 - INFO - Total de itens: 1,000
+2025-11-12 10:13:52 - INFO - Tamanho do batch: 100
+2025-11-12 10:13:52 - INFO - Total de batches: 10
+2025-11-12 10:13:52 - INFO - Delay entre batches: 120s
+2025-11-12 10:13:52 - INFO - Concorrência por batch: 1
+2025-11-12 10:13:52 - INFO - Tempo Estimado para conclusão total do Batch: 20.0 minutos
+2025-11-12 10:13:52 - INFO - ================================
+
+2025-11-12 10:13:52 - INFO - Batch 1/10 - Processando itens 1 a 100 (100 itens)...
+2025-11-12 10:13:52 - INFO - Iniciando busca de 'DETALHES' assíncrona para 100 AppIDs com concorrência 1...
+2025-11-12 10:14:37 - INFO - Busca assíncrona concluída.
+2025-11-12 10:14:37 - INFO - --- Busca concluída: ---
+2025-11-12 10:14:37 - INFO - 82 sucesso(s) (82.00%),
+2025-11-12 10:14:37 - INFO - 18 falha(s) (18.00%).
+2025-11-12 10:14:37 - INFO - --- Detalhamento dos erros: ---
+2025-11-12 10:14:37 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-12 10:14:37 - INFO - * Timeout: 0
+2025-11-12 10:14:37 - INFO - * Ausentes: 18
+2025-11-12 10:14:37 - INFO - * Outros: 0
+2025-11-12 10:15:57 - INFO - Inserção em bulk concluída: 100 registros processados em steam_raw.
+2025-11-12 10:16:05 - INFO - Dados de detalhes inseridos com sucesso no PostgreSQL.
+2025-11-12 10:17:03 - INFO - Conexão com o banco de dados estabelecida com sucesso: postgres@localhost:5432/postgres
+2025-11-12 10:17:03 - INFO - Conexão com o banco de dados encerrada.
+2025-11-12 10:17:22 - INFO - Aguardando 120s antes do próximo batch...
+
+2025-11-12 10:19:22 - INFO - Batch 2/10 - Processando itens 101 a 200 (100 itens)...
+2025-11-12 10:19:22 - INFO - Iniciando busca de 'DETALHES' assíncrona para 100 AppIDs com concorrência 1...
+2025-11-12 10:20:07 - INFO - Busca assíncrona concluída.
+2025-11-12 10:20:07 - INFO - --- Busca concluída: ---
+2025-11-12 10:20:07 - INFO - 96 sucesso(s) (96.00%),
+2025-11-12 10:20:07 - INFO - 4 falha(s) (4.00%).
+2025-11-12 10:20:07 - INFO - --- Detalhamento dos erros: ---
+2025-11-12 10:20:07 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-12 10:20:07 - INFO - * Timeout: 0
+2025-11-12 10:20:07 - INFO - * Ausentes: 4
+2025-11-12 10:20:07 - INFO - * Outros: 0
+2025-11-12 10:20:11 - INFO - Inserção em bulk concluída: 100 registros processados em steam_raw.
+2025-11-12 10:20:11 - INFO - Dados de detalhes inseridos com sucesso no PostgreSQL.
+2025-11-12 10:20:11 - INFO - Aguardando 120s antes do próximo batch...
+
+2025-11-12 10:22:11 - INFO - Batch 3/10 - Processando itens 201 a 300 (100 itens)...
+2025-11-12 10:22:11 - INFO - Iniciando busca de 'DETALHES' assíncrona para 100 AppIDs com concorrência 1...
+2025-11-12 10:22:58 - INFO - Busca assíncrona concluída.
+2025-11-12 10:22:58 - INFO - --- Busca concluída: ---
+2025-11-12 10:22:58 - INFO - 92 sucesso(s) (92.00%),
+2025-11-12 10:22:58 - INFO - 8 falha(s) (8.00%).
+2025-11-12 10:22:58 - INFO - --- Detalhamento dos erros: ---
+2025-11-12 10:22:58 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-12 10:22:58 - INFO - * Timeout: 0
+2025-11-12 10:22:58 - INFO - * Ausentes: 8
+2025-11-12 10:22:58 - INFO - * Outros: 0
+2025-11-12 10:23:01 - INFO - Inserção em bulk concluída: 100 registros processados em steam_raw.
+2025-11-12 10:23:01 - INFO - Dados de detalhes inseridos com sucesso no PostgreSQL.
+2025-11-12 10:23:01 - INFO - Aguardando 120s antes do próximo batch...
+
+2025-11-12 10:25:01 - INFO - Batch 4/10 - Processando itens 301 a 400 (100 itens)...
+2025-11-12 10:25:01 - INFO - Iniciando busca de 'DETALHES' assíncrona para 100 AppIDs com concorrência 1...
+2025-11-12 10:25:43 - INFO - Busca assíncrona concluída.
+2025-11-12 10:25:43 - INFO - --- Busca concluída: ---
+2025-11-12 10:25:43 - INFO - 97 sucesso(s) (97.00%),
+2025-11-12 10:25:43 - INFO - 3 falha(s) (3.00%).
+2025-11-12 10:25:43 - INFO - --- Detalhamento dos erros: ---
+2025-11-12 10:25:43 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-12 10:25:43 - INFO - * Timeout: 0
+2025-11-12 10:25:43 - INFO - * Ausentes: 3
+2025-11-12 10:25:43 - INFO - * Outros: 0
+2025-11-12 10:25:47 - INFO - Inserção em bulk concluída: 100 registros processados em steam_raw.
+2025-11-12 10:25:47 - INFO - Dados de detalhes inseridos com sucesso no PostgreSQL.
+2025-11-12 10:25:47 - INFO - Aguardando 120s antes do próximo batch...
+
+2025-11-12 10:27:47 - INFO - Batch 5/10 - Processando itens 401 a 500 (100 itens)...
+2025-11-12 10:27:47 - INFO - Iniciando busca de 'DETALHES' assíncrona para 100 AppIDs com concorrência 1...
+2025-11-12 10:28:28 - INFO - Busca assíncrona concluída.
+2025-11-12 10:28:28 - INFO - --- Busca concluída: ---
+2025-11-12 10:28:28 - INFO - 97 sucesso(s) (97.00%),
+2025-11-12 10:28:28 - INFO - 3 falha(s) (3.00%).
+2025-11-12 10:28:28 - INFO - --- Detalhamento dos erros: ---
+2025-11-12 10:28:28 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-12 10:28:28 - INFO - * Timeout: 0
+2025-11-12 10:28:28 - INFO - * Ausentes: 3
+2025-11-12 10:28:28 - INFO - * Outros: 0
+2025-11-12 10:28:30 - INFO - Inserção em bulk concluída: 100 registros processados em steam_raw.
+2025-11-12 10:28:30 - INFO - Dados de detalhes inseridos com sucesso no PostgreSQL.
+2025-11-12 10:28:30 - INFO - Aguardando 120s antes do próximo batch...
+
+2025-11-12 10:30:30 - INFO - Batch 6/10 - Processando itens 501 a 600 (100 itens)...
+2025-11-12 10:30:30 - INFO - Iniciando busca de 'DETALHES' assíncrona para 100 AppIDs com concorrência 1...
+2025-11-12 10:31:14 - INFO - Busca assíncrona concluída.
+2025-11-12 10:31:14 - INFO - --- Busca concluída: ---
+2025-11-12 10:31:14 - INFO - 96 sucesso(s) (96.00%),
+2025-11-12 10:31:14 - INFO - 4 falha(s) (4.00%).
+2025-11-12 10:31:14 - INFO - --- Detalhamento dos erros: ---
+2025-11-12 10:31:14 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-12 10:31:14 - INFO - * Timeout: 0
+2025-11-12 10:31:14 - INFO - * Ausentes: 4
+2025-11-12 10:31:14 - INFO - * Outros: 0
+2025-11-12 10:31:18 - INFO - Inserção em bulk concluída: 100 registros processados em steam_raw.
+2025-11-12 10:31:18 - INFO - Dados de detalhes inseridos com sucesso no PostgreSQL.
+2025-11-12 10:31:18 - INFO - Aguardando 120s antes do próximo batch...
+
+2025-11-12 10:33:18 - INFO - Batch 7/10 - Processando itens 601 a 700 (100 itens)...
+2025-11-12 10:33:18 - INFO - Iniciando busca de 'DETALHES' assíncrona para 100 AppIDs com concorrência 1...
+2025-11-12 10:33:59 - INFO - Busca assíncrona concluída.
+2025-11-12 10:33:59 - INFO - --- Busca concluída: ---
+2025-11-12 10:33:59 - INFO - 90 sucesso(s) (90.00%),
+2025-11-12 10:33:59 - INFO - 10 falha(s) (10.00%).
+2025-11-12 10:33:59 - INFO - --- Detalhamento dos erros: ---
+2025-11-12 10:33:59 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-12 10:33:59 - INFO - * Timeout: 0
+2025-11-12 10:33:59 - INFO - * Ausentes: 10
+2025-11-12 10:33:59 - INFO - * Outros: 0
+2025-11-12 10:34:02 - INFO - Inserção em bulk concluída: 100 registros processados em steam_raw.
+2025-11-12 10:34:02 - INFO - Dados de detalhes inseridos com sucesso no PostgreSQL.
+2025-11-12 10:34:02 - INFO - Aguardando 120s antes do próximo batch...
+
+2025-11-12 10:36:02 - INFO - Batch 8/10 - Processando itens 701 a 800 (100 itens)...
+2025-11-12 10:36:02 - INFO - Iniciando busca de 'DETALHES' assíncrona para 100 AppIDs com concorrência 1...
+2025-11-12 10:36:45 - INFO - Busca assíncrona concluída.
+2025-11-12 10:36:45 - INFO - --- Busca concluída: ---
+2025-11-12 10:36:45 - INFO - 96 sucesso(s) (96.00%),
+2025-11-12 10:36:45 - INFO - 4 falha(s) (4.00%).
+2025-11-12 10:36:45 - INFO - --- Detalhamento dos erros: ---
+2025-11-12 10:36:45 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-12 10:36:45 - INFO - * Timeout: 0
+2025-11-12 10:36:45 - INFO - * Ausentes: 4
+2025-11-12 10:36:45 - INFO - * Outros: 0
+2025-11-12 10:36:48 - INFO - Inserção em bulk concluída: 100 registros processados em steam_raw.
+2025-11-12 10:36:48 - INFO - Dados de detalhes inseridos com sucesso no PostgreSQL.
+2025-11-12 10:36:48 - INFO - Aguardando 120s antes do próximo batch...
+
+2025-11-12 10:38:48 - INFO - Batch 9/10 - Processando itens 801 a 900 (100 itens)...
+2025-11-12 10:38:48 - INFO - Iniciando busca de 'DETALHES' assíncrona para 100 AppIDs com concorrência 1...
+2025-11-12 10:39:31 - INFO - Busca assíncrona concluída.
+2025-11-12 10:39:31 - INFO - --- Busca concluída: ---
+2025-11-12 10:39:31 - INFO - 96 sucesso(s) (96.00%),
+2025-11-12 10:39:31 - INFO - 4 falha(s) (4.00%).
+2025-11-12 10:39:31 - INFO - --- Detalhamento dos erros: ---
+2025-11-12 10:39:31 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-12 10:39:31 - INFO - * Timeout: 0
+2025-11-12 10:39:31 - INFO - * Ausentes: 4
+2025-11-12 10:39:31 - INFO - * Outros: 0
+2025-11-12 10:39:33 - INFO - Inserção em bulk concluída: 100 registros processados em steam_raw.
+2025-11-12 10:39:33 - INFO - Dados de detalhes inseridos com sucesso no PostgreSQL.
+2025-11-12 10:39:33 - INFO - Aguardando 120s antes do próximo batch...
+
+2025-11-12 10:41:33 - INFO - Batch 10/10 - Processando itens 901 a 1000 (100 itens)...
+2025-11-12 10:41:33 - INFO - Iniciando busca de 'DETALHES' assíncrona para 100 AppIDs com concorrência 1...
+2025-11-12 10:42:16 - INFO - Busca assíncrona concluída.
+2025-11-12 10:42:16 - INFO - --- Busca concluída: ---
+2025-11-12 10:42:16 - INFO - 94 sucesso(s) (94.00%),
+2025-11-12 10:42:16 - INFO - 6 falha(s) (6.00%).
+2025-11-12 10:42:16 - INFO - --- Detalhamento dos erros: ---
+2025-11-12 10:42:16 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-12 10:42:16 - INFO - * Timeout: 0
+2025-11-12 10:42:16 - INFO - * Ausentes: 6
+2025-11-12 10:42:16 - INFO - * Outros: 0
+2025-11-12 10:42:19 - INFO - Inserção em bulk concluída: 100 registros processados em steam_raw.
+2025-11-12 10:42:19 - INFO - Dados de detalhes inseridos com sucesso no PostgreSQL.
+2025-11-12 10:42:19 - INFO - ===========PROCESSAMENTO COMPLETO! (Detalhes)==========
+2025-11-12 10:42:19 - INFO - Total processado: 100 sucessos de 1,000 itens (0.00%)
+2025-11-12 10:42:19 - INFO - 
+2025-11-12 10:42:19 - INFO - === PROCESSAMENTO EM BATCHES (REVIEWS) ===
+2025-11-12 10:42:19 - INFO - Total de itens: 1,000
+2025-11-12 10:42:19 - INFO - Tamanho do batch: 1,000
+2025-11-12 10:42:19 - INFO - Total de batches: 1
+2025-11-12 10:42:19 - INFO - Delay entre batches: 30s
+2025-11-12 10:42:19 - INFO - Concorrência por batch: 10
+2025-11-12 10:42:19 - INFO - Tempo Estimado para conclusão total do Batch: 0.5 minutos
+2025-11-12 10:42:19 - INFO - ==========================================
+
+2025-11-12 10:42:19 - INFO - Batch 1/1 - Processando itens 1 a 1000 (1000 itens)...
+2025-11-12 10:42:19 - INFO - Iniciando busca de 'REVIEWS' assíncrona para 1000 AppIDs com concorrência 10...
+2025-11-12 10:43:04 - INFO - Busca assíncrona concluída.
+2025-11-12 10:43:04 - INFO - --- Busca concluída: ---
+2025-11-12 10:43:04 - INFO - 1000 sucesso(s) (100.00%),
+2025-11-12 10:43:04 - INFO - 0 falha(s) (0.00%).
+2025-11-12 10:43:04 - INFO - --- Detalhamento dos erros: ---
+2025-11-12 10:43:04 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-12 10:43:04 - INFO - * Timeout: 0
+2025-11-12 10:43:04 - INFO - * Ausentes: 0
+2025-11-12 10:43:04 - INFO - * Outros: 0
+2025-11-12 10:43:05 - INFO - Inserção em bulk concluída: 1000 registros processados em steam_raw.
+2025-11-12 10:43:05 - INFO - Dados de reviews inseridos com sucesso no PostgreSQL.
+2025-11-12 10:43:05 - INFO - ===========PROCESSAMENTO COMPLETO! (Reviews)==========
+2025-11-12 10:43:05 - INFO - Total processado: 1,000 itens.
+2025-11-12 10:43:05 - INFO - Processando aplicativos de 1001 a 2000 de 205356
+2025-11-12 10:43:05 - INFO - Progresso: 0.5%
+2025-11-12 10:43:05 - INFO - Tempo estimado restante: 408.712 minutos
+2025-11-12 10:43:05 - INFO - ----------------------------------------
+2025-11-12 10:43:05 - INFO - Número de IDs a processar neste lote: 1000
+2025-11-12 10:43:05 - INFO - 
+2025-11-12 10:43:05 - INFO - === PROCESSAMENTO EM BATCHES ===
+2025-11-12 10:43:05 - INFO - Total de itens: 1,000
+2025-11-12 10:43:05 - INFO - Tamanho do batch: 100
+2025-11-12 10:43:05 - INFO - Total de batches: 10
+2025-11-12 10:43:05 - INFO - Delay entre batches: 120s
+2025-11-12 10:43:05 - INFO - Concorrência por batch: 1
+2025-11-12 10:43:05 - INFO - Tempo Estimado para conclusão total do Batch: 20.0 minutos
+2025-11-12 10:43:05 - INFO - ================================
+
+2025-11-12 10:43:05 - INFO - Batch 1/10 - Processando itens 1 a 100 (100 itens)...
+2025-11-12 10:43:05 - INFO - Iniciando busca de 'DETALHES' assíncrona para 100 AppIDs com concorrência 1...
+2025-11-12 10:43:50 - INFO - Busca assíncrona concluída.
+2025-11-12 10:43:50 - INFO - --- Busca concluída: ---
+2025-11-12 10:43:50 - INFO - 98 sucesso(s) (98.00%),
+2025-11-12 10:43:50 - INFO - 2 falha(s) (2.00%).
+2025-11-12 10:43:50 - INFO - --- Detalhamento dos erros: ---
+2025-11-12 10:43:50 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-12 10:43:50 - INFO - * Timeout: 0
+2025-11-12 10:43:50 - INFO - * Ausentes: 2
+2025-11-12 10:43:50 - INFO - * Outros: 0
+2025-11-12 10:43:53 - INFO - Inserção em bulk concluída: 100 registros processados em steam_raw.
+2025-11-12 10:43:53 - INFO - Dados de detalhes inseridos com sucesso no PostgreSQL.
+2025-11-12 10:43:53 - INFO - Aguardando 120s antes do próximo batch...
+
+2025-11-12 10:45:53 - INFO - Batch 2/10 - Processando itens 101 a 200 (100 itens)...
+2025-11-12 10:45:53 - INFO - Iniciando busca de 'DETALHES' assíncrona para 100 AppIDs com concorrência 1...
+2025-11-12 10:46:38 - INFO - Busca assíncrona concluída.
+2025-11-12 10:46:38 - CRITICAL - Falha crítica ao buscar detalhes em bulk: 'NoneType' object has no attribute 'get'
+2025-11-12 10:46:38 - ERROR - Erro ao alimentar o banco de dados PostgreSQL: Falha ao buscar detalhes em bulk: 'NoneType' object has no attribute 'get'
+2025-11-12 10:46:38 - INFO - Conexão com o banco de dados encerrada.
+2025-11-12 10:46:38 - INFO - Conexão com o banco de dados estabelecida com sucesso: postgres@localhost:5432/postgres
+2025-11-12 10:46:38 - INFO - Encontrados 276513 AppIDs na tabela 'steam_generico'.
+2025-11-12 10:46:38 - INFO - Encontrados 72306 AppIDs na tabela 'steam_raw'.
+2025-11-12 10:46:38 - INFO - ========== Detalhes dos AppIDs já processados e novos para processar ========
+2025-11-12 10:46:38 - INFO - AppIDs já processados: 72306
+2025-11-12 10:46:38 - INFO - AppIDs novos para processar: 204256
+2025-11-12 10:46:38 - INFO - =============================================================================
+2025-11-12 10:46:38 - INFO - Encontrados 0 jogos desatualizados na tabela 'steam_raw'.
+2025-11-12 10:46:38 - INFO - Total final de AppIDs a processar: 204256
+2025-11-12 10:46:38 - INFO - Processando aplicativos de 1 a 1000 de 204256
+2025-11-12 10:46:38 - INFO - Progresso: 0.0%
+2025-11-12 10:46:38 - INFO - Tempo estimado restante: 408.512 minutos
+2025-11-12 10:46:38 - INFO - ----------------------------------------
+2025-11-12 10:46:38 - INFO - Número de IDs a processar neste lote: 1000
+2025-11-12 10:46:38 - INFO - 
+2025-11-12 10:46:38 - INFO - === PROCESSAMENTO EM BATCHES ===
+2025-11-12 10:46:38 - INFO - Total de itens: 1,000
+2025-11-12 10:46:38 - INFO - Tamanho do batch: 100
+2025-11-12 10:46:38 - INFO - Total de batches: 10
+2025-11-12 10:46:38 - INFO - Delay entre batches: 120s
+2025-11-12 10:46:38 - INFO - Concorrência por batch: 1
+2025-11-12 10:46:38 - INFO - Tempo Estimado para conclusão total do Batch: 20.0 minutos
+2025-11-12 10:46:38 - INFO - ================================
+
+2025-11-12 10:46:38 - INFO - Batch 1/10 - Processando itens 1 a 100 (100 itens)...
+2025-11-12 10:46:38 - INFO - Iniciando busca de 'DETALHES' assíncrona para 100 AppIDs com concorrência 1...
+2025-11-12 10:47:23 - INFO - Busca assíncrona concluída.
+2025-11-12 10:47:23 - INFO - --- Busca concluída: ---
+2025-11-12 10:47:23 - INFO - 97 sucesso(s) (97.00%),
+2025-11-12 10:47:23 - INFO - 3 falha(s) (3.00%).
+2025-11-12 10:47:23 - INFO - --- Detalhamento dos erros: ---
+2025-11-12 10:47:23 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-12 10:47:23 - INFO - * Timeout: 0
+2025-11-12 10:47:23 - INFO - * Ausentes: 3
+2025-11-12 10:47:23 - INFO - * Outros: 0
+2025-11-12 10:47:26 - INFO - Inserção em bulk concluída: 100 registros processados em steam_raw.
+2025-11-12 10:47:26 - INFO - Dados de detalhes inseridos com sucesso no PostgreSQL.
+2025-11-12 10:47:26 - INFO - Aguardando 120s antes do próximo batch...
+
+2025-11-12 10:49:26 - INFO - Batch 2/10 - Processando itens 101 a 200 (100 itens)...
+2025-11-12 10:49:26 - INFO - Iniciando busca de 'DETALHES' assíncrona para 100 AppIDs com concorrência 1...
+2025-11-12 10:50:12 - INFO - Busca assíncrona concluída.
+2025-11-12 10:50:12 - CRITICAL - Falha crítica ao buscar detalhes em bulk: 'NoneType' object has no attribute 'get'
+2025-11-12 10:50:12 - ERROR - Erro ao alimentar o banco de dados PostgreSQL: Falha ao buscar detalhes em bulk: 'NoneType' object has no attribute 'get'
+2025-11-12 10:50:12 - INFO - Conexão com o banco de dados encerrada.
+2025-11-12 10:50:13 - INFO - Conexão com o banco de dados estabelecida com sucesso: postgres@localhost:5432/postgres
+2025-11-12 10:50:13 - INFO - Encontrados 276513 AppIDs na tabela 'steam_generico'.
+2025-11-12 10:50:13 - INFO - Encontrados 72406 AppIDs na tabela 'steam_raw'.
+2025-11-12 10:50:13 - INFO - ========== Detalhes dos AppIDs já processados e novos para processar ========
+2025-11-12 10:50:13 - INFO - AppIDs já processados: 72406
+2025-11-12 10:50:13 - INFO - AppIDs novos para processar: 204156
+2025-11-12 10:50:13 - INFO - =============================================================================
+2025-11-12 10:50:13 - INFO - Encontrados 0 jogos desatualizados na tabela 'steam_raw'.
+2025-11-12 10:50:13 - INFO - Total final de AppIDs a processar: 204156
+2025-11-12 10:50:13 - INFO - Processando aplicativos de 1 a 1000 de 204156
+2025-11-12 10:50:13 - INFO - Progresso: 0.0%
+2025-11-12 10:50:13 - INFO - Tempo estimado restante: 408.312 minutos
+2025-11-12 10:50:13 - INFO - ----------------------------------------
+2025-11-12 10:50:13 - INFO - Número de IDs a processar neste lote: 1000
+2025-11-12 10:50:13 - INFO - 
+2025-11-12 10:50:13 - INFO - === PROCESSAMENTO EM BATCHES ===
+2025-11-12 10:50:13 - INFO - Total de itens: 1,000
+2025-11-12 10:50:13 - INFO - Tamanho do batch: 100
+2025-11-12 10:50:13 - INFO - Total de batches: 10
+2025-11-12 10:50:13 - INFO - Delay entre batches: 120s
+2025-11-12 10:50:13 - INFO - Concorrência por batch: 1
+2025-11-12 10:50:13 - INFO - Tempo Estimado para conclusão total do Batch: 20.0 minutos
+2025-11-12 10:50:13 - INFO - ================================
+
+2025-11-12 10:50:13 - INFO - Batch 1/10 - Processando itens 1 a 100 (100 itens)...
+2025-11-12 10:50:13 - INFO - Iniciando busca de 'DETALHES' assíncrona para 100 AppIDs com concorrência 1...
+2025-11-12 10:50:53 - INFO - Busca assíncrona concluída.
+2025-11-12 10:50:53 - CRITICAL - Falha crítica ao buscar detalhes em bulk: 'NoneType' object has no attribute 'get'
+2025-11-12 10:50:53 - ERROR - Erro ao alimentar o banco de dados PostgreSQL: Falha ao buscar detalhes em bulk: 'NoneType' object has no attribute 'get'
+2025-11-12 10:50:53 - INFO - Conexão com o banco de dados encerrada.
+2025-11-12 10:50:53 - ERROR - Erro ao iniciar o bot: Erro ao processar a tarefa após 3 tentativas: Erro ao alimentar o banco de dados PostgreSQL: Falha ao buscar detalhes em bulk: 'NoneType' object has no attribute 'get'
+Traceback: <traceback object at 0x00000198C5253BC0>

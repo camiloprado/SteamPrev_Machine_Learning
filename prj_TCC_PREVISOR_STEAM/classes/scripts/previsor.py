@@ -230,6 +230,86 @@ class Previsor:
         except Exception as e:
             logger.error(f"Erro ao alimentar o banco de dados: {e}")
             raise Exception(f"Erro ao alimentar o banco de dados: {e}")
+    
+    @classmethod
+    def alimentar_banco_dados_raw_docker(cls):
+        """
+        Alimenta o banco de dados PostgreSQL (Docker) com os dados coletados da API.
+        Versão otimizada que usa o PostgreSQL local em vez do Supabase.
+
+        Parâmetros:
+        
+        Retorna:
+        - None
+        """
+        try:
+            PostgreSQL.conectar()
+            
+            # Define o range de processamento por vez pelo .env
+            var_intRange = int(os.getenv("RANGE_PROCESSAMENTO_APPIDS_RAW", 1000))
+            
+            # Carrega a lista de aplicativos do PostgreSQL (steam_generico)
+            var_listAppID = PostgreSQL.buscar_todos_appids(arg_strNomeTabela="steam_generico")
+            var_intTamanhoTotalFila = len(var_listAppID)
+            
+            # Carregamento de teste de carga
+            var_intAmbiente = os.getenv("AMBIENTE", "PRD").upper()
+
+            # Verifica quais AppIDs já estão no banco de dados steam_raw
+            var_listAppIDExistentes = PostgreSQL.buscar_todos_appids(arg_strNomeTabela="steam_raw")
+            var_setAppIDExistentes = set(var_listAppIDExistentes)
+            
+            # Remove os AppIDs que já estão no banco de dados
+            var_listAppIDParaProcessar = [appid for appid in var_listAppID if appid not in var_setAppIDExistentes]
+            var_strTexto = f"{10*'='} Detalhes dos AppIDs já processados e novos para processar {8*'='}"
+            logger.info(var_strTexto)
+            logger.info(f"AppIDs já processados: {len(var_setAppIDExistentes)}")
+            logger.info(f"AppIDs novos para processar: {len(var_listAppIDParaProcessar)}")
+            logger.info(len(var_strTexto)*"=")
+
+            # Verifica quais AppIDs estão desatualizados
+            var_listJogosDesatualizados = PostgreSQL.buscar_jogos_desatualizados(arg_strNomeTabela="steam_raw")
+            for var_dictJogo in var_listJogosDesatualizados:
+                var_intAppID = var_dictJogo['appid']
+                # Adiciona os AppIDs desatualizados para reprocessamento
+                if var_intAppID not in var_listAppIDParaProcessar:
+                    var_listAppIDParaProcessar.append(var_intAppID)
+            
+            if var_listJogosDesatualizados:
+                logger.info(f"AppIDs desatualizados adicionados: {len(var_listJogosDesatualizados)}")
+            
+            var_intTamanhoTotalFila = len(var_listAppIDParaProcessar)
+            logger.info(f"Total final de AppIDs a processar: {var_intTamanhoTotalFila}")
+
+            # Itera sobre os aplicativos em lotes
+            for i in range(0, var_intTamanhoTotalFila, var_intRange):
+                logger.info(f"Processando aplicativos de {i + 1} a {min(i + var_intRange, var_intTamanhoTotalFila)} de {var_intTamanhoTotalFila}")
+                logger.info(f"Progresso: {(i/var_intTamanhoTotalFila)*100:.1f}%")
+                logger.info(f"Tempo estimado restante: {((var_intTamanhoTotalFila - i) / var_intRange) * 2} minutos")
+                logger.info(f"----------------------------------------")
+                
+                # Carrega os aplicativos atuais
+                if var_intAmbiente == "HML":
+                    var_listAppIDAtual = var_listAppIDParaProcessar[i:i+int(os.getenv("BATCH_TESTE", 20))]
+                else:
+                    var_listAppIDAtual = var_listAppIDParaProcessar[i:i+var_intRange]
+                
+                logger.info(f"Número de IDs a processar neste lote: {len(var_listAppIDAtual)}")
+                
+                # Busca detalhes dos jogos
+                asyncio.run(SteamClient.fetch_details_bulk_batched(arg_seqAppids=var_listAppIDAtual))
+                
+                # Busca reviews dos jogos
+                asyncio.run(SteamClient.fetch_reviews_summary_batched(arg_seqAppids=var_listAppIDAtual))
+            
+            logger.info("Processamento concluído com sucesso!")
+                
+        except Exception as e:
+            logger.error(f"Erro ao alimentar o banco de dados PostgreSQL: {e}")
+            raise Exception(f"Erro ao alimentar o banco de dados PostgreSQL: {e}")
+        finally:
+            PostgreSQL.desconectar()
+        
         
     @classmethod
     def alimentar_banco_dados_Steam(cls):

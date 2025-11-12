@@ -1,5 +1,6 @@
-from prj_TCC_PREVISOR_STEAM.classes.SQL.supabase_db import SupabaseDB
 from prj_TCC_PREVISOR_STEAM.classes.framework.AllSettings import Settings
+from prj_TCC_PREVISOR_STEAM.classes.SQL.supabase_db import SupabaseDB
+from prj_TCC_PREVISOR_STEAM.classes.SQL.postgre import PostgreSQL
 
 from typing import Any, Sequence
 from datetime import datetime, timedelta, timezone
@@ -194,6 +195,14 @@ class SteamClient:
             var_listBatchResults = await cls.fetch_details_bulk(var_listBatch)
             var_listDetails = []
             for var_dictResult in var_listBatchResults:
+                # Valida se o resultado não é None ou exceção
+                if var_dictResult is None or isinstance(var_dictResult, Exception):
+                    continue
+                
+                if not isinstance(var_dictResult, dict):
+                    logger.warning(f"Resultado inválido (não é dict): {type(var_dictResult)}")
+                    continue
+                
                 var_dictResult = {
                     "appid": var_dictResult.get("APPID"),
                     "detalhes": var_dictResult.get("data"),
@@ -201,8 +210,12 @@ class SteamClient:
                 }
                 var_listDetails.append(var_dictResult)
 
-            SupabaseDB.inserir_dadosSteamRaw_Bulk(var_listDetails)
-            logger.info("Dados de detalhes inseridos com sucesso.")
+            # Insere no PostgreSQL (Docker) em vez de Supabase
+            if var_listDetails:
+                PostgreSQL.inserir_dadosSteamRaw_Bulk(arg_listDados=var_listDetails)
+                logger.info(f"Dados de detalhes inseridos com sucesso no PostgreSQL ({len(var_listDetails)} registros).")
+            else:
+                logger.warning("Nenhum dado válido para inserir neste batch.")
 
             # Aguarda entre batches (exceto no último)
             if var_intBatchNum < var_intTotalBatches - 1:
@@ -360,6 +373,14 @@ class SteamClient:
             
             var_listReviews = []
             for var_dictResult in var_listBatchResults:
+                # Valida se o resultado não é None ou exceção
+                if var_dictResult is None or isinstance(var_dictResult, Exception):
+                    continue
+                
+                if not isinstance(var_dictResult, dict):
+                    logger.warning(f"Resultado inválido (não é dict): {type(var_dictResult)}")
+                    continue
+                
                 var_dictResult = {
                     "appid": var_dictResult.get("APPID"),
                     "reviews": var_dictResult.get("data"),
@@ -367,8 +388,12 @@ class SteamClient:
                 }
                 var_listReviews.append(var_dictResult)
 
-            SupabaseDB.inserir_dadosSteamRaw_Bulk(var_listReviews)
-            logger.info("Dados de detalhes inseridos com sucesso.")
+            # Insere no PostgreSQL (Docker) em vez de Supabase
+            if var_listReviews:
+                PostgreSQL.inserir_dadosSteamRaw_Bulk(arg_listDados=var_listReviews)
+                logger.info(f"Dados de reviews inseridos com sucesso no PostgreSQL ({len(var_listReviews)} registros).")
+            else:
+                logger.warning("Nenhum dado válido para inserir neste batch.")
 
             # Aguarda entre batches (exceto no último)
             if var_intBatchNum < var_intTotalBatches - 1:

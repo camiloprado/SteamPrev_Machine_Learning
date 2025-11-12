@@ -31,11 +31,9 @@ class PostgreSQL:
                         host=var_strHost,
                         port=var_intPort
                     )
-                    logger.info("Conexão com o banco de dados estabelecida com sucesso.")
+                    logger.info(f"Conexão com o banco de dados estabelecida com sucesso: {var_strUser}@{var_strHost}:{var_intPort}/{var_strDbname}")
                 except Exception as e:
                     logger.error(f"Erro ao conectar ao banco de dados: {e}")
-            else:
-                logger.info("Já existe uma conexão ativa com o banco de dados.")
         except Exception as e:
             logger.error(f"Erro ao conectar ao banco de dados: {e}")
             raise Exception(f"Erro ao conectar ao banco de dados: {e}")
@@ -150,6 +148,138 @@ class PostgreSQL:
             logger.error(f"Erro ao criar a tabela '{arg_strNomeTabela}': {e}")
             raise Exception(f"Erro ao criar a tabela '{arg_strNomeTabela}': {e}")
 
+    @classmethod
+    def inserir_dadosSteamRaw(cls, arg_dictDados: dict) -> None:
+        """
+        Insere ou atualiza dados na tabela steam_raw.
+
+        Parâmetros:
+        - arg_dictDados (dict): Dicionário com os dados a inserir.
+        """
+        cls.conectar()
+        try:
+            var_intAppid = arg_dictDados.get("appid") or arg_dictDados.get("steam_appid")
+            if not var_intAppid:
+                logger.warning("AppID ausente em dados steam_raw")
+                return
+            
+            var_dictDetalhes = arg_dictDados.get("detalhes", {})
+            var_dictReviews = arg_dictDados.get("reviews", {})
+            
+            # Verifica se há dados existentes
+            var_strSQLBusca = "SELECT detalhes, reviews FROM steam_raw WHERE appid = %s;"
+            var_dictExistente = {}
+            
+            with cls._var_connConnection.cursor() as cursor:
+                cursor.execute(var_strSQLBusca, (var_intAppid,))
+                var_tuple = cursor.fetchone()
+                if var_tuple:
+                    var_dictExistente = {
+                        "detalhes": var_tuple[0] if var_tuple[0] else {},
+                        "reviews": var_tuple[1] if var_tuple[1] else {}
+                    }
+            
+            # Lógica de sobrescrever nulos/vazios
+            if not var_dictDetalhes and var_dictExistente.get("detalhes"):
+                var_dictDetalhes = var_dictExistente["detalhes"]
+            if not var_dictReviews and var_dictExistente.get("reviews"):
+                var_dictReviews = var_dictExistente["reviews"]
+            
+            if not var_dictDetalhes and not var_dictReviews:
+                logger.warning(f"Nenhum dado válido para inserir/atualizar para o AppID {var_intAppid}")
+                return
+            
+            var_strSQL = """
+            INSERT INTO steam_raw (appid, detalhes, reviews, ultima_atualizacao)
+            VALUES (%s, %s, %s, %s)
+            ON CONFLICT (appid) DO UPDATE SET
+                detalhes = EXCLUDED.detalhes,
+                reviews = EXCLUDED.reviews,
+                ultima_atualizacao = EXCLUDED.ultima_atualizacao;
+            """
+            
+            var_listValores = [
+                var_intAppid,
+                json.dumps(var_dictDetalhes),
+                json.dumps(var_dictReviews),
+                datetime.now()
+            ]
+            
+            with cls._var_connConnection.cursor() as cursor:
+                logger.info(f"Executando SQL INSERT/UPDATE para AppID {var_intAppid}")
+                logger.info(f"Valores: detalhes={var_dictDetalhes}, reviews={var_dictReviews}")
+                cursor.execute(var_strSQL, tuple(var_listValores))
+                var_intRowCount = cursor.rowcount
+                cls._var_connConnection.commit()
+                logger.info(f"Dados steam_raw inseridos/atualizados para o AppID {var_intAppid} (linhas afetadas: {var_intRowCount})")
+        except Exception as e:
+            logger.error(f"Erro ao inserir dados steam_raw: {e}")
+            raise Exception(f"Erro ao inserir dados steam_raw: {e}")
+
+    @classmethod
+    def inserir_dadosSteamRaw_Bulk(cls, arg_listDados: list) -> None:
+        """
+        Insere ou atualiza dados em bulk na tabela steam_raw de forma otimizada.
+        Parâmetros:
+        - arg_listDados (list): Lista de dicionários com os dados a inserir.
+                               Cada dicionário deve ter: appid, detalhes (opcional), reviews (opcional)
+        """
+        cls.conectar()
+        try:
+            if not arg_listDados:
+                logger.warning("Lista de dados vazia, nenhum dado para inserir.")
+                raise Exception("Lista de dados vazia, nenhum dado para inserir.")
+            
+            # SQL para UPSERT (INSERT ... ON CONFLICT)
+            var_strSQL = """
+            INSERT INTO steam_raw (appid, detalhes, reviews, ultima_atualizacao)
+            VALUES (%s, %s, %s, %s)
+            ON CONFLICT (appid) DO UPDATE SET
+                detalhes = COALESCE(EXCLUDED.detalhes, steam_raw.detalhes),
+                reviews = COALESCE(EXCLUDED.reviews, steam_raw.reviews),
+                ultima_atualizacao = EXCLUDED.ultima_atualizacao;
+            """
+            
+            # Prepara os valores para inserção em batch
+            var_listValores = []
+            
+            for var_dictDados in arg_listDados:
+                var_intAppid = var_dictDados.get("appid")
+                if not var_intAppid:
+                    logger.warning(f"AppID ausente em dados, pulando registro: {var_dictDados}")
+                    continue
+                
+                var_dictDetalhes = var_dictDados.get("detalhes")
+                var_dictReviews = var_dictDados.get("reviews")
+                var_dateNow = var_dictDados.get("ultima_atualizacao", datetime.utcnow().isoformat(sep=' ', timespec='microseconds'))
+                # Converte para JSON string se não for None/vazio
+                var_strDetalhes = json.dumps(var_dictDetalhes) if var_dictDetalhes else None
+                var_strReviews = json.dumps(var_dictReviews) if var_dictReviews else None
+                
+                var_listValores.append((
+                    var_intAppid,
+                    var_strDetalhes,
+                    var_strReviews,
+                    var_dateNow
+                ))
+            
+            if not var_listValores:
+                logger.warning("Nenhum dado válido para inserir após processamento.")
+                return
+            
+            # Executa a inserção em batch
+            with cls._var_connConnection.cursor() as cursor:
+                cursor.executemany(var_strSQL, var_listValores)
+                var_intRowCount = cursor.rowcount
+                cls._var_connConnection.commit()
+                logger.info(f"Inserção em bulk concluída: {var_intRowCount} registros processados em steam_raw.")
+                
+        except Exception as e:
+            cls._var_connConnection.rollback()
+            logger.error(f"Erro ao inserir dados em bulk em steam_raw: {e}")
+            raise Exception(f"Erro ao inserir dados em bulk em steam_raw: {e}")
+        
+        
     @classmethod
     def inserir_dadosSteamRaw_details(cls, arg_dictDados: dict):
         """
@@ -444,6 +574,180 @@ class PostgreSQL:
         except Exception as e:
             logger.error(f"Erro ao buscar todos os dados da tabela '{arg_strNomeTabela}': {e}")
             raise Exception(f"Erro ao buscar todos os dados da tabela '{arg_strNomeTabela}': {e}")
+    
+    @classmethod
+    def buscar_appids_nao_processados(cls, arg_intLimit: int = None) -> list[int]:
+        """
+        Busca AppIDs que estão em steam_raw mas não estão em steam_bd.
+        Útil para identificar jogos que precisam ser processados.
+
+        Parâmetros:
+        - arg_intLimit (int): Número máximo de AppIDs a retornar. Use None para sem limite. (Padrão: None)
+
+        Retorna:
+        - list[int]: Lista de AppIDs que precisam ser processados.
+        """
+        cls.conectar()
+        try:
+            var_strSQL = """
+            SELECT sr.appid 
+            FROM steam_raw sr
+            LEFT JOIN steam_bd sb ON sr.appid = sb.appid
+            WHERE sb.appid IS NULL
+            """
+            
+            if arg_intLimit is not None:
+                var_strSQL += f" LIMIT {arg_intLimit}"
+            
+            var_strSQL += ";"
+            
+            with cls._var_connConnection.cursor() as cursor:
+                cursor.execute(var_strSQL)
+                var_listResultados = cursor.fetchall()
+                var_listAppids = [row[0] for row in var_listResultados]
+                logger.info(f"Encontrados {len(var_listAppids)} AppIDs não processados.")
+                return var_listAppids
+        except Exception as e:
+            logger.error(f"Erro ao buscar AppIDs não processados: {e}")
+            return []
+    
+    @classmethod
+    def buscar_todos_appids(cls, arg_strNomeTabela: str = "steam_raw") -> list[int]:
+        """
+        Busca todos os AppIDs de uma tabela.
+
+        Parâmetros:
+        - arg_strNomeTabela (str): Nome da tabela. (Padrão: "steam_raw")
+
+        Retorna:
+        - list[int]: Lista de todos os AppIDs na tabela.
+        """
+        cls.conectar()
+        try:
+            var_strSQL = f"""
+            SELECT appid FROM {arg_strNomeTabela};
+            """
+            with cls._var_connConnection.cursor() as cursor:
+                cursor.execute(var_strSQL)
+                var_listResultados = cursor.fetchall()
+                var_listAppids = [row[0] for row in var_listResultados]
+                logger.info(f"Encontrados {len(var_listAppids)} AppIDs na tabela '{arg_strNomeTabela}'.")
+                return var_listAppids
+        except Exception as e:
+            logger.error(f"Erro ao buscar todos os AppIDs da tabela '{arg_strNomeTabela}': {e}")
+            return []
+    
+    @classmethod
+    def buscar_jogos_desatualizados(cls, arg_strNomeTabela: str = "steam_raw", arg_intDiasAtualizacao: int = None, arg_intLimite: int = None) -> list[dict]:
+        """
+        Busca jogos que não foram atualizados recentemente.
+
+        Parâmetros:
+        - arg_strNomeTabela (str): Nome da tabela onde os dados serão buscados. (Padrão: "steam_raw")
+        - arg_intDiasAtualizacao (int): Número de dias para considerar desatualizado. Se None, usa settings. (Padrão: None)
+        - arg_intLimite (int): Número máximo de registros a retornar. (Padrão: None = todos)
+
+        Retorna:
+        - list[dict]: Lista de jogos desatualizados.
+        """
+        cls.conectar()
+        try:
+            var_intDias = arg_intDiasAtualizacao or Settings._var_dictSettings.get("dias_para_atualizacao", 30)
+            var_dataCorte = datetime.now() - __import__('datetime').timedelta(days=var_intDias)
+            
+            var_strSQL = f"""
+            SELECT * FROM {arg_strNomeTabela}
+            WHERE ultima_atualizacao < %s
+            """
+            
+            if arg_intLimite:
+                var_strSQL += f" LIMIT {arg_intLimite}"
+            
+            var_strSQL += ";"
+            
+            with cls._var_connConnection.cursor() as cursor:
+                cursor.execute(var_strSQL, (var_dataCorte,))
+                var_listResultados = cursor.fetchall()
+                var_listColnames = [desc[0] for desc in cursor.description]
+                var_listDados = [dict(zip(var_listColnames, row)) for row in var_listResultados]
+                logger.info(f"Encontrados {len(var_listDados)} jogos desatualizados na tabela '{arg_strNomeTabela}'.")
+                return var_listDados
+        except Exception as e:
+            logger.error(f"Erro ao buscar jogos desatualizados: {e}")
+            return []
+    
+    @classmethod
+    def inserir_dadosSteamGenerico(cls, arg_listDadosGerais: list) -> bool:
+        """
+        Insere ou atualiza dados na tabela steam_generico.
+        Apenas insere jogos que estão desatualizados.
+
+        Parâmetros:
+        - arg_listDadosGerais (list): Lista de dicionários com os dados gerais da Steam
+                                      Cada dicionário deve conter: {"appid": int, "name": str}
+
+        Retorna:
+        - bool: True se inseriu dados, False se não havia jogos desatualizados
+        """
+        cls.conectar()
+        
+        try:
+            # Verifica se há jogos desatualizados
+            var_listDesatualizados = cls.buscar_jogos_desatualizados(arg_strNomeTabela="steam_generico")
+
+            if not var_listDesatualizados:
+                logger.info("Nenhum jogo desatualizado encontrado em steam_generico.")
+                return False
+            
+            # Cria set de AppIDs desatualizados para verificação rápida
+            var_setAppidsDesatualizados = {jogo.get("appid") for jogo in var_listDesatualizados}
+            
+            # Filtra apenas os dados que precisam ser atualizados
+            var_listDadosParaInserir = [
+                dados for dados in arg_listDadosGerais 
+                if dados.get("appid") in var_setAppidsDesatualizados
+            ]
+            
+            if not var_listDadosParaInserir:
+                logger.info("Nenhum dado dos fornecidos precisa ser atualizado.")
+                return False
+            
+            # Insere/atualiza em lotes de 5000
+            var_intTotalInserido = 0
+            for var_intIndex in range(0, len(var_listDadosParaInserir), 5000):
+                var_listLote = var_listDadosParaInserir[var_intIndex:var_intIndex + 5000]
+                
+                for var_dictDados in var_listLote:
+                    var_intAppid = var_dictDados.get("appid")
+                    if not var_intAppid:
+                        logger.warning("AppID ausente em dados steam_generico")
+                        continue
+                    
+                    var_strSQL = """
+                    INSERT INTO steam_generico (appid, name, ultima_atualizacao)
+                    VALUES (%s, %s, %s)
+                    ON CONFLICT (appid) DO UPDATE SET
+                        name = EXCLUDED.name,
+                        ultima_atualizacao = EXCLUDED.ultima_atualizacao;
+                    """
+                    
+                    with cls._var_connConnection.cursor() as cursor:
+                        cursor.execute(var_strSQL, (
+                            var_intAppid,
+                            var_dictDados.get("name"),
+                            datetime.now()
+                        ))
+                        var_intTotalInserido += cursor.rowcount
+                
+                cls._var_connConnection.commit()
+                logger.info(f"Lote de {len(var_listLote)} registros processado.")
+            
+            logger.info(f"Dados de steam_generico salvos/atualizados para {var_intTotalInserido} registros.")
+            return True
+            
+        except Exception as e:
+            logger.error(f"Erro ao inserir dados steam_generico: {e}")
+            raise Exception(f"Erro ao inserir dados steam_generico: {e}")
         
     @classmethod
     def verificar_ultima_atualizacao(cls, arg_intAppid: int, arg_strNomeTabela: str) -> datetime | None:
