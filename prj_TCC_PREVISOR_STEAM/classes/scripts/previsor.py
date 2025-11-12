@@ -279,13 +279,14 @@ class Previsor:
                 logger.info(f"AppIDs desatualizados adicionados: {len(var_listJogosDesatualizados)}")
             
             var_intTamanhoTotalFila = len(var_listAppIDParaProcessar)
+            var_intTamanhoMetadeFila = var_intTamanhoTotalFila // 2
             logger.info(f"Total final de AppIDs a processar: {var_intTamanhoTotalFila}")
 
             # Itera sobre os aplicativos em lotes
-            for i in range(0, var_intTamanhoTotalFila, var_intRange):
-                logger.info(f"Processando aplicativos de {i + 1} a {min(i + var_intRange, var_intTamanhoTotalFila)} de {var_intTamanhoTotalFila}")
-                logger.info(f"Progresso: {(i/var_intTamanhoTotalFila)*100:.1f}%")
-                logger.info(f"Tempo estimado restante: {((var_intTamanhoTotalFila - i) / var_intRange) * 2} minutos")
+            for i in range(0, var_intTamanhoMetadeFila, var_intRange):
+                logger.info(f"Processando aplicativos de {i + 1} a {min(i + var_intRange, var_intTamanhoMetadeFila)} de {var_intTamanhoMetadeFila}")
+                logger.info(f"Progresso: {(i/var_intTamanhoMetadeFila)*100:.1f}%")
+                logger.info(f"Tempo estimado restante: {((var_intTamanhoMetadeFila - i) / var_intRange) * 2} minutos")
                 logger.info(f"----------------------------------------")
                 
                 # Carrega os aplicativos atuais

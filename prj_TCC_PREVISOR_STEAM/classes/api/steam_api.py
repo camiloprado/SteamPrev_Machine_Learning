@@ -75,28 +75,84 @@ class SteamClient:
     def find_app_list(cls) -> list[dict[str, Any]]:
         """
         Executa a requisição para obter a lista de aplicativos da Steam diretamente da API.
+        Implementa retry automático com backoff exponencial em caso de falha.
 
         Parâmetros:
 
         Retorna:
         - var_listData (list): A lista de aplicativos da Steam.
         """
-        # Se não tiver cache ou for forçado, baixa da Steam
-        try:
-            # Faz a requisição para a Steam
-            var_respResponse = requests.get(STEAM_APP_LIST_URL, headers=CON_DEFAULT_HEADERS, timeout=60)
+        var_intMaxTentativas = 5
+        var_intDelayBase = 5  # segundos
+        
+        for var_intTentativa in range(var_intMaxTentativas):
+            try:
+                logger.info(f"Tentativa {var_intTentativa + 1}/{var_intMaxTentativas} - Buscando lista de aplicativos da Steam...")
+                
+                # Faz a requisição para a Steam
+                var_respResponse = requests.get(
+                    STEAM_APP_LIST_URL, 
+                    headers=CON_DEFAULT_HEADERS, 
+                    timeout=60
+                )
 
-            # Verifica se a resposta foi bem-sucedida
-            var_respResponse.raise_for_status()
+                # Verifica se a resposta foi bem-sucedida
+                var_respResponse.raise_for_status()
 
-            # Processa os dados recebidos
-            var_listData = var_respResponse.json().get("applist", {}).get("apps", [])
-            Settings._var_listApp = var_listData
-            return var_listData
+                # Processa os dados recebidos
+                var_listData = var_respResponse.json().get("applist", {}).get("apps", [])
+                Settings._var_listApp = var_listData
+                logger.info(f"Lista de aplicativos carregada com sucesso! ({len(var_listData)} jogos)")
+                return var_listData
             
-        except Exception as e:
-            logger.error(f"Erro ao buscar a lista de aplicativos da Steam: {e}")
-            raise Exception(f"Erro ao buscar a lista de aplicativos da Steam: {e}")
+            except requests.exceptions.HTTPError as e:
+                # Erros HTTP específicos (503, 500, etc.)
+                var_intStatusCode = e.response.status_code if hasattr(e, 'response') else 0
+                
+                if var_intStatusCode == 503:
+                    logger.warning(f"Serviço Steam temporariamente indisponível (503 Service Unavailable)")
+                elif var_intStatusCode >= 500:
+                    logger.warning(f"Erro interno do servidor Steam ({var_intStatusCode})")
+                else:
+                    logger.error(f"Erro HTTP ao buscar lista da Steam: {e}")
+                    raise  Exception(f"Erro HTTP não recuperável ao buscar lista da Steam: {e}")  # Erro não recuperável (4xx, etc.)
+                
+                # Calcula tempo de espera com backoff exponencial
+                if var_intTentativa < var_intMaxTentativas - 1:
+                    var_intDelay = var_intDelayBase * (2 ** var_intTentativa)  # 5, 10, 20, 40, 80 segundos
+                    logger.info(f"Aguardando {var_intDelay}s antes da próxima tentativa...")
+                    sleep(var_intDelay)
+                else:
+                    logger.error(f"Falha após {var_intMaxTentativas} tentativas. API Steam pode estar fora do ar.")
+                    raise Exception(f"API Steam indisponível após {var_intMaxTentativas} tentativas: {e}")
+            
+            except requests.exceptions.Timeout:
+                logger.warning(f"Timeout ao buscar lista da Steam (tentativa {var_intTentativa + 1}/{var_intMaxTentativas})")
+                
+                if var_intTentativa < var_intMaxTentativas - 1:
+                    var_intDelay = var_intDelayBase * (2 ** var_intTentativa)
+                    logger.info(f"Aguardando {var_intDelay}s antes da próxima tentativa...")
+                    sleep(var_intDelay)
+                else:
+                    raise Exception(f"Timeout após {var_intMaxTentativas} tentativas ao buscar lista da Steam")
+            
+            except requests.exceptions.ConnectionError as e:
+                logger.warning(f"Erro de conexão com a API Steam (tentativa {var_intTentativa + 1}/{var_intMaxTentativas})")
+                
+                if var_intTentativa < var_intMaxTentativas - 1:
+                    var_intDelay = var_intDelayBase * (2 ** var_intTentativa)
+                    logger.info(f"Aguardando {var_intDelay}s antes da próxima tentativa...")
+                    sleep(var_intDelay)
+                else:
+                    raise Exception(f"Erro de conexão após {var_intMaxTentativas} tentativas: {e}")
+            
+            except Exception as e:
+                logger.error(f"Erro inesperado ao buscar a lista de aplicativos da Steam: {e}")
+                raise Exception(f"Erro ao buscar a lista de aplicativos da Steam: {e}")
+        
+        # Fallback se todas as tentativas falharem
+        raise Exception(f"Falha ao buscar lista da Steam após {var_intMaxTentativas} tentativas")
+
 
     # ------------------- Find appid -------------------
     @classmethod
@@ -316,7 +372,13 @@ class SteamClient:
                 var_listOut = await asyncio.gather(*var_listTasks, return_exceptions=True)
                 logger.info("Busca assíncrona concluída.")
 
-            var_intFalha = sum(1 for item in var_listOut if item.get("data") == "AUSENTE")
+            var_intContNones = 0
+            for item in var_listOut:
+                if item is None or isinstance(item, Exception):
+                    var_listOut.remove(item)
+                    var_intContNones += 1
+
+            var_intFalha = sum(1 for item in var_listOut if item.get("data") == "AUSENTE") + var_intContNones
             logger.info(f"--- Busca concluída: ---")
             logger.info(f"{len(var_listOut)-var_intFalha} sucesso(s) ({(len(var_listOut)-var_intFalha)/(len(arg_seqAppids)):.2%}),")
             logger.info(f"{var_intFalha} falha(s) ({var_intFalha/len(arg_seqAppids):.2%}).")
