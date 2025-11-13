@@ -677,6 +677,102 @@ class PostgreSQL:
             return []
     
     @classmethod
+    def buscar_appids_nao_processados_otimizado(cls, arg_intPcId: int = 1, arg_intTotalPcs: int = 1, arg_intLimite: int = None) -> list[int]:
+        """
+        Busca AppIDs que NÃO estão em steam_raw usando SQL eficiente.
+        Evita carregar todos os 280k registros na memória.
+        Suporta divisão de trabalho entre múltiplos PCs.
+
+        Parâmetros:
+        - arg_intPcId (int): ID deste PC (1, 2, 3...). (Padrão: 1)
+        - arg_intTotalPcs (int): Total de PCs processando. (Padrão: 1)
+        - arg_intLimite (int): Número máximo de AppIDs a retornar. (Padrão: None = todos)
+
+        Retorna:
+        - list[int]: Lista de AppIDs que precisam ser processados (já filtrados para este PC).
+        """
+        cls.conectar()
+        try:
+            logger.info(f"Buscando AppIDs não processados (PC {arg_intPcId}/{arg_intTotalPcs})...")
+            
+            # faz LEFT JOIN direto no banco
+            # Retorna apenas AppIDs que NÃO existem em steam_raw
+            var_strSQL = """
+            SELECT sg.appid 
+            FROM steam_generico sg
+            LEFT JOIN steam_raw sr ON sg.appid = sr.appid
+            WHERE sr.appid IS NULL
+            """
+            
+            # Aplica filtro de divisão de trabalho entre PCs (se aplicável)
+            if arg_intTotalPcs > 1:
+                # MOD(appid, total_pcs) = (pc_id - 1)
+                # PC 1: MOD(appid, 2) = 0 (pares)
+                # PC 2: MOD(appid, 2) = 1 (ímpares)
+                var_strSQL += f" AND MOD(sg.appid, {arg_intTotalPcs}) = {arg_intPcId - 1}"
+            
+            if arg_intLimite:
+                var_strSQL += f" LIMIT {arg_intLimite}"
+            
+            var_strSQL += ";"
+            
+            with cls._var_connConnection.cursor() as cursor:
+                cursor.execute(var_strSQL)
+                var_listResultados = cursor.fetchall()
+                var_listAppids = [row[0] for row in var_listResultados]
+                
+                logger.info(f"Encontrados {len(var_listAppids):,} AppIDs não processados para PC {arg_intPcId}")
+                return var_listAppids
+                
+        except Exception as e:
+            logger.error(f"Erro ao buscar AppIDs não processados: {e}")
+            return []
+    
+    @classmethod
+    def buscar_appids_desatualizados_otimizado(cls, arg_intDiasAtualizacao: int = None, arg_intPcId: int = 1, arg_intTotalPcs: int = 1) -> list[int]:
+        """
+        Busca apenas AppIDs de jogos desatualizados.
+        Não carrega dados completos, apenas os IDs.
+
+        Parâmetros:
+        - arg_intDiasAtualizacao (int): Dias para considerar desatualizado. (Padrão: 30)
+        - arg_intPcId (int): ID deste PC. (Padrão: 1)
+        - arg_intTotalPcs (int): Total de PCs. (Padrão: 1)
+
+        Retorna:
+        - list[int]: Lista de AppIDs desatualizados.
+        """
+        cls.conectar()
+        try:
+            var_intDias = arg_intDiasAtualizacao or Settings._var_dictSettings.get("dias_para_atualizacao", 30)
+            var_dataCorte = datetime.now() - __import__('datetime').timedelta(days=var_intDias)
+            
+            logger.info(f"Buscando AppIDs desatualizados (>{var_intDias} dias)...")
+            
+            var_strSQL = """
+            SELECT appid FROM steam_raw
+            WHERE ultima_atualizacao < %s
+            """
+            
+            # Aplica filtro de PC se necessário
+            if arg_intTotalPcs > 1:
+                var_strSQL += f" AND MOD(appid, {arg_intTotalPcs}) = {arg_intPcId - 1}"
+            
+            var_strSQL += ";"
+            
+            with cls._var_connConnection.cursor() as cursor:
+                cursor.execute(var_strSQL, (var_dataCorte,))
+                var_listResultados = cursor.fetchall()
+                var_listAppids = [row[0] for row in var_listResultados]
+                
+                logger.info(f"Encontrados {len(var_listAppids):,} AppIDs desatualizados")
+                return var_listAppids
+                
+        except Exception as e:
+            logger.error(f"Erro ao buscar AppIDs desatualizados: {e}")
+            return []
+    
+    @classmethod
     def inserir_dadosSteamGenerico(cls, arg_listDadosGerais: list) -> bool:
         """
         Insere ou atualiza dados na tabela steam_generico.

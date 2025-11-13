@@ -5,7 +5,7 @@ from prj_TCC_PREVISOR_STEAM.classes.SQL.postgre import PostgreSQL
 from typing import Any, Sequence
 from datetime import datetime, timedelta, timezone
 from time import sleep
-import asyncio, random, json, logging, os, re, aiohttp, requests
+import asyncio, random, json, logging, os, re, aiohttp, requests, traceback
 
 logger = logging.getLogger(__name__)
 
@@ -111,8 +111,10 @@ class SteamClient:
                 
                 if var_intStatusCode == 503:
                     logger.warning(f"Serviço Steam temporariamente indisponível (503 Service Unavailable)")
+                    return False
                 elif var_intStatusCode >= 500:
                     logger.warning(f"Erro interno do servidor Steam ({var_intStatusCode})")
+                    return False
                 else:
                     logger.error(f"Erro HTTP ao buscar lista da Steam: {e}")
                     raise  Exception(f"Erro HTTP não recuperável ao buscar lista da Steam: {e}")  # Erro não recuperável (4xx, etc.)
@@ -372,12 +374,10 @@ class SteamClient:
                 var_listOut = await asyncio.gather(*var_listTasks, return_exceptions=True)
                 logger.info("Busca assíncrona concluída.")
 
-            var_intContNones = 0
-            for item in var_listOut:
-                if item is None or isinstance(item, Exception):
-                    var_listOut.remove(item)
-                    var_intContNones += 1
-
+            # Conta None's e filtra a lista de forma segura
+            var_intContNones = sum(1 for item in var_listOut if item is None)
+            var_listOut = [item for item in var_listOut if item is not None]
+            
             var_intFalha = sum(1 for item in var_listOut if item.get("data") == "AUSENTE") + var_intContNones
             logger.info(f"--- Busca concluída: ---")
             logger.info(f"{len(var_listOut)-var_intFalha} sucesso(s) ({(len(var_listOut)-var_intFalha)/(len(arg_seqAppids)):.2%}),")
@@ -388,6 +388,11 @@ class SteamClient:
             logger.info(f"* Ausentes: {var_intAusentes}")
             logger.info(f"* Outros: {var_intErrosOutros}")
             return var_listOut
+        
+        except AttributeError as e:
+            var_strTraceback = traceback.format_exc()
+            logger.critical(f"Falha crítica ao buscar detalhes em bulk: {e}\n{var_strTraceback}")
+            raise RuntimeError(f"Falha ao buscar detalhes em bulk: {e}")
         
         except Exception as e:
             logger.critical(f"Falha crítica ao buscar detalhes em bulk: {e}")

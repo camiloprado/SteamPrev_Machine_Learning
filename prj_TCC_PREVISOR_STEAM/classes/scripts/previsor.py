@@ -236,6 +236,7 @@ class Previsor:
         """
         Alimenta o banco de dados PostgreSQL (Docker) com os dados coletados da API.
         Versão otimizada que usa o PostgreSQL local em vez do Supabase.
+        Suporta divisão de trabalho entre múltiplos PCs usando PC_ID.
 
         Parâmetros:
         
@@ -248,45 +249,60 @@ class Previsor:
             # Define o range de processamento por vez pelo .env
             var_intRange = int(os.getenv("RANGE_PROCESSAMENTO_APPIDS_RAW", 1000))
             
-            # Carrega a lista de aplicativos do PostgreSQL (steam_generico)
-            var_listAppID = PostgreSQL.buscar_todos_appids(arg_strNomeTabela="steam_generico")
-            var_intTamanhoTotalFila = len(var_listAppID)
+            # Identifica qual PC está executando (1 ou 2)
+            var_intPcId = int(os.getenv("PC_ID", "1"))
+            var_intTotalPcs = int(os.getenv("TOTAL_PCS", "1"))
+            
+            if var_intTotalPcs > 1:
+                logger.info(f"{'='*60}")
+                logger.info(f"MODO MULTI-PC ATIVADO: PC {var_intPcId} de {var_intTotalPcs}")
+                logger.info(f"{'='*60}")
             
             # Carregamento de teste de carga
             var_intAmbiente = os.getenv("AMBIENTE", "PRD").upper()
 
-            # Verifica quais AppIDs já estão no banco de dados steam_raw
-            var_listAppIDExistentes = PostgreSQL.buscar_todos_appids(arg_strNomeTabela="steam_raw")
-            var_setAppIDExistentes = set(var_listAppIDExistentes)
+            # Busca apenas AppIDs não processados (LEFT JOIN no banco)
+            # Já aplica filtro de divisão de trabalho entre PCs
+            logger.info("Consultando AppIDs não processados...")
+            var_listAppIDParaProcessar = PostgreSQL.buscar_appids_nao_processados_otimizado(
+                arg_intPcId=var_intPcId,
+                arg_intTotalPcs=var_intTotalPcs
+            )
             
-            # Remove os AppIDs que já estão no banco de dados
-            var_listAppIDParaProcessar = [appid for appid in var_listAppID if appid not in var_setAppIDExistentes]
-            var_strTexto = f"{10*'='} Detalhes dos AppIDs já processados e novos para processar {8*'='}"
+            var_strTexto = f"{10*'='} AppIDs novos para processar {10*'='}"
             logger.info(var_strTexto)
-            logger.info(f"AppIDs já processados: {len(var_setAppIDExistentes)}")
-            logger.info(f"AppIDs novos para processar: {len(var_listAppIDParaProcessar)}")
+            logger.info(f"AppIDs novos atribuídos ao PC {var_intPcId}: {len(var_listAppIDParaProcessar):,}")
             logger.info(len(var_strTexto)*"=")
 
-            # Verifica quais AppIDs estão desatualizados
-            var_listJogosDesatualizados = PostgreSQL.buscar_jogos_desatualizados(arg_strNomeTabela="steam_raw")
-            for var_dictJogo in var_listJogosDesatualizados:
-                var_intAppID = var_dictJogo['appid']
-                # Adiciona os AppIDs desatualizados para reprocessamento
-                if var_intAppID not in var_listAppIDParaProcessar:
-                    var_listAppIDParaProcessar.append(var_intAppID)
+            # Busca AppIDs desatualizados e adiciona à lista
+            logger.info("Consultando AppIDs desatualizados")
+            var_listAppIDDesatualizados = PostgreSQL.buscar_appids_desatualizados_otimizado(
+                arg_intPcId=var_intPcId,
+                arg_intTotalPcs=var_intTotalPcs
+            )
             
-            if var_listJogosDesatualizados:
-                logger.info(f"AppIDs desatualizados adicionados: {len(var_listJogosDesatualizados)}")
+            # Adiciona desatualizados (evita duplicatas)
+            var_setAppIDParaProcessar = set(var_listAppIDParaProcessar)
+            for var_intAppID in var_listAppIDDesatualizados:
+                if var_intAppID not in var_setAppIDParaProcessar:
+                    var_listAppIDParaProcessar.append(var_intAppID)
+                    var_setAppIDParaProcessar.add(var_intAppID)
+            
+            if var_listAppIDDesatualizados:
+                logger.info(f"AppIDs desatualizados adicionados: {len(var_listAppIDDesatualizados):,}")
             
             var_intTamanhoTotalFila = len(var_listAppIDParaProcessar)
-            var_intTamanhoMetadeFila = var_intTamanhoTotalFila // 2
-            logger.info(f"Total final de AppIDs a processar: {var_intTamanhoTotalFila}")
+            logger.info(f"Total final de AppIDs a processar (PC {var_intPcId}): {var_intTamanhoTotalFila:,}")
+
+            if var_intTamanhoTotalFila == 0:
+                logger.info("Nenhum AppID para processar! Todos os dados estão atualizados.")
+                return
 
             # Itera sobre os aplicativos em lotes
-            for i in range(0, var_intTamanhoMetadeFila, var_intRange):
-                logger.info(f"Processando aplicativos de {i + 1} a {min(i + var_intRange, var_intTamanhoMetadeFila)} de {var_intTamanhoMetadeFila}")
-                logger.info(f"Progresso: {(i/var_intTamanhoMetadeFila)*100:.1f}%")
-                logger.info(f"Tempo estimado restante: {((var_intTamanhoMetadeFila - i) / var_intRange) * 2} minutos")
+            for i in range(0, var_intTamanhoTotalFila, var_intRange):
+                logger.info(f"Processando aplicativos de {i + 1} a {min(i + var_intRange, var_intTamanhoTotalFila)} de {var_intTamanhoTotalFila}")
+                logger.info(f"Progresso: {(i/var_intTamanhoTotalFila)*100:.1f}%")
+                logger.info(f"Tempo estimado restante: {((var_intTamanhoTotalFila - i) / var_intRange) * 2} minutos")
                 logger.info(f"----------------------------------------")
                 
                 # Carrega os aplicativos atuais

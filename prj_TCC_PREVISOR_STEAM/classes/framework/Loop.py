@@ -30,6 +30,7 @@ class Loop:
                     Process.execute()
                     var_listFila.pop(0)
                     logger.info(f"Tarefa concluída. Tarefas restantes: {len(var_listFila)}")
+                    
                 except Exception as e:
                     var_strTraceback = e.__traceback__
                     if var_intTentativa == Settings._var_dictSettings["max_tentativas"] - 1:

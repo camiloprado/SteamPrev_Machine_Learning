@@ -24,7 +24,10 @@ class GetTask:
         Retorna:
         """
         try:
-            PostgreSQL.inserir_dadosSteamGenerico(arg_listDadosGerais=SteamClient.find_app_list())
+            var_listDados = SteamClient.find_app_list()
+            if not var_listDados:
+                var_listDados = SteamClient.load_app_list()
+            PostgreSQL.inserir_dadosSteamGenerico(arg_listDadosGerais=var_listDados)
             cls._var_listTaskQueue = [1]
             
         except Exception as e:

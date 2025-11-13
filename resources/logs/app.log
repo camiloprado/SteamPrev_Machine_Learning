@@ -128359,3 +128359,1544 @@ Traceback: <traceback object at 0x0000026113755E80>
 2025-11-12 17:07:14 - ERROR - Falha após 5 tentativas. API Steam pode estar fora do ar.
 2025-11-12 17:07:14 - ERROR - Erro ao criar a fila de tarefas: API Steam indisponível após 5 tentativas: 503 Server Error: Service Unavailable for url: https://api.steampowered.com/ISteamApps/GetAppList/v2/
 2025-11-12 17:07:14 - ERROR - Erro ao iniciar o bot: Erro na inicialização: <traceback object at 0x000001EB4F2B9EC0>
+2025-11-12 17:36:53 - INFO - Tentativa 1/5 - Buscando lista de aplicativos da Steam...
+2025-11-12 17:36:53 - WARNING - Serviço Steam temporariamente indisponível (503 Service Unavailable)
+2025-11-12 17:36:53 - INFO - Aguardando 5s antes da próxima tentativa...
+2025-11-12 17:36:58 - INFO - Tentativa 2/5 - Buscando lista de aplicativos da Steam...
+2025-11-12 17:36:58 - WARNING - Serviço Steam temporariamente indisponível (503 Service Unavailable)
+2025-11-12 17:36:58 - INFO - Aguardando 10s antes da próxima tentativa...
+2025-11-12 22:58:35 - INFO - Tentativa 1/5 - Buscando lista de aplicativos da Steam...
+2025-11-12 22:58:35 - WARNING - Serviço Steam temporariamente indisponível (503 Service Unavailable)
+2025-11-12 22:58:35 - INFO - Aguardando 5s antes da próxima tentativa...
+2025-11-12 23:01:47 - INFO - Tentativa 1/5 - Buscando lista de aplicativos da Steam...
+2025-11-12 23:01:48 - WARNING - Serviço Steam temporariamente indisponível (503 Service Unavailable)
+2025-11-12 23:01:55 - INFO - Conexão com o banco de dados estabelecida com sucesso: postgres@localhost:5432/postgres
+2025-11-12 23:01:55 - INFO - Encontrados 0 jogos desatualizados na tabela 'steam_generico'.
+2025-11-12 23:01:55 - INFO - Nenhum jogo desatualizado encontrado em steam_generico.
+2025-11-12 23:02:01 - INFO - Encontrados 276513 AppIDs na tabela 'steam_generico'.
+2025-11-12 23:02:01 - INFO - Encontrados 76506 AppIDs na tabela 'steam_raw'.
+2025-11-12 23:02:01 - INFO - ========== Detalhes dos AppIDs já processados e novos para processar ========
+2025-11-12 23:02:01 - INFO - AppIDs já processados: 76506
+2025-11-12 23:02:01 - INFO - AppIDs novos para processar: 200056
+2025-11-12 23:02:01 - INFO - =============================================================================
+2025-11-12 23:02:01 - INFO - Encontrados 0 jogos desatualizados na tabela 'steam_raw'.
+2025-11-12 23:02:01 - INFO - Total final de AppIDs a processar: 200056
+2025-11-12 23:02:01 - INFO - Processando aplicativos de 1 a 1000 de 100028
+2025-11-12 23:02:01 - INFO - Progresso: 0.0%
+2025-11-12 23:02:01 - INFO - Tempo estimado restante: 200.056 minutos
+2025-11-12 23:02:01 - INFO - ----------------------------------------
+2025-11-12 23:02:01 - INFO - Número de IDs a processar neste lote: 1000
+2025-11-12 23:02:01 - INFO - 
+2025-11-12 23:02:01 - INFO - === PROCESSAMENTO EM BATCHES ===
+2025-11-12 23:02:01 - INFO - Total de itens: 1,000
+2025-11-12 23:02:01 - INFO - Tamanho do batch: 100
+2025-11-12 23:02:01 - INFO - Total de batches: 10
+2025-11-12 23:02:01 - INFO - Delay entre batches: 120s
+2025-11-12 23:02:01 - INFO - Concorrência por batch: 1
+2025-11-12 23:02:01 - INFO - Tempo Estimado para conclusão total do Batch: 20.0 minutos
+2025-11-12 23:02:01 - INFO - ================================
+
+2025-11-12 23:02:01 - INFO - Batch 1/10 - Processando itens 1 a 100 (100 itens)...
+2025-11-12 23:02:01 - INFO - Iniciando busca de 'DETALHES' assíncrona para 100 AppIDs com concorrência 1...
+2025-11-12 23:02:48 - INFO - Busca assíncrona concluída.
+2025-11-12 23:02:48 - INFO - --- Busca concluída: ---
+2025-11-12 23:02:48 - INFO - 95 sucesso(s) (95.00%),
+2025-11-12 23:02:48 - INFO - 5 falha(s) (5.00%).
+2025-11-12 23:02:48 - INFO - --- Detalhamento dos erros: ---
+2025-11-12 23:02:48 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-12 23:02:48 - INFO - * Timeout: 0
+2025-11-12 23:02:48 - INFO - * Ausentes: 5
+2025-11-12 23:02:48 - INFO - * Outros: 0
+2025-11-12 23:02:52 - INFO - Inserção em bulk concluída: 100 registros processados em steam_raw.
+2025-11-12 23:02:52 - INFO - Dados de detalhes inseridos com sucesso no PostgreSQL (100 registros).
+2025-11-12 23:02:52 - INFO - Aguardando 120s antes do próximo batch...
+
+2025-11-12 23:04:52 - INFO - Batch 2/10 - Processando itens 101 a 200 (100 itens)...
+2025-11-12 23:04:52 - INFO - Iniciando busca de 'DETALHES' assíncrona para 100 AppIDs com concorrência 1...
+2025-11-12 23:05:40 - INFO - Busca assíncrona concluída.
+2025-11-12 23:05:40 - INFO - --- Busca concluída: ---
+2025-11-12 23:05:40 - INFO - 97 sucesso(s) (97.00%),
+2025-11-12 23:05:40 - INFO - 3 falha(s) (3.00%).
+2025-11-12 23:05:40 - INFO - --- Detalhamento dos erros: ---
+2025-11-12 23:05:40 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-12 23:05:40 - INFO - * Timeout: 0
+2025-11-12 23:05:40 - INFO - * Ausentes: 3
+2025-11-12 23:05:40 - INFO - * Outros: 0
+2025-11-12 23:05:44 - INFO - Inserção em bulk concluída: 100 registros processados em steam_raw.
+2025-11-12 23:05:44 - INFO - Dados de detalhes inseridos com sucesso no PostgreSQL (100 registros).
+2025-11-12 23:05:44 - INFO - Aguardando 120s antes do próximo batch...
+
+2025-11-12 23:07:44 - INFO - Batch 3/10 - Processando itens 201 a 300 (100 itens)...
+2025-11-12 23:07:44 - INFO - Iniciando busca de 'DETALHES' assíncrona para 100 AppIDs com concorrência 1...
+2025-11-12 23:08:30 - INFO - Busca assíncrona concluída.
+2025-11-12 23:08:30 - INFO - --- Busca concluída: ---
+2025-11-12 23:08:30 - INFO - 98 sucesso(s) (98.00%),
+2025-11-12 23:08:30 - INFO - 2 falha(s) (2.00%).
+2025-11-12 23:08:30 - INFO - --- Detalhamento dos erros: ---
+2025-11-12 23:08:30 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-12 23:08:30 - INFO - * Timeout: 0
+2025-11-12 23:08:30 - INFO - * Ausentes: 2
+2025-11-12 23:08:30 - INFO - * Outros: 0
+2025-11-12 23:08:34 - INFO - Inserção em bulk concluída: 100 registros processados em steam_raw.
+2025-11-12 23:08:34 - INFO - Dados de detalhes inseridos com sucesso no PostgreSQL (100 registros).
+2025-11-12 23:08:34 - INFO - Aguardando 120s antes do próximo batch...
+
+2025-11-12 23:10:34 - INFO - Batch 4/10 - Processando itens 301 a 400 (100 itens)...
+2025-11-12 23:10:34 - INFO - Iniciando busca de 'DETALHES' assíncrona para 100 AppIDs com concorrência 1...
+2025-11-12 23:11:19 - INFO - Busca assíncrona concluída.
+2025-11-12 23:11:19 - INFO - --- Busca concluída: ---
+2025-11-12 23:11:19 - INFO - 94 sucesso(s) (94.00%),
+2025-11-12 23:11:19 - INFO - 6 falha(s) (6.00%).
+2025-11-12 23:11:19 - INFO - --- Detalhamento dos erros: ---
+2025-11-12 23:11:19 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-12 23:11:19 - INFO - * Timeout: 0
+2025-11-12 23:11:19 - INFO - * Ausentes: 6
+2025-11-12 23:11:19 - INFO - * Outros: 0
+2025-11-12 23:11:23 - INFO - Inserção em bulk concluída: 100 registros processados em steam_raw.
+2025-11-12 23:11:23 - INFO - Dados de detalhes inseridos com sucesso no PostgreSQL (100 registros).
+2025-11-12 23:11:23 - INFO - Aguardando 120s antes do próximo batch...
+
+2025-11-12 23:13:23 - INFO - Batch 5/10 - Processando itens 401 a 500 (100 itens)...
+2025-11-12 23:13:23 - INFO - Iniciando busca de 'DETALHES' assíncrona para 100 AppIDs com concorrência 1...
+2025-11-12 23:14:10 - INFO - Busca assíncrona concluída.
+2025-11-12 23:14:10 - INFO - --- Busca concluída: ---
+2025-11-12 23:14:10 - INFO - 96 sucesso(s) (96.00%),
+2025-11-12 23:14:10 - INFO - 4 falha(s) (4.00%).
+2025-11-12 23:14:10 - INFO - --- Detalhamento dos erros: ---
+2025-11-12 23:14:10 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-12 23:14:10 - INFO - * Timeout: 0
+2025-11-12 23:14:10 - INFO - * Ausentes: 4
+2025-11-12 23:14:10 - INFO - * Outros: 0
+2025-11-12 23:14:14 - INFO - Inserção em bulk concluída: 100 registros processados em steam_raw.
+2025-11-12 23:14:14 - INFO - Dados de detalhes inseridos com sucesso no PostgreSQL (100 registros).
+2025-11-12 23:14:14 - INFO - Aguardando 120s antes do próximo batch...
+
+2025-11-12 23:16:14 - INFO - Batch 6/10 - Processando itens 501 a 600 (100 itens)...
+2025-11-12 23:16:14 - INFO - Iniciando busca de 'DETALHES' assíncrona para 100 AppIDs com concorrência 1...
+2025-11-12 23:17:00 - INFO - Busca assíncrona concluída.
+2025-11-12 23:17:00 - INFO - --- Busca concluída: ---
+2025-11-12 23:17:00 - INFO - 94 sucesso(s) (94.00%),
+2025-11-12 23:17:00 - INFO - 6 falha(s) (6.00%).
+2025-11-12 23:17:00 - INFO - --- Detalhamento dos erros: ---
+2025-11-12 23:17:00 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-12 23:17:00 - INFO - * Timeout: 0
+2025-11-12 23:17:00 - INFO - * Ausentes: 6
+2025-11-12 23:17:00 - INFO - * Outros: 0
+2025-11-12 23:17:03 - INFO - Inserção em bulk concluída: 100 registros processados em steam_raw.
+2025-11-12 23:17:03 - INFO - Dados de detalhes inseridos com sucesso no PostgreSQL (100 registros).
+2025-11-12 23:17:03 - INFO - Aguardando 120s antes do próximo batch...
+
+2025-11-12 23:19:03 - INFO - Batch 7/10 - Processando itens 601 a 700 (100 itens)...
+2025-11-12 23:19:03 - INFO - Iniciando busca de 'DETALHES' assíncrona para 100 AppIDs com concorrência 1...
+2025-11-12 23:19:50 - INFO - Busca assíncrona concluída.
+2025-11-12 23:19:50 - INFO - --- Busca concluída: ---
+2025-11-12 23:19:50 - INFO - 95 sucesso(s) (95.00%),
+2025-11-12 23:19:50 - INFO - 5 falha(s) (5.00%).
+2025-11-12 23:19:50 - INFO - --- Detalhamento dos erros: ---
+2025-11-12 23:19:50 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-12 23:19:50 - INFO - * Timeout: 0
+2025-11-12 23:19:50 - INFO - * Ausentes: 5
+2025-11-12 23:19:50 - INFO - * Outros: 0
+2025-11-12 23:19:53 - INFO - Inserção em bulk concluída: 100 registros processados em steam_raw.
+2025-11-12 23:19:53 - INFO - Dados de detalhes inseridos com sucesso no PostgreSQL (100 registros).
+2025-11-12 23:19:53 - INFO - Aguardando 120s antes do próximo batch...
+
+2025-11-12 23:21:53 - INFO - Batch 8/10 - Processando itens 701 a 800 (100 itens)...
+2025-11-12 23:21:53 - INFO - Iniciando busca de 'DETALHES' assíncrona para 100 AppIDs com concorrência 1...
+2025-11-12 23:22:46 - INFO - Busca assíncrona concluída.
+2025-11-12 23:22:46 - INFO - --- Busca concluída: ---
+2025-11-12 23:22:46 - INFO - 96 sucesso(s) (96.00%),
+2025-11-12 23:22:46 - INFO - 4 falha(s) (4.00%).
+2025-11-12 23:22:46 - INFO - --- Detalhamento dos erros: ---
+2025-11-12 23:22:46 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-12 23:22:46 - INFO - * Timeout: 0
+2025-11-12 23:22:46 - INFO - * Ausentes: 4
+2025-11-12 23:22:46 - INFO - * Outros: 0
+2025-11-12 23:22:49 - INFO - Inserção em bulk concluída: 100 registros processados em steam_raw.
+2025-11-12 23:22:49 - INFO - Dados de detalhes inseridos com sucesso no PostgreSQL (100 registros).
+2025-11-12 23:22:49 - INFO - Aguardando 120s antes do próximo batch...
+
+2025-11-12 23:24:49 - INFO - Batch 9/10 - Processando itens 801 a 900 (100 itens)...
+2025-11-12 23:24:49 - INFO - Iniciando busca de 'DETALHES' assíncrona para 100 AppIDs com concorrência 1...
+2025-11-12 23:25:35 - INFO - Busca assíncrona concluída.
+2025-11-12 23:25:35 - INFO - --- Busca concluída: ---
+2025-11-12 23:25:35 - INFO - 98 sucesso(s) (98.00%),
+2025-11-12 23:25:35 - INFO - 2 falha(s) (2.00%).
+2025-11-12 23:25:35 - INFO - --- Detalhamento dos erros: ---
+2025-11-12 23:25:35 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-12 23:25:35 - INFO - * Timeout: 0
+2025-11-12 23:25:35 - INFO - * Ausentes: 2
+2025-11-12 23:25:35 - INFO - * Outros: 0
+2025-11-12 23:25:38 - INFO - Inserção em bulk concluída: 100 registros processados em steam_raw.
+2025-11-12 23:25:38 - INFO - Dados de detalhes inseridos com sucesso no PostgreSQL (100 registros).
+2025-11-12 23:25:38 - INFO - Aguardando 120s antes do próximo batch...
+
+2025-11-12 23:27:38 - INFO - Batch 10/10 - Processando itens 901 a 1000 (100 itens)...
+2025-11-12 23:27:38 - INFO - Iniciando busca de 'DETALHES' assíncrona para 100 AppIDs com concorrência 1...
+2025-11-12 23:28:24 - INFO - Busca assíncrona concluída.
+2025-11-12 23:28:24 - INFO - --- Busca concluída: ---
+2025-11-12 23:28:24 - INFO - 98 sucesso(s) (98.00%),
+2025-11-12 23:28:24 - INFO - 2 falha(s) (2.00%).
+2025-11-12 23:28:24 - INFO - --- Detalhamento dos erros: ---
+2025-11-12 23:28:24 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-12 23:28:24 - INFO - * Timeout: 0
+2025-11-12 23:28:24 - INFO - * Ausentes: 2
+2025-11-12 23:28:24 - INFO - * Outros: 0
+2025-11-12 23:28:27 - INFO - Inserção em bulk concluída: 100 registros processados em steam_raw.
+2025-11-12 23:28:27 - INFO - Dados de detalhes inseridos com sucesso no PostgreSQL (100 registros).
+2025-11-12 23:28:27 - INFO - ===========PROCESSAMENTO COMPLETO! (Detalhes)==========
+2025-11-12 23:28:27 - INFO - Total processado: 100 sucessos de 1,000 itens (0.00%)
+2025-11-12 23:28:27 - INFO - 
+2025-11-12 23:28:27 - INFO - === PROCESSAMENTO EM BATCHES (REVIEWS) ===
+2025-11-12 23:28:27 - INFO - Total de itens: 1,000
+2025-11-12 23:28:27 - INFO - Tamanho do batch: 1,000
+2025-11-12 23:28:27 - INFO - Total de batches: 1
+2025-11-12 23:28:27 - INFO - Delay entre batches: 30s
+2025-11-12 23:28:27 - INFO - Concorrência por batch: 10
+2025-11-12 23:28:27 - INFO - Tempo Estimado para conclusão total do Batch: 0.5 minutos
+2025-11-12 23:28:27 - INFO - ==========================================
+
+2025-11-12 23:28:27 - INFO - Batch 1/1 - Processando itens 1 a 1000 (1000 itens)...
+2025-11-12 23:28:27 - INFO - Iniciando busca de 'REVIEWS' assíncrona para 1000 AppIDs com concorrência 10...
+2025-11-12 23:29:15 - INFO - Busca assíncrona concluída.
+2025-11-12 23:29:15 - INFO - --- Busca concluída: ---
+2025-11-12 23:29:15 - INFO - 1000 sucesso(s) (100.00%),
+2025-11-12 23:29:15 - INFO - 0 falha(s) (0.00%).
+2025-11-12 23:29:15 - INFO - --- Detalhamento dos erros: ---
+2025-11-12 23:29:15 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-12 23:29:15 - INFO - * Timeout: 0
+2025-11-12 23:29:15 - INFO - * Ausentes: 0
+2025-11-12 23:29:15 - INFO - * Outros: 0
+2025-11-12 23:29:17 - INFO - Inserção em bulk concluída: 1000 registros processados em steam_raw.
+2025-11-12 23:29:17 - INFO - Dados de reviews inseridos com sucesso no PostgreSQL (1000 registros).
+2025-11-12 23:29:17 - INFO - ===========PROCESSAMENTO COMPLETO! (Reviews)==========
+2025-11-12 23:29:17 - INFO - Total processado: 1,000 itens.
+2025-11-12 23:29:17 - INFO - Processando aplicativos de 1001 a 2000 de 100028
+2025-11-12 23:29:17 - INFO - Progresso: 1.0%
+2025-11-12 23:29:17 - INFO - Tempo estimado restante: 198.056 minutos
+2025-11-12 23:29:17 - INFO - ----------------------------------------
+2025-11-12 23:29:17 - INFO - Número de IDs a processar neste lote: 1000
+2025-11-12 23:29:17 - INFO - 
+2025-11-12 23:29:17 - INFO - === PROCESSAMENTO EM BATCHES ===
+2025-11-12 23:29:17 - INFO - Total de itens: 1,000
+2025-11-12 23:29:17 - INFO - Tamanho do batch: 100
+2025-11-12 23:29:17 - INFO - Total de batches: 10
+2025-11-12 23:29:17 - INFO - Delay entre batches: 120s
+2025-11-12 23:29:17 - INFO - Concorrência por batch: 1
+2025-11-12 23:29:17 - INFO - Tempo Estimado para conclusão total do Batch: 20.0 minutos
+2025-11-12 23:29:17 - INFO - ================================
+
+2025-11-12 23:29:17 - INFO - Batch 1/10 - Processando itens 1 a 100 (100 itens)...
+2025-11-12 23:29:17 - INFO - Iniciando busca de 'DETALHES' assíncrona para 100 AppIDs com concorrência 1...
+2025-11-12 23:29:57 - INFO - Busca assíncrona concluída.
+2025-11-13 07:18:22 - INFO - Tentativa 1/5 - Buscando lista de aplicativos da Steam...
+2025-11-13 07:18:22 - WARNING - Serviço Steam temporariamente indisponível (503 Service Unavailable)
+2025-11-13 07:18:22 - INFO - Conexão com o banco de dados estabelecida com sucesso: postgres@localhost:5432/postgres
+2025-11-13 07:18:22 - INFO - Encontrados 0 jogos desatualizados na tabela 'steam_generico'.
+2025-11-13 07:18:22 - INFO - Nenhum jogo desatualizado encontrado em steam_generico.
+2025-11-13 07:18:23 - INFO - Encontrados 276513 AppIDs na tabela 'steam_generico'.
+2025-11-13 07:18:23 - INFO - Encontrados 77506 AppIDs na tabela 'steam_raw'.
+2025-11-13 07:18:23 - INFO - ========== Detalhes dos AppIDs já processados e novos para processar ========
+2025-11-13 07:18:23 - INFO - AppIDs já processados: 77506
+2025-11-13 07:18:23 - INFO - AppIDs novos para processar: 199056
+2025-11-13 07:18:23 - INFO - =============================================================================
+2025-11-13 07:18:23 - INFO - Encontrados 0 jogos desatualizados na tabela 'steam_raw'.
+2025-11-13 07:18:23 - INFO - Total final de AppIDs a processar: 199056
+2025-11-13 07:18:23 - INFO - Processando aplicativos de 1 a 1000 de 99528
+2025-11-13 07:18:23 - INFO - Progresso: 0.0%
+2025-11-13 07:18:23 - INFO - Tempo estimado restante: 199.056 minutos
+2025-11-13 07:18:23 - INFO - ----------------------------------------
+2025-11-13 07:18:23 - INFO - Número de IDs a processar neste lote: 1000
+2025-11-13 07:18:23 - INFO - 
+2025-11-13 07:18:23 - INFO - === PROCESSAMENTO EM BATCHES ===
+2025-11-13 07:18:23 - INFO - Total de itens: 1,000
+2025-11-13 07:18:23 - INFO - Tamanho do batch: 100
+2025-11-13 07:18:23 - INFO - Total de batches: 10
+2025-11-13 07:18:23 - INFO - Delay entre batches: 120s
+2025-11-13 07:18:23 - INFO - Concorrência por batch: 1
+2025-11-13 07:18:23 - INFO - Tempo Estimado para conclusão total do Batch: 20.0 minutos
+2025-11-13 07:18:23 - INFO - ================================
+
+2025-11-13 07:18:23 - INFO - Batch 1/10 - Processando itens 1 a 100 (100 itens)...
+2025-11-13 07:18:23 - INFO - Iniciando busca de 'DETALHES' assíncrona para 100 AppIDs com concorrência 1...
+2025-11-13 07:19:05 - INFO - Busca assíncrona concluída.
+2025-11-13 07:19:05 - INFO - --- Busca concluída: ---
+2025-11-13 07:19:05 - INFO - 96 sucesso(s) (96.00%),
+2025-11-13 07:19:05 - INFO - 4 falha(s) (4.00%).
+2025-11-13 07:19:05 - INFO - --- Detalhamento dos erros: ---
+2025-11-13 07:19:05 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-13 07:19:05 - INFO - * Timeout: 0
+2025-11-13 07:19:05 - INFO - * Ausentes: 4
+2025-11-13 07:19:05 - INFO - * Outros: 0
+2025-11-13 07:19:08 - INFO - Inserção em bulk concluída: 100 registros processados em steam_raw.
+2025-11-13 07:19:08 - INFO - Dados de detalhes inseridos com sucesso no PostgreSQL (100 registros).
+2025-11-13 07:19:08 - INFO - Aguardando 120s antes do próximo batch...
+
+2025-11-13 07:21:08 - INFO - Batch 2/10 - Processando itens 101 a 200 (100 itens)...
+2025-11-13 07:21:08 - INFO - Iniciando busca de 'DETALHES' assíncrona para 100 AppIDs com concorrência 1...
+2025-11-13 07:21:48 - INFO - Busca assíncrona concluída.
+2025-11-13 07:21:48 - INFO - --- Busca concluída: ---
+2025-11-13 07:21:48 - INFO - 99 sucesso(s) (99.00%),
+2025-11-13 07:21:48 - INFO - 1 falha(s) (1.00%).
+2025-11-13 07:21:48 - INFO - --- Detalhamento dos erros: ---
+2025-11-13 07:21:48 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-13 07:21:48 - INFO - * Timeout: 0
+2025-11-13 07:21:48 - INFO - * Ausentes: 1
+2025-11-13 07:21:48 - INFO - * Outros: 0
+2025-11-13 07:21:51 - INFO - Inserção em bulk concluída: 100 registros processados em steam_raw.
+2025-11-13 07:21:51 - INFO - Dados de detalhes inseridos com sucesso no PostgreSQL (100 registros).
+2025-11-13 07:21:51 - INFO - Aguardando 120s antes do próximo batch...
+
+2025-11-13 07:23:51 - INFO - Batch 3/10 - Processando itens 201 a 300 (100 itens)...
+2025-11-13 07:23:51 - INFO - Iniciando busca de 'DETALHES' assíncrona para 100 AppIDs com concorrência 1...
+2025-11-13 07:24:35 - INFO - Busca assíncrona concluída.
+2025-11-13 07:24:35 - INFO - --- Busca concluída: ---
+2025-11-13 07:24:35 - INFO - 95 sucesso(s) (95.00%),
+2025-11-13 07:24:35 - INFO - 5 falha(s) (5.00%).
+2025-11-13 07:24:35 - INFO - --- Detalhamento dos erros: ---
+2025-11-13 07:24:35 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-13 07:24:35 - INFO - * Timeout: 0
+2025-11-13 07:24:35 - INFO - * Ausentes: 5
+2025-11-13 07:24:35 - INFO - * Outros: 0
+2025-11-13 07:24:39 - INFO - Inserção em bulk concluída: 100 registros processados em steam_raw.
+2025-11-13 07:24:39 - INFO - Dados de detalhes inseridos com sucesso no PostgreSQL (100 registros).
+2025-11-13 07:24:39 - INFO - Aguardando 120s antes do próximo batch...
+
+2025-11-13 07:26:39 - INFO - Batch 4/10 - Processando itens 301 a 400 (100 itens)...
+2025-11-13 07:26:39 - INFO - Iniciando busca de 'DETALHES' assíncrona para 100 AppIDs com concorrência 1...
+2025-11-13 07:27:20 - INFO - Busca assíncrona concluída.
+2025-11-13 07:27:20 - INFO - --- Busca concluída: ---
+2025-11-13 07:27:20 - INFO - 97 sucesso(s) (97.00%),
+2025-11-13 07:27:20 - INFO - 3 falha(s) (3.00%).
+2025-11-13 07:27:20 - INFO - --- Detalhamento dos erros: ---
+2025-11-13 07:27:20 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-13 07:27:20 - INFO - * Timeout: 0
+2025-11-13 07:27:20 - INFO - * Ausentes: 3
+2025-11-13 07:27:20 - INFO - * Outros: 0
+2025-11-13 07:27:24 - INFO - Inserção em bulk concluída: 100 registros processados em steam_raw.
+2025-11-13 07:27:24 - INFO - Dados de detalhes inseridos com sucesso no PostgreSQL (100 registros).
+2025-11-13 07:27:24 - INFO - Aguardando 120s antes do próximo batch...
+
+2025-11-13 07:29:24 - INFO - Batch 5/10 - Processando itens 401 a 500 (100 itens)...
+2025-11-13 07:29:24 - INFO - Iniciando busca de 'DETALHES' assíncrona para 100 AppIDs com concorrência 1...
+2025-11-13 07:30:06 - INFO - Busca assíncrona concluída.
+2025-11-13 07:30:06 - INFO - --- Busca concluída: ---
+2025-11-13 07:30:06 - INFO - 96 sucesso(s) (96.00%),
+2025-11-13 07:30:06 - INFO - 4 falha(s) (4.00%).
+2025-11-13 07:30:06 - INFO - --- Detalhamento dos erros: ---
+2025-11-13 07:30:06 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-13 07:30:06 - INFO - * Timeout: 0
+2025-11-13 07:30:06 - INFO - * Ausentes: 4
+2025-11-13 07:30:06 - INFO - * Outros: 0
+2025-11-13 07:30:10 - INFO - Inserção em bulk concluída: 100 registros processados em steam_raw.
+2025-11-13 07:30:10 - INFO - Dados de detalhes inseridos com sucesso no PostgreSQL (100 registros).
+2025-11-13 07:30:10 - INFO - Aguardando 120s antes do próximo batch...
+
+2025-11-13 07:32:10 - INFO - Batch 6/10 - Processando itens 501 a 600 (100 itens)...
+2025-11-13 07:32:10 - INFO - Iniciando busca de 'DETALHES' assíncrona para 100 AppIDs com concorrência 1...
+2025-11-13 07:32:51 - INFO - Busca assíncrona concluída.
+2025-11-13 07:32:51 - INFO - --- Busca concluída: ---
+2025-11-13 07:32:51 - INFO - 95 sucesso(s) (95.00%),
+2025-11-13 07:32:51 - INFO - 5 falha(s) (5.00%).
+2025-11-13 07:32:51 - INFO - --- Detalhamento dos erros: ---
+2025-11-13 07:32:51 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-13 07:32:51 - INFO - * Timeout: 0
+2025-11-13 07:32:51 - INFO - * Ausentes: 5
+2025-11-13 07:32:51 - INFO - * Outros: 0
+2025-11-13 07:32:55 - INFO - Inserção em bulk concluída: 100 registros processados em steam_raw.
+2025-11-13 07:32:55 - INFO - Dados de detalhes inseridos com sucesso no PostgreSQL (100 registros).
+2025-11-13 07:32:55 - INFO - Aguardando 120s antes do próximo batch...
+
+2025-11-13 07:34:55 - INFO - Batch 7/10 - Processando itens 601 a 700 (100 itens)...
+2025-11-13 07:34:55 - INFO - Iniciando busca de 'DETALHES' assíncrona para 100 AppIDs com concorrência 1...
+2025-11-13 07:35:38 - INFO - Busca assíncrona concluída.
+2025-11-13 07:35:38 - INFO - --- Busca concluída: ---
+2025-11-13 07:35:38 - INFO - 98 sucesso(s) (98.00%),
+2025-11-13 07:35:38 - INFO - 2 falha(s) (2.00%).
+2025-11-13 07:35:38 - INFO - --- Detalhamento dos erros: ---
+2025-11-13 07:35:38 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-13 07:35:38 - INFO - * Timeout: 0
+2025-11-13 07:35:38 - INFO - * Ausentes: 2
+2025-11-13 07:35:38 - INFO - * Outros: 0
+2025-11-13 07:35:41 - INFO - Inserção em bulk concluída: 100 registros processados em steam_raw.
+2025-11-13 07:35:41 - INFO - Dados de detalhes inseridos com sucesso no PostgreSQL (100 registros).
+2025-11-13 07:35:41 - INFO - Aguardando 120s antes do próximo batch...
+
+2025-11-13 07:37:41 - INFO - Batch 8/10 - Processando itens 701 a 800 (100 itens)...
+2025-11-13 07:37:41 - INFO - Iniciando busca de 'DETALHES' assíncrona para 100 AppIDs com concorrência 1...
+2025-11-13 07:38:02 - WARNING - AppID 1196310: Erro HTTP status 500
+2025-11-13 07:38:32 - INFO - Busca assíncrona concluída.
+2025-11-13 07:38:32 - INFO - --- Busca concluída: ---
+2025-11-13 07:38:32 - INFO - 93 sucesso(s) (93.00%),
+2025-11-13 07:38:32 - INFO - 6 falha(s) (6.00%).
+2025-11-13 07:38:32 - INFO - --- Detalhamento dos erros: ---
+2025-11-13 07:38:32 - INFO - * HTTP: 1 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-13 07:38:32 - INFO - * Timeout: 0
+2025-11-13 07:38:32 - INFO - * Ausentes: 5
+2025-11-13 07:38:32 - INFO - * Outros: 0
+2025-11-13 07:38:36 - INFO - Inserção em bulk concluída: 99 registros processados em steam_raw.
+2025-11-13 07:38:36 - INFO - Dados de detalhes inseridos com sucesso no PostgreSQL (99 registros).
+2025-11-13 07:38:36 - INFO - Aguardando 120s antes do próximo batch...
+
+2025-11-13 07:40:36 - INFO - Batch 9/10 - Processando itens 801 a 900 (100 itens)...
+2025-11-13 07:40:36 - INFO - Iniciando busca de 'DETALHES' assíncrona para 100 AppIDs com concorrência 1...
+2025-11-13 07:41:20 - INFO - Busca assíncrona concluída.
+2025-11-13 07:41:20 - INFO - --- Busca concluída: ---
+2025-11-13 07:41:20 - INFO - 100 sucesso(s) (100.00%),
+2025-11-13 07:41:20 - INFO - 0 falha(s) (0.00%).
+2025-11-13 07:41:20 - INFO - --- Detalhamento dos erros: ---
+2025-11-13 07:41:20 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-13 07:41:20 - INFO - * Timeout: 0
+2025-11-13 07:41:20 - INFO - * Ausentes: 0
+2025-11-13 07:41:20 - INFO - * Outros: 0
+2025-11-13 07:41:23 - INFO - Inserção em bulk concluída: 100 registros processados em steam_raw.
+2025-11-13 07:41:23 - INFO - Dados de detalhes inseridos com sucesso no PostgreSQL (100 registros).
+2025-11-13 07:41:23 - INFO - Aguardando 120s antes do próximo batch...
+
+2025-11-13 07:43:23 - INFO - Batch 10/10 - Processando itens 901 a 1000 (100 itens)...
+2025-11-13 07:43:23 - INFO - Iniciando busca de 'DETALHES' assíncrona para 100 AppIDs com concorrência 1...
+2025-11-13 07:44:08 - INFO - Busca assíncrona concluída.
+2025-11-13 07:44:08 - INFO - --- Busca concluída: ---
+2025-11-13 07:44:08 - INFO - 95 sucesso(s) (95.00%),
+2025-11-13 07:44:08 - INFO - 5 falha(s) (5.00%).
+2025-11-13 07:44:08 - INFO - --- Detalhamento dos erros: ---
+2025-11-13 07:44:08 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-13 07:44:08 - INFO - * Timeout: 0
+2025-11-13 07:44:08 - INFO - * Ausentes: 5
+2025-11-13 07:44:08 - INFO - * Outros: 0
+2025-11-13 07:44:11 - INFO - Inserção em bulk concluída: 100 registros processados em steam_raw.
+2025-11-13 07:44:11 - INFO - Dados de detalhes inseridos com sucesso no PostgreSQL (100 registros).
+2025-11-13 07:44:11 - INFO - ===========PROCESSAMENTO COMPLETO! (Detalhes)==========
+2025-11-13 07:44:11 - INFO - Total processado: 100 sucessos de 1,000 itens (0.00%)
+2025-11-13 07:44:11 - INFO - 
+2025-11-13 07:44:11 - INFO - === PROCESSAMENTO EM BATCHES (REVIEWS) ===
+2025-11-13 07:44:11 - INFO - Total de itens: 1,000
+2025-11-13 07:44:11 - INFO - Tamanho do batch: 1,000
+2025-11-13 07:44:11 - INFO - Total de batches: 1
+2025-11-13 07:44:11 - INFO - Delay entre batches: 30s
+2025-11-13 07:44:11 - INFO - Concorrência por batch: 10
+2025-11-13 07:44:11 - INFO - Tempo Estimado para conclusão total do Batch: 0.5 minutos
+2025-11-13 07:44:11 - INFO - ==========================================
+
+2025-11-13 07:44:11 - INFO - Batch 1/1 - Processando itens 1 a 1000 (1000 itens)...
+2025-11-13 07:44:11 - INFO - Iniciando busca de 'REVIEWS' assíncrona para 1000 AppIDs com concorrência 10...
+2025-11-13 07:44:56 - INFO - Busca assíncrona concluída.
+2025-11-13 07:44:56 - INFO - --- Busca concluída: ---
+2025-11-13 07:44:56 - INFO - 1000 sucesso(s) (100.00%),
+2025-11-13 07:44:56 - INFO - 0 falha(s) (0.00%).
+2025-11-13 07:44:56 - INFO - --- Detalhamento dos erros: ---
+2025-11-13 07:44:56 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-13 07:44:56 - INFO - * Timeout: 0
+2025-11-13 07:44:56 - INFO - * Ausentes: 0
+2025-11-13 07:44:56 - INFO - * Outros: 0
+2025-11-13 07:44:58 - INFO - Inserção em bulk concluída: 1000 registros processados em steam_raw.
+2025-11-13 07:44:58 - INFO - Dados de reviews inseridos com sucesso no PostgreSQL (1000 registros).
+2025-11-13 07:44:58 - INFO - ===========PROCESSAMENTO COMPLETO! (Reviews)==========
+2025-11-13 07:44:58 - INFO - Total processado: 1,000 itens.
+2025-11-13 07:44:58 - INFO - Processando aplicativos de 1001 a 2000 de 99528
+2025-11-13 07:44:58 - INFO - Progresso: 1.0%
+2025-11-13 07:44:58 - INFO - Tempo estimado restante: 197.056 minutos
+2025-11-13 07:44:58 - INFO - ----------------------------------------
+2025-11-13 07:44:58 - INFO - Número de IDs a processar neste lote: 1000
+2025-11-13 07:44:58 - INFO - 
+2025-11-13 07:44:58 - INFO - === PROCESSAMENTO EM BATCHES ===
+2025-11-13 07:44:58 - INFO - Total de itens: 1,000
+2025-11-13 07:44:58 - INFO - Tamanho do batch: 100
+2025-11-13 07:44:58 - INFO - Total de batches: 10
+2025-11-13 07:44:58 - INFO - Delay entre batches: 120s
+2025-11-13 07:44:58 - INFO - Concorrência por batch: 1
+2025-11-13 07:44:58 - INFO - Tempo Estimado para conclusão total do Batch: 20.0 minutos
+2025-11-13 07:44:58 - INFO - ================================
+
+2025-11-13 07:44:58 - INFO - Batch 1/10 - Processando itens 1 a 100 (100 itens)...
+2025-11-13 07:44:58 - INFO - Iniciando busca de 'DETALHES' assíncrona para 100 AppIDs com concorrência 1...
+2025-11-13 07:45:36 - INFO - Busca assíncrona concluída.
+2025-11-13 07:47:28 - CRITICAL - Falha crítica ao buscar detalhes em bulk: 'NoneType' object has no attribute 'get'
+Traceback (most recent call last):
+  File "D:\Projeto_TCC_CC\prj_TCC_PREVISOR_STEAM\classes\api\steam_api.py", line 383, in fetch_details_bulk
+    var_intFalha = sum(1 for item in var_listOut if item.get("data") == "AUSENTE") + var_intContNones
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Projeto_TCC_CC\prj_TCC_PREVISOR_STEAM\classes\api\steam_api.py", line 383, in <genexpr>
+    var_intFalha = sum(1 for item in var_listOut if item.get("data") == "AUSENTE") + var_intContNones
+                                                    ^^^^^^^^
+AttributeError: 'NoneType' object has no attribute 'get'
+
+2025-11-13 07:47:43 - ERROR - Erro ao alimentar o banco de dados PostgreSQL: Falha ao buscar detalhes em bulk: 'NoneType' object has no attribute 'get'
+2025-11-13 07:47:43 - INFO - Conexão com o banco de dados encerrada.
+2025-11-13 07:47:44 - INFO - Conexão com o banco de dados estabelecida com sucesso: postgres@localhost:5432/postgres
+2025-11-13 07:47:44 - INFO - Encontrados 276513 AppIDs na tabela 'steam_generico'.
+2025-11-13 07:47:44 - INFO - Encontrados 78506 AppIDs na tabela 'steam_raw'.
+2025-11-13 07:47:44 - INFO - ========== Detalhes dos AppIDs já processados e novos para processar ========
+2025-11-13 07:47:44 - INFO - AppIDs já processados: 78506
+2025-11-13 07:47:44 - INFO - AppIDs novos para processar: 198056
+2025-11-13 07:47:44 - INFO - =============================================================================
+2025-11-13 07:47:44 - INFO - Encontrados 0 jogos desatualizados na tabela 'steam_raw'.
+2025-11-13 07:47:44 - INFO - Total final de AppIDs a processar: 198056
+2025-11-13 07:47:44 - INFO - Processando aplicativos de 1 a 1000 de 99028
+2025-11-13 07:47:44 - INFO - Progresso: 0.0%
+2025-11-13 07:47:44 - INFO - Tempo estimado restante: 198.056 minutos
+2025-11-13 07:47:44 - INFO - ----------------------------------------
+2025-11-13 07:47:44 - INFO - Número de IDs a processar neste lote: 1000
+2025-11-13 07:47:44 - INFO - 
+2025-11-13 07:47:44 - INFO - === PROCESSAMENTO EM BATCHES ===
+2025-11-13 07:47:44 - INFO - Total de itens: 1,000
+2025-11-13 07:47:44 - INFO - Tamanho do batch: 100
+2025-11-13 07:47:44 - INFO - Total de batches: 10
+2025-11-13 07:47:44 - INFO - Delay entre batches: 120s
+2025-11-13 07:47:44 - INFO - Concorrência por batch: 1
+2025-11-13 07:47:44 - INFO - Tempo Estimado para conclusão total do Batch: 20.0 minutos
+2025-11-13 07:47:44 - INFO - ================================
+
+2025-11-13 07:47:44 - INFO - Batch 1/10 - Processando itens 1 a 100 (100 itens)...
+2025-11-13 07:47:44 - INFO - Iniciando busca de 'DETALHES' assíncrona para 100 AppIDs com concorrência 1...
+2025-11-13 07:48:31 - INFO - Busca assíncrona concluída.
+2025-11-13 07:50:33 - INFO - --- Busca concluída: ---
+2025-11-13 07:50:33 - INFO - 98 sucesso(s) (98.00%),
+2025-11-13 07:50:33 - INFO - 2 falha(s) (2.00%).
+2025-11-13 07:50:33 - INFO - --- Detalhamento dos erros: ---
+2025-11-13 07:50:33 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-13 07:50:33 - INFO - * Timeout: 0
+2025-11-13 07:50:33 - INFO - * Ausentes: 2
+2025-11-13 07:50:33 - INFO - * Outros: 0
+2025-11-13 07:50:37 - INFO - Inserção em bulk concluída: 100 registros processados em steam_raw.
+2025-11-13 07:50:37 - INFO - Dados de detalhes inseridos com sucesso no PostgreSQL (100 registros).
+2025-11-13 07:50:37 - INFO - Aguardando 120s antes do próximo batch...
+
+2025-11-13 07:50:50 - INFO - Tentativa 1/5 - Buscando lista de aplicativos da Steam...
+2025-11-13 07:50:50 - WARNING - Serviço Steam temporariamente indisponível (503 Service Unavailable)
+2025-11-13 07:50:50 - INFO - Conexão com o banco de dados estabelecida com sucesso: postgres@localhost:5432/postgres
+2025-11-13 07:50:50 - INFO - Encontrados 0 jogos desatualizados na tabela 'steam_generico'.
+2025-11-13 07:50:50 - INFO - Nenhum jogo desatualizado encontrado em steam_generico.
+2025-11-13 07:50:51 - INFO - Encontrados 276513 AppIDs na tabela 'steam_generico'.
+2025-11-13 07:50:51 - INFO - Encontrados 78606 AppIDs na tabela 'steam_raw'.
+2025-11-13 07:50:51 - INFO - ========== Detalhes dos AppIDs já processados e novos para processar ========
+2025-11-13 07:50:51 - INFO - AppIDs já processados: 78606
+2025-11-13 07:50:51 - INFO - AppIDs novos para processar: 197956
+2025-11-13 07:50:51 - INFO - =============================================================================
+2025-11-13 07:50:51 - INFO - Encontrados 0 jogos desatualizados na tabela 'steam_raw'.
+2025-11-13 07:50:51 - INFO - Total final de AppIDs a processar: 197956
+2025-11-13 07:50:51 - INFO - Processando aplicativos de 1 a 1000 de 98978
+2025-11-13 07:50:51 - INFO - Progresso: 0.0%
+2025-11-13 07:50:51 - INFO - Tempo estimado restante: 197.956 minutos
+2025-11-13 07:50:51 - INFO - ----------------------------------------
+2025-11-13 07:50:51 - INFO - Número de IDs a processar neste lote: 1000
+2025-11-13 07:50:51 - INFO - 
+2025-11-13 07:50:51 - INFO - === PROCESSAMENTO EM BATCHES ===
+2025-11-13 07:50:51 - INFO - Total de itens: 1,000
+2025-11-13 07:50:51 - INFO - Tamanho do batch: 100
+2025-11-13 07:50:51 - INFO - Total de batches: 10
+2025-11-13 07:50:51 - INFO - Delay entre batches: 120s
+2025-11-13 07:50:51 - INFO - Concorrência por batch: 1
+2025-11-13 07:50:51 - INFO - Tempo Estimado para conclusão total do Batch: 20.0 minutos
+2025-11-13 07:50:51 - INFO - ================================
+
+2025-11-13 07:50:51 - INFO - Batch 1/10 - Processando itens 1 a 100 (100 itens)...
+2025-11-13 07:50:51 - INFO - Iniciando busca de 'DETALHES' assíncrona para 100 AppIDs com concorrência 1...
+2025-11-13 07:51:35 - INFO - Busca assíncrona concluída.
+2025-11-13 07:51:35 - INFO - --- Busca concluída: ---
+2025-11-13 07:51:35 - INFO - 96 sucesso(s) (96.00%),
+2025-11-13 07:51:35 - INFO - 4 falha(s) (4.00%).
+2025-11-13 07:51:35 - INFO - --- Detalhamento dos erros: ---
+2025-11-13 07:51:35 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-13 07:51:35 - INFO - * Timeout: 0
+2025-11-13 07:51:35 - INFO - * Ausentes: 4
+2025-11-13 07:51:35 - INFO - * Outros: 0
+2025-11-13 07:51:38 - INFO - Inserção em bulk concluída: 100 registros processados em steam_raw.
+2025-11-13 07:51:38 - INFO - Dados de detalhes inseridos com sucesso no PostgreSQL (100 registros).
+2025-11-13 07:51:38 - INFO - Aguardando 120s antes do próximo batch...
+
+2025-11-13 07:53:38 - INFO - Batch 2/10 - Processando itens 101 a 200 (100 itens)...
+2025-11-13 07:53:38 - INFO - Iniciando busca de 'DETALHES' assíncrona para 100 AppIDs com concorrência 1...
+2025-11-13 07:54:21 - INFO - Busca assíncrona concluída.
+2025-11-13 07:55:00 - INFO - --- Busca concluída: ---
+2025-11-13 07:55:00 - INFO - 90 sucesso(s) (90.00%),
+2025-11-13 07:55:00 - INFO - 10 falha(s) (10.00%).
+2025-11-13 07:55:00 - INFO - --- Detalhamento dos erros: ---
+2025-11-13 07:55:00 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-13 07:55:00 - INFO - * Timeout: 0
+2025-11-13 07:55:00 - INFO - * Ausentes: 10
+2025-11-13 07:55:00 - INFO - * Outros: 0
+2025-11-13 07:55:04 - INFO - Inserção em bulk concluída: 100 registros processados em steam_raw.
+2025-11-13 07:55:04 - INFO - Dados de detalhes inseridos com sucesso no PostgreSQL (100 registros).
+2025-11-13 07:55:04 - INFO - Aguardando 120s antes do próximo batch...
+
+2025-11-13 07:57:04 - INFO - Batch 3/10 - Processando itens 201 a 300 (100 itens)...
+2025-11-13 07:57:04 - INFO - Iniciando busca de 'DETALHES' assíncrona para 100 AppIDs com concorrência 1...
+2025-11-13 07:57:48 - INFO - Busca assíncrona concluída.
+2025-11-13 07:57:48 - INFO - --- Busca concluída: ---
+2025-11-13 07:57:48 - INFO - 96 sucesso(s) (96.00%),
+2025-11-13 07:57:48 - INFO - 4 falha(s) (4.00%).
+2025-11-13 07:57:48 - INFO - --- Detalhamento dos erros: ---
+2025-11-13 07:57:48 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-13 07:57:48 - INFO - * Timeout: 0
+2025-11-13 07:57:48 - INFO - * Ausentes: 4
+2025-11-13 07:57:48 - INFO - * Outros: 0
+2025-11-13 07:57:53 - INFO - Inserção em bulk concluída: 100 registros processados em steam_raw.
+2025-11-13 07:57:53 - INFO - Dados de detalhes inseridos com sucesso no PostgreSQL (100 registros).
+2025-11-13 07:57:53 - INFO - Aguardando 120s antes do próximo batch...
+
+2025-11-13 07:59:53 - INFO - Batch 4/10 - Processando itens 301 a 400 (100 itens)...
+2025-11-13 07:59:53 - INFO - Iniciando busca de 'DETALHES' assíncrona para 100 AppIDs com concorrência 1...
+2025-11-13 08:00:35 - INFO - Busca assíncrona concluída.
+2025-11-13 08:00:35 - INFO - --- Busca concluída: ---
+2025-11-13 08:00:35 - INFO - 95 sucesso(s) (95.00%),
+2025-11-13 08:00:35 - INFO - 5 falha(s) (5.00%).
+2025-11-13 08:00:35 - INFO - --- Detalhamento dos erros: ---
+2025-11-13 08:00:35 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-13 08:00:35 - INFO - * Timeout: 0
+2025-11-13 08:00:35 - INFO - * Ausentes: 5
+2025-11-13 08:00:35 - INFO - * Outros: 0
+2025-11-13 08:00:38 - INFO - Inserção em bulk concluída: 100 registros processados em steam_raw.
+2025-11-13 08:00:38 - INFO - Dados de detalhes inseridos com sucesso no PostgreSQL (100 registros).
+2025-11-13 08:00:38 - INFO - Aguardando 120s antes do próximo batch...
+
+2025-11-13 08:02:38 - INFO - Batch 5/10 - Processando itens 401 a 500 (100 itens)...
+2025-11-13 08:02:38 - INFO - Iniciando busca de 'DETALHES' assíncrona para 100 AppIDs com concorrência 1...
+2025-11-13 08:03:18 - INFO - Busca assíncrona concluída.
+2025-11-13 08:03:18 - INFO - --- Busca concluída: ---
+2025-11-13 08:03:18 - INFO - 96 sucesso(s) (96.00%),
+2025-11-13 08:03:18 - INFO - 4 falha(s) (4.00%).
+2025-11-13 08:03:18 - INFO - --- Detalhamento dos erros: ---
+2025-11-13 08:03:18 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-13 08:03:18 - INFO - * Timeout: 0
+2025-11-13 08:03:18 - INFO - * Ausentes: 4
+2025-11-13 08:03:18 - INFO - * Outros: 0
+2025-11-13 08:03:23 - INFO - Inserção em bulk concluída: 100 registros processados em steam_raw.
+2025-11-13 08:03:23 - INFO - Dados de detalhes inseridos com sucesso no PostgreSQL (100 registros).
+2025-11-13 08:03:23 - INFO - Aguardando 120s antes do próximo batch...
+
+2025-11-13 08:05:23 - INFO - Batch 6/10 - Processando itens 501 a 600 (100 itens)...
+2025-11-13 08:05:23 - INFO - Iniciando busca de 'DETALHES' assíncrona para 100 AppIDs com concorrência 1...
+2025-11-13 08:06:08 - INFO - Busca assíncrona concluída.
+2025-11-13 08:06:08 - INFO - --- Busca concluída: ---
+2025-11-13 08:06:08 - INFO - 93 sucesso(s) (93.00%),
+2025-11-13 08:06:08 - INFO - 7 falha(s) (7.00%).
+2025-11-13 08:06:08 - INFO - --- Detalhamento dos erros: ---
+2025-11-13 08:06:08 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-13 08:06:08 - INFO - * Timeout: 0
+2025-11-13 08:06:08 - INFO - * Ausentes: 7
+2025-11-13 08:06:08 - INFO - * Outros: 0
+2025-11-13 08:06:11 - INFO - Inserção em bulk concluída: 100 registros processados em steam_raw.
+2025-11-13 08:06:11 - INFO - Dados de detalhes inseridos com sucesso no PostgreSQL (100 registros).
+2025-11-13 08:06:11 - INFO - Aguardando 120s antes do próximo batch...
+
+2025-11-13 08:08:11 - INFO - Batch 7/10 - Processando itens 601 a 700 (100 itens)...
+2025-11-13 08:08:11 - INFO - Iniciando busca de 'DETALHES' assíncrona para 100 AppIDs com concorrência 1...
+2025-11-13 08:08:54 - INFO - Busca assíncrona concluída.
+2025-11-13 08:08:54 - INFO - --- Busca concluída: ---
+2025-11-13 08:08:54 - INFO - 98 sucesso(s) (98.00%),
+2025-11-13 08:08:54 - INFO - 2 falha(s) (2.00%).
+2025-11-13 08:08:54 - INFO - --- Detalhamento dos erros: ---
+2025-11-13 08:08:54 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-13 08:08:54 - INFO - * Timeout: 0
+2025-11-13 08:08:54 - INFO - * Ausentes: 2
+2025-11-13 08:08:54 - INFO - * Outros: 0
+2025-11-13 08:08:58 - INFO - Inserção em bulk concluída: 100 registros processados em steam_raw.
+2025-11-13 08:08:58 - INFO - Dados de detalhes inseridos com sucesso no PostgreSQL (100 registros).
+2025-11-13 08:08:58 - INFO - Aguardando 120s antes do próximo batch...
+
+2025-11-13 08:10:58 - INFO - Batch 8/10 - Processando itens 701 a 800 (100 itens)...
+2025-11-13 08:10:58 - INFO - Iniciando busca de 'DETALHES' assíncrona para 100 AppIDs com concorrência 1...
+2025-11-13 08:11:41 - INFO - Busca assíncrona concluída.
+2025-11-13 08:11:41 - INFO - --- Busca concluída: ---
+2025-11-13 08:11:41 - INFO - 96 sucesso(s) (96.00%),
+2025-11-13 08:11:41 - INFO - 4 falha(s) (4.00%).
+2025-11-13 08:11:41 - INFO - --- Detalhamento dos erros: ---
+2025-11-13 08:11:41 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-13 08:11:41 - INFO - * Timeout: 0
+2025-11-13 08:11:41 - INFO - * Ausentes: 4
+2025-11-13 08:11:41 - INFO - * Outros: 0
+2025-11-13 08:11:44 - INFO - Inserção em bulk concluída: 100 registros processados em steam_raw.
+2025-11-13 08:11:44 - INFO - Dados de detalhes inseridos com sucesso no PostgreSQL (100 registros).
+2025-11-13 08:11:44 - INFO - Aguardando 120s antes do próximo batch...
+
+2025-11-13 08:13:44 - INFO - Batch 9/10 - Processando itens 801 a 900 (100 itens)...
+2025-11-13 08:13:44 - INFO - Iniciando busca de 'DETALHES' assíncrona para 100 AppIDs com concorrência 1...
+2025-11-13 08:14:30 - INFO - Busca assíncrona concluída.
+2025-11-13 08:14:30 - INFO - --- Busca concluída: ---
+2025-11-13 08:14:30 - INFO - 97 sucesso(s) (97.00%),
+2025-11-13 08:14:30 - INFO - 3 falha(s) (3.00%).
+2025-11-13 08:14:30 - INFO - --- Detalhamento dos erros: ---
+2025-11-13 08:14:30 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-13 08:14:30 - INFO - * Timeout: 0
+2025-11-13 08:14:30 - INFO - * Ausentes: 3
+2025-11-13 08:14:30 - INFO - * Outros: 0
+2025-11-13 08:14:33 - INFO - Inserção em bulk concluída: 100 registros processados em steam_raw.
+2025-11-13 08:14:33 - INFO - Dados de detalhes inseridos com sucesso no PostgreSQL (100 registros).
+2025-11-13 08:14:33 - INFO - Aguardando 120s antes do próximo batch...
+
+2025-11-13 08:16:33 - INFO - Batch 10/10 - Processando itens 901 a 1000 (100 itens)...
+2025-11-13 08:16:33 - INFO - Iniciando busca de 'DETALHES' assíncrona para 100 AppIDs com concorrência 1...
+2025-11-13 08:17:18 - INFO - Busca assíncrona concluída.
+2025-11-13 08:17:18 - INFO - --- Busca concluída: ---
+2025-11-13 08:17:18 - INFO - 98 sucesso(s) (98.00%),
+2025-11-13 08:17:18 - INFO - 2 falha(s) (2.00%).
+2025-11-13 08:17:18 - INFO - --- Detalhamento dos erros: ---
+2025-11-13 08:17:18 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-13 08:17:18 - INFO - * Timeout: 0
+2025-11-13 08:17:18 - INFO - * Ausentes: 2
+2025-11-13 08:17:18 - INFO - * Outros: 0
+2025-11-13 08:17:21 - INFO - Inserção em bulk concluída: 100 registros processados em steam_raw.
+2025-11-13 08:17:21 - INFO - Dados de detalhes inseridos com sucesso no PostgreSQL (100 registros).
+2025-11-13 08:17:21 - INFO - ===========PROCESSAMENTO COMPLETO! (Detalhes)==========
+2025-11-13 08:17:21 - INFO - Total processado: 100 sucessos de 1,000 itens (0.00%)
+2025-11-13 08:17:21 - INFO - 
+2025-11-13 08:17:21 - INFO - === PROCESSAMENTO EM BATCHES (REVIEWS) ===
+2025-11-13 08:17:21 - INFO - Total de itens: 1,000
+2025-11-13 08:17:21 - INFO - Tamanho do batch: 1,000
+2025-11-13 08:17:21 - INFO - Total de batches: 1
+2025-11-13 08:17:21 - INFO - Delay entre batches: 30s
+2025-11-13 08:17:21 - INFO - Concorrência por batch: 10
+2025-11-13 08:17:21 - INFO - Tempo Estimado para conclusão total do Batch: 0.5 minutos
+2025-11-13 08:17:21 - INFO - ==========================================
+
+2025-11-13 08:17:21 - INFO - Batch 1/1 - Processando itens 1 a 1000 (1000 itens)...
+2025-11-13 08:17:21 - INFO - Iniciando busca de 'REVIEWS' assíncrona para 1000 AppIDs com concorrência 10...
+2025-11-13 08:18:06 - INFO - Busca assíncrona concluída.
+2025-11-13 08:18:06 - INFO - --- Busca concluída: ---
+2025-11-13 08:18:06 - INFO - 1000 sucesso(s) (100.00%),
+2025-11-13 08:18:06 - INFO - 0 falha(s) (0.00%).
+2025-11-13 08:18:06 - INFO - --- Detalhamento dos erros: ---
+2025-11-13 08:18:06 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-13 08:18:06 - INFO - * Timeout: 0
+2025-11-13 08:18:06 - INFO - * Ausentes: 0
+2025-11-13 08:18:06 - INFO - * Outros: 0
+2025-11-13 08:18:07 - INFO - Inserção em bulk concluída: 1000 registros processados em steam_raw.
+2025-11-13 08:18:07 - INFO - Dados de reviews inseridos com sucesso no PostgreSQL (1000 registros).
+2025-11-13 08:18:07 - INFO - ===========PROCESSAMENTO COMPLETO! (Reviews)==========
+2025-11-13 08:18:07 - INFO - Total processado: 1,000 itens.
+2025-11-13 08:18:07 - INFO - Processando aplicativos de 1001 a 2000 de 98978
+2025-11-13 08:18:07 - INFO - Progresso: 1.0%
+2025-11-13 08:18:07 - INFO - Tempo estimado restante: 195.956 minutos
+2025-11-13 08:18:07 - INFO - ----------------------------------------
+2025-11-13 08:18:07 - INFO - Número de IDs a processar neste lote: 1000
+2025-11-13 08:18:07 - INFO - 
+2025-11-13 08:18:07 - INFO - === PROCESSAMENTO EM BATCHES ===
+2025-11-13 08:18:07 - INFO - Total de itens: 1,000
+2025-11-13 08:18:07 - INFO - Tamanho do batch: 100
+2025-11-13 08:18:07 - INFO - Total de batches: 10
+2025-11-13 08:18:07 - INFO - Delay entre batches: 120s
+2025-11-13 08:18:07 - INFO - Concorrência por batch: 1
+2025-11-13 08:18:07 - INFO - Tempo Estimado para conclusão total do Batch: 20.0 minutos
+2025-11-13 08:18:07 - INFO - ================================
+
+2025-11-13 08:18:07 - INFO - Batch 1/10 - Processando itens 1 a 100 (100 itens)...
+2025-11-13 08:18:07 - INFO - Iniciando busca de 'DETALHES' assíncrona para 100 AppIDs com concorrência 1...
+2025-11-13 08:18:47 - INFO - Busca assíncrona concluída.
+2025-11-13 08:18:47 - INFO - --- Busca concluída: ---
+2025-11-13 08:18:47 - INFO - -88 sucesso(s) (-88.00%),
+2025-11-13 08:18:47 - INFO - 94 falha(s) (94.00%).
+2025-11-13 08:18:47 - INFO - --- Detalhamento dos erros: ---
+2025-11-13 08:18:47 - INFO - * HTTP: 94 (403 Forbidden: 0, 429 Too Many Requests: 94)
+2025-11-13 08:18:47 - INFO - * Timeout: 0
+2025-11-13 08:18:47 - INFO - * Ausentes: 0
+2025-11-13 08:18:47 - INFO - * Outros: 0
+2025-11-13 08:18:47 - INFO - Inserção em bulk concluída: 6 registros processados em steam_raw.
+2025-11-13 08:18:47 - INFO - Dados de detalhes inseridos com sucesso no PostgreSQL (6 registros).
+2025-11-13 08:18:47 - INFO - Aguardando 120s antes do próximo batch...
+
+2025-11-13 08:20:47 - INFO - Batch 2/10 - Processando itens 101 a 200 (100 itens)...
+2025-11-13 08:20:47 - INFO - Iniciando busca de 'DETALHES' assíncrona para 100 AppIDs com concorrência 1...
+2025-11-13 08:21:30 - INFO - Busca assíncrona concluída.
+2025-11-13 08:21:30 - INFO - --- Busca concluída: ---
+2025-11-13 08:21:30 - INFO - 96 sucesso(s) (96.00%),
+2025-11-13 08:21:30 - INFO - 4 falha(s) (4.00%).
+2025-11-13 08:21:30 - INFO - --- Detalhamento dos erros: ---
+2025-11-13 08:21:30 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-13 08:21:30 - INFO - * Timeout: 0
+2025-11-13 08:21:30 - INFO - * Ausentes: 4
+2025-11-13 08:21:30 - INFO - * Outros: 0
+2025-11-13 08:21:34 - INFO - Inserção em bulk concluída: 100 registros processados em steam_raw.
+2025-11-13 08:21:34 - INFO - Dados de detalhes inseridos com sucesso no PostgreSQL (100 registros).
+2025-11-13 08:21:34 - INFO - Aguardando 120s antes do próximo batch...
+
+2025-11-13 08:23:34 - INFO - Batch 3/10 - Processando itens 201 a 300 (100 itens)...
+2025-11-13 08:23:34 - INFO - Iniciando busca de 'DETALHES' assíncrona para 100 AppIDs com concorrência 1...
+2025-11-13 08:24:19 - INFO - Busca assíncrona concluída.
+2025-11-13 08:24:19 - INFO - --- Busca concluída: ---
+2025-11-13 08:24:19 - INFO - 96 sucesso(s) (96.00%),
+2025-11-13 08:24:19 - INFO - 4 falha(s) (4.00%).
+2025-11-13 08:24:19 - INFO - --- Detalhamento dos erros: ---
+2025-11-13 08:24:19 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-13 08:24:19 - INFO - * Timeout: 0
+2025-11-13 08:24:19 - INFO - * Ausentes: 4
+2025-11-13 08:24:19 - INFO - * Outros: 0
+2025-11-13 08:24:22 - INFO - Inserção em bulk concluída: 100 registros processados em steam_raw.
+2025-11-13 08:24:22 - INFO - Dados de detalhes inseridos com sucesso no PostgreSQL (100 registros).
+2025-11-13 08:24:22 - INFO - Aguardando 120s antes do próximo batch...
+
+2025-11-13 08:26:22 - INFO - Batch 4/10 - Processando itens 301 a 400 (100 itens)...
+2025-11-13 08:26:22 - INFO - Iniciando busca de 'DETALHES' assíncrona para 100 AppIDs com concorrência 1...
+2025-11-13 08:27:06 - INFO - Busca assíncrona concluída.
+2025-11-13 08:27:06 - INFO - --- Busca concluída: ---
+2025-11-13 08:27:06 - INFO - 96 sucesso(s) (96.00%),
+2025-11-13 08:27:06 - INFO - 4 falha(s) (4.00%).
+2025-11-13 08:27:06 - INFO - --- Detalhamento dos erros: ---
+2025-11-13 08:27:06 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-13 08:27:06 - INFO - * Timeout: 0
+2025-11-13 08:27:06 - INFO - * Ausentes: 4
+2025-11-13 08:27:06 - INFO - * Outros: 0
+2025-11-13 08:27:08 - INFO - Inserção em bulk concluída: 100 registros processados em steam_raw.
+2025-11-13 08:27:08 - INFO - Dados de detalhes inseridos com sucesso no PostgreSQL (100 registros).
+2025-11-13 08:27:08 - INFO - Aguardando 120s antes do próximo batch...
+
+2025-11-13 08:29:08 - INFO - Batch 5/10 - Processando itens 401 a 500 (100 itens)...
+2025-11-13 08:29:08 - INFO - Iniciando busca de 'DETALHES' assíncrona para 100 AppIDs com concorrência 1...
+2025-11-13 08:29:52 - INFO - Busca assíncrona concluída.
+2025-11-13 08:29:52 - INFO - --- Busca concluída: ---
+2025-11-13 08:29:52 - INFO - 97 sucesso(s) (97.00%),
+2025-11-13 08:29:52 - INFO - 3 falha(s) (3.00%).
+2025-11-13 08:29:52 - INFO - --- Detalhamento dos erros: ---
+2025-11-13 08:29:52 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-13 08:29:52 - INFO - * Timeout: 0
+2025-11-13 08:29:52 - INFO - * Ausentes: 3
+2025-11-13 08:29:52 - INFO - * Outros: 0
+2025-11-13 08:29:55 - INFO - Inserção em bulk concluída: 100 registros processados em steam_raw.
+2025-11-13 08:29:55 - INFO - Dados de detalhes inseridos com sucesso no PostgreSQL (100 registros).
+2025-11-13 08:29:55 - INFO - Aguardando 120s antes do próximo batch...
+
+2025-11-13 08:31:55 - INFO - Batch 6/10 - Processando itens 501 a 600 (100 itens)...
+2025-11-13 08:31:55 - INFO - Iniciando busca de 'DETALHES' assíncrona para 100 AppIDs com concorrência 1...
+2025-11-13 08:32:37 - INFO - Busca assíncrona concluída.
+2025-11-13 08:32:37 - INFO - --- Busca concluída: ---
+2025-11-13 08:32:37 - INFO - 94 sucesso(s) (94.00%),
+2025-11-13 08:32:37 - INFO - 6 falha(s) (6.00%).
+2025-11-13 08:32:37 - INFO - --- Detalhamento dos erros: ---
+2025-11-13 08:32:37 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-13 08:32:37 - INFO - * Timeout: 0
+2025-11-13 08:32:37 - INFO - * Ausentes: 6
+2025-11-13 08:32:37 - INFO - * Outros: 0
+2025-11-13 08:32:40 - INFO - Inserção em bulk concluída: 100 registros processados em steam_raw.
+2025-11-13 08:32:40 - INFO - Dados de detalhes inseridos com sucesso no PostgreSQL (100 registros).
+2025-11-13 08:32:40 - INFO - Aguardando 120s antes do próximo batch...
+
+2025-11-13 08:34:40 - INFO - Batch 7/10 - Processando itens 601 a 700 (100 itens)...
+2025-11-13 08:34:40 - INFO - Iniciando busca de 'DETALHES' assíncrona para 100 AppIDs com concorrência 1...
+2025-11-13 08:35:23 - INFO - Busca assíncrona concluída.
+2025-11-13 08:35:23 - INFO - --- Busca concluída: ---
+2025-11-13 08:35:23 - INFO - 99 sucesso(s) (99.00%),
+2025-11-13 08:35:23 - INFO - 1 falha(s) (1.00%).
+2025-11-13 08:35:23 - INFO - --- Detalhamento dos erros: ---
+2025-11-13 08:35:23 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-13 08:35:23 - INFO - * Timeout: 0
+2025-11-13 08:35:23 - INFO - * Ausentes: 1
+2025-11-13 08:35:23 - INFO - * Outros: 0
+2025-11-13 08:35:26 - INFO - Inserção em bulk concluída: 100 registros processados em steam_raw.
+2025-11-13 08:35:26 - INFO - Dados de detalhes inseridos com sucesso no PostgreSQL (100 registros).
+2025-11-13 08:35:26 - INFO - Aguardando 120s antes do próximo batch...
+
+2025-11-13 08:37:26 - INFO - Batch 8/10 - Processando itens 701 a 800 (100 itens)...
+2025-11-13 08:37:26 - INFO - Iniciando busca de 'DETALHES' assíncrona para 100 AppIDs com concorrência 1...
+2025-11-13 08:38:10 - INFO - Busca assíncrona concluída.
+2025-11-13 08:38:10 - INFO - --- Busca concluída: ---
+2025-11-13 08:38:10 - INFO - 95 sucesso(s) (95.00%),
+2025-11-13 08:38:10 - INFO - 5 falha(s) (5.00%).
+2025-11-13 08:38:10 - INFO - --- Detalhamento dos erros: ---
+2025-11-13 08:38:10 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-13 08:38:10 - INFO - * Timeout: 0
+2025-11-13 08:38:10 - INFO - * Ausentes: 5
+2025-11-13 08:38:10 - INFO - * Outros: 0
+2025-11-13 08:38:13 - INFO - Inserção em bulk concluída: 100 registros processados em steam_raw.
+2025-11-13 08:38:13 - INFO - Dados de detalhes inseridos com sucesso no PostgreSQL (100 registros).
+2025-11-13 08:38:13 - INFO - Aguardando 120s antes do próximo batch...
+
+2025-11-13 08:40:13 - INFO - Batch 9/10 - Processando itens 801 a 900 (100 itens)...
+2025-11-13 08:40:13 - INFO - Iniciando busca de 'DETALHES' assíncrona para 100 AppIDs com concorrência 1...
+2025-11-13 08:40:56 - INFO - Busca assíncrona concluída.
+2025-11-13 08:40:56 - INFO - --- Busca concluída: ---
+2025-11-13 08:40:56 - INFO - 98 sucesso(s) (98.00%),
+2025-11-13 08:40:56 - INFO - 2 falha(s) (2.00%).
+2025-11-13 08:40:56 - INFO - --- Detalhamento dos erros: ---
+2025-11-13 08:40:56 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-13 08:40:56 - INFO - * Timeout: 0
+2025-11-13 08:40:56 - INFO - * Ausentes: 2
+2025-11-13 08:40:56 - INFO - * Outros: 0
+2025-11-13 08:40:57 - INFO - Inserção em bulk concluída: 100 registros processados em steam_raw.
+2025-11-13 08:40:57 - INFO - Dados de detalhes inseridos com sucesso no PostgreSQL (100 registros).
+2025-11-13 08:40:57 - INFO - Aguardando 120s antes do próximo batch...
+
+2025-11-13 08:42:57 - INFO - Batch 10/10 - Processando itens 901 a 1000 (100 itens)...
+2025-11-13 08:42:57 - INFO - Iniciando busca de 'DETALHES' assíncrona para 100 AppIDs com concorrência 1...
+2025-11-13 08:43:39 - INFO - Busca assíncrona concluída.
+2025-11-13 08:43:39 - INFO - --- Busca concluída: ---
+2025-11-13 08:43:39 - INFO - 90 sucesso(s) (90.00%),
+2025-11-13 08:43:39 - INFO - 10 falha(s) (10.00%).
+2025-11-13 08:43:39 - INFO - --- Detalhamento dos erros: ---
+2025-11-13 08:43:39 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-13 08:43:39 - INFO - * Timeout: 0
+2025-11-13 08:43:39 - INFO - * Ausentes: 10
+2025-11-13 08:43:39 - INFO - * Outros: 0
+2025-11-13 08:43:42 - INFO - Inserção em bulk concluída: 100 registros processados em steam_raw.
+2025-11-13 08:43:42 - INFO - Dados de detalhes inseridos com sucesso no PostgreSQL (100 registros).
+2025-11-13 08:43:42 - INFO - ===========PROCESSAMENTO COMPLETO! (Detalhes)==========
+2025-11-13 08:43:42 - INFO - Total processado: 100 sucessos de 1,000 itens (0.00%)
+2025-11-13 08:43:42 - INFO - 
+2025-11-13 08:43:42 - INFO - === PROCESSAMENTO EM BATCHES (REVIEWS) ===
+2025-11-13 08:43:42 - INFO - Total de itens: 1,000
+2025-11-13 08:43:42 - INFO - Tamanho do batch: 1,000
+2025-11-13 08:43:42 - INFO - Total de batches: 1
+2025-11-13 08:43:42 - INFO - Delay entre batches: 30s
+2025-11-13 08:43:42 - INFO - Concorrência por batch: 10
+2025-11-13 08:43:42 - INFO - Tempo Estimado para conclusão total do Batch: 0.5 minutos
+2025-11-13 08:43:42 - INFO - ==========================================
+
+2025-11-13 08:43:42 - INFO - Batch 1/1 - Processando itens 1 a 1000 (1000 itens)...
+2025-11-13 08:43:42 - INFO - Iniciando busca de 'REVIEWS' assíncrona para 1000 AppIDs com concorrência 10...
+2025-11-13 08:44:27 - INFO - Busca assíncrona concluída.
+2025-11-13 08:44:27 - INFO - --- Busca concluída: ---
+2025-11-13 08:44:27 - INFO - 1000 sucesso(s) (100.00%),
+2025-11-13 08:44:27 - INFO - 0 falha(s) (0.00%).
+2025-11-13 08:44:27 - INFO - --- Detalhamento dos erros: ---
+2025-11-13 08:44:27 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-13 08:44:27 - INFO - * Timeout: 0
+2025-11-13 08:44:27 - INFO - * Ausentes: 0
+2025-11-13 08:44:27 - INFO - * Outros: 0
+2025-11-13 08:44:28 - INFO - Inserção em bulk concluída: 1000 registros processados em steam_raw.
+2025-11-13 08:44:28 - INFO - Dados de reviews inseridos com sucesso no PostgreSQL (1000 registros).
+2025-11-13 08:44:28 - INFO - ===========PROCESSAMENTO COMPLETO! (Reviews)==========
+2025-11-13 08:44:28 - INFO - Total processado: 1,000 itens.
+2025-11-13 08:44:28 - INFO - Processando aplicativos de 2001 a 3000 de 98978
+2025-11-13 08:44:28 - INFO - Progresso: 2.0%
+2025-11-13 08:44:28 - INFO - Tempo estimado restante: 193.956 minutos
+2025-11-13 08:44:28 - INFO - ----------------------------------------
+2025-11-13 08:44:28 - INFO - Número de IDs a processar neste lote: 1000
+2025-11-13 08:44:28 - INFO - 
+2025-11-13 08:44:28 - INFO - === PROCESSAMENTO EM BATCHES ===
+2025-11-13 08:44:28 - INFO - Total de itens: 1,000
+2025-11-13 08:44:28 - INFO - Tamanho do batch: 100
+2025-11-13 08:44:28 - INFO - Total de batches: 10
+2025-11-13 08:44:28 - INFO - Delay entre batches: 120s
+2025-11-13 08:44:28 - INFO - Concorrência por batch: 1
+2025-11-13 08:44:28 - INFO - Tempo Estimado para conclusão total do Batch: 20.0 minutos
+2025-11-13 08:44:28 - INFO - ================================
+
+2025-11-13 08:44:28 - INFO - Batch 1/10 - Processando itens 1 a 100 (100 itens)...
+2025-11-13 08:44:28 - INFO - Iniciando busca de 'DETALHES' assíncrona para 100 AppIDs com concorrência 1...
+2025-11-13 08:45:06 - INFO - Busca assíncrona concluída.
+2025-11-13 08:45:06 - INFO - --- Busca concluída: ---
+2025-11-13 08:45:06 - INFO - -100 sucesso(s) (-100.00%),
+2025-11-13 08:45:06 - INFO - 100 falha(s) (100.00%).
+2025-11-13 08:45:06 - INFO - --- Detalhamento dos erros: ---
+2025-11-13 08:45:06 - INFO - * HTTP: 100 (403 Forbidden: 0, 429 Too Many Requests: 100)
+2025-11-13 08:45:06 - INFO - * Timeout: 0
+2025-11-13 08:45:06 - INFO - * Ausentes: 0
+2025-11-13 08:45:06 - INFO - * Outros: 0
+2025-11-13 08:45:06 - WARNING - Nenhum dado válido para inserir neste batch.
+2025-11-13 08:45:06 - INFO - Aguardando 120s antes do próximo batch...
+
+2025-11-13 08:47:06 - INFO - Batch 2/10 - Processando itens 101 a 200 (100 itens)...
+2025-11-13 08:47:06 - INFO - Iniciando busca de 'DETALHES' assíncrona para 100 AppIDs com concorrência 1...
+2025-11-13 08:47:50 - INFO - Busca assíncrona concluída.
+2025-11-13 08:47:50 - INFO - --- Busca concluída: ---
+2025-11-13 08:47:50 - INFO - 100 sucesso(s) (100.00%),
+2025-11-13 08:47:50 - INFO - 0 falha(s) (0.00%).
+2025-11-13 08:47:50 - INFO - --- Detalhamento dos erros: ---
+2025-11-13 08:47:50 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-13 08:47:50 - INFO - * Timeout: 0
+2025-11-13 08:47:50 - INFO - * Ausentes: 0
+2025-11-13 08:47:50 - INFO - * Outros: 0
+2025-11-13 08:47:54 - INFO - Inserção em bulk concluída: 100 registros processados em steam_raw.
+2025-11-13 08:47:54 - INFO - Dados de detalhes inseridos com sucesso no PostgreSQL (100 registros).
+2025-11-13 08:47:54 - INFO - Aguardando 120s antes do próximo batch...
+
+2025-11-13 08:49:54 - INFO - Batch 3/10 - Processando itens 201 a 300 (100 itens)...
+2025-11-13 08:49:54 - INFO - Iniciando busca de 'DETALHES' assíncrona para 100 AppIDs com concorrência 1...
+2025-11-13 08:50:38 - INFO - Busca assíncrona concluída.
+2025-11-13 08:50:38 - INFO - --- Busca concluída: ---
+2025-11-13 08:50:38 - INFO - 98 sucesso(s) (98.00%),
+2025-11-13 08:50:38 - INFO - 2 falha(s) (2.00%).
+2025-11-13 08:50:38 - INFO - --- Detalhamento dos erros: ---
+2025-11-13 08:50:38 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-13 08:50:38 - INFO - * Timeout: 0
+2025-11-13 08:50:38 - INFO - * Ausentes: 2
+2025-11-13 08:50:38 - INFO - * Outros: 0
+2025-11-13 08:50:41 - INFO - Inserção em bulk concluída: 100 registros processados em steam_raw.
+2025-11-13 08:50:41 - INFO - Dados de detalhes inseridos com sucesso no PostgreSQL (100 registros).
+2025-11-13 08:50:41 - INFO - Aguardando 120s antes do próximo batch...
+
+2025-11-13 08:52:41 - INFO - Batch 4/10 - Processando itens 301 a 400 (100 itens)...
+2025-11-13 08:52:41 - INFO - Iniciando busca de 'DETALHES' assíncrona para 100 AppIDs com concorrência 1...
+2025-11-13 08:53:25 - INFO - Busca assíncrona concluída.
+2025-11-13 08:53:25 - INFO - --- Busca concluída: ---
+2025-11-13 08:53:25 - INFO - 100 sucesso(s) (100.00%),
+2025-11-13 08:53:25 - INFO - 0 falha(s) (0.00%).
+2025-11-13 08:53:25 - INFO - --- Detalhamento dos erros: ---
+2025-11-13 08:53:25 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-13 08:53:25 - INFO - * Timeout: 0
+2025-11-13 08:53:25 - INFO - * Ausentes: 0
+2025-11-13 08:53:25 - INFO - * Outros: 0
+2025-11-13 08:53:28 - INFO - Inserção em bulk concluída: 100 registros processados em steam_raw.
+2025-11-13 08:53:28 - INFO - Dados de detalhes inseridos com sucesso no PostgreSQL (100 registros).
+2025-11-13 08:53:28 - INFO - Aguardando 120s antes do próximo batch...
+
+2025-11-13 08:55:28 - INFO - Batch 5/10 - Processando itens 401 a 500 (100 itens)...
+2025-11-13 08:55:28 - INFO - Iniciando busca de 'DETALHES' assíncrona para 100 AppIDs com concorrência 1...
+2025-11-13 08:56:14 - INFO - Busca assíncrona concluída.
+2025-11-13 08:56:14 - INFO - --- Busca concluída: ---
+2025-11-13 08:56:14 - INFO - 100 sucesso(s) (100.00%),
+2025-11-13 08:56:14 - INFO - 0 falha(s) (0.00%).
+2025-11-13 08:56:14 - INFO - --- Detalhamento dos erros: ---
+2025-11-13 08:56:14 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-13 08:56:14 - INFO - * Timeout: 0
+2025-11-13 08:56:14 - INFO - * Ausentes: 0
+2025-11-13 08:56:14 - INFO - * Outros: 0
+2025-11-13 08:56:17 - INFO - Inserção em bulk concluída: 100 registros processados em steam_raw.
+2025-11-13 08:56:17 - INFO - Dados de detalhes inseridos com sucesso no PostgreSQL (100 registros).
+2025-11-13 08:56:17 - INFO - Aguardando 120s antes do próximo batch...
+
+2025-11-13 08:58:17 - INFO - Batch 6/10 - Processando itens 501 a 600 (100 itens)...
+2025-11-13 08:58:17 - INFO - Iniciando busca de 'DETALHES' assíncrona para 100 AppIDs com concorrência 1...
+2025-11-13 08:59:00 - INFO - Busca assíncrona concluída.
+2025-11-13 08:59:00 - INFO - --- Busca concluída: ---
+2025-11-13 08:59:00 - INFO - 98 sucesso(s) (98.00%),
+2025-11-13 08:59:00 - INFO - 2 falha(s) (2.00%).
+2025-11-13 08:59:00 - INFO - --- Detalhamento dos erros: ---
+2025-11-13 08:59:00 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-13 08:59:00 - INFO - * Timeout: 0
+2025-11-13 08:59:00 - INFO - * Ausentes: 2
+2025-11-13 08:59:00 - INFO - * Outros: 0
+2025-11-13 08:59:03 - INFO - Inserção em bulk concluída: 100 registros processados em steam_raw.
+2025-11-13 08:59:03 - INFO - Dados de detalhes inseridos com sucesso no PostgreSQL (100 registros).
+2025-11-13 08:59:03 - INFO - Aguardando 120s antes do próximo batch...
+
+2025-11-13 09:01:03 - INFO - Batch 7/10 - Processando itens 601 a 700 (100 itens)...
+2025-11-13 09:01:03 - INFO - Iniciando busca de 'DETALHES' assíncrona para 100 AppIDs com concorrência 1...
+2025-11-13 09:01:46 - INFO - Busca assíncrona concluída.
+2025-11-13 09:01:46 - INFO - --- Busca concluída: ---
+2025-11-13 09:01:46 - INFO - 99 sucesso(s) (99.00%),
+2025-11-13 09:01:46 - INFO - 1 falha(s) (1.00%).
+2025-11-13 09:01:46 - INFO - --- Detalhamento dos erros: ---
+2025-11-13 09:01:46 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-13 09:01:46 - INFO - * Timeout: 0
+2025-11-13 09:01:46 - INFO - * Ausentes: 1
+2025-11-13 09:01:46 - INFO - * Outros: 0
+2025-11-13 09:01:49 - INFO - Inserção em bulk concluída: 100 registros processados em steam_raw.
+2025-11-13 09:01:49 - INFO - Dados de detalhes inseridos com sucesso no PostgreSQL (100 registros).
+2025-11-13 09:01:49 - INFO - Aguardando 120s antes do próximo batch...
+
+2025-11-13 09:03:49 - INFO - Batch 8/10 - Processando itens 701 a 800 (100 itens)...
+2025-11-13 09:03:49 - INFO - Iniciando busca de 'DETALHES' assíncrona para 100 AppIDs com concorrência 1...
+2025-11-13 09:04:34 - INFO - Busca assíncrona concluída.
+2025-11-13 09:04:34 - INFO - --- Busca concluída: ---
+2025-11-13 09:04:34 - INFO - 93 sucesso(s) (93.00%),
+2025-11-13 09:04:34 - INFO - 7 falha(s) (7.00%).
+2025-11-13 09:04:34 - INFO - --- Detalhamento dos erros: ---
+2025-11-13 09:04:34 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-13 09:04:34 - INFO - * Timeout: 0
+2025-11-13 09:04:34 - INFO - * Ausentes: 7
+2025-11-13 09:04:34 - INFO - * Outros: 0
+2025-11-13 09:04:37 - INFO - Inserção em bulk concluída: 100 registros processados em steam_raw.
+2025-11-13 09:04:37 - INFO - Dados de detalhes inseridos com sucesso no PostgreSQL (100 registros).
+2025-11-13 09:04:37 - INFO - Aguardando 120s antes do próximo batch...
+
+2025-11-13 09:06:37 - INFO - Batch 9/10 - Processando itens 801 a 900 (100 itens)...
+2025-11-13 09:06:37 - INFO - Iniciando busca de 'DETALHES' assíncrona para 100 AppIDs com concorrência 1...
+2025-11-13 09:07:21 - INFO - Busca assíncrona concluída.
+2025-11-13 09:07:21 - INFO - --- Busca concluída: ---
+2025-11-13 09:07:21 - INFO - 93 sucesso(s) (93.00%),
+2025-11-13 09:07:21 - INFO - 7 falha(s) (7.00%).
+2025-11-13 09:07:21 - INFO - --- Detalhamento dos erros: ---
+2025-11-13 09:07:21 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-13 09:07:21 - INFO - * Timeout: 0
+2025-11-13 09:07:21 - INFO - * Ausentes: 7
+2025-11-13 09:07:21 - INFO - * Outros: 0
+2025-11-13 09:07:23 - INFO - Inserção em bulk concluída: 100 registros processados em steam_raw.
+2025-11-13 09:07:23 - INFO - Dados de detalhes inseridos com sucesso no PostgreSQL (100 registros).
+2025-11-13 09:07:23 - INFO - Aguardando 120s antes do próximo batch...
+
+2025-11-13 09:09:23 - INFO - Batch 10/10 - Processando itens 901 a 1000 (100 itens)...
+2025-11-13 09:09:24 - INFO - Iniciando busca de 'DETALHES' assíncrona para 100 AppIDs com concorrência 1...
+2025-11-13 09:10:07 - INFO - Busca assíncrona concluída.
+2025-11-13 09:10:07 - INFO - --- Busca concluída: ---
+2025-11-13 09:10:07 - INFO - 96 sucesso(s) (96.00%),
+2025-11-13 09:10:07 - INFO - 4 falha(s) (4.00%).
+2025-11-13 09:10:07 - INFO - --- Detalhamento dos erros: ---
+2025-11-13 09:10:07 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-13 09:10:07 - INFO - * Timeout: 0
+2025-11-13 09:10:07 - INFO - * Ausentes: 4
+2025-11-13 09:10:07 - INFO - * Outros: 0
+2025-11-13 09:10:10 - INFO - Inserção em bulk concluída: 100 registros processados em steam_raw.
+2025-11-13 09:10:10 - INFO - Dados de detalhes inseridos com sucesso no PostgreSQL (100 registros).
+2025-11-13 09:10:10 - INFO - ===========PROCESSAMENTO COMPLETO! (Detalhes)==========
+2025-11-13 09:10:10 - INFO - Total processado: 100 sucessos de 1,000 itens (0.00%)
+2025-11-13 09:10:10 - INFO - 
+2025-11-13 09:10:10 - INFO - === PROCESSAMENTO EM BATCHES (REVIEWS) ===
+2025-11-13 09:10:10 - INFO - Total de itens: 1,000
+2025-11-13 09:10:10 - INFO - Tamanho do batch: 1,000
+2025-11-13 09:10:10 - INFO - Total de batches: 1
+2025-11-13 09:10:10 - INFO - Delay entre batches: 30s
+2025-11-13 09:10:10 - INFO - Concorrência por batch: 10
+2025-11-13 09:10:10 - INFO - Tempo Estimado para conclusão total do Batch: 0.5 minutos
+2025-11-13 09:10:10 - INFO - ==========================================
+
+2025-11-13 09:10:10 - INFO - Batch 1/1 - Processando itens 1 a 1000 (1000 itens)...
+2025-11-13 09:10:10 - INFO - Iniciando busca de 'REVIEWS' assíncrona para 1000 AppIDs com concorrência 10...
+2025-11-13 09:10:56 - INFO - Busca assíncrona concluída.
+2025-11-13 09:10:56 - INFO - --- Busca concluída: ---
+2025-11-13 09:10:56 - INFO - 1000 sucesso(s) (100.00%),
+2025-11-13 09:10:56 - INFO - 0 falha(s) (0.00%).
+2025-11-13 09:10:56 - INFO - --- Detalhamento dos erros: ---
+2025-11-13 09:10:56 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-13 09:10:56 - INFO - * Timeout: 0
+2025-11-13 09:10:56 - INFO - * Ausentes: 0
+2025-11-13 09:10:56 - INFO - * Outros: 0
+2025-11-13 09:10:57 - INFO - Inserção em bulk concluída: 1000 registros processados em steam_raw.
+2025-11-13 09:10:57 - INFO - Dados de reviews inseridos com sucesso no PostgreSQL (1000 registros).
+2025-11-13 09:10:57 - INFO - ===========PROCESSAMENTO COMPLETO! (Reviews)==========
+2025-11-13 09:10:57 - INFO - Total processado: 1,000 itens.
+2025-11-13 09:10:57 - INFO - Processando aplicativos de 3001 a 4000 de 98978
+2025-11-13 09:10:57 - INFO - Progresso: 3.0%
+2025-11-13 09:10:57 - INFO - Tempo estimado restante: 191.956 minutos
+2025-11-13 09:10:57 - INFO - ----------------------------------------
+2025-11-13 09:10:57 - INFO - Número de IDs a processar neste lote: 1000
+2025-11-13 09:10:57 - INFO - 
+2025-11-13 09:10:57 - INFO - === PROCESSAMENTO EM BATCHES ===
+2025-11-13 09:10:57 - INFO - Total de itens: 1,000
+2025-11-13 09:10:57 - INFO - Tamanho do batch: 100
+2025-11-13 09:10:57 - INFO - Total de batches: 10
+2025-11-13 09:10:57 - INFO - Delay entre batches: 120s
+2025-11-13 09:10:57 - INFO - Concorrência por batch: 1
+2025-11-13 09:10:57 - INFO - Tempo Estimado para conclusão total do Batch: 20.0 minutos
+2025-11-13 09:10:57 - INFO - ================================
+
+2025-11-13 09:10:57 - INFO - Batch 1/10 - Processando itens 1 a 100 (100 itens)...
+2025-11-13 09:10:57 - INFO - Iniciando busca de 'DETALHES' assíncrona para 100 AppIDs com concorrência 1...
+2025-11-13 09:11:42 - INFO - Busca assíncrona concluída.
+2025-11-13 09:11:42 - INFO - --- Busca concluída: ---
+2025-11-13 09:11:42 - INFO - 99 sucesso(s) (99.00%),
+2025-11-13 09:11:42 - INFO - 1 falha(s) (1.00%).
+2025-11-13 09:11:42 - INFO - --- Detalhamento dos erros: ---
+2025-11-13 09:11:42 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-13 09:11:42 - INFO - * Timeout: 0
+2025-11-13 09:11:42 - INFO - * Ausentes: 1
+2025-11-13 09:11:42 - INFO - * Outros: 0
+2025-11-13 09:11:44 - INFO - Inserção em bulk concluída: 100 registros processados em steam_raw.
+2025-11-13 09:11:44 - INFO - Dados de detalhes inseridos com sucesso no PostgreSQL (100 registros).
+2025-11-13 09:11:44 - INFO - Aguardando 120s antes do próximo batch...
+
+2025-11-13 09:13:44 - INFO - Batch 2/10 - Processando itens 101 a 200 (100 itens)...
+2025-11-13 09:13:44 - INFO - Iniciando busca de 'DETALHES' assíncrona para 100 AppIDs com concorrência 1...
+2025-11-13 09:14:24 - INFO - Busca assíncrona concluída.
+2025-11-13 09:14:24 - INFO - --- Busca concluída: ---
+2025-11-13 09:14:24 - INFO - -98 sucesso(s) (-98.00%),
+2025-11-13 09:14:24 - INFO - 99 falha(s) (99.00%).
+2025-11-13 09:14:24 - INFO - --- Detalhamento dos erros: ---
+2025-11-13 09:14:24 - INFO - * HTTP: 99 (403 Forbidden: 0, 429 Too Many Requests: 99)
+2025-11-13 09:14:24 - INFO - * Timeout: 0
+2025-11-13 09:14:24 - INFO - * Ausentes: 0
+2025-11-13 09:14:24 - INFO - * Outros: 0
+2025-11-13 09:14:24 - INFO - Inserção em bulk concluída: 1 registros processados em steam_raw.
+2025-11-13 09:14:24 - INFO - Dados de detalhes inseridos com sucesso no PostgreSQL (1 registros).
+2025-11-13 09:14:24 - INFO - Aguardando 120s antes do próximo batch...
+
+2025-11-13 09:16:24 - INFO - Batch 3/10 - Processando itens 201 a 300 (100 itens)...
+2025-11-13 09:16:24 - INFO - Iniciando busca de 'DETALHES' assíncrona para 100 AppIDs com concorrência 1...
+2025-11-13 09:17:09 - INFO - Busca assíncrona concluída.
+2025-11-13 09:17:09 - INFO - --- Busca concluída: ---
+2025-11-13 09:17:09 - INFO - 98 sucesso(s) (98.00%),
+2025-11-13 09:17:09 - INFO - 2 falha(s) (2.00%).
+2025-11-13 09:17:09 - INFO - --- Detalhamento dos erros: ---
+2025-11-13 09:17:09 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-13 09:17:09 - INFO - * Timeout: 0
+2025-11-13 09:17:09 - INFO - * Ausentes: 2
+2025-11-13 09:17:09 - INFO - * Outros: 0
+2025-11-13 09:17:12 - INFO - Inserção em bulk concluída: 100 registros processados em steam_raw.
+2025-11-13 09:17:12 - INFO - Dados de detalhes inseridos com sucesso no PostgreSQL (100 registros).
+2025-11-13 09:17:12 - INFO - Aguardando 120s antes do próximo batch...
+
+2025-11-13 09:19:12 - INFO - Batch 4/10 - Processando itens 301 a 400 (100 itens)...
+2025-11-13 09:19:12 - INFO - Iniciando busca de 'DETALHES' assíncrona para 100 AppIDs com concorrência 1...
+2025-11-13 09:19:57 - INFO - Busca assíncrona concluída.
+2025-11-13 09:19:57 - INFO - --- Busca concluída: ---
+2025-11-13 09:19:57 - INFO - 99 sucesso(s) (99.00%),
+2025-11-13 09:19:57 - INFO - 1 falha(s) (1.00%).
+2025-11-13 09:19:57 - INFO - --- Detalhamento dos erros: ---
+2025-11-13 09:19:57 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-13 09:19:57 - INFO - * Timeout: 0
+2025-11-13 09:19:57 - INFO - * Ausentes: 1
+2025-11-13 09:19:57 - INFO - * Outros: 0
+2025-11-13 09:20:00 - INFO - Inserção em bulk concluída: 100 registros processados em steam_raw.
+2025-11-13 09:20:00 - INFO - Dados de detalhes inseridos com sucesso no PostgreSQL (100 registros).
+2025-11-13 09:20:00 - INFO - Aguardando 120s antes do próximo batch...
+
+2025-11-13 09:22:00 - INFO - Batch 5/10 - Processando itens 401 a 500 (100 itens)...
+2025-11-13 09:22:00 - INFO - Iniciando busca de 'DETALHES' assíncrona para 100 AppIDs com concorrência 1...
+2025-11-13 09:22:44 - INFO - Busca assíncrona concluída.
+2025-11-13 09:22:44 - INFO - --- Busca concluída: ---
+2025-11-13 09:22:44 - INFO - 97 sucesso(s) (97.00%),
+2025-11-13 09:22:44 - INFO - 3 falha(s) (3.00%).
+2025-11-13 09:22:44 - INFO - --- Detalhamento dos erros: ---
+2025-11-13 09:22:44 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-13 09:22:44 - INFO - * Timeout: 0
+2025-11-13 09:22:44 - INFO - * Ausentes: 3
+2025-11-13 09:22:44 - INFO - * Outros: 0
+2025-11-13 09:22:47 - INFO - Inserção em bulk concluída: 100 registros processados em steam_raw.
+2025-11-13 09:22:47 - INFO - Dados de detalhes inseridos com sucesso no PostgreSQL (100 registros).
+2025-11-13 09:22:47 - INFO - Aguardando 120s antes do próximo batch...
+
+2025-11-13 09:24:47 - INFO - Batch 6/10 - Processando itens 501 a 600 (100 itens)...
+2025-11-13 09:24:47 - INFO - Iniciando busca de 'DETALHES' assíncrona para 100 AppIDs com concorrência 1...
+2025-11-13 09:25:32 - INFO - Busca assíncrona concluída.
+2025-11-13 09:25:32 - INFO - --- Busca concluída: ---
+2025-11-13 09:25:32 - INFO - 98 sucesso(s) (98.00%),
+2025-11-13 09:25:32 - INFO - 2 falha(s) (2.00%).
+2025-11-13 09:25:32 - INFO - --- Detalhamento dos erros: ---
+2025-11-13 09:25:32 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-13 09:25:32 - INFO - * Timeout: 0
+2025-11-13 09:25:32 - INFO - * Ausentes: 2
+2025-11-13 09:25:32 - INFO - * Outros: 0
+2025-11-13 09:25:36 - INFO - Inserção em bulk concluída: 100 registros processados em steam_raw.
+2025-11-13 09:25:36 - INFO - Dados de detalhes inseridos com sucesso no PostgreSQL (100 registros).
+2025-11-13 09:25:36 - INFO - Aguardando 120s antes do próximo batch...
+
+2025-11-13 09:27:36 - INFO - Batch 7/10 - Processando itens 601 a 700 (100 itens)...
+2025-11-13 09:27:36 - INFO - Iniciando busca de 'DETALHES' assíncrona para 100 AppIDs com concorrência 1...
+2025-11-13 09:28:19 - INFO - Busca assíncrona concluída.
+2025-11-13 09:28:19 - INFO - --- Busca concluída: ---
+2025-11-13 09:28:19 - INFO - 98 sucesso(s) (98.00%),
+2025-11-13 09:28:19 - INFO - 2 falha(s) (2.00%).
+2025-11-13 09:28:19 - INFO - --- Detalhamento dos erros: ---
+2025-11-13 09:28:19 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-13 09:28:19 - INFO - * Timeout: 0
+2025-11-13 09:28:19 - INFO - * Ausentes: 2
+2025-11-13 09:28:19 - INFO - * Outros: 0
+2025-11-13 09:28:23 - INFO - Inserção em bulk concluída: 100 registros processados em steam_raw.
+2025-11-13 09:28:23 - INFO - Dados de detalhes inseridos com sucesso no PostgreSQL (100 registros).
+2025-11-13 09:28:23 - INFO - Aguardando 120s antes do próximo batch...
+
+2025-11-13 09:30:23 - INFO - Batch 8/10 - Processando itens 701 a 800 (100 itens)...
+2025-11-13 09:30:23 - INFO - Iniciando busca de 'DETALHES' assíncrona para 100 AppIDs com concorrência 1...
+2025-11-13 09:31:07 - INFO - Busca assíncrona concluída.
+2025-11-13 09:31:07 - INFO - --- Busca concluída: ---
+2025-11-13 09:31:07 - INFO - 98 sucesso(s) (98.00%),
+2025-11-13 09:31:07 - INFO - 2 falha(s) (2.00%).
+2025-11-13 09:31:07 - INFO - --- Detalhamento dos erros: ---
+2025-11-13 09:31:07 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-13 09:31:07 - INFO - * Timeout: 0
+2025-11-13 09:31:07 - INFO - * Ausentes: 2
+2025-11-13 09:31:07 - INFO - * Outros: 0
+2025-11-13 09:31:11 - INFO - Inserção em bulk concluída: 100 registros processados em steam_raw.
+2025-11-13 09:31:11 - INFO - Dados de detalhes inseridos com sucesso no PostgreSQL (100 registros).
+2025-11-13 09:31:11 - INFO - Aguardando 120s antes do próximo batch...
+
+2025-11-13 09:33:11 - INFO - Batch 9/10 - Processando itens 801 a 900 (100 itens)...
+2025-11-13 09:33:11 - INFO - Iniciando busca de 'DETALHES' assíncrona para 100 AppIDs com concorrência 1...
+2025-11-13 09:33:53 - INFO - Busca assíncrona concluída.
+2025-11-13 09:33:53 - INFO - --- Busca concluída: ---
+2025-11-13 09:33:53 - INFO - 95 sucesso(s) (95.00%),
+2025-11-13 09:33:53 - INFO - 5 falha(s) (5.00%).
+2025-11-13 09:33:53 - INFO - --- Detalhamento dos erros: ---
+2025-11-13 09:33:53 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-13 09:33:53 - INFO - * Timeout: 0
+2025-11-13 09:33:53 - INFO - * Ausentes: 5
+2025-11-13 09:33:53 - INFO - * Outros: 0
+2025-11-13 09:33:56 - INFO - Inserção em bulk concluída: 100 registros processados em steam_raw.
+2025-11-13 09:33:56 - INFO - Dados de detalhes inseridos com sucesso no PostgreSQL (100 registros).
+2025-11-13 09:33:56 - INFO - Aguardando 120s antes do próximo batch...
+
+2025-11-13 09:35:56 - INFO - Batch 10/10 - Processando itens 901 a 1000 (100 itens)...
+2025-11-13 09:35:56 - INFO - Iniciando busca de 'DETALHES' assíncrona para 100 AppIDs com concorrência 1...
+2025-11-13 09:36:41 - INFO - Busca assíncrona concluída.
+2025-11-13 09:36:41 - INFO - --- Busca concluída: ---
+2025-11-13 09:36:41 - INFO - 90 sucesso(s) (90.00%),
+2025-11-13 09:36:41 - INFO - 10 falha(s) (10.00%).
+2025-11-13 09:36:41 - INFO - --- Detalhamento dos erros: ---
+2025-11-13 09:36:41 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-13 09:36:41 - INFO - * Timeout: 0
+2025-11-13 09:36:41 - INFO - * Ausentes: 10
+2025-11-13 09:36:41 - INFO - * Outros: 0
+2025-11-13 09:36:45 - INFO - Inserção em bulk concluída: 100 registros processados em steam_raw.
+2025-11-13 09:36:45 - INFO - Dados de detalhes inseridos com sucesso no PostgreSQL (100 registros).
+2025-11-13 09:36:45 - INFO - ===========PROCESSAMENTO COMPLETO! (Detalhes)==========
+2025-11-13 09:36:45 - INFO - Total processado: 100 sucessos de 1,000 itens (0.00%)
+2025-11-13 09:36:45 - INFO - 
+2025-11-13 09:36:45 - INFO - === PROCESSAMENTO EM BATCHES (REVIEWS) ===
+2025-11-13 09:36:45 - INFO - Total de itens: 1,000
+2025-11-13 09:36:45 - INFO - Tamanho do batch: 1,000
+2025-11-13 09:36:45 - INFO - Total de batches: 1
+2025-11-13 09:36:45 - INFO - Delay entre batches: 30s
+2025-11-13 09:36:45 - INFO - Concorrência por batch: 10
+2025-11-13 09:36:45 - INFO - Tempo Estimado para conclusão total do Batch: 0.5 minutos
+2025-11-13 09:36:45 - INFO - ==========================================
+
+2025-11-13 09:36:45 - INFO - Batch 1/1 - Processando itens 1 a 1000 (1000 itens)...
+2025-11-13 09:36:45 - INFO - Iniciando busca de 'REVIEWS' assíncrona para 1000 AppIDs com concorrência 10...
+2025-11-13 09:37:30 - INFO - Busca assíncrona concluída.
+2025-11-13 09:37:30 - INFO - --- Busca concluída: ---
+2025-11-13 09:37:30 - INFO - 1000 sucesso(s) (100.00%),
+2025-11-13 09:37:30 - INFO - 0 falha(s) (0.00%).
+2025-11-13 09:37:30 - INFO - --- Detalhamento dos erros: ---
+2025-11-13 09:37:30 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-13 09:37:30 - INFO - * Timeout: 0
+2025-11-13 09:37:30 - INFO - * Ausentes: 0
+2025-11-13 09:37:30 - INFO - * Outros: 0
+2025-11-13 09:37:31 - INFO - Inserção em bulk concluída: 1000 registros processados em steam_raw.
+2025-11-13 09:37:31 - INFO - Dados de reviews inseridos com sucesso no PostgreSQL (1000 registros).
+2025-11-13 09:37:31 - INFO - ===========PROCESSAMENTO COMPLETO! (Reviews)==========
+2025-11-13 09:37:31 - INFO - Total processado: 1,000 itens.
+2025-11-13 09:37:31 - INFO - Processando aplicativos de 4001 a 5000 de 98978
+2025-11-13 09:37:31 - INFO - Progresso: 4.0%
+2025-11-13 09:37:31 - INFO - Tempo estimado restante: 189.956 minutos
+2025-11-13 09:37:31 - INFO - ----------------------------------------
+2025-11-13 09:37:31 - INFO - Número de IDs a processar neste lote: 1000
+2025-11-13 09:37:31 - INFO - 
+2025-11-13 09:37:31 - INFO - === PROCESSAMENTO EM BATCHES ===
+2025-11-13 09:37:31 - INFO - Total de itens: 1,000
+2025-11-13 09:37:31 - INFO - Tamanho do batch: 100
+2025-11-13 09:37:31 - INFO - Total de batches: 10
+2025-11-13 09:37:31 - INFO - Delay entre batches: 120s
+2025-11-13 09:37:31 - INFO - Concorrência por batch: 1
+2025-11-13 09:37:31 - INFO - Tempo Estimado para conclusão total do Batch: 20.0 minutos
+2025-11-13 09:37:31 - INFO - ================================
+
+2025-11-13 09:37:31 - INFO - Batch 1/10 - Processando itens 1 a 100 (100 itens)...
+2025-11-13 09:37:31 - INFO - Iniciando busca de 'DETALHES' assíncrona para 100 AppIDs com concorrência 1...
+2025-11-13 09:38:15 - INFO - Busca assíncrona concluída.
+2025-11-13 09:38:15 - INFO - --- Busca concluída: ---
+2025-11-13 09:38:15 - INFO - 95 sucesso(s) (95.00%),
+2025-11-13 09:38:15 - INFO - 5 falha(s) (5.00%).
+2025-11-13 09:38:15 - INFO - --- Detalhamento dos erros: ---
+2025-11-13 09:38:15 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-13 09:38:15 - INFO - * Timeout: 0
+2025-11-13 09:38:15 - INFO - * Ausentes: 5
+2025-11-13 09:38:15 - INFO - * Outros: 0
+2025-11-13 09:38:19 - INFO - Inserção em bulk concluída: 100 registros processados em steam_raw.
+2025-11-13 09:38:19 - INFO - Dados de detalhes inseridos com sucesso no PostgreSQL (100 registros).
+2025-11-13 09:38:19 - INFO - Aguardando 120s antes do próximo batch...
+
+2025-11-13 09:40:19 - INFO - Batch 2/10 - Processando itens 101 a 200 (100 itens)...
+2025-11-13 09:40:19 - INFO - Iniciando busca de 'DETALHES' assíncrona para 100 AppIDs com concorrência 1...
+2025-11-13 09:40:58 - INFO - Busca assíncrona concluída.
+2025-11-13 09:40:58 - INFO - --- Busca concluída: ---
+2025-11-13 09:40:58 - INFO - -88 sucesso(s) (-88.00%),
+2025-11-13 09:40:58 - INFO - 94 falha(s) (94.00%).
+2025-11-13 09:40:58 - INFO - --- Detalhamento dos erros: ---
+2025-11-13 09:40:58 - INFO - * HTTP: 94 (403 Forbidden: 0, 429 Too Many Requests: 94)
+2025-11-13 09:40:58 - INFO - * Timeout: 0
+2025-11-13 09:40:58 - INFO - * Ausentes: 0
+2025-11-13 09:40:58 - INFO - * Outros: 0
+2025-11-13 09:40:58 - INFO - Inserção em bulk concluída: 6 registros processados em steam_raw.
+2025-11-13 09:40:58 - INFO - Dados de detalhes inseridos com sucesso no PostgreSQL (6 registros).
+2025-11-13 09:40:58 - INFO - Aguardando 120s antes do próximo batch...
+
+2025-11-13 09:42:58 - INFO - Batch 3/10 - Processando itens 201 a 300 (100 itens)...
+2025-11-13 09:42:58 - INFO - Iniciando busca de 'DETALHES' assíncrona para 100 AppIDs com concorrência 1...
+2025-11-13 09:43:42 - INFO - Busca assíncrona concluída.
+2025-11-13 09:43:42 - INFO - --- Busca concluída: ---
+2025-11-13 09:43:42 - INFO - 87 sucesso(s) (87.00%),
+2025-11-13 09:43:42 - INFO - 13 falha(s) (13.00%).
+2025-11-13 09:43:42 - INFO - --- Detalhamento dos erros: ---
+2025-11-13 09:43:42 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-13 09:43:42 - INFO - * Timeout: 0
+2025-11-13 09:43:42 - INFO - * Ausentes: 13
+2025-11-13 09:43:42 - INFO - * Outros: 0
+2025-11-13 09:43:45 - INFO - Inserção em bulk concluída: 100 registros processados em steam_raw.
+2025-11-13 09:43:45 - INFO - Dados de detalhes inseridos com sucesso no PostgreSQL (100 registros).
+2025-11-13 09:43:45 - INFO - Aguardando 120s antes do próximo batch...
+
+2025-11-13 09:45:45 - INFO - Batch 4/10 - Processando itens 301 a 400 (100 itens)...
+2025-11-13 09:45:45 - INFO - Iniciando busca de 'DETALHES' assíncrona para 100 AppIDs com concorrência 1...
+2025-11-13 09:46:28 - INFO - Busca assíncrona concluída.
+2025-11-13 09:46:28 - INFO - --- Busca concluída: ---
+2025-11-13 09:46:28 - INFO - 93 sucesso(s) (93.00%),
+2025-11-13 09:46:28 - INFO - 7 falha(s) (7.00%).
+2025-11-13 09:46:28 - INFO - --- Detalhamento dos erros: ---
+2025-11-13 09:46:28 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-13 09:46:28 - INFO - * Timeout: 0
+2025-11-13 09:46:28 - INFO - * Ausentes: 7
+2025-11-13 09:46:28 - INFO - * Outros: 0
+2025-11-13 09:46:31 - INFO - Inserção em bulk concluída: 100 registros processados em steam_raw.
+2025-11-13 09:46:31 - INFO - Dados de detalhes inseridos com sucesso no PostgreSQL (100 registros).
+2025-11-13 09:46:31 - INFO - Aguardando 120s antes do próximo batch...
+
+2025-11-13 09:48:31 - INFO - Batch 5/10 - Processando itens 401 a 500 (100 itens)...
+2025-11-13 09:48:31 - INFO - Iniciando busca de 'DETALHES' assíncrona para 100 AppIDs com concorrência 1...
+2025-11-13 09:49:13 - INFO - Busca assíncrona concluída.
+2025-11-13 09:49:13 - INFO - --- Busca concluída: ---
+2025-11-13 09:49:13 - INFO - 98 sucesso(s) (98.00%),
+2025-11-13 09:49:13 - INFO - 2 falha(s) (2.00%).
+2025-11-13 09:49:13 - INFO - --- Detalhamento dos erros: ---
+2025-11-13 09:49:13 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-13 09:49:13 - INFO - * Timeout: 0
+2025-11-13 09:49:13 - INFO - * Ausentes: 2
+2025-11-13 09:49:13 - INFO - * Outros: 0
+2025-11-13 09:49:14 - INFO - Inserção em bulk concluída: 100 registros processados em steam_raw.
+2025-11-13 09:49:14 - INFO - Dados de detalhes inseridos com sucesso no PostgreSQL (100 registros).
+2025-11-13 09:49:14 - INFO - Aguardando 120s antes do próximo batch...
+
+2025-11-13 09:51:14 - INFO - Batch 6/10 - Processando itens 501 a 600 (100 itens)...
+2025-11-13 09:51:14 - INFO - Iniciando busca de 'DETALHES' assíncrona para 100 AppIDs com concorrência 1...
+2025-11-13 09:51:56 - INFO - Busca assíncrona concluída.
+2025-11-13 09:51:56 - INFO - --- Busca concluída: ---
+2025-11-13 09:51:56 - INFO - 98 sucesso(s) (98.00%),
+2025-11-13 09:51:56 - INFO - 2 falha(s) (2.00%).
+2025-11-13 09:51:56 - INFO - --- Detalhamento dos erros: ---
+2025-11-13 09:51:56 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-13 09:51:56 - INFO - * Timeout: 0
+2025-11-13 09:51:56 - INFO - * Ausentes: 2
+2025-11-13 09:51:56 - INFO - * Outros: 0
+2025-11-13 09:52:00 - INFO - Inserção em bulk concluída: 100 registros processados em steam_raw.
+2025-11-13 09:52:00 - INFO - Dados de detalhes inseridos com sucesso no PostgreSQL (100 registros).
+2025-11-13 09:52:00 - INFO - Aguardando 120s antes do próximo batch...
+
+2025-11-13 09:54:00 - INFO - Batch 7/10 - Processando itens 601 a 700 (100 itens)...
+2025-11-13 09:54:00 - INFO - Iniciando busca de 'DETALHES' assíncrona para 100 AppIDs com concorrência 1...
+2025-11-13 09:54:45 - INFO - Busca assíncrona concluída.
+2025-11-13 09:54:45 - INFO - --- Busca concluída: ---
+2025-11-13 09:54:45 - INFO - 95 sucesso(s) (95.00%),
+2025-11-13 09:54:45 - INFO - 5 falha(s) (5.00%).
+2025-11-13 09:54:45 - INFO - --- Detalhamento dos erros: ---
+2025-11-13 09:54:45 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-13 09:54:45 - INFO - * Timeout: 0
+2025-11-13 09:54:45 - INFO - * Ausentes: 5
+2025-11-13 09:54:45 - INFO - * Outros: 0
+2025-11-13 09:54:48 - INFO - Inserção em bulk concluída: 100 registros processados em steam_raw.
+2025-11-13 09:54:48 - INFO - Dados de detalhes inseridos com sucesso no PostgreSQL (100 registros).
+2025-11-13 09:54:48 - INFO - Aguardando 120s antes do próximo batch...
+
+2025-11-13 09:56:48 - INFO - Batch 8/10 - Processando itens 701 a 800 (100 itens)...
+2025-11-13 09:56:48 - INFO - Iniciando busca de 'DETALHES' assíncrona para 100 AppIDs com concorrência 1...
+2025-11-13 09:57:32 - INFO - Busca assíncrona concluída.
+2025-11-13 09:57:32 - INFO - --- Busca concluída: ---
+2025-11-13 09:57:32 - INFO - 93 sucesso(s) (93.00%),
+2025-11-13 09:57:32 - INFO - 7 falha(s) (7.00%).
+2025-11-13 09:57:32 - INFO - --- Detalhamento dos erros: ---
+2025-11-13 09:57:32 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-13 09:57:32 - INFO - * Timeout: 0
+2025-11-13 09:57:32 - INFO - * Ausentes: 7
+2025-11-13 09:57:32 - INFO - * Outros: 0
+2025-11-13 09:57:35 - INFO - Inserção em bulk concluída: 100 registros processados em steam_raw.
+2025-11-13 09:57:35 - INFO - Dados de detalhes inseridos com sucesso no PostgreSQL (100 registros).
+2025-11-13 09:57:35 - INFO - Aguardando 120s antes do próximo batch...
+
+2025-11-13 09:59:35 - INFO - Batch 9/10 - Processando itens 801 a 900 (100 itens)...
+2025-11-13 09:59:35 - INFO - Iniciando busca de 'DETALHES' assíncrona para 100 AppIDs com concorrência 1...
+2025-11-13 10:00:16 - INFO - Busca assíncrona concluída.
+2025-11-13 10:00:16 - INFO - --- Busca concluída: ---
+2025-11-13 10:00:16 - INFO - 96 sucesso(s) (96.00%),
+2025-11-13 10:00:16 - INFO - 4 falha(s) (4.00%).
+2025-11-13 10:00:16 - INFO - --- Detalhamento dos erros: ---
+2025-11-13 10:00:16 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-13 10:00:16 - INFO - * Timeout: 0
+2025-11-13 10:00:16 - INFO - * Ausentes: 4
+2025-11-13 10:00:16 - INFO - * Outros: 0
+2025-11-13 10:00:19 - INFO - Inserção em bulk concluída: 100 registros processados em steam_raw.
+2025-11-13 10:00:19 - INFO - Dados de detalhes inseridos com sucesso no PostgreSQL (100 registros).
+2025-11-13 10:00:19 - INFO - Aguardando 120s antes do próximo batch...
+
+2025-11-13 10:02:19 - INFO - Batch 10/10 - Processando itens 901 a 1000 (100 itens)...
+2025-11-13 10:02:19 - INFO - Iniciando busca de 'DETALHES' assíncrona para 100 AppIDs com concorrência 1...
+2025-11-13 10:03:01 - INFO - Busca assíncrona concluída.
+2025-11-13 10:03:01 - INFO - --- Busca concluída: ---
+2025-11-13 10:03:01 - INFO - 95 sucesso(s) (95.00%),
+2025-11-13 10:03:01 - INFO - 5 falha(s) (5.00%).
+2025-11-13 10:03:01 - INFO - --- Detalhamento dos erros: ---
+2025-11-13 10:03:01 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-13 10:03:01 - INFO - * Timeout: 0
+2025-11-13 10:03:01 - INFO - * Ausentes: 5
+2025-11-13 10:03:01 - INFO - * Outros: 0
+2025-11-13 10:03:04 - INFO - Inserção em bulk concluída: 100 registros processados em steam_raw.
+2025-11-13 10:03:04 - INFO - Dados de detalhes inseridos com sucesso no PostgreSQL (100 registros).
+2025-11-13 10:03:04 - INFO - ===========PROCESSAMENTO COMPLETO! (Detalhes)==========
+2025-11-13 10:03:04 - INFO - Total processado: 100 sucessos de 1,000 itens (0.00%)
+2025-11-13 10:03:04 - INFO - 
+2025-11-13 10:03:04 - INFO - === PROCESSAMENTO EM BATCHES (REVIEWS) ===
+2025-11-13 10:03:04 - INFO - Total de itens: 1,000
+2025-11-13 10:03:04 - INFO - Tamanho do batch: 1,000
+2025-11-13 10:03:04 - INFO - Total de batches: 1
+2025-11-13 10:03:04 - INFO - Delay entre batches: 30s
+2025-11-13 10:03:04 - INFO - Concorrência por batch: 10
+2025-11-13 10:03:04 - INFO - Tempo Estimado para conclusão total do Batch: 0.5 minutos
+2025-11-13 10:03:04 - INFO - ==========================================
+
+2025-11-13 10:03:04 - INFO - Batch 1/1 - Processando itens 1 a 1000 (1000 itens)...
+2025-11-13 10:03:04 - INFO - Iniciando busca de 'REVIEWS' assíncrona para 1000 AppIDs com concorrência 10...
+2025-11-13 10:03:49 - INFO - Busca assíncrona concluída.
+2025-11-13 10:03:49 - INFO - --- Busca concluída: ---
+2025-11-13 10:03:49 - INFO - 1000 sucesso(s) (100.00%),
+2025-11-13 10:03:49 - INFO - 0 falha(s) (0.00%).
+2025-11-13 10:03:49 - INFO - --- Detalhamento dos erros: ---
+2025-11-13 10:03:49 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-13 10:03:49 - INFO - * Timeout: 0
+2025-11-13 10:03:49 - INFO - * Ausentes: 0
+2025-11-13 10:03:49 - INFO - * Outros: 0
+2025-11-13 10:03:50 - INFO - Inserção em bulk concluída: 1000 registros processados em steam_raw.
+2025-11-13 10:03:50 - INFO - Dados de reviews inseridos com sucesso no PostgreSQL (1000 registros).
+2025-11-13 10:03:50 - INFO - ===========PROCESSAMENTO COMPLETO! (Reviews)==========
+2025-11-13 10:03:50 - INFO - Total processado: 1,000 itens.
+2025-11-13 10:03:50 - INFO - Processando aplicativos de 5001 a 6000 de 98978
+2025-11-13 10:03:50 - INFO - Progresso: 5.1%
+2025-11-13 10:03:50 - INFO - Tempo estimado restante: 187.956 minutos
+2025-11-13 10:03:50 - INFO - ----------------------------------------
+2025-11-13 10:03:50 - INFO - Número de IDs a processar neste lote: 1000
+2025-11-13 10:03:50 - INFO - 
+2025-11-13 10:03:50 - INFO - === PROCESSAMENTO EM BATCHES ===
+2025-11-13 10:03:50 - INFO - Total de itens: 1,000
+2025-11-13 10:03:50 - INFO - Tamanho do batch: 100
+2025-11-13 10:03:50 - INFO - Total de batches: 10
+2025-11-13 10:03:50 - INFO - Delay entre batches: 120s
+2025-11-13 10:03:50 - INFO - Concorrência por batch: 1
+2025-11-13 10:03:50 - INFO - Tempo Estimado para conclusão total do Batch: 20.0 minutos
+2025-11-13 10:03:50 - INFO - ================================
+
+2025-11-13 10:03:50 - INFO - Batch 1/10 - Processando itens 1 a 100 (100 itens)...
+2025-11-13 10:03:50 - INFO - Iniciando busca de 'DETALHES' assíncrona para 100 AppIDs com concorrência 1...
+2025-11-13 10:04:32 - INFO - Busca assíncrona concluída.
+2025-11-13 10:04:32 - INFO - --- Busca concluída: ---
+2025-11-13 10:04:32 - INFO - 93 sucesso(s) (93.00%),
+2025-11-13 10:04:32 - INFO - 7 falha(s) (7.00%).
+2025-11-13 10:04:32 - INFO - --- Detalhamento dos erros: ---
+2025-11-13 10:04:32 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-13 10:04:32 - INFO - * Timeout: 0
+2025-11-13 10:04:32 - INFO - * Ausentes: 7
+2025-11-13 10:04:32 - INFO - * Outros: 0
+2025-11-13 10:04:35 - INFO - Inserção em bulk concluída: 100 registros processados em steam_raw.
+2025-11-13 10:04:35 - INFO - Dados de detalhes inseridos com sucesso no PostgreSQL (100 registros).
+2025-11-13 10:04:35 - INFO - Aguardando 120s antes do próximo batch...
+
+2025-11-13 10:05:34 - INFO - Tentativa 1/5 - Buscando lista de aplicativos da Steam...
+2025-11-13 10:05:34 - WARNING - Serviço Steam temporariamente indisponível (503 Service Unavailable)
+2025-11-13 10:05:35 - INFO - Conexão com o banco de dados estabelecida com sucesso: postgres@localhost:5432/postgres
+2025-11-13 10:05:35 - INFO - Encontrados 0 jogos desatualizados na tabela 'steam_generico'.
+2025-11-13 10:05:35 - INFO - Nenhum jogo desatualizado encontrado em steam_generico.
+2025-11-13 10:15:59 - INFO - ============================================================
+2025-11-13 10:16:01 - INFO - MODO MULTI-PC ATIVADO: PC 1 de 2
+2025-11-13 10:16:04 - INFO - ============================================================
+2025-11-13 10:16:07 - INFO - Consultando AppIDs não processados...
+2025-11-13 10:16:15 - INFO - Buscando AppIDs não processados (PC 1/2)...
+2025-11-13 10:17:19 - INFO - Encontrados 187,725 AppIDs não processados para PC 1
+2025-11-13 10:17:42 - INFO - ========== AppIDs novos para processar ==========
+2025-11-13 10:17:55 - INFO - AppIDs novos atribuídos ao PC 1: 187,725
+2025-11-13 10:17:58 - INFO - =================================================
+2025-11-13 10:18:01 - INFO - Consultando AppIDs desatualizados
+2025-11-13 10:18:12 - INFO - Buscando AppIDs desatualizados (>90 dias)...
+2025-11-13 10:18:23 - INFO - Encontrados 0 AppIDs desatualizados
+2025-11-13 10:18:44 - INFO - Total final de AppIDs a processar (PC 1): 187,725
+2025-11-13 10:18:53 - INFO - Processando aplicativos de 1 a 1000 de 187725
+2025-11-13 10:18:53 - INFO - Progresso: 0.0%
+2025-11-13 10:18:54 - INFO - Tempo estimado restante: 375.45 minutos
+2025-11-13 10:18:54 - INFO - ----------------------------------------
+2025-11-13 10:19:11 - INFO - Número de IDs a processar neste lote: 1000
+2025-11-13 10:19:19 - INFO - 
+2025-11-13 10:19:20 - INFO - === PROCESSAMENTO EM BATCHES ===
+2025-11-13 10:19:20 - INFO - Total de itens: 1,000
+2025-11-13 10:19:21 - INFO - Tamanho do batch: 100
+2025-11-13 10:19:21 - INFO - Total de batches: 10
+2025-11-13 10:19:22 - INFO - Delay entre batches: 120s
+2025-11-13 10:19:22 - INFO - Concorrência por batch: 1
+2025-11-13 10:19:23 - INFO - Tempo Estimado para conclusão total do Batch: 20.0 minutos
+2025-11-13 10:19:23 - INFO - ================================
+
+2025-11-13 10:19:29 - INFO - Batch 1/10 - Processando itens 1 a 100 (100 itens)...
+2025-11-13 10:19:30 - INFO - Iniciando busca de 'DETALHES' assíncrona para 100 AppIDs com concorrência 1...
+2025-11-13 10:20:15 - INFO - Busca assíncrona concluída.
+2025-11-13 10:20:15 - INFO - --- Busca concluída: ---
+2025-11-13 10:20:15 - INFO - 94 sucesso(s) (94.00%),
+2025-11-13 10:20:15 - INFO - 6 falha(s) (6.00%).
+2025-11-13 10:20:15 - INFO - --- Detalhamento dos erros: ---
+2025-11-13 10:20:15 - INFO - * HTTP: 0 (403 Forbidden: 0, 429 Too Many Requests: 0)
+2025-11-13 10:20:15 - INFO - * Timeout: 0
+2025-11-13 10:20:15 - INFO - * Ausentes: 6
+2025-11-13 10:20:15 - INFO - * Outros: 0
+2025-11-13 10:21:00 - INFO - Inserção em bulk concluída: 100 registros processados em steam_raw.
+2025-11-13 10:21:02 - INFO - Dados de detalhes inseridos com sucesso no PostgreSQL (100 registros).
