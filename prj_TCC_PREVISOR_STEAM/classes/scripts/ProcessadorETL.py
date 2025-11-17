@@ -248,7 +248,7 @@ class ProcessadorETL:
         Converte data de lançamento para formato ISO (YYYY-MM-DD).
         
         Parametros:
-        - arg_strDate (str): Data em diversos formatos (ex: "1/Nov/2000", "Nov 1, 2000", "2000-11-01")
+        - arg_strDate (str): Data em diversos formatos (ex: "1/Nov/2000", "Nov 1, 2000", "2000-11-01", "2025", "abril de 2026")
         
         Retorna:
         - str: Data no formato ISO (YYYY-MM-DD) ou string vazia se inválida
@@ -258,6 +258,8 @@ class ProcessadorETL:
         - "Nov 1, 2000" -> "2000-11-01"
         - "1/Nov/2000" -> "2000-11-01"
         - "2000-11-01" -> "2000-11-01"
+        - "2025" -> "2025-01-01"
+        - "abril de 2026" -> "2026-04-01"
         """
         if not arg_strDate or arg_strDate.strip() == "":
             return ""
@@ -270,21 +272,49 @@ class ProcessadorETL:
         if any(texto in arg_strDate.lower() for texto in var_listTextosDescritivos):
             return "EM BREVE"
         
+        # Trata apenas ano (ex: "2025", "2026", "2027")
+        var_strDataLimpa = arg_strDate.strip()
+        if var_strDataLimpa.isdigit() and len(var_strDataLimpa) == 4:
+            var_intAno = int(var_strDataLimpa)
+            # Valida ano razoável (1990-2030)
+            if 1990 <= var_intAno <= datetime.now().year + 5:
+                return f"{var_intAno}-01-01"
+            else:
+                logger.warning(f"Ano fora do intervalo esperado: {var_strDataLimpa}")
+                return ""
+        
         # Mapa de meses em diferentes idiomas
         var_dictMeses = {
             # Português
             'jan': 1, 'fev': 2, 'mar': 3, 'abr': 4, 'mai': 5, 'jun': 6,
             'jul': 7, 'ago': 8, 'set': 9, 'out': 10, 'nov': 11, 'dez': 12,
+            'janeiro': 1, 'fevereiro': 2, 'marco': 3, 'abril': 4, 'maio': 5, 'junho': 6,
+            'julho': 7, 'agosto': 8, 'setembro': 9, 'outubro': 10, 'novembro': 11, 'dezembro': 12,
             # Inglês
             'jan': 1, 'feb': 2, 'mar': 3, 'apr': 4, 'may': 5, 'jun': 6,
             'jul': 7, 'aug': 8, 'sep': 9, 'oct': 10, 'nov': 11, 'dec': 12,
+            'january': 1, 'february': 2, 'march': 3, 'april': 4, 'may': 5, 'june': 6,
+            'july': 7, 'august': 8, 'september': 9, 'october': 10, 'november': 11, 'december': 12,
             # Espanhol
             'ene': 1, 'feb': 2, 'mar': 3, 'abr': 4, 'may': 5, 'jun': 6,
             'jul': 7, 'ago': 8, 'sep': 9, 'oct': 10, 'nov': 11, 'dic': 12,
-            # Meses por extenso em inglês
-            'january': 1, 'february': 2, 'march': 3, 'april': 4, 'may': 5, 'june': 6,
-            'july': 7, 'august': 8, 'september': 9, 'october': 10, 'november': 11, 'december': 12
         }
+        
+        # Trata formato "mês de ano" (ex: "abril de 2026", "agosto de 2027")
+        var_matchMesAno = re.search(r'([a-zA-ZçÇ]+)\s+(?:de\s+)?(\d{4})', var_strDataLimpa.lower())
+        if var_matchMesAno:
+            var_strMes = var_matchMesAno.group(1).lower()
+            var_strAno = var_matchMesAno.group(2)
+            
+            # Busca o mês no dicionário (usando primeiras 3 letras ou nome completo)
+            var_intMes = None
+            if var_strMes in var_dictMeses:
+                var_intMes = var_dictMeses[var_strMes]
+            elif var_strMes[:3] in var_dictMeses:
+                var_intMes = var_dictMeses[var_strMes[:3]]
+            
+            if var_intMes:
+                return f"{var_strAno}-{var_intMes:02d}-01"
         
         try:
             # Remove espaços extras e normaliza
@@ -385,18 +415,35 @@ class ProcessadorETL:
         Retorna:
         - dict: Dicionário estruturado para steam_bd
         """
-        var_dictDetalhes = arg_dictDadosRaw.get("detalhes", {})
-        var_dictReviews = arg_dictDadosRaw.get("reviews", {})
-        
-        if var_dictDetalhes == "AUSENTE":
-            raise ValueError(f"Detalhes ausentes para AppID {arg_dictDadosRaw.get('steam_appid')}")
+        # Validação inicial: verifica se há dados
+        if not arg_dictDadosRaw:
+            raise ValueError("Dicionário de dados está vazio")
         
         # Tenta pegar appid de diferentes campos possíveis
         var_intAppid = (
             arg_dictDadosRaw.get("steam_appid") or 
-            arg_dictDadosRaw.get("appid") or 
-            ProcessadorETL.extrair_campo_seguro(var_dictDetalhes, "steam_appid")
+            arg_dictDadosRaw.get("appid")
         )
+        
+        # Validação: AppID deve existir
+        if not var_intAppid:
+            raise ValueError("AppID não encontrado nos dados brutos")
+        
+        # Extrai detalhes e reviews
+        var_dictDetalhes = arg_dictDadosRaw.get("detalhes")
+        var_dictReviews = arg_dictDadosRaw.get("reviews", {})
+        
+        # Validação crítica: detalhes não podem ser None ou "AUSENTE"
+        if var_dictDetalhes is None or var_dictDetalhes == "AUSENTE" or not isinstance(var_dictDetalhes, dict):
+            raise ValueError(f"Detalhes ausentes para AppID {var_intAppid}")
+        
+        # Se detalhes está vazio, tenta extrair do próprio arg_dictDadosRaw
+        if not var_dictDetalhes:
+            # Alguns registros podem ter detalhes diretamente no dicionário principal
+            if "name" in arg_dictDadosRaw:
+                var_dictDetalhes = arg_dictDadosRaw
+            else:
+                raise ValueError(f"Detalhes vazios para AppID {var_intAppid}")
         
         return {
             "appid": var_intAppid,
@@ -456,36 +503,74 @@ class ProcessadorETL:
         # Garante conexão com o Docker
         PostgreSQL.conectar()
         
-        # 1. Buscar dados brutos do Docker
+        # Buscar dados brutos do Docker
         var_listDadosBrutos = []
+        var_intErrosBusca = 0
+        
         for var_intAppid in arg_listAppids:
             try:
                 var_dictDados = PostgreSQL.buscar_dados(var_intAppid, "steam_raw")
                 if var_dictDados:
                     # Adiciona o appid ao dicionário se não estiver presente
-                    if "appid" not in var_dictDados:
+                    if "appid" not in var_dictDados and "steam_appid" not in var_dictDados:
                         var_dictDados["appid"] = var_intAppid
                     var_listDadosBrutos.append(var_dictDados)
+                else:
+                    var_intErrosBusca += 1
             except Exception as e:
-                logger.info(f"logger.infoErro ao buscar AppID {var_intAppid}: {e}")
+                logger.error(f"Erro ao buscar AppID {var_intAppid}: {e}")
+                var_intErrosBusca += 1
         
-        logger.info(f"{len(var_listDadosBrutos)} jogos encontrados no Docker")
+        logger.info(f"{len(var_listDadosBrutos)} jogos encontrados no Docker ({var_intErrosBusca} erros de busca)")
         
-        # 2. Transformar dados
+        # Transformar dados
         var_listDadosEstruturados = []
+        var_intErrosTransformacao = 0
+        var_dictContagemErros = {
+            'detalhes_ausentes': 0,
+            'appid_invalido': 0,
+            'dados_vazios': 0,
+            'outros': 0
+        }
+        
         for var_dictDadosRaw in var_listDadosBrutos:
             try:
                 var_dictDadosBD = ProcessadorETL.transformar_raw_para_bd(var_dictDadosRaw)
                 var_listDadosEstruturados.append(var_dictDadosBD)
+            except ValueError as e:
+                var_intErrosTransformacao += 1
+                var_strErro = str(e).lower()
+                
+                # Categoriza o erro
+                if 'detalhes ausentes' in var_strErro or 'detalhes vazios' in var_strErro:
+                    var_dictContagemErros['detalhes_ausentes'] += 1
+                elif 'appid' in var_strErro:
+                    var_dictContagemErros['appid_invalido'] += 1
+                elif 'vazio' in var_strErro:
+                    var_dictContagemErros['dados_vazios'] += 1
+                else:
+                    var_dictContagemErros['outros'] += 1
+                    logger.error(f"Erro ao processar AppID {var_dictDadosRaw.get('appid', 'DESCONHECIDO')}: {e}")
             except Exception as e:
-                logger.error(f"Erro ao processar AppID {var_dictDadosRaw.get('appid')}: {e}")
+                var_intErrosTransformacao += 1
+                var_dictContagemErros['outros'] += 1
+                logger.error(f"Erro inesperado ao processar AppID {var_dictDadosRaw.get('appid', 'DESCONHECIDO')}: {e}")
         
         logger.info(f"{len(var_listDadosEstruturados)} jogos transformados com sucesso")
         
-        # 3. Inserir no Supabase
+        if var_intErrosTransformacao > 0:
+            logger.warning(f"{var_intErrosTransformacao} erros de transformação:")
+            logger.warning(f"  - Detalhes ausentes: {var_dictContagemErros['detalhes_ausentes']}")
+            logger.warning(f"  - AppID inválido: {var_dictContagemErros['appid_invalido']}")
+            logger.warning(f"  - Dados vazios: {var_dictContagemErros['dados_vazios']}")
+            logger.warning(f"  - Outros erros: {var_dictContagemErros['outros']}")
+        
+        # Inserir no Supabase
         if var_listDadosEstruturados:
             try:
                 SupabaseDB.inserir_dadosSteamBD(var_listDadosEstruturados)
                 logger.info(f"{len(var_listDadosEstruturados)} jogos inseridos no Supabase!")
             except Exception as e:
                 logger.error(f"Erro ao inserir no Supabase: {e}")
+        else:
+            logger.warning("Nenhum jogo válido para inserir no Supabase")
