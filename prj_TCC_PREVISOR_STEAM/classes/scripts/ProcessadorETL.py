@@ -17,8 +17,7 @@ class ProcessadorETL:
     @staticmethod
     def normalizar_texto(arg_strTexto: str) -> str:
         """
-        Remove acentuação e caracteres especiais, mantendo apenas ASCII.
-        Converte caracteres corrompidos (Ingl??s) para formato limpo (Ingles).
+        Remove acentuação e caracteres especiais usando normalização NFKD.
 
         Parametros:
         - arg_strTexto (str): Texto para normalizar
@@ -26,42 +25,57 @@ class ProcessadorETL:
         Retorna:
         - str: Texto normalizado sem acentuação
         
-        Exemplo: "Português" -> "Portugues", "Ingl??s" -> "Ingles"
+        Exemplo: "Português™" -> "PortuguesTM", "①Action" -> "1Action"
         """
         if not arg_strTexto:
             return arg_strTexto
         
-        # Mapa de correções para palavras corrompidas conhecidas
+        # Mapeamento direto para textos corrompidos conhecidos
         var_dictCorrecoes = {
             'Ingl??s': 'Ingles',
             'Portugu??s': 'Portugues',
-            'Alem??o': 'Alemao',
-            'Japon??s': 'Japones',
+            'Portugu??s (Brasil)': 'Portugues (Brasil)',
             'Franc??s': 'Frances',
-            'Chin??s': 'Chines',
-            'Italiano': 'Italiano',
-            'Espa??ol': 'Espanhol',
-            'Coreano': 'Coreano',
+            'Alem??o': 'Alemao',
+            'Alem??oidiomas com suporte total de ??udio': 'Alemao',  # Corrige texto grudado
+            'Espanhol': 'Espanhol',
+            'Japon??s': 'Japones',
+            'Chin??s simplificado': 'Chines simplificado',
+            'Chin??s tradicional': 'Chines tradicional',
             'Russo': 'Russo',
-            # Gêneros corrompidos
-            'a????o': 'Acao',
+            'Coreano': 'Coreano',
+            'Tailand??s': 'Tailandes',
+            'Italiano': 'Italiano',
+            'Espanhol (Am??rica Latina)': 'Espanhol (America Latina)',
+            'Espanhol (Espanha)': 'Espanhol (Espanha)',
             'A????o': 'Acao',
-            'Aventura': 'Aventura',
-            'Estrat??gia': 'Estrategia',
-            'Simula????o': 'Simulacao',
-            'simula????o': 'Simulacao'
+            'Demonstra????o de jogo': 'Demonstracao de jogo',
+            'Op????o apenas com teclado': 'Opcao apenas com teclado',
+            'Nenhuma an??lise de usu??rio': 'Nenhuma analise de usuario',
+            'fam??lia': 'familia',
+            'Compartilhamento em fam??lia': 'Compartilhamento em familia',
+            'c??mera': 'camera',
+            'Conforto de c??mera': 'Conforto de camera',
+            'Som est??reo': 'Som estereo',
+            'Dificuldade ajust??vel': 'Dificuldade ajustavel',
+            'Texto de tamanho ajust??vel': 'Texto de tamanho ajustavel',
+            'Cartas Colecion??veis Steam': 'Cartas Colecionaveis Steam',
+            'idiomas com suporte total de ??udio': 'idiomas com suporte total de audio'
         }
         
-        # Aplica correções conhecidas
-        var_strCorrigido = arg_strTexto
-        for var_strCorreto, var_strSubstituto in var_dictCorrecoes.items():
-            var_strCorrigido = var_strCorrigido.replace(var_strCorreto, var_strSubstituto)
+        # Verifica correção direta primeiro
+        if arg_strTexto in var_dictCorrecoes:
+            return var_dictCorrecoes[arg_strTexto]
         
-        # Remove caracteres corrompidos restantes
-        var_strLimpo = var_strCorrigido.replace('?', '').replace('�', '')
+        # Se contém ??, remove toda parte corrompida
+        if '??' in arg_strTexto:
+            # Substitui sequências ?? por nada (remove caracteres corrompidos)
+            var_strTexto = re.sub(r'\?+', '', arg_strTexto)
+        else:
+            var_strTexto = arg_strTexto
         
-        # Normaliza NFD (decompõe caracteres acentuados)
-        var_strNormalizado = unicodedata.normalize('NFD', var_strLimpo)
+        # Normaliza NFKD (decompõe e normaliza compatibilidade)
+        var_strNormalizado = unicodedata.normalize('NFKD', var_strTexto)
         
         # Remove marcas diacríticas (acentos)
         var_strSemAcento = ''.join(
@@ -69,8 +83,14 @@ class ProcessadorETL:
             if unicodedata.category(char) != 'Mn'
         )
         
-        # Remove espaços duplicados e limpa
-        var_strFinal = ' '.join(var_strSemAcento.split())
+        # Remove caracteres de controle
+        var_strLimpo = ''.join(
+            char for char in var_strSemAcento
+            if char.isprintable() or char.isspace()
+        )
+        
+        # Remove espaços duplicados
+        var_strFinal = ' '.join(var_strLimpo.split())
         
         return var_strFinal
     
@@ -234,13 +254,24 @@ class ProcessadorETL:
         var_listLinguas = [l.strip() for l in var_strLimpo.split(',')]
         
         # Normaliza cada língua (remove acentuação e caracteres corrompidos)
-        var_listNormalizadas = [
-            ProcessadorETL.normalizar_texto(var_strLingua) 
-            for var_strLingua in var_listLinguas 
-            if var_strLingua
-        ]
+        var_listNormalizadas = []
+        for var_strLingua in var_listLinguas:
+            if var_strLingua:
+                var_strNormalizado = ProcessadorETL.normalizar_texto(var_strLingua)
+                
+                # Filtra entradas inválidas ou redundantes
+                if var_strNormalizado and len(var_strNormalizado) > 2:
+                    # Ignora se é apenas descrição de suporte de áudio
+                    if var_strNormalizado.lower() not in ['idiomas com suporte total de audio', 'idiomas']:
+                        var_listNormalizadas.append(var_strNormalizado)
         
-        return var_listNormalizadas[:10]  # Limita a 10
+        # Remove duplicatas mantendo ordem
+        var_listUnicas = []
+        for lang in var_listNormalizadas:
+            if lang not in var_listUnicas:
+                var_listUnicas.append(lang)
+        
+        return var_listUnicas[:10]  # Limita a 10
     
     @staticmethod
     def processar_data_lancamento(arg_strDate: str) -> str:
@@ -267,7 +298,7 @@ class ProcessadorETL:
         # Ignora textos descritivos
         var_listTextosDescritivos = [
             'em breve', 'a ser anunciada', 'coming soon', 'tba', 'to be announced',
-            'trimestre', 'quarter', 'q1', 'q2', 'q3', 'q4'
+            'trimestre', 'quarter', 'q1', 'q2', 'q3', 'q4', 'maybe'
         ]
         if any(texto in arg_strDate.lower() for texto in var_listTextosDescritivos):
             return "EM BREVE"
@@ -281,7 +312,7 @@ class ProcessadorETL:
                 return f"{var_intAno}-01-01"
             else:
                 logger.warning(f"Ano fora do intervalo esperado: {var_strDataLimpa}")
-                return ""
+                return "EM BREVE"
         
         # Mapa de meses em diferentes idiomas
         var_dictMeses = {
@@ -420,10 +451,7 @@ class ProcessadorETL:
             raise ValueError("Dicionário de dados está vazio")
         
         # Tenta pegar appid de diferentes campos possíveis
-        var_intAppid = (
-            arg_dictDadosRaw.get("steam_appid") or 
-            arg_dictDadosRaw.get("appid")
-        )
+        var_intAppid = arg_dictDadosRaw.get("appid")
         
         # Validação: AppID deve existir
         if not var_intAppid:
@@ -444,84 +472,75 @@ class ProcessadorETL:
                 var_dictDetalhes = arg_dictDadosRaw
             else:
                 raise ValueError(f"Detalhes vazios para AppID {var_intAppid}")
+        var_dictDadosTransformados = {}
+        var_dictDadosTransformados['appid'] = var_intAppid
         
-        return {
-            "appid": var_intAppid,
-            "nome": ProcessadorETL.normalizar_texto(
-                ProcessadorETL.extrair_campo_seguro(var_dictDetalhes, "name", arg_anyPadrao="Desconhecido")
-            ),
-            "classificacao_etaria": ProcessadorETL.processar_classificacao_etaria(
+        # Nome: normaliza e trunca em 255 caracteres (limite do PostgREST)
+        var_strNome = ProcessadorETL.normalizar_texto(
+            ProcessadorETL.extrair_campo_seguro(var_dictDetalhes, "name", arg_anyPadrao="Desconhecido")
+        )
+        var_dictDadosTransformados["nome"] = var_strNome[:255] if len(var_strNome) > 255 else var_strNome
+        
+        var_dictDadosTransformados["classificacao_etaria"] = ProcessadorETL.processar_classificacao_etaria(
                 ProcessadorETL.extrair_campo_seguro(var_dictDetalhes, "required_age", arg_anyPadrao=0)
-            ),
-            "linguagens": ProcessadorETL.processar_linguas(
+            )
+        var_dictDadosTransformados['linguagens'] = ProcessadorETL.processar_linguas(
                 ProcessadorETL.extrair_campo_seguro(var_dictDetalhes, "supported_languages", arg_anyPadrao="")
-            ),
-            "desenvolvedores": [
+            )
+        var_dictDadosTransformados["desenvolvedores"] = [
                 ProcessadorETL.normalizar_texto(dev) 
                 for dev in ProcessadorETL.extrair_campo_seguro(var_dictDetalhes, "developers", arg_anyPadrao=[])
-            ],
-            "distribuidores": [
+            ]
+        var_dictDadosTransformados["distribuidores"] = [
                 ProcessadorETL.normalizar_texto(pub) 
                 for pub in ProcessadorETL.extrair_campo_seguro(var_dictDetalhes, "publishers", arg_anyPadrao=[])
-            ],
-            "preco": ProcessadorETL.processar_preco(
+            ]
+        var_dictDadosTransformados["preco"] = ProcessadorETL.processar_preco(
                 ProcessadorETL.extrair_campo_seguro(var_dictDetalhes, "price_overview")
-            ),
-            "metacritic_score": str(ProcessadorETL.extrair_campo_seguro(
-                var_dictDetalhes, "metacritic", "score", arg_anyPadrao=""
-            )),
-            "categorias": ProcessadorETL.processar_categorias(
-                ProcessadorETL.extrair_campo_seguro(var_dictDetalhes, "categories", arg_anyPadrao=[])
-            ),
-            "genero": ProcessadorETL.processar_generos(
-                ProcessadorETL.extrair_campo_seguro(var_dictDetalhes, "genres", arg_anyPadrao=[])
-            ),
-            "data_lancamento": ProcessadorETL.processar_data_lancamento(
-                ProcessadorETL.extrair_campo_seguro(
-                    var_dictDetalhes, "release_date", "date", arg_anyPadrao=""
-                )
-            ),
-            "review_score": ProcessadorETL.extrair_campo_seguro(var_dictReviews, "review_score", arg_anyPadrao=0),
-            "total_reviews": ProcessadorETL.extrair_campo_seguro(var_dictReviews, "total_reviews", arg_anyPadrao=0),
-            "total_negative": ProcessadorETL.extrair_campo_seguro(var_dictReviews, "total_negative", arg_anyPadrao=0),
-            "total_positive": ProcessadorETL.extrair_campo_seguro(var_dictReviews, "total_positive", arg_anyPadrao=0),
-            "review_score_desc": ProcessadorETL.normalizar_texto(
-                ProcessadorETL.extrair_campo_seguro(var_dictReviews, "review_score_desc", arg_anyPadrao="")
             )
-        }
+        var_dictDadosTransformados["metacritic_score"] = str(ProcessadorETL.extrair_campo_seguro(
+                var_dictDetalhes, "metacritic", "score", arg_anyPadrao=""
+            ))
+        var_dictDadosTransformados['categorias'] = ProcessadorETL.processar_categorias(
+                ProcessadorETL.extrair_campo_seguro(var_dictDetalhes, "categories", arg_anyPadrao=[])
+            )
+        var_dictDadosTransformados["genero"] = ProcessadorETL.processar_generos(
+                ProcessadorETL.extrair_campo_seguro(var_dictDetalhes, "genres", arg_anyPadrao=[])
+            )
+        var_dictDadosTransformados["data_lancamento"] = ProcessadorETL.processar_data_lancamento(
+                ProcessadorETL.normalizar_texto(
+                    ProcessadorETL.extrair_campo_seguro(
+                        var_dictDetalhes, "release_date", "date", arg_anyPadrao=""
+                    )
+                )
+            )
+        var_dictDadosTransformados['review_score'] =  ProcessadorETL.extrair_campo_seguro(var_dictReviews, "review_score", arg_anyPadrao=0)
+        var_dictDadosTransformados["total_reviews"] = ProcessadorETL.extrair_campo_seguro(var_dictReviews, "total_reviews", arg_anyPadrao=0)
+        var_dictDadosTransformados["total_negative"] = ProcessadorETL.extrair_campo_seguro(var_dictReviews, "total_negative", arg_anyPadrao=0)
+        var_dictDadosTransformados["total_positive"] = ProcessadorETL.extrair_campo_seguro(var_dictReviews, "total_positive", arg_anyPadrao=0)
+        var_dictDadosTransformados["review_score_desc"] = ProcessadorETL.normalizar_texto(
+            ProcessadorETL.extrair_campo_seguro(var_dictReviews, "review_score_desc", arg_anyPadrao="")
+            )
+        
+        # Extrai o tipo do jogo (game, dlc, bundle, etc)
+        var_strType = ProcessadorETL.extrair_campo_seguro(var_dictDetalhes, "type", arg_anyPadrao="game")
+        var_dictDadosTransformados["type"] = var_strType if var_strType else "game"
+        
+        return var_dictDadosTransformados
     
     @staticmethod
-    def processar_lote(arg_listAppids: List[int]) -> None:
+    def processar_lote() -> None:
         """
         Processa um lote de AppIDs do Docker para o Supabase
         
         Parametros:
-        - arg_listAppids: Lista de AppIDs para processar
         """
-        logger.info(f"Processando {len(arg_listAppids)} jogos...")
-        
         # Garante conexão com o Docker
         PostgreSQL.conectar()
         
         # Buscar dados brutos do Docker
-        var_listDadosBrutos = []
-        var_intErrosBusca = 0
-        
-        for var_intAppid in arg_listAppids:
-            try:
-                var_dictDados = PostgreSQL.buscar_dados(var_intAppid, "steam_raw")
-                if var_dictDados:
-                    # Adiciona o appid ao dicionário se não estiver presente
-                    if "appid" not in var_dictDados and "steam_appid" not in var_dictDados:
-                        var_dictDados["appid"] = var_intAppid
-                    var_listDadosBrutos.append(var_dictDados)
-                else:
-                    var_intErrosBusca += 1
-            except Exception as e:
-                logger.error(f"Erro ao buscar AppID {var_intAppid}: {e}")
-                var_intErrosBusca += 1
-        
-        logger.info(f"{len(var_listDadosBrutos)} jogos encontrados no Docker ({var_intErrosBusca} erros de busca)")
+        var_listDados = PostgreSQL.buscar_todos_dados("steam_raw")
+        logger.info(f"{len(var_listDados)} jogos encontrados no Docker.")
         
         # Transformar dados
         var_listDadosEstruturados = []
@@ -533,7 +552,7 @@ class ProcessadorETL:
             'outros': 0
         }
         
-        for var_dictDadosRaw in var_listDadosBrutos:
+        for var_dictDadosRaw in var_listDados:
             try:
                 var_dictDadosBD = ProcessadorETL.transformar_raw_para_bd(var_dictDadosRaw)
                 var_listDadosEstruturados.append(var_dictDadosBD)
@@ -568,9 +587,108 @@ class ProcessadorETL:
         # Inserir no Supabase
         if var_listDadosEstruturados:
             try:
-                SupabaseDB.inserir_dadosSteamBD(var_listDadosEstruturados)
+                SupabaseDB.inserir_dadosSteamBd_Bulk(var_listDadosEstruturados)
                 logger.info(f"{len(var_listDadosEstruturados)} jogos inseridos no Supabase!")
             except Exception as e:
                 logger.error(f"Erro ao inserir no Supabase: {e}")
         else:
             logger.warning("Nenhum jogo válido para inserir no Supabase")
+    
+    @staticmethod
+    def transformar_raw_para_unificado(arg_dictDadosRaw: Dict) -> Dict:
+        """
+        Transforma dados brutos em formato para steam_unificado.
+        Combina dados estruturados + mantém JSONB completo.
+        
+        Parâmetros:
+        - arg_dictDadosRaw (dict): Dicionário com appid, detalhes, reviews
+        
+        Retorna:
+        - dict: Dicionário estruturado para steam_unificado
+        """
+        # Primeiro transforma usando o método existente
+        var_dictDadosEstruturados = ProcessadorETL.transformar_raw_para_bd(arg_dictDadosRaw)
+        
+        # Adiciona os campos JSONB completos
+        var_dictDadosEstruturados['detalhes_completos'] = arg_dictDadosRaw.get('detalhes')
+        var_dictDadosEstruturados['reviews_completos'] = arg_dictDadosRaw.get('reviews')
+        
+        return var_dictDadosEstruturados
+    
+    @staticmethod
+    def processar_lote_unificado() -> None:
+        """
+        Processa um lote de AppIDs do Docker para steam_unificado.
+        Versão consolidada que mantém dados estruturados + JSONB.
+        
+        Parâmetros:
+        """
+        # Garante conexão com o Docker
+        PostgreSQL.conectar()
+        
+        # Buscar dados brutos do Docker
+        var_listDados = PostgreSQL.buscar_todos_dados("steam_raw")
+        logger.info(f"{len(var_listDados)} jogos encontrados no Docker.")
+        
+        # Transformar dados
+        var_listDadosUnificados = []
+        var_intErrosTransformacao = 0
+        var_dictContagemErros = {
+            'detalhes_ausentes': 0,
+            'appid_invalido': 0,
+            'dados_vazios': 0,
+            'outros': 0
+        }
+        
+        for var_dictDadosRaw in var_listDados:
+            try:
+                var_dictDadosUnificado = ProcessadorETL.transformar_raw_para_unificado(var_dictDadosRaw)
+                var_listDadosUnificados.append(var_dictDadosUnificado)
+            except ValueError as e:
+                var_intErrosTransformacao += 1
+                var_strErro = str(e).lower()
+                
+                # Categoriza o erro
+                if 'detalhes ausentes' in var_strErro or 'detalhes vazios' in var_strErro:
+                    var_dictContagemErros['detalhes_ausentes'] += 1
+                elif 'appid' in var_strErro:
+                    var_dictContagemErros['appid_invalido'] += 1
+                elif 'vazio' in var_strErro:
+                    var_dictContagemErros['dados_vazios'] += 1
+                else:
+                    var_dictContagemErros['outros'] += 1
+                    logger.error(f"Erro ao processar AppID {var_dictDadosRaw.get('appid', 'DESCONHECIDO')}: {e}")
+            except Exception as e:
+                var_intErrosTransformacao += 1
+                var_dictContagemErros['outros'] += 1
+                logger.error(f"Erro inesperado ao processar AppID {var_dictDadosRaw.get('appid', 'DESCONHECIDO')}: {e}")
+        
+        logger.info(f"{len(var_listDadosUnificados)} jogos transformados com sucesso")
+        
+        if var_intErrosTransformacao > 0:
+            logger.warning(f"{var_intErrosTransformacao} erros de transformação:")
+            logger.warning(f"  - Detalhes ausentes: {var_dictContagemErros['detalhes_ausentes']}")
+            logger.warning(f"  - AppID inválido: {var_dictContagemErros['appid_invalido']}")
+            logger.warning(f"  - Dados vazios: {var_dictContagemErros['dados_vazios']}")
+            logger.warning(f"  - Outros erros: {var_dictContagemErros['outros']}")
+        
+        # Inserir em steam_unificado
+        if var_listDadosUnificados:
+            try:
+                var_intInseridos = 0
+                var_intTotal = len(var_listDadosUnificados)
+                for var_dictDado in var_listDadosUnificados:
+                    var_floatPercentual = (var_intInseridos / var_intTotal) * 100
+                    if var_floatPercentual in [0, 25, 50, 75, 100]:
+                        logger.info(f"Inseridos {var_floatPercentual}% do total de {var_intTotal}")
+                    try:
+                        PostgreSQL.inserir_steam_unificado(var_dictDado)
+                        var_intInseridos += 1
+                    except Exception as e:
+                        logger.error(f"Erro ao inserir AppID {var_dictDado.get('appid')}: {e}")
+                
+                logger.info(f"{var_intInseridos}/{len(var_listDadosUnificados)} jogos inseridos em steam_unificado!")
+            except Exception as e:
+                logger.error(f"Erro ao inserir em steam_unificado: {e}")
+        else:
+            logger.warning("Nenhum jogo válido para inserir em steam_unificado")

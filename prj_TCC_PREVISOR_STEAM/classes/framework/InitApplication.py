@@ -2,6 +2,10 @@ from prj_TCC_PREVISOR_STEAM.classes.framework.AllSettings import Settings
 from prj_TCC_PREVISOR_STEAM.classes.utils.GetTask import GetTask
 from prj_TCC_PREVISOR_STEAM.classes.SQL.postgre import PostgreSQL
 
+import logging
+
+logger = logging.getLogger(__name__)
+
 class InitApplication:
     """
     Classe para inicializar as aplicações.
@@ -18,6 +22,10 @@ class InitApplication:
         Retorna:
         - None
         """
+        logger.info("="*60)
+        logger.info("INICIANDO APLICAÇÃO")
+        logger.info("="*60)
+        
         if arg_boolFirstRun:
             GetTask.abandona_fila(arg_boolAbandonar=True)
             GetTask.criar_fila()
@@ -32,3 +40,7 @@ class InitApplication:
                 
             else:
                 break
+        
+        logger.info("="*60)
+        logger.info("APLICAÇÃO INICIALIZADA")
+        logger.info("="*60)

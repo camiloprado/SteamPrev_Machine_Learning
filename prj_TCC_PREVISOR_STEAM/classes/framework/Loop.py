@@ -22,7 +22,11 @@ class Loop:
         
         """
         var_listFila = GetTask.load_task_queue()
-
+        var_intTotalTarefas = len(var_listFila)
+        logger.info("="*60)
+        logger.info(f"INICIANDO LOOP PRINCIPAL - {var_intTotalTarefas} tarefas na fila")
+        logger.info("="*60)
+        
         while len(var_listFila) > 0:
             for var_intTentativa in range(Settings._var_dictSettings["max_tentativas"]):
                 try:
@@ -39,3 +43,7 @@ class Loop:
 
                 else:
                     break
+        
+        logger.info("="*60)
+        logger.info(f"LOOP PRINCIPAL CONCLUÍDO - {var_intTotalTarefas} tarefas processadas")
+        logger.info("="*60)

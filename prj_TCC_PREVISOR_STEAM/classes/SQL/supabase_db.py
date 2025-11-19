@@ -2,6 +2,7 @@ from prj_TCC_PREVISOR_STEAM.classes.framework.AllSettings import Settings
 
 import os
 import logging
+from time import sleep
 from typing import Dict, List, Any, Optional
 from datetime import datetime, timedelta, timezone
 from dotenv import load_dotenv
@@ -410,6 +411,41 @@ class SupabaseDB:
             logger.error(f"Erro ao inserir dados steam_bd: {e}")
             raise Exception(f"Erro ao inserir dados steam_bd: {e}")
     
+    @staticmethod
+    def inserir_dadosSteamBd_Bulk(arg_listDados: List[Dict[str, Any]]) -> None:
+        """
+        Insere ou atualiza dados na tabela steam_bd.
+        
+        Parâmetros:
+        - arg_listDados (list): Lista de dicionários
+        """
+        SupabaseDB._garantir_conexao()
+
+        var_intTamanhoTotalFila = len(arg_listDados)
+        var_intRange = 1000  # Reduzido de 10000 para 1000 para evitar timeout
+
+        for i in range(0, var_intTamanhoTotalFila, var_intRange):
+            logger.info(f"Inserindo registros {i} a {min(i+var_intRange, var_intTamanhoTotalFila)} em steam_bd")
+            try:
+                SupabaseDB._var_botClient.table("steam_bd").upsert(
+                    arg_listDados[i:i+var_intRange],
+                    on_conflict="appid"
+                ).execute()
+                sleep(2)  # Aumentado de 1 para 2 segundos para dar tempo ao banco
+            except Exception as e:
+                logger.error(f"Erro ao inserir dados em bulk em steam_bd: {e}")
+                
+                # Se o erro for de tamanho, tenta identificar qual registro está problemático
+                if '22001' in str(e) or 'too long' in str(e):
+                    logger.warning(f"Tentando identificar registro problemático no range {i}-{min(i+var_intRange, var_intTamanhoTotalFila)}...")
+                    for idx, registro in enumerate(arg_listDados[i:i+var_intRange]):
+                        # Verifica cada campo
+                        for campo, valor in registro.items():
+                            if isinstance(valor, str) and len(valor) > 255:
+                                logger.error(f"AppID {registro.get('appid')} (índice {i+idx}): campo '{campo}' tem {len(valor)} caracteres (valor: {valor[:100]}...)")
+                
+                raise Exception(f"Erro ao inserir dados em bulk em steam_bd: {e}")
+        
     @classmethod
     def buscar_dadosSteamBD(cls, arg_intAppid: int) -> Optional[Dict[str, Any]]:
         """

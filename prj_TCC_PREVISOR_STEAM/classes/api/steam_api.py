@@ -118,15 +118,6 @@ class SteamClient:
                 else:
                     logger.error(f"Erro HTTP ao buscar lista da Steam: {e}")
                     raise  Exception(f"Erro HTTP não recuperável ao buscar lista da Steam: {e}")  # Erro não recuperável (4xx, etc.)
-                
-                # Calcula tempo de espera com backoff exponencial
-                if var_intTentativa < var_intMaxTentativas - 1:
-                    var_intDelay = var_intDelayBase * (2 ** var_intTentativa)  # 5, 10, 20, 40, 80 segundos
-                    logger.info(f"Aguardando {var_intDelay}s antes da próxima tentativa...")
-                    sleep(var_intDelay)
-                else:
-                    logger.error(f"Falha após {var_intMaxTentativas} tentativas. API Steam pode estar fora do ar.")
-                    raise Exception(f"API Steam indisponível após {var_intMaxTentativas} tentativas: {e}")
             
             except requests.exceptions.Timeout:
                 logger.warning(f"Timeout ao buscar lista da Steam (tentativa {var_intTentativa + 1}/{var_intMaxTentativas})")
@@ -631,8 +622,11 @@ class SteamClient:
             
             # Processa o batch atual
             var_dictBatchResults = await cls.lookup_itad_ids(var_listBatch)
-            var_dictAllResults.update(var_dictBatchResults)
             
+            # Acumula os resultados
+            if var_dictBatchResults:
+                PostgreSQL.inserir_dados_itad_raw_batched(var_dictBatchResults)
+                
             # Aguarda entre batches (exceto no último)
             if var_intBatchNum < var_intTotalBatches - 1:
                 logger.info(f"Aguardando {var_intDelay}s antes do próximo batch...\n")
@@ -640,8 +634,6 @@ class SteamClient:
         
         logger.info(f"===========PROCESSAMENTO COMPLETO!==========")
         logger.info(f"Total processado: {len(var_dictAllResults):,} sucessos de {var_intTotalItems:,} itens ({len(var_dictAllResults)/var_intTotalItems:.2%})")
-        
-        return var_dictAllResults
     
     @classmethod
     async def lookup_itad_ids(cls, arg_seqAppids: Sequence[int]) -> dict[int, dict]:

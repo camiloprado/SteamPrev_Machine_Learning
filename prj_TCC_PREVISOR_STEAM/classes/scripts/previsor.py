@@ -9,8 +9,6 @@ from time import sleep
 import json, logging, asyncio, os
 from typing import Dict, Any
 
-from prj_TCC_PREVISOR_STEAM.classes.utils.GetTask import GetTask
-
 logger = logging.getLogger(__name__)
 
 class Previsor:
@@ -389,10 +387,9 @@ class Previsor:
         try:
             # Inicializa o contador de tentativas
             var_intTentativaMaxima = Settings._var_dictSettings.get("max_tentativas", 3)
-            # Busca dados do Supabase da tabela steam_bd
-            var_listDadosSteamBD = SupabaseDB.buscar_todos_dadosSteamBD()
+            var_listAppID = PostgreSQL.buscar_todos_appids()
             # Define o tamanho total da fila
-            var_intTamanhoTotalFila = len(var_listDadosSteamBD)
+            var_intTamanhoTotalFila = len(var_listAppID)
             # Define o range de processamento por vez pelo .env
             var_intRange = int(os.getenv("RANGE_PROCESSAMENTO_ITAD_RAW", 5000))
             
@@ -400,8 +397,7 @@ class Previsor:
             for i in range(0, var_intTamanhoTotalFila, var_intRange):
                 logger.info(f"Processando aplicativos de {i + 1} a {min(i + var_intRange, var_intTamanhoTotalFila)} de {var_intTamanhoTotalFila}")
                 # Carrega os aplicativos atuais
-                var_listAppAtual = var_listDadosSteamBD[i:i+var_intRange]
-                var_listAppIDAtual = [var_listAppAtual[j]['appid'] for j in range(len(var_listAppAtual))]
+                var_listAppIDAtual = var_listAppID[i:i+var_intRange]
                 
                 # Verifica quais AppIDs já estão no banco de dados ITAD
                 var_listAppIDnoBD = SupabaseDB.buscar_jogos_por_ID(arg_listAppIDs=var_listAppIDAtual, arg_strNomeTabel="itad_raw")
@@ -455,6 +451,112 @@ class Previsor:
         except Exception as e:
             logger.error(f"Erro ao alimentar o banco de dados ITAD: {e}")
             raise Exception(f"Erro ao alimentar o banco de dados ITAD: {e}")
+    
+    @classmethod
+    def alimentar_banco_dados_ITAD_docker(cls):
+        """
+        Alimenta o banco de dados PostgreSQL (Docker) com dados do ITAD.
+        Versão otimizada que usa o PostgreSQL local em vez do Supabase.
+        Suporta divisão de trabalho entre múltiplos PCs usando PC_ID.
+        
+        Parâmetros:
+        
+        Retorna:
+        - None
+        """
+        try:
+            PostgreSQL.conectar()
+            
+            # Define o range de processamento por vez pelo .env
+            var_intRange = int(os.getenv("RANGE_PROCESSAMENTO_ITAD_RAW", 5000))
+            
+            # Identifica qual PC está executando
+            var_intPcId = int(os.getenv("PC_ID", "1"))
+            var_intTotalPcs = int(os.getenv("TOTAL_PCS", "1"))
+            
+            if var_intTotalPcs > 1:
+                logger.info(f"{'='*60}")
+                logger.info(f"MODO MULTI-PC ATIVADO (ITAD): PC {var_intPcId} de {var_intTotalPcs}")
+                logger.info(f"{'='*60}")
+            
+            # Carregamento de teste de carga
+            var_intAmbiente = os.getenv("AMBIENTE", "PRD").upper()
+
+            # Busca AppIDs do steam_bd que ainda não têm dados no ITAD
+            logger.info("Consultando AppIDs sem dados ITAD...")
+            var_listAppIDParaProcessar = PostgreSQL.buscar_appids_sem_itad(
+                arg_intPcId=var_intPcId,
+                arg_intTotalPcs=var_intTotalPcs
+            )
+            
+            var_strTexto = f"{10*'='} AppIDs para processar ITAD {10*'='}"
+            logger.info(var_strTexto)
+            logger.info(f"AppIDs novos atribuídos ao PC {var_intPcId}: {len(var_listAppIDParaProcessar):,}")
+            logger.info(len(var_strTexto)*"=")
+
+            # Busca AppIDs ITAD desatualizados (>90 dias)
+            logger.info("Consultando AppIDs ITAD desatualizados")
+            var_listAppIDDesatualizados = PostgreSQL.buscar_appids_itad_desatualizados(
+                arg_intPcId=var_intPcId,
+                arg_intTotalPcs=var_intTotalPcs
+            )
+            
+            # Adiciona desatualizados (evita duplicatas)
+            var_setAppIDParaProcessar = set(var_listAppIDParaProcessar)
+            for var_intAppID in var_listAppIDDesatualizados:
+                if var_intAppID not in var_setAppIDParaProcessar:
+                    var_listAppIDParaProcessar.append(var_intAppID)
+                    var_setAppIDParaProcessar.add(var_intAppID)
+            
+            if var_listAppIDDesatualizados:
+                logger.info(f"AppIDs ITAD desatualizados adicionados: {len(var_listAppIDDesatualizados):,}")
+            
+            var_intTamanhoTotalFila = len(var_listAppIDParaProcessar)
+            logger.info(f"Total final de AppIDs a processar ITAD (PC {var_intPcId}): {var_intTamanhoTotalFila:,}")
+
+            if var_intTamanhoTotalFila == 0:
+                logger.info("Nenhum AppID para processar no ITAD! Todos os dados estão atualizados.")
+                return
+
+            # Itera sobre os aplicativos em lotes
+            for i in range(0, var_intTamanhoTotalFila, var_intRange):
+                logger.info(f"Processando aplicativos ITAD de {i + 1} a {min(i + var_intRange, var_intTamanhoTotalFila)} de {var_intTamanhoTotalFila}")
+                logger.info(f"Progresso: {(i/var_intTamanhoTotalFila)*100:.1f}%")
+                logger.info(f"----------------------------------------")
+                
+                # Carrega os aplicativos atuais
+                if var_intAmbiente == "HML":
+                    var_listAppIDAtual = var_listAppIDParaProcessar[i:i+int(os.getenv("BATCH_TESTE", 20))]
+                else:
+                    var_listAppIDAtual = var_listAppIDParaProcessar[i:i+var_intRange]
+                
+                logger.info(f"Número de IDs ITAD a processar neste lote: {len(var_listAppIDAtual)}")
+                
+                # Busca dados ITAD para os AppIDs
+                var_dictResultado = asyncio.run(SteamClient.lookup_itad_ids_batched(arg_seqAppids=var_listAppIDAtual))
+                
+                if var_dictResultado:
+                    logger.info(f"Obtidos {len(var_dictResultado):,} registros do ITAD")
+                    
+                    # Insere os dados no PostgreSQL (itad_raw + steam_itad_mapping)
+                    var_intInseridos = PostgreSQL.inserir_dados_itad_raw_bulk(var_dictResultado)
+                    logger.info(f"Registros inseridos no banco: {var_intInseridos:,}")
+                else:
+                    logger.warning("Nenhum dado retornado do ITAD neste lote")
+                
+                # Pausa entre lotes
+                if i + var_intRange < var_intTamanhoTotalFila:
+                    logger.info("Aguardando 2 segundos antes do próximo lote...")
+                    sleep(2)
+            
+            logger.info("Processamento ITAD concluído com sucesso!")
+                
+        except Exception as e:
+            logger.error(f"Erro ao alimentar o banco de dados ITAD (PostgreSQL): {e}")
+            raise Exception(f"Erro ao alimentar o banco de dados ITAD (PostgreSQL): {e}")
+        finally:
+            PostgreSQL.desconectar()
+        
         
     # ================ AUSENTES ================
     @staticmethod

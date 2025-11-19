@@ -164,7 +164,7 @@ class Settings:
         cls.steam_api_settings()
         cls.bd_settings_default()
         cls.bd_settings_previsao()
-        cls._var_dictSettings["max_tentativas"] = 3
+        cls._var_dictSettings["max_tentativas"] = 1
         cls._var_dictSettings["steam_itad_api_key"] = cls._var_strItadApiKey
         cls._var_dictSettings["path_data_app_details"] = "resources/dados/steam_app_details.json"
         cls._var_dictSettings["db_name"] = cls._var_strDBName
