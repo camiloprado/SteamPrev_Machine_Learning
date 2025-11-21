@@ -91,6 +91,17 @@ Crie o banco de dados PostgreSQL antes de rodar o sistema:
 CREATE DATABASE previsao_steam;
 ```
 
+## 📚 Documentação Adicional
+
+Para mais informações sobre o sistema:
+
+- **[📖 O Que o Sistema Faz?](resources/docs/O_QUE_O_SISTEMA_FAZ.md)** - Explicação completa e detalhada do sistema
+- **[🏗️ Arquitetura do Sistema](resources/docs/ARQUITETURA_SISTEMA.md)** - Diagramas técnicos e componentes
+- **[❓ Perguntas Frequentes](resources/docs/PERGUNTAS_FREQUENTES.md)** - Respostas rápidas sobre o sistema
+- **[🎯 Quick Start ITAD](resources/docs/QUICK_START_ITAD.md)** - Guia de inserção de dados ITAD
+- **[💻 Configuração Multi-PC](resources/docs/CONFIGURACAO_MULTI_PC.md)** - Setup distribuído
+- **[📦 Guia de Instalação](resources/docs/GUIA_INSTALACAO_OUTRO_PC.md)** - Como instalar em outro PC
+
 ## Licença
 
 Este projeto é acadêmico e sem fins lucrativos.
