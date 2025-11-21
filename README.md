@@ -2,13 +2,20 @@
 
 Sistema para análise, coleta e previsão de dados de jogos da Steam, integrando informações da API Steam, IsThereAnyDeal (ITAD) e banco de dados PostgreSQL.
 
+## 🎯 O Que Este Sistema Faz?
+
+O **Previsor Steam** automatiza a coleta massiva de dados de jogos da plataforma Steam, incluindo detalhes técnicos, avaliações, preços e histórico. Os dados são armazenados em PostgreSQL para análises de mercado, tendências e estudos acadêmicos.
+
+**📖 Para uma explicação completa e detalhada**, consulte: [O Que o Sistema Faz?](resources/docs/O_QUE_O_SISTEMA_FAZ.md)
+
 ## Funcionalidades
 
-- Coleta de dados de jogos da Steam (detalhes, reviews, preços)
-- Integração com ITAD para histórico de preços
-- Armazenamento dos dados em PostgreSQL
-- Processamento assíncrono para maior performance
-- Limpeza e organização dos dados coletados
+- **Coleta Automática**: Busca dados de jogos da Steam (detalhes, reviews, preços)
+- **Histórico de Preços**: Integração com ITAD para rastreamento de promoções
+- **Armazenamento Robusto**: PostgreSQL com inserções otimizadas em lote
+- **Performance**: Processamento assíncrono para múltiplas requisições simultâneas
+- **Qualidade de Dados**: Limpeza e normalização automática dos dados coletados
+- **Multi-PC**: Suporte para coleta distribuída em várias máquinas
 
 ## Estrutura do Projeto
 
