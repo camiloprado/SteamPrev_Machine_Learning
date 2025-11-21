@@ -940,5 +940,139 @@ class SupabaseDB:
             return True
             
         except Exception as e:
-            logger.error(f"Erro ao deletar jogo: {e}")
+            logger.error(f"Erro ao deletar AppID {arg_intAppid}: {e}")
             return False
+    
+    # ============================================
+    # MÉTODOS PARA STEAM_UNIFICADO (TABELA CONSOLIDADA)
+    # ============================================
+    
+    @classmethod
+    def inserir_steam_unificado(cls, arg_dictDados: Dict[str, Any]) -> None:
+        """
+        Insere ou atualiza um registro na tabela steam_unificado do Supabase.
+        
+        Parâmetros:
+        - arg_dictDados (dict): Dicionário com os dados do jogo
+        
+        Retorna:
+        - None
+        """
+        cls._garantir_conexao()
+        
+        try:
+            cls._var_botClient.table("steam_unificado").upsert(
+                arg_dictDados,
+                on_conflict="appid"
+            ).execute()
+            
+            logger.info(f"AppID {arg_dictDados.get('appid')} inserido/atualizado em steam_unificado (Supabase)")
+            
+        except Exception as e:
+            logger.error(f"Erro ao inserir em steam_unificado (Supabase): {e}")
+            raise
+    
+    @classmethod
+    def inserir_steam_unificado_bulk(cls, arg_listDados: List[Dict[str, Any]]) -> None:
+        """
+        Insere ou atualiza múltiplos registros na tabela steam_unificado do Supabase.
+        
+        Parâmetros:
+        - arg_listDados (list): Lista de dicionários com dados dos jogos
+        
+        Retorna:
+        - None
+        """
+        cls._garantir_conexao()
+        
+        var_intTamanhoTotalFila = len(arg_listDados)
+        var_intRange = 500  # Supabase recomenda batches menores
+        
+        for i in range(0, var_intTamanhoTotalFila, var_intRange):
+            logger.info(f"Inserindo registros {i} a {min(i+var_intRange, var_intTamanhoTotalFila)} em steam_unificado (Supabase)")
+            try:
+                cls._var_botClient.table("steam_unificado").upsert(
+                    arg_listDados[i:i+var_intRange],
+                    on_conflict="appid"
+                ).execute()
+                sleep(1)  # Evita rate limiting
+            except Exception as e:
+                logger.error(f"Erro ao inserir batch em steam_unificado (Supabase): {e}")
+                raise
+    
+    @classmethod
+    def buscar_steam_unificado(cls, arg_intAppid: int) -> Optional[Dict[str, Any]]:
+        """
+        Busca um jogo na tabela steam_unificado do Supabase.
+        
+        Parâmetros:
+        - arg_intAppid (int): ID do aplicativo Steam
+        
+        Retorna:
+        - dict | None: Dicionário com os dados ou None se não encontrado
+        """
+        cls._garantir_conexao()
+        
+        try:
+            var_apiResult = cls._var_botClient.table("steam_unificado").select("*").eq(
+                "appid", arg_intAppid
+            ).execute()
+            
+            if var_apiResult.data and len(var_apiResult.data) > 0:
+                return var_apiResult.data[0]
+            return None
+            
+        except Exception as e:
+            logger.error(f"Erro ao buscar AppID {arg_intAppid} em steam_unificado (Supabase): {e}")
+            return None
+    
+    @classmethod
+    def buscar_todos_steam_unificado(cls, arg_intLimit: int = None, arg_intOffset: int = 0) -> List[Dict[str, Any]]:
+        """
+        Busca todos os jogos da tabela steam_unificado do Supabase.
+        
+        Parâmetros:
+        - arg_intLimit (int): Limite de registros (None = 1000 padrão Supabase)
+        - arg_intOffset (int): Deslocamento para paginação
+        
+        Retorna:
+        - list[dict]: Lista de dicionários com os dados
+        """
+        cls._garantir_conexao()
+        
+        try:
+            var_query = cls._var_botClient.table("steam_unificado").select("*")
+            
+            if arg_intLimit:
+                var_query = var_query.limit(arg_intLimit)
+            
+            if arg_intOffset > 0:
+                var_query = var_query.range(arg_intOffset, arg_intOffset + (arg_intLimit or 1000) - 1)
+            
+            var_apiResult = var_query.execute()
+            return var_apiResult.data if var_apiResult.data else []
+            
+        except Exception as e:
+            logger.error(f"Erro ao buscar todos de steam_unificado (Supabase): {e}")
+            return []
+    
+    @classmethod
+    def contar_steam_unificado(cls) -> int:
+        """
+        Conta o total de registros em steam_unificado do Supabase.
+        
+        Retorna:
+        - int: Total de registros
+        """
+        cls._garantir_conexao()
+        
+        try:
+            var_apiResult = cls._var_botClient.table("steam_unificado").select(
+                "appid", count="exact"
+            ).limit(1).execute()
+            
+            return var_apiResult.count if var_apiResult.count else 0
+            
+        except Exception as e:
+            logger.error(f"Erro ao contar registros em steam_unificado (Supabase): {e}")
+            return 0
