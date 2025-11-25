@@ -12,4 +12,9 @@
 *temp_
 prj_TCC_PREVISOR_STEAM/resources/logs/
 /docker/volumes
+
+# Arquivos de dados exportados (muito grandes para git)
+prj_TCC_PREVISOR_STEAM/resources/dados/*.csv
+prj_TCC_PREVISOR_STEAM/resources/dados/*.json
+!prj_TCC_PREVISOR_STEAM/resources/dados/steam_applist.json
 backup_public.sql
