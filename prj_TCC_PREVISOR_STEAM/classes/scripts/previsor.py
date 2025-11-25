@@ -533,16 +533,7 @@ class Previsor:
                 logger.info(f"Número de IDs ITAD a processar neste lote: {len(var_listAppIDAtual)}")
                 
                 # Busca dados ITAD para os AppIDs
-                var_dictResultado = asyncio.run(SteamClient.lookup_itad_ids_batched(arg_seqAppids=var_listAppIDAtual))
-                
-                if var_dictResultado:
-                    logger.info(f"Obtidos {len(var_dictResultado):,} registros do ITAD")
-                    
-                    # Insere os dados no PostgreSQL (itad_raw + steam_itad_mapping)
-                    var_intInseridos = PostgreSQL.inserir_dados_itad_raw_bulk(var_dictResultado)
-                    logger.info(f"Registros inseridos no banco: {var_intInseridos:,}")
-                else:
-                    logger.warning("Nenhum dado retornado do ITAD neste lote")
+                asyncio.run(SteamClient.lookup_itad_ids_batched(arg_seqAppids=var_listAppIDAtual))
                 
                 # Pausa entre lotes
                 if i + var_intRange < var_intTamanhoTotalFila:
