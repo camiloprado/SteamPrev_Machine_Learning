@@ -14,7 +14,10 @@ CON_DEFAULT_HEADERS = {
     "Accept-Language": "pt-BR,pt;q=0.9,en-US;q=0.8,en;q=0.7",
 }
 
-STEAM_APP_LIST_URL = "https://api.steampowered.com/ISteamApps/GetAppList/v2/"
+# STEAM_APP_LIST_URL API DESCONTINUADA PELA VALVE (404 desde Nov/2024)
+# Usando arquivo JSON local steam_applist.json com dados históricos
+STEAM_APP_LIST_URL_DEPRECATED = "https://api.steampowered.com/ISteamApps/GetAppList/v2/"
+STEAM_APP_LIST_LOCAL_FALLBACK = "prj_TCC_PREVISOR_STEAM/resources/dados/steam_applist.json"
 STEAM_DETAILS_URL = "https://store.steampowered.com/api/appdetails"
 STEAM_REVIEWS_URL = "https://store.steampowered.com/appreviews/{appid}"
 ITAD_LOOKUP_URL = "https://api.isthereanydeal.com/lookup/id/title/v1"
@@ -57,19 +60,37 @@ class SteamClient:
             except Exception:
                 pass
 
-            try:
-                var_listData = cls.find_app_list()
-                # Salva no cache local
+        # Se chegou aqui, precisa buscar da API ou do JSON local
+        try:
+            var_listData = cls.find_app_list()
+            
+            # Se retornou lista vazia ou False, tenta carregar do JSON local
+            if not var_listData:
+                logger.warning("API Steam não retornou dados. Tentando arquivo local...")
+                var_listData = cls._load_from_local_json()
+            
+            # Se conseguiu dados, salva no cache local
+            if var_listData:
                 os.makedirs(os.path.dirname(var_strPath), exist_ok=True)
-
-                # Salva o arquivo
                 with open(var_strPath, "w", encoding="utf-8") as f:
                     json.dump(var_listData, f)
+                Settings._var_listApp = var_listData
                 Settings._var_boolAppListLoaded = True
-
-            except Exception as e:
+                return var_listData
+            else:
                 Settings._var_listApp = []
                 return Settings._var_listApp
+
+        except Exception as e:
+            logger.error(f"Erro ao buscar da API: {e}")
+            logger.info("Tentando carregar do arquivo local...")
+            var_listData = cls._load_from_local_json()
+            if var_listData:
+                Settings._var_listApp = var_listData
+                Settings._var_boolAppListLoaded = True
+                return var_listData
+            Settings._var_listApp = []
+            return Settings._var_listApp
 
     @classmethod
     def find_app_list(cls) -> list[dict[str, Any]]:
@@ -89,9 +110,9 @@ class SteamClient:
             try:
                 logger.info(f"Tentativa {var_intTentativa + 1}/{var_intMaxTentativas} - Buscando lista de aplicativos da Steam...")
                 
-                # Faz a requisição para a Steam
+                # Faz a requisição para a Steam (API descontinuada desde Nov/2024)
                 var_respResponse = requests.get(
-                    STEAM_APP_LIST_URL, 
+                    STEAM_APP_LIST_URL_DEPRECATED, 
                     headers=CON_DEFAULT_HEADERS, 
                     timeout=60
                 )
@@ -109,7 +130,11 @@ class SteamClient:
                 # Erros HTTP específicos (503, 500, etc.)
                 var_intStatusCode = e.response.status_code if hasattr(e, 'response') else 0
                 
-                if var_intStatusCode == 503:
+                if var_intStatusCode == 404:
+                    logger.warning(f"API Steam GetAppList retornou 404 (endpoint descontinuado)")
+                    logger.info(f"Usando arquivo JSON local como fallback...")
+                    return cls._load_from_local_json()
+                elif var_intStatusCode == 503:
                     logger.warning(f"Serviço Steam temporariamente indisponível (503 Service Unavailable)")
                     return False
                 elif var_intStatusCode >= 500:
@@ -146,6 +171,46 @@ class SteamClient:
         # Fallback se todas as tentativas falharem
         raise Exception(f"Falha ao buscar lista da Steam após {var_intMaxTentativas} tentativas")
 
+    @classmethod
+    def _load_from_local_json(cls) -> list[dict[str, Any]]:
+        """
+        Carrega a lista de aplicativos do arquivo JSON local (steam_applist.json).
+        Usado como fallback quando a API Steam GetAppList está indisponível.
+        
+        Retorna:
+        - var_listData (list): A lista de aplicativos da Steam do arquivo local.
+        """
+        try:
+            # Determina o caminho do arquivo JSON local
+            var_strScriptDir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+            var_strJsonPath = os.path.join(var_strScriptDir, "resources", "dados", "steam_applist.json")
+            
+            if not os.path.exists(var_strJsonPath):
+                logger.error(f"Arquivo steam_applist.json não encontrado: {var_strJsonPath}")
+                logger.error("A API Steam foi descontinuada e o arquivo de fallback não existe.")
+                return []
+            
+            # Lê o arquivo JSON local
+            logger.info(f"Carregando do arquivo local: {var_strJsonPath}")
+            with open(var_strJsonPath, "r", encoding="utf-8") as f:
+                var_listData = json.load(f)
+            
+            # Obtém data de modificação do arquivo
+            var_dateMTime = datetime.fromtimestamp(os.path.getmtime(var_strJsonPath))
+            var_intDaysOld = (datetime.now() - var_dateMTime).days
+            
+            Settings._var_listApp = var_listData
+            logger.info(f"Lista carregada do arquivo local! ({len(var_listData):,} apps)")
+            logger.info(f"Dados com {var_intDaysOld} dias (última atualização: {var_dateMTime.strftime('%Y-%m-%d')})")
+            
+            return var_listData
+            
+        except json.JSONDecodeError as e:
+            logger.error(f"Erro ao decodificar JSON do steam_applist.json: {e}")
+            return []
+        except Exception as e:
+            logger.error(f"Erro ao carregar steam_applist.json: {e}")
+            return []
 
     # ------------------- Find appid -------------------
     @classmethod
