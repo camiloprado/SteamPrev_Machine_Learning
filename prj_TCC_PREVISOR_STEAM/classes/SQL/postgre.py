@@ -1,6 +1,7 @@
 from prj_TCC_PREVISOR_STEAM.classes.framework.AllSettings import Settings
 
 from datetime import datetime
+from psycopg2.extras import execute_batch
 from time import sleep
 import psycopg2, sqlalchemy, json, logging
 
@@ -219,12 +220,13 @@ class PostgreSQL:
     @classmethod
     def inserir_dadosSteamRaw_Bulk(cls, arg_listDados: list) -> None:
         """
-        Insere ou atualiza dados em bulk na tabela steam_raw de forma otimizada.
+        Insere ou atualiza dados em bulk na tabela steam_raw de forma otimizada e atualiza steam_generico automaticamente.
         Parâmetros:
         - arg_listDados (list): Lista de dicionários com os dados a inserir.
                                Cada dicionário deve ter: appid, detalhes (opcional), reviews (opcional)
         """
         cls.conectar()
+        
         try:
             if not arg_listDados:
                 logger.warning("Lista de dados vazia, nenhum dado para inserir.")
@@ -274,11 +276,41 @@ class PostgreSQL:
                 cls._var_connConnection.commit()
                 logger.info(f"Inserção em bulk concluída: {var_intRowCount} registros processados em steam_raw.")
                 
-        except Exception as e:
+                var_listAppidsInseridos = []
+                
+                for var_dictDados in arg_listDados:
+                    var_intAppid = var_dictDados.get("appid")
+                    var_dictDetalhes = var_dictDados.get("detalhes")
+                    
+                    if var_intAppid and var_dictDetalhes and var_dictDetalhes.get("name"):
+                        var_listAppidsInseridos.append((
+                            var_intAppid,
+                            var_dictDetalhes.get("name")
+                        ))
+                
+                # Insere/atualiza steam_generico (batch)
+                if var_listAppidsInseridos:
+                    var_strSQLGenerico = """
+                    INSERT INTO steam_generico (appid, name, ultima_atualizacao)
+                    VALUES (%s, %s, NOW())
+                    ON CONFLICT (appid) DO UPDATE SET
+                        name = EXCLUDED.name,
+                        ultima_atualizacao = EXCLUDED.ultima_atualizacao;
+                    """
+                    
+                    with cls._var_connConnection.cursor() as var_curCursor:
+                        execute_batch(var_curCursor, var_strSQLGenerico, var_listAppidsInseridos)
+                    
+                    cls._var_connConnection.commit()
+                    logger.debug(f"Sincronizados {len(var_listAppidsInseridos)} registros em steam_generico")
+        
+        except Exception as err:
+            logger.error(f"Erro ao inserir dados steam_raw: {err}")
             cls._var_connConnection.rollback()
-            logger.error(f"Erro ao inserir dados em bulk em steam_raw: {e}")
-            raise Exception(f"Erro ao inserir dados em bulk em steam_raw: {e}")
-               
+            raise Exception(f"Erro ao inserir dados em bulk em steam_raw e/ou steam_generico: {err}")
+        finally:
+            cls.desconectar()
+
     @classmethod
     def inserir_dadosSteamRaw_details(cls, arg_dictDados: dict):
         """
@@ -781,52 +813,43 @@ class PostgreSQL:
             return []
     
     @classmethod
-    def buscar_appids_sem_itad(cls, arg_intPcId: int = 1, arg_intTotalPcs: int = 1) -> list[int]:
+    def buscar_appids_sem_itad(cls, arg_intLimit: int = None) -> list:
         """
-        Busca AppIDs do steam_bd que ainda não têm dados no steam_itad_mapping.
-        IMPORTANTE: Retorna apenas AppIDs que existem em steam_generico (requerido pela FK).
+        Busca AppIDs que NÃO têm dados ITAD válidos (steam_itad_mapping).
         
-        Parâmetros:
-        - arg_intPcId (int): ID deste PC. (Padrão: 1)
-        - arg_intTotalPcs (int): Total de PCs. (Padrão: 1)
+        Retorna AppIDs que NÃO estão em steam_itad_mapping (nunca processados ou falharam).
         
-        Retorna:
-        - list[int]: Lista de AppIDs sem dados ITAD
+        Args:
+            arg_intLimit: Limite de resultados (None = todos)
+        
+        Returns:
+            Lista de AppIDs sem dados ITAD válidos
         """
+        cls.conectar()
+        
         try:
-            cls.conectar()
-            
-            if cls._var_connConnection is None:
-                logger.error("Conexão com banco de dados não estabelecida")
-                return []
-            
-            logger.info(f"Buscando AppIDs sem dados ITAD (PC {arg_intPcId}/{arg_intTotalPcs})...")
-            
             var_strSQL = """
-            SELECT sb.appid 
-            FROM steam_bd sb
-            INNER JOIN steam_generico sg ON sb.appid = sg.appid
-            LEFT JOIN steam_itad_mapping sim ON sb.appid = sim.appid
+            SELECT sg.appid
+            FROM steam_generico sg
+            LEFT JOIN steam_itad_mapping sim ON sg.appid = sim.appid
             WHERE sim.appid IS NULL
+            ORDER BY sg.appid
             """
             
-            # Aplica filtro de PC se necessário
-            if arg_intTotalPcs > 1:
-                var_strSQL += f" AND MOD(sb.appid, {arg_intTotalPcs}) = {arg_intPcId - 1}"
-            
-            var_strSQL += ";"
+            if arg_intLimit:
+                var_strSQL += f" LIMIT {arg_intLimit}"
             
             with cls._var_connConnection.cursor() as cursor:
                 cursor.execute(var_strSQL)
-                var_listResultados = cursor.fetchall()
-                var_listAppids = [row[0] for row in var_listResultados]
-                
-                logger.info(f"Encontrados {len(var_listAppids):,} AppIDs sem dados ITAD")
-                return var_listAppids
-                
+                var_listResultados = [row[0] for row in cursor.fetchall()]
+            
+            return var_listResultados
+            
         except Exception as e:
-            logger.error(f"Erro ao buscar AppIDs sem ITAD: {e}")
-            return []
+            raise Exception(f"Erro ao buscar AppIDs sem ITAD: {e}")
+        
+        finally:
+            cls.desconectar()
     
     @classmethod
     def buscar_appids_itad_desatualizados(cls, arg_intDiasAtualizacao: int = None, arg_intPcId: int = 1, arg_intTotalPcs: int = 1) -> list[int]:
@@ -870,8 +893,7 @@ class PostgreSQL:
                 return var_listAppids
                 
         except Exception as e:
-            logger.error(f"Erro ao buscar AppIDs ITAD desatualizados: {e}")
-            return []
+            raise Exception(f"Erro ao buscar AppIDs ITAD desatualizados: {e}")
     
     @classmethod
     def inserir_dados_itad_raw_bulk(cls, arg_dictDadosItad: dict[int, dict]) -> int:
