@@ -27,6 +27,7 @@ class InitApplication:
         logger.info("="*60)
         
         if arg_boolFirstRun:
+            Settings.start_docker_postgres()
             GetTask.abandona_fila(arg_boolAbandonar=True)
             GetTask.criar_fila()
             

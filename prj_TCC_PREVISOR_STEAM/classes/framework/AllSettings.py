@@ -1,6 +1,8 @@
 
 import os
 import logging
+import subprocess
+import time
 from typing import Any
 from dotenv import load_dotenv
 
@@ -117,6 +119,72 @@ class Settings:
         }
 
     @classmethod
+    def start_docker_postgres(cls):
+        """
+        Inicia o container PostgreSQL do Docker se não estiver rodando.
+        Aguarda até que o container esteja healthy antes de continuar.
+        """
+        try:
+            # Verifica se o container está rodando
+            var_strResultCheck = subprocess.run(
+                ["docker", "inspect", "--format={{.State.Health.Status}}", "supabase-db"],
+                capture_output=True,
+                text=True,
+                timeout=5
+            )
+            
+            var_strStatus = var_strResultCheck.stdout.strip()
+            
+            # Se já está healthy, não precisa fazer nada
+            if var_strStatus == "healthy":
+                logging.info("PostgreSQL já está rodando e healthy")
+                return True
+            
+            # Se não está rodando ou não está healthy, tenta iniciar
+            logging.info("Iniciando container PostgreSQL...")
+            
+            var_strResultStart = subprocess.run(
+                ["docker-compose", "-f", "docker/docker-compose.yml", "up", "-d", "db"],
+                capture_output=True,
+                text=True,
+                timeout=30,
+                cwd=os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
+            )
+            
+            if var_strResultStart.returncode != 0:
+                logging.warning(f"Erro ao iniciar PostgreSQL: {var_strResultStart.stderr}")
+                return False
+            
+            # Aguarda o container ficar healthy (máximo 60 segundos)
+            logging.info("Aguardando PostgreSQL ficar pronto...")
+            for var_intTentativa in range(30):
+                var_strResultHealth = subprocess.run(
+                    ["docker", "inspect", "--format={{.State.Health.Status}}", "supabase-db"],
+                    capture_output=True,
+                    text=True,
+                    timeout=5
+                )
+                
+                if var_strResultHealth.stdout.strip() == "healthy":
+                    logging.info("PostgreSQL está pronto!")
+                    return True
+                
+                time.sleep(2)
+            
+            logging.warning("Timeout: PostgreSQL não ficou healthy em 60 segundos")
+            return False
+            
+        except subprocess.TimeoutExpired:
+            logging.warning("Timeout ao iniciar PostgreSQL")
+            return False
+        except FileNotFoundError:
+            logging.warning("Docker ou docker-compose não encontrado. Pulando inicialização automática.")
+            return False
+        except Exception as e:
+            logging.warning(f"Erro ao iniciar PostgreSQL: {e}")
+            return False
+
+    @classmethod
     def configure_logging(cls):
         """
         Configura o sistema de logging do projeto.
@@ -197,5 +265,5 @@ class Settings:
         - Um iterável com todas as chaves e valores das configurações.
         """
         return cls._var_dictSettings.items()
-
+     
 Settings.build()
