@@ -1,5 +1,4 @@
 from prj_TCC_PREVISOR_STEAM.classes.framework.AllSettings import Settings
-from prj_TCC_PREVISOR_STEAM.classes.SQL.supabase_db import SupabaseDB
 from prj_TCC_PREVISOR_STEAM.classes.SQL.postgre import PostgreSQL
 
 from typing import Any, Sequence
@@ -212,60 +211,6 @@ class SteamClient:
             logger.error(f"Erro ao carregar steam_applist.json: {e}")
             return []
 
-    # ------------------- Find appid -------------------
-    @classmethod
-    def find_appid(cls, arg_strName: str) -> int | None:
-        """
-        Encontra o appid de um jogo pelo seu nome.
-        
-        Parâmetros:
-        - arg_strName (str): O nome do jogo.
-        
-        Retorna:
-        - var_intAppid (int | None): O appid do jogo ou None se não encontrado.
-        """
-        var_listApps = cls.load_app_list()
-        var_strAlvo = arg_strName.strip().lower()
-        for var_dictApp in var_listApps:
-            if var_dictApp.get("name", "").lower() == var_strAlvo:
-                var_intAppid = var_dictApp.get("appid")
-                return var_intAppid
-        var_strPadrao = re.sub(r"[^a-z0-9]", "", var_strAlvo)
-        for var_dictApp in var_listApps:
-            var_strNome = var_dictApp.get("name")
-            if isinstance(var_strNome, str) and re.sub(r"[^a-z0-9]", "", var_strNome.lower()) == var_strPadrao:
-                var_intAppid = var_dictApp.get("appid")
-                return var_intAppid
-        return None
-
-    # ------------------- Steam details -------------------
-    @classmethod
-    def fetch_details(cls, arg_intAppid: int) -> dict:
-        """
-        Busca os detalhes de um jogo na Steam pelo seu appid.
-
-        Parâmetros:
-        - arg_intAppid (int): O appid do jogo.
-
-        Retorna:
-        - var_dictDetails (dict): Um dicionário com os detalhes do jogo ou um dicionário vazio se não encontrado.
-        """
-        try:
-            var_dictParams = {"appids": arg_intAppid, "l": "brazilian"}
-            var_respResponse = requests.get(
-                STEAM_DETAILS_URL,
-                params=var_dictParams,
-                headers=CON_DEFAULT_HEADERS,
-                timeout=30,
-            )
-            var_respResponse.raise_for_status()
-            var_dictData = var_respResponse.json()
-            if var_dictData and str(arg_intAppid) in var_dictData and var_dictData[str(arg_intAppid)]["success"]:
-                var_dictDetails = var_dictData[str(arg_intAppid)]["data"]
-                return var_dictDetails
-        except Exception as e:
-            pass
-        return {}
 
     # ------------------- Async bulk details com batches -------------------
     @classmethod
@@ -822,66 +767,6 @@ class SteamClient:
             logger.critical(f"Falha crítica ao buscar ITAD lookup em bulk: {e}")
             raise RuntimeError(f"ITAD lookup falhou: {e}")
     
-    @classmethod
-    def lookup_itad_title(cls, arg_seqTitles: Sequence[str]) -> dict:
-        """
-        Realiza lookup de títulos na API do IsThereAnyDeal (ITAD).
-        
-        Parâmetros:
-        - arg_seqTitles (Sequence[str]): Uma sequência de títulos dos jogos.
-        
-        Retorna:
-        - var_dictResults (dict): Um dicionário com os resultados do lookup.
-        """
-        if not Settings._var_strItadApiKey:
-            raise RuntimeError("ITAD_API_KEY não definido")
-        try:
-            var_dictHeaders = {"Content-Type": "application/json"}
-            var_respResponse = requests.post(
-                f"{ITAD_LOOKUP_URL}?key={Settings._var_strItadApiKey}",
-                data=json.dumps(list(arg_seqTitles)),
-                headers=var_dictHeaders,
-                timeout=30,
-            )
-            var_respResponse.raise_for_status()
-            var_dictResults = var_respResponse.json()
-            return var_dictResults
-        except Exception as e:
-            raise RuntimeError(f"ITAD lookup falhou: {e}")
-
-    # ------------------- ITAD price history -------------------
-    @classmethod
-    def fetch_price_history(cls, arg_strItadPlain: str, arg_intAnos: int = 5) -> list:
-        """
-        Busca o histórico de preços de um jogo na API do IsThereAnyDeal (ITAD).
-        
-        Parâmetros:
-        - arg_strItadPlain (str): O identificador "plain" do jogo no ITAD.
-        - arg_intAnos (int): O número de anos para buscar o histórico.
-        
-        Retorna:
-        - var_dictResults (list): Uma lista com o histórico de preços do jogo.
-        """
-        if not Settings._var_strItadApiKey:
-            raise RuntimeError("ITAD_API_KEY não definido")
-        
-        # Calcula o tempo desde a data atual para o parâmetro 'since'
-        var_strSince = (datetime.now(timezone.utc) - timedelta(days=arg_intAnos * 365)).strftime("%Y-%m-%dT%H:%M:%SZ")
-        var_dictParams = {
-            "key": Settings._var_strItadApiKey,
-            "id": arg_strItadPlain,
-            "shops": "61", # ID da Steam no ITAD
-            "country": "BR",
-            "since": var_strSince,
-        }
-        try:
-            var_respResponse = requests.get(ITAD_HISTORY_URL, params=var_dictParams, timeout=30)
-            var_respResponse.raise_for_status()
-            var_dictResults = var_respResponse.json()
-            return var_dictResults
-        except Exception as e:
-            raise RuntimeError(f"Falha histórico ITAD: {e}")
-        
     # ------------------- Async ITAD price history bulk com batches -------------------
     @classmethod
     async def fetch_price_history_bulk_batched(cls, arg_seqItadPlain: Sequence[str], arg_intAnos: int = 5) -> dict:

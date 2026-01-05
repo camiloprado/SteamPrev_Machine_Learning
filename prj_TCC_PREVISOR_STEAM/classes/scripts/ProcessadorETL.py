@@ -1,6 +1,5 @@
 from prj_TCC_PREVISOR_STEAM.classes.framework.AllSettings import Settings
 from prj_TCC_PREVISOR_STEAM.classes.SQL.postgre import PostgreSQL
-from prj_TCC_PREVISOR_STEAM.classes.SQL.supabase_db import SupabaseDB
 
 from typing import List, Dict, Any
 import re, logging
@@ -527,72 +526,6 @@ class ProcessadorETL:
         var_dictDadosTransformados["type"] = var_strType if var_strType else "game"
         
         return var_dictDadosTransformados
-    
-    @staticmethod
-    def processar_lote() -> None:
-        """
-        Processa um lote de AppIDs do Docker para o Supabase
-        
-        Parametros:
-        """
-        # Garante conexão com o Docker
-        PostgreSQL.conectar()
-        
-        # Buscar dados brutos do Docker
-        var_listDados = PostgreSQL.buscar_todos_dados("steam_raw")
-        logger.info(f"{len(var_listDados)} jogos encontrados no Docker.")
-        
-        # Transformar dados
-        var_listDadosEstruturados = []
-        var_intErrosTransformacao = 0
-        var_dictContagemErros = {
-            'detalhes_ausentes': 0,
-            'appid_invalido': 0,
-            'dados_vazios': 0,
-            'outros': 0
-        }
-        
-        for var_dictDadosRaw in var_listDados:
-            try:
-                var_dictDadosBD = ProcessadorETL.transformar_raw_para_bd(var_dictDadosRaw)
-                var_listDadosEstruturados.append(var_dictDadosBD)
-            except ValueError as e:
-                var_intErrosTransformacao += 1
-                var_strErro = str(e).lower()
-                
-                # Categoriza o erro
-                if 'detalhes ausentes' in var_strErro or 'detalhes vazios' in var_strErro:
-                    var_dictContagemErros['detalhes_ausentes'] += 1
-                elif 'appid' in var_strErro:
-                    var_dictContagemErros['appid_invalido'] += 1
-                elif 'vazio' in var_strErro:
-                    var_dictContagemErros['dados_vazios'] += 1
-                else:
-                    var_dictContagemErros['outros'] += 1
-                    logger.error(f"Erro ao processar AppID {var_dictDadosRaw.get('appid', 'DESCONHECIDO')}: {e}")
-            except Exception as e:
-                var_intErrosTransformacao += 1
-                var_dictContagemErros['outros'] += 1
-                logger.error(f"Erro inesperado ao processar AppID {var_dictDadosRaw.get('appid', 'DESCONHECIDO')}: {e}")
-        
-        logger.info(f"{len(var_listDadosEstruturados)} jogos transformados com sucesso")
-        
-        if var_intErrosTransformacao > 0:
-            logger.warning(f"{var_intErrosTransformacao} erros de transformação:")
-            logger.warning(f"  - Detalhes ausentes: {var_dictContagemErros['detalhes_ausentes']}")
-            logger.warning(f"  - AppID inválido: {var_dictContagemErros['appid_invalido']}")
-            logger.warning(f"  - Dados vazios: {var_dictContagemErros['dados_vazios']}")
-            logger.warning(f"  - Outros erros: {var_dictContagemErros['outros']}")
-        
-        # Inserir no Supabase
-        if var_listDadosEstruturados:
-            try:
-                SupabaseDB.inserir_dadosSteamBd_Bulk(var_listDadosEstruturados)
-                logger.info(f"{len(var_listDadosEstruturados)} jogos inseridos no Supabase!")
-            except Exception as e:
-                logger.error(f"Erro ao inserir no Supabase: {e}")
-        else:
-            logger.warning("Nenhum jogo válido para inserir no Supabase")
     
     @staticmethod
     def transformar_raw_para_unificado(arg_dictDadosRaw: Dict) -> Dict:
