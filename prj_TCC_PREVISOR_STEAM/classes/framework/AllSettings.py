@@ -227,7 +227,7 @@ class Settings:
         """
         Constrói as configurações iniciais do sistema.
         """
-        load_dotenv()
+        load_dotenv(override=True)  # Força recarga das variáveis de ambiente
         cls.configure_logging()  # Configura o logging primeiro
         cls.steam_api_settings()
         cls.bd_settings_default()
