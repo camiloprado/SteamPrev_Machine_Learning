@@ -895,8 +895,10 @@ class SteamClient:
         Retorna:
         - var_dictAllResults (dict): Um dicionário mapeando cada plain para seu histórico de preços.
         """
-        var_intBatchSize = Settings._var_intBatchesSize
-        var_intDelay = Settings._var_intDelayBetweenBatches
+        var_dictConfigAPI = Settings.steam_api_itad()
+        var_intBatchSize = var_dictConfigAPI.get("BatchSize", 200)
+        var_intDelay = var_dictConfigAPI.get("Delay", 120)
+        var_intAsyncConcurrency = var_dictConfigAPI.get("Concurrency", 1)
         var_intTotalItems = len(arg_seqItadPlain)
         var_intTotalBatches = (var_intTotalItems + var_intBatchSize - 1) // var_intBatchSize
         
@@ -905,7 +907,7 @@ class SteamClient:
         logger.info(f"Tamanho do batch: {var_intBatchSize:,}")
         logger.info(f"Total de batches: {var_intTotalBatches}")
         logger.info(f"Delay entre batches: {var_intDelay}s")
-        logger.info(f"Concorrência por batch: {Settings._var_intAsyncConcurrency}")
+        logger.info(f"Concorrência por batch: {var_intAsyncConcurrency}")
         logger.info(f"Anos de histórico: {arg_intAnos}")
         logger.info(f"==================================================\n")
         
@@ -945,6 +947,9 @@ class SteamClient:
         Retorna:
         - var_dictResults (dict): Um dicionário mapeando cada plain para seu histórico de preços.
         """
+        var_dictConfigAPI = Settings.steam_api_itad()
+        var_intAsyncConcurrency = var_dictConfigAPI.get("Concurrency", 3)
+
         if not Settings._var_strItadApiKey:
             raise RuntimeError("ITAD_API_KEY não definido")
         
@@ -952,7 +957,7 @@ class SteamClient:
             var_strSince = (datetime.now(timezone.utc) - timedelta(days=arg_intAnos * 365)).strftime("%Y-%m-%dT%H:%M:%SZ")
             
             # Controle de concorrência
-            var_semSemaphore = asyncio.Semaphore(Settings._var_intAsyncConcurrency)
+            var_semSemaphore = asyncio.Semaphore(var_intAsyncConcurrency)
             
             # Contadores de erro
             var_intErrosHTTP = 0
@@ -1020,7 +1025,7 @@ class SteamClient:
             # Executa os workers assíncronos
             async with aiohttp.ClientSession() as var_respSession:
                 var_listTasks = [asyncio.create_task(worker(var_respSession, plain)) for plain in arg_seqItadPlain]
-                logger.info(f"Iniciando busca de 'HISTÓRICO DE PREÇOS' assíncrona para {len(var_listTasks)} jogos (ITAD) com concorrência {Settings._var_intAsyncConcurrency}...")
+                logger.info(f"Iniciando busca de 'HISTÓRICO DE PREÇOS' assíncrona para {len(var_listTasks)} jogos (ITAD) com concorrência {var_intAsyncConcurrency}...")
                 
                 # Aguarda a conclusão de todas as tarefas
                 var_listOut = await asyncio.gather(*var_listTasks, return_exceptions=True)

@@ -627,7 +627,7 @@ class ProcessadorETL:
         PostgreSQL.conectar()
         
         # Buscar dados brutos do Docker
-        var_listDados = PostgreSQL.buscar_todos_dados("steam_raw")
+        var_listDados = PostgreSQL.buscar_todos_dados(arg_strNomeTabela="steam_raw")
         logger.info(f"{len(var_listDados)} jogos encontrados no Docker.")
         
         # Transformar dados

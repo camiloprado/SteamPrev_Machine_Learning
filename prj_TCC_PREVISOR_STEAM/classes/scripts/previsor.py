@@ -457,7 +457,6 @@ class Previsor:
         """
         Alimenta o banco de dados PostgreSQL (Docker) com dados do ITAD.
         Versão otimizada que usa o PostgreSQL local em vez do Supabase.
-        Suporta divisão de trabalho entre múltiplos PCs usando PC_ID.
         
         Parâmetros:
         
@@ -466,6 +465,7 @@ class Previsor:
         """
         try:
             PostgreSQL.conectar()
+            var_listDados = PostgreSQL.buscar_todos_dados(arg_strNomeTabela="steam_raw")
             
             # Define o range de processamento por vez pelo .env
             var_intRange = int(os.getenv("RANGE_PROCESSAMENTO_ITAD_RAW", 5000))
@@ -484,10 +484,7 @@ class Previsor:
 
             # Busca AppIDs do steam_bd que ainda não têm dados no ITAD
             logger.info("Consultando AppIDs sem dados ITAD...")
-            var_listAppIDParaProcessar = PostgreSQL.buscar_appids_sem_itad(
-                arg_intPcId=var_intPcId,
-                arg_intTotalPcs=var_intTotalPcs
-            )
+            var_listAppIDParaProcessar = PostgreSQL.buscar_appids_sem_itad()
             
             var_strTexto = f"{10*'='} AppIDs para processar ITAD {10*'='}"
             logger.info(var_strTexto)
@@ -535,6 +532,10 @@ class Previsor:
                 # Busca dados ITAD para os AppIDs
                 asyncio.run(SteamClient.lookup_itad_ids_batched(arg_seqAppids=var_listAppIDAtual))
                 
+                var_listITADID = list(PostgreSQL.buscar_itad_id_por_appid(arg_listAppids=var_listAppIDAtual))
+
+                # Busca histórico de preços ITAD para os AppIDs
+                asyncio.run(SteamClient.fetch_price_history_bulk_batched(arg_seqItadPlain=var_listITADID))
                 # Pausa entre lotes
                 if i + var_intRange < var_intTamanhoTotalFila:
                     logger.info("Aguardando 2 segundos antes do próximo lote...")

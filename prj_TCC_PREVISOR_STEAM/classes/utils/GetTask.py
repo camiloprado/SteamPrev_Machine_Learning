@@ -38,6 +38,7 @@ class GetTask:
                 Previsor.alimentar_banco_dados_raw_docker()
 
             ProcessadorETL.processar_lote_unificado()
+            
             # Alimentação do banco de dados ITAD para o docker
             if PostgreSQL.buscar_appids_desatualizados_otimizado(arg_strNomeTabela="itad_raw"):
                 Previsor.alimentar_banco_dados_ITAD_docker()

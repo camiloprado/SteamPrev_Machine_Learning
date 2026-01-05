@@ -3,6 +3,7 @@ from prj_TCC_PREVISOR_STEAM.classes.framework.AllSettings import Settings
 from datetime import datetime
 from psycopg2.extras import execute_batch
 from time import sleep
+from typing import Generator
 import psycopg2, sqlalchemy, json, logging
 
 logger = logging.getLogger(__name__)
@@ -520,7 +521,7 @@ class PostgreSQL:
             raise Exception(f"Erro ao inserir/atualizar dados para o AppID {arg_dictDados.get('appid')}: {e}")
         
     @classmethod
-    def atualizar_reviewsSteamBD(cls, arg_intAppid: int, arg_jsonReviews: dict):
+    def atualizar_reviewsSteamBD(cls, arg_intAppid: int, arg_jsonReviews: dict) -> None:
         """
         Atualiza as resenhas de um jogo na tabela do banco de dados da Steam.
 
@@ -554,7 +555,7 @@ class PostgreSQL:
             raise Exception(f"Erro ao atualizar resenhas para o AppID {arg_intAppid}: {e}")
         
     @classmethod
-    def buscar_dados(cls, arg_intAppid: int, arg_strNomeTabela: str) -> dict | None:
+    def buscar_dados(cls, arg_intAppid: int, arg_strNomeTabela: str) -> dict:
         """
         Busca os dados de um jogo na tabela do banco de dados da Steam.
 
@@ -563,21 +564,20 @@ class PostgreSQL:
         - arg_strNomeTabela (str): Nome da tabela onde os dados serão buscados.
 
         Retorna:
-        - dict | None: Dicionário com os dados do jogo ou None se não encontrado.
+        - dict: Dicionário com os dados do jogo ou um dicionário vazio se não encontrado.
         """
         try:
-            var_strSQL = f"""
-            SELECT * FROM {arg_strNomeTabela} WHERE appid = %s;
-            """
+            var_strSQL = f"SELECT * FROM {arg_strNomeTabela} WHERE appid = %s;"
             with cls._var_connConnection.cursor() as cursor:
                 cursor.execute(var_strSQL, (arg_intAppid,))
                 var_resultado = cursor.fetchone()
-                if var_resultado:
-                    var_listColnames = [desc[0] for desc in cursor.description]
-                    return dict(zip(var_listColnames, var_resultado))
-                else:
-                    logger.warning(f"Nenhum dado encontrado para o AppID {arg_intAppid}.")
-                    return None
+
+            if var_resultado:
+                var_listColnames = [desc[0] for desc in cursor.description]
+                return dict(zip(var_listColnames, var_resultado))
+            
+            logger.warning(f"Nenhum dado encontrado para o AppID {arg_intAppid}.")
+            return {} 
         except Exception as e:
             logger.error(f"Erro ao buscar dados para o AppID {arg_intAppid}: {e}")
             raise Exception(f"Erro ao buscar dados para o AppID {arg_intAppid}: {e}")
@@ -1150,6 +1150,36 @@ class PostgreSQL:
             logger.error(f"Erro ao atualizar dados para o AppID {arg_intAppid}: {e}")
             raise Exception(f"Erro ao atualizar dados para o AppID {arg_intAppid}: {e}")
     
+    @classmethod
+    def buscar_itad_id_por_appid(cls, arg_listAppids: list) -> Generator[str | None, None, None]:
+        """
+        Busca o ID ITAD correspondente a uma lista de AppIDs Steam.
+
+        Parâmetros:
+        - arg_listAppids (list): Lista de AppIDs Steam.
+
+        Retorna:
+        - Generator[str | None, None, None]: Generator que produz IDs ITAD correspondentes (um por vez).
+                                              Retorna None para AppIDs sem mapeamento ITAD.
+        """
+        try:
+            for var_intAppid in arg_listAppids:
+                var_strSQL = """
+                SELECT id_itad FROM steam_itad_mapping WHERE appid = %s;
+                """
+                # Executa a consulta para cada AppID
+                with cls._var_connConnection.cursor() as cursor:
+                    cursor.execute(var_strSQL, (var_intAppid,))
+                    var_tupleResultado = cursor.fetchone()
+                    if var_tupleResultado:
+                        # Retorna o ID ITAD encontrado
+                        yield var_tupleResultado[0]
+                    else:
+                        yield None
+        except Exception as e:
+            logger.error(f"Erro ao buscar IDs ITAD para AppIDs fornecidos: {e}")
+            raise Exception(f"Erro ao buscar IDs ITAD para AppIDs fornecidos: {e}")
+        
     # ============================================
     # MÉTODOS PARA STEAM_UNIFICADO (TABELA CONSOLIDADA)
     # ============================================
