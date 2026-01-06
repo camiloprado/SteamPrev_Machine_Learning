@@ -8,7 +8,7 @@ db = PostgreSQL()
 db.conectar()
 cur = db._var_connConnection.cursor()
 
-tabelas = ['steam_raw', 'steam_bd', 'steam_generico', 'steam_unificado', 'itad_raw', 'steam_itad_mapping']
+tabelas = ['steam_raw', 'steam_generico', 'steam_unificado', 'itad_raw', 'steam_itad_mapping']
 
 for tabela in tabelas:
     cur.execute(f"SELECT column_name FROM information_schema.columns WHERE table_name='{tabela}' ORDER BY ordinal_position")

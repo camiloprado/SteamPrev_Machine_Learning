@@ -20,9 +20,11 @@ class TreinarModelo:
     Classe para treinar modelos de Machine Learning para previsão de promoções Steam.
     
     Utiliza dados de:
-    - steam_bd: Informações estruturadas dos jogos
-    - steam_raw: Dados brutos JSONB (detalhes e reviews)
+    - steam_unificado: Informações estruturadas + JSONB (detalhes e reviews)
+    - steam_raw: Dados brutos JSONB completos
     - itad_raw: Histórico de preços do IsThereAnyDeal
+    
+    Estratégia: Treinamento incremental a cada 90 dias baseado em ultima_atualizacao
     
     Algoritmos disponíveis:
     - RandomForest: Baseline (rápido, interpretável)
@@ -31,30 +33,43 @@ class TreinarModelo:
     """
     
     @classmethod
-    def carregar_dados_steam_bd(cls) -> pd.DataFrame:
+    def carregar_dados_steam_unificado(cls, arg_intDiasJanela: int = 90) -> pd.DataFrame:
         """
-        Carrega dados processados da tabela steam_bd.
+        Carrega dados processados da tabela steam_unificado com filtro de janela temporal.
+        
+        Parâmetros:
+        - arg_intDiasJanela (int): Janela de dias para filtrar dados atualizados (padrão: 90)
         
         Retorna:
-        - pd.DataFrame: Dados dos jogos com features processadas
+        - pd.DataFrame: Dados dos jogos com features processadas (últimos N dias)
         """
         try:
             PostgreSQL.conectar()
-            logger.info("Carregando dados de steam_bd...")
+            logger.info(f"Carregando dados de steam_unificado (últimos {arg_intDiasJanela} dias)...")
             
-            var_listDados = PostgreSQL.buscar_todos_dados(arg_strNomeTabela="steam_bd")
+            var_strSQL = f"""
+                SELECT * FROM steam_unificado
+                WHERE ultima_atualizacao >= NOW() - INTERVAL '{arg_intDiasJanela} days'
+                ORDER BY ultima_atualizacao DESC;
+            """
+            
+            with PostgreSQL._var_connConnection.cursor() as cursor:
+                cursor.execute(var_strSQL)
+                var_listResultados = cursor.fetchall()
+                var_listColnames = [var_strDesc[0] for var_strDesc in cursor.description]
+                var_listDados = [dict(zip(var_listColnames, var_tupleRow)) for var_tupleRow in var_listResultados]
             
             if not var_listDados:
-                logger.warning("Nenhum dado encontrado em steam_bd")
+                logger.warning(f"Nenhum dado encontrado em steam_unificado (últimos {arg_intDiasJanela} dias)")
                 return pd.DataFrame()
             
             var_dfDados = pd.DataFrame(var_listDados)
-            logger.info(f"Carregados {len(var_dfDados):,} registros de steam_bd")
+            logger.info(f"Carregados {len(var_dfDados):,} registros de steam_unificado")
             
             return var_dfDados
             
         except Exception as e:
-            logger.error(f"Erro ao carregar dados de steam_bd: {e}")
+            logger.error(f"Erro ao carregar dados de steam_unificado: {e}")
             return pd.DataFrame()
     
     @classmethod
@@ -248,39 +263,36 @@ class TreinarModelo:
             return {}
     
     @classmethod
-    def preparar_dataset_completo(cls) -> pd.DataFrame:
+    def preparar_dataset_completo(cls, arg_intDiasJanela: int = 90) -> pd.DataFrame:
         """
-        Prepara dataset completo combinando steam_bd, steam_raw e itad_raw.
+        Prepara dataset completo combinando steam_unificado, steam_raw e itad_raw com filtro temporal.
+        
+        Parâmetros:
+        - arg_intDiasJanela (int): Janela de dias para filtrar dados atualizados (padrão: 90)
         
         Retorna:
         - pd.DataFrame: Dataset pronto para treinamento com histórico de preços
         """
-        logger.info("Preparando dataset completo...")
+        logger.info(f"Preparando dataset completo (últimos {arg_intDiasJanela} dias)...")
         
-        # Carrega dados estruturados
-        var_dfBd = cls.carregar_dados_steam_bd()
+        # Carrega dados estruturados com filtro temporal
+        var_dfUnificado = cls.carregar_dados_steam_unificado(arg_intDiasJanela=arg_intDiasJanela)
         
-        if var_dfBd.empty:
-            logger.error("Nenhum dado em steam_bd. Execute o processamento ETL primeiro.")
+        if var_dfUnificado.empty:
+            logger.error("Nenhum dado em steam_unificado. Execute o processamento ETL primeiro.")
             return pd.DataFrame()
         
-        # Carrega dados brutos para enriquecer
-        var_dfRaw = cls.carregar_dados_steam_raw(arg_listAppids=var_dfBd['appid'].tolist())
-        
-        # Extrai features dos detalhes JSONB
+        # Extrai features dos campos JSONB (detalhes_completos, reviews_completos)
         logger.info("Extraindo features dos detalhes JSONB...")
-        var_dfRaw['features_detalhes'] = var_dfRaw['detalhes'].apply(cls.extrair_features_detalhes)
+        var_dfUnificado['features_detalhes'] = var_dfUnificado['detalhes_completos'].apply(cls.extrair_features_detalhes)
         
         # Expande features extraídas em colunas
-        var_dfFeatures = pd.json_normalize(var_dfRaw['features_detalhes'])
-        var_dfRaw = pd.concat([var_dfRaw[['appid']], var_dfFeatures], axis=1)
-        
-        # Combina steam_bd com features extraídas
-        var_dfCompleto = var_dfBd.merge(var_dfRaw, on='appid', how='left')
+        var_dfFeatures = pd.json_normalize(var_dfUnificado['features_detalhes'])
+        var_dfCompleto = pd.concat([var_dfUnificado[['appid', 'nome', 'preco', 'review_score', 'total_reviews']], var_dfFeatures], axis=1)
         
         # Carrega e integra histórico de preços ITAD
         logger.info("Carregando histórico de preços ITAD...")
-        var_dfItad = cls.carregar_dados_itad_raw(arg_listAppids=var_dfBd['appid'].tolist())
+        var_dfItad = cls.carregar_dados_itad_raw(arg_listAppids=var_dfUnificado['appid'].tolist())
         
         if not var_dfItad.empty:
             var_dfCompleto = var_dfCompleto.merge(var_dfItad, on='appid', how='left')
@@ -622,10 +634,10 @@ class TreinarModelo:
         return var_lgbModelo, var_dictMetricas
     
     @classmethod
-    def executar_pipeline_completo(cls, arg_strAlgoritmo='todos') -> dict:
+    def executar_pipeline_completo(cls, arg_strAlgoritmo='todos', arg_intDiasJanela: int = 90) -> dict:
         """
         Executa pipeline completo de treinamento:
-        1. Carrega dados (steam_bd + steam_raw + itad_raw)
+        1. Carrega dados (steam_unificado + steam_raw + itad_raw) com filtro temporal
         2. Feature engineering
         3. Seleção de features
         4. Treina modelos (RandomForest, XGBoost, LightGBM)
@@ -633,16 +645,17 @@ class TreinarModelo:
         
         Parâmetros:
         - arg_strAlgoritmo (str): 'randomforest', 'xgboost', 'lightgbm' ou 'todos'
+        - arg_intDiasJanela (int): Janela de dias para filtrar dados atualizados (padrão: 90)
         
         Retorna:
         - dict: Resultados de todos os modelos treinados
         """
         logger.info("="*60)
-        logger.info("INICIANDO PIPELINE DE TREINAMENTO")
+        logger.info(f"INICIANDO PIPELINE DE TREINAMENTO (Janela: {arg_intDiasJanela} dias)")
         logger.info("="*60)
         
-        # 1. Preparar dataset
-        var_dfDados = cls.preparar_dataset_completo()
+        # 1. Preparar dataset com filtro temporal
+        var_dfDados = cls.preparar_dataset_completo(arg_intDiasJanela=arg_intDiasJanela)
         
         if var_dfDados.empty:
             logger.error("Dataset vazio. Abortando treinamento.")
@@ -751,6 +764,155 @@ class TreinarModelo:
             'total_amostras': len(X),
             'data_treinamento': datetime.now().isoformat()
         }
+    
+    @classmethod
+    def registrar_treinamento(cls, arg_dictResultados: dict, arg_intDiasJanela: int = 90) -> None:
+        """
+        Registra treinamento realizado na tabela ml_treinamento_historico.
+        
+        Parâmetros:
+        - arg_dictResultados (dict): Resultados do pipeline de treinamento
+        - arg_intDiasJanela (int): Janela de dias utilizada no treinamento
+        """
+        try:
+            PostgreSQL.conectar()
+            
+            var_strMelhorModelo = arg_dictResultados['melhor_modelo']
+            var_dictMetricas = arg_dictResultados['modelos'][var_strMelhorModelo]['metricas']
+            
+            var_strSQL = """
+                INSERT INTO ml_treinamento_historico (
+                    data_inicio_janela,
+                    data_fim_janela,
+                    total_registros_treino,
+                    total_registros_validacao,
+                    algoritmo,
+                    acuracia,
+                    f1_score,
+                    parametros,
+                    observacoes
+                ) VALUES (
+                    NOW() - INTERVAL '%s days',
+                    NOW(),
+                    %s,
+                    %s,
+                    %s,
+                    %s,
+                    %s,
+                    %s,
+                    %s
+                );
+            """
+            
+            var_jsonParametros = json.dumps({
+                'features_count': len(arg_dictResultados['features']),
+                'modelos_treinados': list(arg_dictResultados['modelos'].keys()),
+                'melhor_modelo': var_strMelhorModelo
+            })
+            
+            with PostgreSQL._var_connConnection.cursor() as cursor:
+                cursor.execute(var_strSQL, (
+                    arg_intDiasJanela,
+                    arg_dictResultados['total_amostras'],
+                    int(arg_dictResultados['total_amostras'] * 0.2),  # 20% validação
+                    var_strMelhorModelo,
+                    var_dictMetricas['accuracy'],
+                    var_dictMetricas['f1_score'],
+                    var_jsonParametros,
+                    f"Treinamento automático janela {arg_intDiasJanela} dias"
+                ))
+                PostgreSQL._var_connConnection.commit()
+            
+            logger.info(f"✅ Treinamento registrado: {var_strMelhorModelo} (Acurácia: {var_dictMetricas['accuracy']:.4f})")
+            
+        except Exception as e:
+            logger.error(f"Erro ao registrar treinamento: {e}")
+    
+    @classmethod
+    def verificar_ultimo_treinamento(cls) -> dict | None:
+        """
+        Verifica quando foi realizado o último treinamento.
+        
+        Retorna:
+        - dict: Dados do último treinamento ou None
+        """
+        try:
+            PostgreSQL.conectar()
+            
+            var_strSQL = """
+                SELECT 
+                    data_treinamento,
+                    data_inicio_janela,
+                    data_fim_janela,
+                    algoritmo,
+                    acuracia,
+                    f1_score,
+                    EXTRACT(DAY FROM NOW() - data_treinamento) as dias_desde_ultimo
+                FROM ml_treinamento_historico
+                ORDER BY data_treinamento DESC
+                LIMIT 1;
+            """
+            
+            with PostgreSQL._var_connConnection.cursor() as cursor:
+                cursor.execute(var_strSQL)
+                var_tupleResultado = cursor.fetchone()
+                
+                if var_tupleResultado:
+                    var_listColnames = [desc[0] for desc in cursor.description]
+                    return dict(zip(var_listColnames, var_tupleResultado))
+                    
+            return None
+            
+        except Exception as e:
+            logger.error(f"Erro ao verificar último treinamento: {e}")
+            return None
+    
+    @classmethod
+    def executar_treinamento_incremental_90dias(cls, arg_strAlgoritmo: str = 'todos') -> dict | None:
+        """
+        Executa pipeline de treinamento com dados dos últimos 90 dias.
+        Registra automaticamente o resultado no histórico.
+        
+        Parâmetros:
+        - arg_strAlgoritmo (str): Algoritmo(s) a treinar ('RandomForest', 'XGBoost', 'LightGBM', 'todos')
+        
+        Retorna:
+        - dict: Resultados do treinamento ou None em caso de erro
+        """
+        try:
+            logger.info("="*60)
+            logger.info("INICIANDO TREINAMENTO INCREMENTAL (90 DIAS)")
+            logger.info("="*60)
+            
+            # Verificar último treinamento
+            var_dictUltimo = cls.verificar_ultimo_treinamento()
+            if var_dictUltimo:
+                logger.info(f"Último treinamento: {var_dictUltimo['dias_desde_ultimo']:.0f} dias atrás")
+                logger.info(f"  Algoritmo: {var_dictUltimo['algoritmo']}")
+                logger.info(f"  Acurácia: {var_dictUltimo['acuracia']:.4f}")
+            else:
+                logger.info("Nenhum treinamento anterior encontrado")
+            
+            # Executar pipeline com janela de 90 dias
+            var_dictResultados = cls.executar_pipeline_completo(
+                arg_strAlgoritmo=arg_strAlgoritmo,
+                arg_intDiasJanela=90
+            )
+            
+            if var_dictResultados:
+                # Registrar treinamento
+                cls.registrar_treinamento(var_dictResultados, arg_intDiasJanela=90)
+                logger.info("="*60)
+                logger.info("TREINAMENTO INCREMENTAL CONCLUÍDO!")
+                logger.info("="*60)
+                return var_dictResultados
+            else:
+                logger.warning("Nenhum resultado obtido do treinamento")
+                return None
+                
+        except Exception as e:
+            logger.error(f"Erro no treinamento incremental: {e}")
+            return None
 
 
 if __name__ == "__main__":

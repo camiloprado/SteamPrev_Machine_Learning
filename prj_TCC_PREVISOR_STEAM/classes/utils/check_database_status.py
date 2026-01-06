@@ -30,7 +30,6 @@ def check_database_status():
         # Lista de tabelas para verificar
         tabelas = [
             'steam_raw',
-            'steam_bd',
             'steam_generico',
             'steam_unificado',
             'itad_raw',
@@ -65,14 +64,7 @@ def check_database_status():
                             data_str = data.strftime('%Y-%m-%d %H:%M:%S') if data else 'N/A'
                             print(f"{appid:<10} {data_str:<25}")
                     
-                    elif tabela == 'steam_bd':
-                        cursor.execute(f"""
-                            SELECT appid, nome, type, preco, data_lancamento 
-                            FROM {tabela} 
-                            ORDER BY appid 
-                            LIMIT 10
-                        """)
-                        print(f"\n[Primeiros 10 registros]:")
+                    elif tabela == 'steam_unificado':
                         print(f"{'AppID':<10} {'Nome':<35} {'Type':<15} {'Preço':<10} {'Lançamento':<12}")
                         print("-" * 80)
                         for row in cursor.fetchall():

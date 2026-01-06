@@ -23,7 +23,7 @@ def verificar_tamanhos_tabelas():
         var_listTabelas = [
             "steam_generico",
             "steam_raw",
-            "steam_bd",
+            "steam_generico",
             "steam_unificado",
             "itad_raw",
             "steam_itad_mapping"
