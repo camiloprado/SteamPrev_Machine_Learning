@@ -37,14 +37,15 @@ class GetTask:
             if PostgreSQL.buscar_appids_desatualizados_otimizado():
                 Previsor.alimentar_banco_dados_raw_docker()
 
-            ProcessadorETL.processar_lote_unificado()
+            # ProcessadorETL.processar_lote_unificado()
 
             # Alimentação do banco de dados ITAD para o docker
             if PostgreSQL.buscar_appids_desatualizados_otimizado(arg_strNomeTabela="itad_raw"):
                 Previsor.alimentar_banco_dados_ITAD_docker()
+                Previsor.alimentar_ITAD_historico_precos()
 
             # Verificar e executar treinamento ML se necessário (a cada 90 dias)
-            cls._verificar_executar_treinamento_ml()
+            # cls._verificar_executar_treinamento_ml()
 
             cls._var_listTaskQueue = [1]
             

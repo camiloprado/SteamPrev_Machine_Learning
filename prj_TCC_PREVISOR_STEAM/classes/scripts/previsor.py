@@ -207,3 +207,78 @@ class Previsor:
             raise Exception(f"Erro ao alimentar o banco de dados ITAD (PostgreSQL): {e}")
         finally:
             PostgreSQL.desconectar()
+
+    @classmethod
+    def alimentar_ITAD_historico_precos(cls):
+        """
+        Alimenta o histórico de preços do ITAD para jogos desatualizados ou sem histórico.
+        Processa apenas registros que:
+        - Estão desatualizados (>90 dias) OU
+        - Não possuem histórico de preços
+
+        Retorna:
+        - None
+        """
+        try:
+            PostgreSQL.conectar()
+            
+            # Busca todos os dados ITAD
+            logger.info("Consultando registros ITAD...")
+            var_listITAD = PostgreSQL.buscar_todos_dados(arg_strNomeTabela="itad_raw")
+            
+            # Filtra registros que precisam de atualização
+            var_listITADID = []
+            var_intSemHistorico = 0
+            var_intDesatualizados = 0
+            
+            for var_dictItem in var_listITAD:
+                # Verifica se tem id_itad válido
+                if not ('id_itad' in var_dictItem and var_dictItem['id_itad']):
+                    continue
+                
+                var_strIdItad = var_dictItem['id_itad']
+                var_boolHistoricoVazio = not var_dictItem.get('historico_preco') or var_dictItem.get('historico_preco') in ['{}', '[]', None]
+                var_boolDesatualizado = False
+                
+                # Verifica se está desatualizado (>90 dias)
+                if var_dictItem.get('ultima_atualizacao'):
+                    try:
+                        var_dtUltimaAtualizacao = datetime.fromisoformat(str(var_dictItem['ultima_atualizacao']))
+                        var_intDiasDesdeAtualizacao = (datetime.now() - var_dtUltimaAtualizacao).days
+                        var_boolDesatualizado = var_intDiasDesdeAtualizacao > 90
+                    except:
+                        var_boolDesatualizado = True
+                else:
+                    var_boolDesatualizado = True
+                
+                # Adiciona à lista se histórico vazio OU desatualizado
+                if var_boolHistoricoVazio or var_boolDesatualizado:
+                    var_listITADID.append(var_strIdItad)
+                    if var_boolHistoricoVazio:
+                        var_intSemHistorico += 1
+                    if var_boolDesatualizado:
+                        var_intDesatualizados += 1
+            
+            logger.info(f"{'='*60}")
+            logger.info(f"Registros que precisam de atualização:")
+            logger.info(f"  - Sem histórico: {var_intSemHistorico:,}")
+            logger.info(f"  - Desatualizados (>90 dias): {var_intDesatualizados:,}")
+            logger.info(f"  - Total a processar: {len(var_listITADID):,}")
+            logger.info(f"{'='*60}")
+            
+            if len(var_listITADID) == 0:
+                logger.info("Nenhum registro ITAD precisa de atualização de histórico!")
+                return
+
+            logger.info(f"Iniciando alimentação do histórico de preços ITAD para {len(var_listITADID):,} jogos.")
+            
+            # Busca histórico de preços ITAD para os IDs selecionados
+            asyncio.run(SteamClient.fetch_price_history_bulk_batched(arg_seqItadPlain=var_listITADID))
+            
+            logger.info("Alimentação do histórico de preços ITAD concluída com sucesso!")
+                
+        except Exception as e:
+            logger.error(f"Erro ao alimentar o histórico de preços ITAD: {e}")
+            raise Exception(f"Erro ao alimentar o histórico de preços ITAD: {e}")
+        finally:
+            PostgreSQL.desconectar()

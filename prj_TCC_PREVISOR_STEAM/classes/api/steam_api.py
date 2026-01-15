@@ -813,7 +813,8 @@ class SteamClient:
             if var_intBatchNum < var_intTotalBatches - 1:
                 logger.info(f"Aguardando {var_intDelay}s antes do próximo batch...\n")
                 await asyncio.sleep(var_intDelay)
-        
+            PostgreSQL.inserir_dados_itad_raw_historico_preco_bulk(var_dictBatchResults)
+            
         logger.info(f"===========PROCESSAMENTO COMPLETO!==========")
         logger.info(f"Total processado: {len(var_dictAllResults):,} sucessos de {var_intTotalItems:,} itens ({len(var_dictAllResults)/var_intTotalItems:.2%})")
         
@@ -880,11 +881,11 @@ class SteamClient:
                         async with arg_clientSession.get(ITAD_HISTORY_URL, params=var_dictParams, timeout=30) as var_respResponse:
                             var_respResponse.raise_for_status()
                             # Processa os dados recebidos
-                            var_dictData = await var_respResponse.json()
+                            var_listData = await var_respResponse.json()
                             
                             # Verifica se os dados são válidos
-                            if var_dictData and var_dictData is not None:
-                                return var_dictData
+                            if var_listData and var_listData is not None:
+                                return var_listData
                             
                             # Caso não retorne dados válidos
                             var_intAusentes += 1
@@ -918,9 +919,9 @@ class SteamClient:
             
             # Filtra os resultados válidos e os retorna
             var_dictResults = {}
-            for idx, var_dictOut in enumerate(var_listOut):
-                if isinstance(var_dictOut, dict) and var_dictOut is not None:
-                    var_dictResults[arg_seqItadPlain[idx]] = var_dictOut
+            for idx, var_listOutData in enumerate(var_listOut):
+                if isinstance(var_listOutData, list) and var_listOutData is not None: 
+                    var_dictResults[arg_seqItadPlain[idx]] = var_listOutData
             
             var_intFalha = len(arg_seqItadPlain) - len(var_dictResults)
             logger.info(f"--- Busca concluída: ---")

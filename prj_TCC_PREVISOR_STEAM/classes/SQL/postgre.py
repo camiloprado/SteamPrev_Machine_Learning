@@ -504,6 +504,61 @@ class PostgreSQL:
             return var_intInseridos
     
     @classmethod
+    def inserir_dados_itad_raw_historico_preco_bulk(cls, arg_dictDadosItad: dict[str, list[dict]]) -> int:
+        """
+        Insere dados históricos de preços na tabela itad_raw em bulk.
+        
+        Parâmetros:
+        - arg_dictDadosItad (dict): Dicionário mapeando ID_ITAD -> lista de registros históricos
+        
+        Retorna:
+        - int: Número de registros inseridos
+        """
+        cls.conectar()
+        try:
+            if not arg_dictDadosItad:
+                logger.warning("Nenhum dado histórico de preços fornecido para inserção")
+                return 0
+            
+            var_intInseridos = 0
+            var_dateNow = datetime.now()
+
+            for var_strIDITAD, var_listHistorico in arg_dictDadosItad.items():
+                try:
+                    with cls._var_connConnection.cursor() as cursor:
+                        var_strSQLHistorico = """
+                        UPDATE itad_raw
+                        SET historico_preco = %s::jsonb,
+                            ultima_atualizacao = %s
+                        WHERE id_itad = %s;
+                        """
+                        
+                        # Converte lista para JSON string
+                        var_strHistoricoJson = json.dumps(var_listHistorico) if var_listHistorico else None
+                        
+                        cursor.execute(var_strSQLHistorico, (var_strHistoricoJson, var_dateNow, var_strIDITAD))
+                        
+                        # Verifica se algum registro foi atualizado
+                        if cursor.rowcount > 0:
+                            cls._var_connConnection.commit()
+                            var_intInseridos += 1
+                        else:
+                            logger.warning(f"ID_ITAD {var_strIDITAD} não encontrado em itad_raw (pulando)")
+                            cls._var_connConnection.rollback()
+
+                except Exception as e:
+                    cls._var_connConnection.rollback()
+                    logger.error(f"Erro ao atualizar histórico de preços para ID_ITAD {var_strIDITAD}: {e}")
+                    continue
+            
+            logger.info(f"Inseridos {var_intInseridos:,} registros no itad_raw")
+            return var_intInseridos
+                
+        except Exception as e:
+            logger.error(f"Erro geral ao inserir dados históricos de preços: {e}")
+            return var_intInseridos
+        
+    @classmethod
     def inserir_dados_itad_raw_batched(cls, arg_dictDadosItad: dict[int, dict], arg_intBatchSize: int = 1000) -> int:
         """
         Insere dados ITAD em lotes para evitar timeout.
