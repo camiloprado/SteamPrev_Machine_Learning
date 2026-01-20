@@ -68,7 +68,23 @@ class LimpezaDados:
         except Exception as e:
             logger.error(f"Erro ao tratar preço '{arg_strPreco}': {e}")
             return 0.0
-        
+    
+    @classmethod
+    def carregar_dataframe(cls, arg_strNomeTabela: str) -> pd.DataFrame:
+        """
+        Carrega os dados de uma tabela PostgreSQL em um DataFrame do pandas.
+
+        Parametros:
+        - arg_strNomeTabela (str): Nome da tabela no banco de dados.
+
+        Retorna:
+        - var_dfData (pd.DataFrame): DataFrame contendo os dados da tabela.
+        """
+        var_listData = PostgreSQL.buscar_todos_dados(arg_strNomeTabela=arg_strNomeTabela)
+        var_dfData = pd.DataFrame(var_listData)
+        return var_dfData
+    
+
     @classmethod
     def ordinal_encoder(cls, arg_dfData: pd.DataFrame, arg_listColunas: list) -> pd.DataFrame:
         """
