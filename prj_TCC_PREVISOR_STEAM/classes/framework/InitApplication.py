@@ -27,9 +27,12 @@ class InitApplication:
         logger.info("="*60)
         
         if arg_boolFirstRun:
-            Settings.start_docker_postgres()
+            var_boolDocker = Settings.start_docker_postgres()
             GetTask.abandona_fila(arg_boolAbandonar=True)
-            GetTask.criar_fila()
+            if var_boolDocker:
+                GetTask.criar_fila()
+            else:
+                raise Exception("Erro ao iniciar o Docker PostgreSQL.")
             
         for var_intTentativa in range(Settings._var_dictSettings["max_tentativas"]):
             try:

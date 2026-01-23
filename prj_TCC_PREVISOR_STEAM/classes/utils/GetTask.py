@@ -3,6 +3,7 @@ from prj_TCC_PREVISOR_STEAM.classes.api.steam_api import SteamClient
 from prj_TCC_PREVISOR_STEAM.classes.SQL.postgre import PostgreSQL
 from prj_TCC_PREVISOR_STEAM.classes.scripts.previsor import Previsor
 from prj_TCC_PREVISOR_STEAM.classes.scripts.ProcessadorETL import ProcessadorETL
+from prj_TCC_PREVISOR_STEAM.classes.limpeza.ProcessadorLimpeza import ProcessadorLimpeza
 from prj_TCC_PREVISOR_STEAM.classes.treinamento.treinamento import TreinarModelo
 
 from datetime import datetime
@@ -36,23 +37,26 @@ class GetTask:
             # Alimentação do banco de dados raw para o docker
             if PostgreSQL.buscar_appids_desatualizados_otimizado():
                 Previsor.alimentar_banco_dados_raw_docker()
-
-            # ProcessadorETL.processar_lote_unificado()
+                ProcessadorETL.processar_lote_unificado()
 
             # Alimentação do banco de dados ITAD para o docker
             if PostgreSQL.buscar_appids_desatualizados_otimizado(arg_strNomeTabela="itad_raw"):
                 Previsor.alimentar_banco_dados_ITAD_docker()
                 Previsor.alimentar_ITAD_historico_precos()
 
+            ProcessadorLimpeza.processar_completo()
             # Verificar e executar treinamento ML se necessário (a cada 90 dias)
             # cls._verificar_executar_treinamento_ml()
 
             cls._var_listTaskQueue = [1]
+            logger.info("Fila de tarefas criada com sucesso.")
             
         except Exception as e:
-            logger.error(f"Erro ao criar a fila de tarefas: {e}")
+            logger.error(f"Erro ao criar a fila de tarefas: {e}", exc_info=True)
+            # Fornecer mais detalhes sobre o erro
+            import traceback
+            logger.error(f"Traceback completo:\n{traceback.format_exc()}")
             raise Exception(f"Erro ao criar a fila de tarefas: {e}")
-        logger.info("Fila de tarefas criada com sucesso.")
         
     @classmethod
     def abandona_fila(cls, arg_boolAbandonar: bool = True):

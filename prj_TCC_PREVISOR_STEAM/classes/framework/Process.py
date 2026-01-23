@@ -29,7 +29,6 @@ class Process:
         logger.info("="*60)
         
         # Lógica para processar a tarefa
-        ProcessadorLimpeza.processar_todos()
         
         logger.info("="*60)
         logger.info("TAREFA PROCESSADA")
