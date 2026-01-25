@@ -196,8 +196,9 @@ class Settings:
         var_intLogLevelSupabase = getattr(logging, var_strLogLevelSupabase, logging.WARNING)
         var_logLogLevelSupabase = logging.WARNING
 
-        # Cria o diretório de logs se não existir
-        var_strLogDir = "resources/logs"
+        # Cria o diretório de logs se não existir (dentro de prj_TCC_PREVISOR_STEAM)
+        var_strBaseDir = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))  # prj_TCC_PREVISOR_STEAM
+        var_strLogDir = os.path.join(var_strBaseDir, "resources", "logs")
         os.makedirs(var_strLogDir, exist_ok=True)
         
         # Configuração básica do logging

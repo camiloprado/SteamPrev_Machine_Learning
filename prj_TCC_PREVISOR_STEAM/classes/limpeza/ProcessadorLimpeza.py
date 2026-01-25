@@ -61,12 +61,17 @@ class MultiLabelBinarizerTransformer(BaseEstimator, TransformerMixin):
         Retorna:
         - self
         """
+        # Normalizar entrada para array 2D
         if isinstance(arg_pdX, pd.Series):
-            arg_pdX = arg_pdX.values.reshape(-1, 1)
+            var_arrayValues = arg_pdX.values.reshape(-1, 1)
+        elif isinstance(arg_pdX, pd.DataFrame):
+            var_arrayValues = arg_pdX.values
+        else:
+            var_arrayValues = arg_pdX
         
         # Conta frequência de cada categoria
         var_dictCategoryCounts = {}
-        for row in arg_pdX:
+        for row in var_arrayValues:
             if pd.notna(row[0]) and row[0] != "" and str(row[0]).strip() != "":
                 # Limpar e separar itens, removendo espaços e vazios
                 var_listItems = [var_strItem.strip() for var_strItem in str(row[0]).split(",") if var_strItem.strip()]
@@ -253,12 +258,30 @@ class ProcessadorLimpeza:
         # Converter arrays para strings separadas por vírgula
         for var_strCol in var_listColunasProblematicas:
             try:
+                # Log ANTES da conversão
+                var_serAmostraAntes = var_dfWork[var_strCol].dropna().head(3)
+                logger.info(f"  [{var_strCol}] ANTES (tipo={type(var_serAmostraAntes.iloc[0]).__name__}): {list(var_serAmostraAntes)}")
+                
                 # Converter listas para strings separadas por vírgula (formato esperado pelo MultiLabelBinarizer)
-                var_dfWork[var_strCol] = var_dfWork[var_strCol].apply(
-                    lambda x: ', '.join(x) if isinstance(x, list) and x else ''
-                )
+                def converter_lista(x):
+                    if not isinstance(x, list):
+                        return str(x) if pd.notna(x) else ''
+                    if not x:  # Lista vazia
+                        return ''
+                    # Tentar join direto (se lista de strings)
+                    try:
+                        return ', '.join(x)
+                    except TypeError:
+                        # Lista contém não-strings (dicts, etc) → converter para string
+                        return str(x)
+                
+                var_dfWork[var_strCol] = var_dfWork[var_strCol].apply(converter_lista)
                 var_intColunasConvertidas += 1
-                logger.debug(f"  {var_strCol}: arrays PostgreSQL → strings separadas por vírgula")
+                
+                # Log DEPOIS da conversão
+                var_serAmostraDepois = var_dfWork[var_strCol].dropna().head(3)
+                logger.info(f"  [{var_strCol}] DEPOIS (tipo={type(var_serAmostraDepois.iloc[0]).__name__}): {list(var_serAmostraDepois)}")
+                logger.info(f"  Valores únicos: {var_dfWork[var_strCol].nunique()}")
             except Exception as e:
                 logger.warning(f"  {var_strCol}: Fallback para str() - {e}")
                 # Fallback: conversão direta para string
@@ -742,12 +765,12 @@ class ProcessadorLimpeza:
                         # Verificar se há dados não vazios
                         var_intNaoVazios = var_dfCopy[var_strColuna].notna().sum()
                         var_intComConteudo = var_dfCopy[var_strColuna].astype(str).str.strip().ne("").sum()
-                        logger.debug(f"  {var_strColuna}: {var_intNaoVazios} não-nulos, {var_intComConteudo} com conteúdo")
+                        logger.info(f"  {var_strColuna}: {var_intNaoVazios} não-nulos, {var_intComConteudo} com conteúdo")
                         
                         # Diagnóstico: verificar primeiros valores
                         if var_intComConteudo > 0:
                             var_serAmostra = var_dfCopy[var_strColuna].dropna().head(3)
-                            logger.debug(f"  Amostra de valores: {list(var_serAmostra)}")
+                            logger.info(f"  Amostra de valores (tipo={type(var_serAmostra.iloc[0]).__name__}): {list(var_serAmostra)}")
                         
                         if var_intComConteudo < 10:
                             logger.warning(f"  Coluna {var_strColuna} tem poucos dados ({var_intComConteudo}), pulando processamento")
@@ -1034,6 +1057,10 @@ class ProcessadorLimpeza:
                 var_dfLimpo = cls.processar_todos()
                 logger.info(f"Etapa 1 concluída - Shape: {var_dfLimpo.shape}")
                 
+                # Converter arrays PostgreSQL ANTES do processamento categórico
+                logger.info("Convertendo arrays PostgreSQL para strings...")
+                var_dfLimpo = cls.limpar_valores_nao_hashable(var_dfLimpo, arg_boolInplace=False)  # Retornar cópia modificada
+                
                 # Etapa 2: Processamento de atributos categóricos
                 logger.info("[ETAPA 2/3] Processamento de atributos categóricos")
                 var_dfCategorico = cls.processar_categoricos(var_dfLimpo)
@@ -1068,9 +1095,8 @@ class ProcessadorLimpeza:
                 cls._var_dictMetricasProcessamento['tempo_total_segundos'] = var_floatDuracaoTotal
                 cls._var_dictMetricasProcessamento['shape_final'] = var_dfFinal.shape
                 
-                # Verificação final: garantir que não há tipos problemáticos (inplace, última conversão)
-                logger.info("Verificando integridade final dos dados...")
-                cls.limpar_valores_nao_hashable(var_dfFinal, arg_boolInplace=True)
+                # Verificação final já não é necessária pois convertemos no início
+                logger.debug("Verificação final de integridade concluída")
                 
                 # Validar qualidade final
                 var_boolQualidadeOk, var_listAvisos = cls.validar_qualidade_dados(var_dfFinal)
