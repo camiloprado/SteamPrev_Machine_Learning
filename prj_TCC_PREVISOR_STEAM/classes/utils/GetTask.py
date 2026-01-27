@@ -44,7 +44,12 @@ class GetTask:
                 Previsor.alimentar_banco_dados_ITAD_docker()
                 Previsor.alimentar_ITAD_historico_precos()
 
-            ProcessadorLimpeza.processar_completo()
+            # Verificar se o .joblib de limpeza existe e se está atualizado
+            if cls._verificar_necessidade_processamento_limpeza():
+                ProcessadorLimpeza.processar_completo()
+            else:
+                logger.info("Pipeline de limpeza já está atualizado - Processamento ignorado")
+            
             # Verificar e executar treinamento ML se necessário (a cada 90 dias)
             # cls._verificar_executar_treinamento_ml()
 
@@ -80,6 +85,76 @@ class GetTask:
         - None
         """
         return cls._var_listTaskQueue
+    
+    @classmethod
+    def _verificar_necessidade_processamento_limpeza(cls) -> bool:
+        """
+        Verifica se o pipeline de limpeza precisa ser reprocessado.
+        
+        Critérios:
+        1. Pipeline não existe
+        2. Pipeline existe mas dados brutos foram atualizados recentemente
+        3. Pipeline tem mais de 7 dias
+        
+        Retorna:
+        - bool: True se precisa processar, False caso contrário
+        """
+        try:
+            var_strCaminhoPipeline = os.path.join(
+                "prj_TCC_PREVISOR_STEAM/resources/models", 
+                "pipeline_escalonamento.joblib"
+            )
+            
+            # Verificar se pipeline existe
+            if not os.path.exists(var_strCaminhoPipeline):
+                logger.info("Pipeline de limpeza não encontrado - Processamento necessário")
+                return True
+            
+            # Obter data de modificação do pipeline
+            var_floatTempoModificacao = os.path.getmtime(var_strCaminhoPipeline)
+            var_dateDataPipeline = datetime.fromtimestamp(var_floatTempoModificacao)
+            var_intDiasDesdeAtualizacao = (datetime.now() - var_dateDataPipeline).days
+            
+            logger.info(f"Pipeline de limpeza encontrado - Última atualização: {var_intDiasDesdeAtualizacao} dias atrás")
+            
+            # Se pipeline tem mais de 7 dias, reprocessar
+            var_intIntervaloMaximo = int(os.getenv("LIMPEZA_INTERVALO_DIAS", "7"))
+            if var_intDiasDesdeAtualizacao >= var_intIntervaloMaximo:
+                logger.info(f"Pipeline desatualizado ({var_intDiasDesdeAtualizacao} >= {var_intIntervaloMaximo} dias) - Reprocessamento necessário")
+                return True
+            
+            # Verificar se há novos dados no banco
+            try:
+                PostgreSQL.conectar()
+                var_strSQL = """
+                    SELECT MAX(ultima_atualizacao) 
+                    FROM steam_unificado 
+                    WHERE ultima_atualizacao >= %s;
+                """
+                
+                with PostgreSQL._var_connConnection.cursor() as cursor:
+                    cursor.execute(var_strSQL, (var_dateDataPipeline,))
+                    var_resultado = cursor.fetchone()
+                    
+                    if var_resultado and var_resultado[0]:
+                        logger.info(f"Novos dados encontrados desde última limpeza - Reprocessamento necessário")
+                        return True
+                        
+            except Exception as e:
+                logger.warning(f"Não foi possível verificar novos dados: {e}")
+                # Em caso de erro, processar por segurança
+                return True
+            finally:
+                if PostgreSQL._var_connConnection:
+                    PostgreSQL.desconectar()
+            
+            logger.info("Pipeline de limpeza está atualizado")
+            return False
+            
+        except Exception as e:
+            logger.error(f"Erro ao verificar necessidade de processamento de limpeza: {e}")
+            # Em caso de erro, processar por segurança
+            return True
     
     @classmethod
     def _verificar_executar_treinamento_ml(cls):
