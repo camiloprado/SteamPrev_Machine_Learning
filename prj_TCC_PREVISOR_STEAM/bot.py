@@ -1,7 +1,7 @@
-from prj_TCC_PREVISOR_STEAM.classes.framework.AllSettings import Settings
-from prj_TCC_PREVISOR_STEAM.classes.framework.Initialization import Initialization
-from prj_TCC_PREVISOR_STEAM.classes.framework.Loop import Loop
-from prj_TCC_PREVISOR_STEAM.classes.framework.End import End
+from prj_TCC_PREVISOR_STEAM.classes.core.settings import Settings
+from prj_TCC_PREVISOR_STEAM.classes.core.initialization import Initialization
+from prj_TCC_PREVISOR_STEAM.classes.core.loopstation import Loop
+from prj_TCC_PREVISOR_STEAM.classes.core.endprocess import End
 import logging
 
 logger = logging.getLogger(__name__)

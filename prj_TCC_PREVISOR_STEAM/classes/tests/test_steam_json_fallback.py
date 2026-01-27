@@ -11,7 +11,7 @@ logging.basicConfig(
     format='%(asctime)s - %(levelname)s - %(message)s'
 )
 
-from prj_TCC_PREVISOR_STEAM.classes.api.steam_api import SteamClient
+from prj_TCC_PREVISOR_STEAM.classes.integrations.steam.client import SteamClient
 
 print("\n" + "="*80)
 print("TESTE: Carregamento com fallback para steam_applist.json")
