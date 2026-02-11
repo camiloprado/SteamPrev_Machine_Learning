@@ -1,10 +1,13 @@
 from prj_TCC_PREVISOR_STEAM.classes.framework.AllSettings import Settings
 from prj_TCC_PREVISOR_STEAM.classes.SQL.postgre import PostgreSQL
+from prj_TCC_PREVISOR_STEAM.classes.limpeza.ProcessadorLimpeza import ProcessadorLimpeza
+from prj_TCC_PREVISOR_STEAM.classes.limpeza.limpeza_dados import LimpezaDados
 
 from sklearn.ensemble import RandomForestClassifier, RandomForestRegressor
 from sklearn.preprocessing import LabelEncoder, StandardScaler
 from sklearn.metrics import accuracy_score, mean_squared_error, f1_score, classification_report
 from sklearn.model_selection import train_test_split
+import os
 import xgboost as xgb
 import lightgbm as lgb
 import pandas as pd
@@ -32,6 +35,15 @@ class TreinarModelo:
     - LightGBM: Muito rápido, eficiente com grandes datasets
     """
     
+    @classmethod
+    def carregar_dados_treinamento(cls):
+        """
+        Carrega o pipeline completo de limpeza dos dados para treinamento do modelo.
+        """
+
+        var_objPipeline = ProcessadorLimpeza.carregar_pipeline()
+        
+        
     @classmethod
     def carregar_dados_steam_unificado(cls, arg_intDiasJanela: int = 90) -> pd.DataFrame:
         """

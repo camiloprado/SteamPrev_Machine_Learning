@@ -199,6 +199,9 @@ class Settings:
         # Cria o diretório de logs se não existir (dentro de prj_TCC_PREVISOR_STEAM)
         var_strBaseDir = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))  # prj_TCC_PREVISOR_STEAM
         var_strLogDir = os.path.join(var_strBaseDir, "resources", "logs")
+        # Garante que usa o caminho absoluto correto
+        if not os.path.isabs(var_strLogDir):
+            var_strLogDir = os.path.abspath(var_strLogDir)
         os.makedirs(var_strLogDir, exist_ok=True)
         
         # Configuração básica do logging

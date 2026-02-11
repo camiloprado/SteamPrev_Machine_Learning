@@ -133,10 +133,11 @@ class PostgreSQL:
                 logger.info(f"Inserção em bulk concluída: {var_intRowCount} registros processados em steam_raw.")
                 
                 var_listAppidsInseridos = []
-                
                 for var_dictDados in arg_listDados:
                     var_intAppid = var_dictDados.get("appid")
                     var_dictDetalhes = var_dictDados.get("detalhes")
+                    if var_dictDetalhes == "AUSENTE":
+                        continue
                     
                     if var_intAppid and var_dictDetalhes and var_dictDetalhes.get("name"):
                         var_listAppidsInseridos.append((

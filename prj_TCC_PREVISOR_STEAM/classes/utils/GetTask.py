@@ -5,6 +5,7 @@ from prj_TCC_PREVISOR_STEAM.classes.scripts.previsor import Previsor
 from prj_TCC_PREVISOR_STEAM.classes.scripts.ProcessadorETL import ProcessadorETL
 from prj_TCC_PREVISOR_STEAM.classes.limpeza.ProcessadorLimpeza import ProcessadorLimpeza
 from prj_TCC_PREVISOR_STEAM.classes.treinamento.treinamento import TreinarModelo
+from prj_TCC_PREVISOR_STEAM.classes.treinamento.ProcessadorTreinamento import ProcessadorTreinamento
 
 from datetime import datetime
 from time import sleep
@@ -28,10 +29,12 @@ class GetTask:
         """
         logger.info("Criando a fila de tarefas.")
         try:
+            # Procura a lista genérica de apps na Steam
             try:
                 var_listDados = SteamClient.find_app_list()
                 PostgreSQL.inserir_dadosSteamGenerico(arg_listDadosGerais=var_listDados)
             except:
+                # Se não encontrar, carrega do arquivo local
                 var_listDados = SteamClient.load_app_list()
 
             # Alimentação do banco de dados raw para o docker
@@ -50,9 +53,7 @@ class GetTask:
             else:
                 logger.info("Pipeline de limpeza já está atualizado - Processamento ignorado")
             
-            # Verificar e executar treinamento ML se necessário (a cada 90 dias)
-            # cls._verificar_executar_treinamento_ml()
-
+            ProcessadorTreinamento.executar_treinamento()
             cls._var_listTaskQueue = [1]
             logger.info("Fila de tarefas criada com sucesso.")
             
