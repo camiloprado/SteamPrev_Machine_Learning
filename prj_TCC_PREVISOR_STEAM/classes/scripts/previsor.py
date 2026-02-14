@@ -1,5 +1,6 @@
 from prj_TCC_PREVISOR_STEAM.classes.framework.AllSettings import Settings
 from prj_TCC_PREVISOR_STEAM.classes.api.steam_api import SteamClient
+from prj_TCC_PREVISOR_STEAM.classes.api.itad_api import ITADClient
 from prj_TCC_PREVISOR_STEAM.classes.SQL.postgre import PostgreSQL
 from prj_TCC_PREVISOR_STEAM.classes.limpeza.limpeza_dados import LimpezaDados
 
@@ -75,6 +76,9 @@ class Previsor:
             if var_listAppIDDesatualizados:
                 logger.info(f"AppIDs desatualizados adicionados: {len(var_listAppIDDesatualizados):,}")
             
+            # Deduplicação final - converte set de volta para lista ordenada
+            var_listAppIDParaProcessar = sorted(list(var_setAppIDParaProcessar))
+            
             var_intTamanhoTotalFila = len(var_listAppIDParaProcessar)
             logger.info(f"Total final de AppIDs a processar (PC {var_intPcId}): {var_intTamanhoTotalFila:,}")
 
@@ -82,8 +86,12 @@ class Previsor:
                 logger.info("Nenhum AppID para processar! Todos os dados estão atualizados.")
                 return
 
+            # Recupera checkpoint se houver
+            var_intInicioCheckpoint = PostgreSQL.recuperar_checkpoint(var_intPcId, "STEAM")
+            logger.info(f"Iniciando do índice: {var_intInicioCheckpoint:,}")
+
             # Itera sobre os aplicativos em lotes
-            for i in range(0, var_intTamanhoTotalFila, var_intRange):
+            for i in range(var_intInicioCheckpoint, var_intTamanhoTotalFila, var_intRange):
                 logger.info(f"Processando aplicativos de {i + 1} a {min(i + var_intRange, var_intTamanhoTotalFila)} de {var_intTamanhoTotalFila}")
                 logger.info(f"Progresso: {(i/var_intTamanhoTotalFila)*100:.1f}%")
                 logger.info(f"Tempo estimado restante: {((var_intTamanhoTotalFila - i) / var_intRange) * 2} minutos")
@@ -102,7 +110,18 @@ class Previsor:
                 
                 # Busca reviews dos jogos
                 asyncio.run(SteamClient.fetch_reviews_summary_batched(arg_seqAppids=var_listAppIDAtual))
+                
+                # Salva checkpoint após batch bem-sucedido
+                PostgreSQL.salvar_checkpoint(var_intPcId, i + var_intRange, "STEAM")
+                
+                # Pausa entre lotes
+                if i + var_intRange < var_intTamanhoTotalFila:
+                    logger.info("Aguardando 2 segundos antes do próximo lote...")
+                    sleep(2)
             
+            # Limpa checkpoint após conclusão total
+            PostgreSQL.limpar_checkpoint(var_intPcId, "STEAM")
+            logger.info("Processamento Steam completo! Checkpoint limpo.")
             logger.info("Processamento concluído com sucesso!")
                 
         except Exception as e:
@@ -167,6 +186,9 @@ class Previsor:
             if var_listAppIDDesatualizados:
                 logger.info(f"AppIDs ITAD desatualizados adicionados: {len(var_listAppIDDesatualizados):,}")
             
+            # Deduplicação final - converte set de volta para lista ordenada
+            var_listAppIDParaProcessar = sorted(list(var_setAppIDParaProcessar))
+            
             var_intTamanhoTotalFila = len(var_listAppIDParaProcessar)
             logger.info(f"Total final de AppIDs a processar ITAD (PC {var_intPcId}): {var_intTamanhoTotalFila:,}")
 
@@ -174,8 +196,12 @@ class Previsor:
                 logger.info("Nenhum AppID para processar no ITAD! Todos os dados estão atualizados.")
                 return
 
+            # Recupera checkpoint se houver
+            var_intInicioCheckpoint = PostgreSQL.recuperar_checkpoint(var_intPcId, "ITAD")
+            logger.info(f"Iniciando ITAD do índice: {var_intInicioCheckpoint:,}")
+
             # Itera sobre os aplicativos em lotes
-            for i in range(0, var_intTamanhoTotalFila, var_intRange):
+            for i in range(var_intInicioCheckpoint, var_intTamanhoTotalFila, var_intRange):
                 logger.info(f"Processando aplicativos ITAD de {i + 1} a {min(i + var_intRange, var_intTamanhoTotalFila)} de {var_intTamanhoTotalFila}")
                 logger.info(f"Progresso: {(i/var_intTamanhoTotalFila)*100:.1f}%")
                 logger.info(f"----------------------------------------")
@@ -189,16 +215,24 @@ class Previsor:
                 logger.info(f"Número de IDs ITAD a processar neste lote: {len(var_listAppIDAtual)}")
                 
                 # Busca dados ITAD para os AppIDs
-                asyncio.run(SteamClient.lookup_itad_ids_batched(arg_seqAppids=var_listAppIDAtual))
+                asyncio.run(ITADClient.lookup_itad_ids_batched(arg_seqAppids=var_listAppIDAtual))
                 
                 var_listITADID = list(PostgreSQL.buscar_itad_id_por_appid(arg_listAppids=var_listAppIDAtual))
 
                 # Busca histórico de preços ITAD para os AppIDs
-                asyncio.run(SteamClient.fetch_price_history_bulk_batched(arg_seqItadPlain=var_listITADID))
+                asyncio.run(ITADClient.fetch_price_history_bulk_batched(arg_seqItadPlain=var_listITADID))
+                
+                # Salva checkpoint após batch ITAD bem-sucedido
+                PostgreSQL.salvar_checkpoint(var_intPcId, i + var_intRange, "ITAD")
+                
                 # Pausa entre lotes
                 if i + var_intRange < var_intTamanhoTotalFila:
                     logger.info("Aguardando 2 segundos antes do próximo lote...")
                     sleep(2)
+            
+            # Limpa checkpoint após conclusão total ITAD
+            PostgreSQL.limpar_checkpoint(var_intPcId, "ITAD")
+            logger.info("Processamento ITAD completo! Checkpoint limpo.")
             
             logger.info("Processamento ITAD concluído com sucesso!")
                 
@@ -273,7 +307,7 @@ class Previsor:
             logger.info(f"Iniciando alimentação do histórico de preços ITAD para {len(var_listITADID):,} jogos.")
             
             # Busca histórico de preços ITAD para os IDs selecionados
-            asyncio.run(SteamClient.fetch_price_history_bulk_batched(arg_seqItadPlain=var_listITADID))
+            asyncio.run(ITADClient.fetch_price_history_bulk_batched(arg_seqItadPlain=var_listITADID))
             
             logger.info("Alimentação do histórico de preços ITAD concluída com sucesso!")
                 

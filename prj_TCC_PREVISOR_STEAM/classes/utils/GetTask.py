@@ -1,5 +1,5 @@
 from prj_TCC_PREVISOR_STEAM.classes.framework.AllSettings import Settings
-from prj_TCC_PREVISOR_STEAM.classes.api.steam_api import SteamClient
+from prj_TCC_PREVISOR_STEAM.classes.api.local_steam import LocalClient
 from prj_TCC_PREVISOR_STEAM.classes.SQL.postgre import PostgreSQL
 from prj_TCC_PREVISOR_STEAM.classes.scripts.previsor import Previsor
 from prj_TCC_PREVISOR_STEAM.classes.scripts.ProcessadorETL import ProcessadorETL
@@ -31,11 +31,11 @@ class GetTask:
         try:
             # Procura a lista genérica de apps na Steam
             try:
-                var_listDados = SteamClient.find_app_list()
+                var_listDados = LocalClient.find_app_list()
                 PostgreSQL.inserir_dadosSteamGenerico(arg_listDadosGerais=var_listDados)
             except:
                 # Se não encontrar, carrega do arquivo local
-                var_listDados = SteamClient.load_app_list()
+                var_listDados = LocalClient.load_app_list()
 
             # Alimentação do banco de dados raw para o docker
             if PostgreSQL.buscar_appids_desatualizados_otimizado():
@@ -135,9 +135,9 @@ class GetTask:
                 
                 with PostgreSQL._var_connConnection.cursor() as cursor:
                     cursor.execute(var_strSQL, (var_dateDataPipeline,))
-                    var_resultado = cursor.fetchone()
+                    var_tupleResultado = cursor.fetchone()
                     
-                    if var_resultado and var_resultado[0]:
+                    if var_tupleResultado and var_tupleResultado[0]:
                         logger.info(f"Novos dados encontrados desde última limpeza - Reprocessamento necessário")
                         return True
                         

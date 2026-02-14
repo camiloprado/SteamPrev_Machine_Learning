@@ -1,4 +1,3 @@
-
 import os
 import logging
 import subprocess
@@ -59,11 +58,15 @@ class Settings:
         Retorna:
         - dict: Configurações da API de Detalhes da Steam.
         """
-        var_intBatchesSize: int = int(os.getenv("STEAM_BATCH_SIZE_DETAILS", "200"))
-        var_intDelayBetweenBatches: int = int(os.getenv("STEAM_DELAY_BETWEEN_BATCHES_DETAILS", "120"))
+        var_intBatchesSize: int = int(os.getenv("STEAM_BATCH_SIZE_DETAILS", "50"))
+        var_intBatchesSizeMin: int = int(os.getenv("STEAM_BATCH_SIZE_DETAILS_MIN", "10"))
+        var_intBatchesSizeMax: int = int(os.getenv("STEAM_BATCH_SIZE_DETAILS_MAX", "200"))
+        var_intDelayBetweenBatches: int = int(os.getenv("STEAM_DELAY_BETWEEN_BATCHES_DETAILS", "180"))
         var_intAsyncConcurrency: int = int(os.getenv("STEAM_ASYNC_CONCURRENCY_DETAILS", "1"))
         return {
             "BatchSize": var_intBatchesSize,
+            "BatchSizeMin": var_intBatchesSizeMin,
+            "BatchSizeMax": var_intBatchesSizeMax,
             "Delay": var_intDelayBetweenBatches,
             "Concurrency": var_intAsyncConcurrency
         }

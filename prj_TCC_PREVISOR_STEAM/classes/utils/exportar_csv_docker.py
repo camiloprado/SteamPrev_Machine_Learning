@@ -92,19 +92,41 @@ def exportar_tabela_csv(
                 var_tupPK = cursor.fetchone()
                 var_strColunaOrdem = var_tupPK[0] if var_tupPK else var_listColunas[0]
             
-            # Processa em batches
-            var_intOffset = 0
-            while var_intOffset < var_intTotal:
-                # Busca batch
-                var_strSQLBatch = f"""
-                SELECT * FROM {arg_strNomeTabela}
-                ORDER BY {var_strColunaOrdem}
-                LIMIT {arg_intBatchSize} OFFSET {var_intOffset};
-                """
+            logger.info(f"   Usando coluna '{var_strColunaOrdem}' para paginação (keyset)")
+            
+            # Processa em batches usando KEYSET PAGINATION (mantém performance constante)
+            var_objUltimoCursor = None  # Valor do último registro processado
+            
+            while var_intProcessados < var_intTotal:
+                # Busca batch usando WHERE > last_key (keyset pagination)
+                if var_objUltimoCursor is None:
+                    var_strSQLBatch = f"""
+                    SELECT * FROM {arg_strNomeTabela}
+                    ORDER BY {var_strColunaOrdem}
+                    LIMIT {arg_intBatchSize};
+                    """
+                else:
+                    # Escapa valor para evitar SQL injection
+                    if isinstance(var_objUltimoCursor, str):
+                        var_strCursorEscapado = var_objUltimoCursor.replace("'", "''")
+                        var_strCondicao = f"{var_strColunaOrdem} > '{var_strCursorEscapado}'"
+                    else:
+                        var_strCondicao = f"{var_strColunaOrdem} > {var_objUltimoCursor}"
+                    
+                    var_strSQLBatch = f"""
+                    SELECT * FROM {arg_strNomeTabela}
+                    WHERE {var_strCondicao}
+                    ORDER BY {var_strColunaOrdem}
+                    LIMIT {arg_intBatchSize};
+                    """
                 
                 with PostgreSQL._var_connConnection.cursor() as cursor:
                     cursor.execute(var_strSQLBatch)
                     var_listRegistros = cursor.fetchall()
+                
+                if not var_listRegistros:
+                    logger.info(f"   Nenhum registro encontrado após cursor {var_objUltimoCursor}. Finalizando.")
+                    break
                 
                 # Escreve linhas (converte JSONB para string)
                 for var_tupleRegistro in var_listRegistros:
@@ -123,9 +145,12 @@ def exportar_tabela_csv(
                             var_listLinha.append(str(var_objValor))
                     
                     var_csvWriter.writerow(var_listLinha)
+                    
+                    # Atualiza cursor para próximo batch (último valor da coluna de ordem)
+                    var_intIndiceColunaOrdem = var_listColunas.index(var_strColunaOrdem)
+                    var_objUltimoCursor = var_tupleRegistro[var_intIndiceColunaOrdem]
                 
                 var_intProcessados += len(var_listRegistros)
-                var_intOffset += arg_intBatchSize
                 
                 # Log de progresso
                 var_fltProgresso = (var_intProcessados / var_intTotal) * 100

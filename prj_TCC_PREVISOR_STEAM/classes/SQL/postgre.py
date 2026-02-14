@@ -1,7 +1,8 @@
 from prj_TCC_PREVISOR_STEAM.classes.framework.AllSettings import Settings
 
 from datetime import datetime
-from psycopg2.extras import execute_batch
+from psycopg2.extras import execute_batch, execute_values
+from psycopg2 import pool
 from time import sleep
 from typing import Generator
 import psycopg2, json, logging
@@ -13,48 +14,155 @@ class PostgreSQL:
     Classe para operações com PostgreSQL.
     """
     _var_connConnection = None
+    _var_poolConnectionPool = None
 
     @classmethod
-    def conectar(cls):
-        """
-        Estabelece uma conexão com o banco de dados PostgreSQL.
-        Levanta exceção se não conseguir conectar.
-        """
-        if cls._var_connConnection is None or cls._var_connConnection.closed:
+    def _init_pool(cls):
+        """Inicializa connection pool se ainda não existir"""
+        if cls._var_poolConnectionPool is None:
             try:
                 var_strDbname = Settings._var_dictSettings["db_name"]
                 var_strUser = Settings._var_dictSettings["db_user"]
                 var_strPassword = Settings._var_dictSettings["db_password"]
                 var_strHost = Settings._var_dictSettings["db_host"]
                 var_intPort = Settings._var_dictSettings["db_port"]
-                cls._var_connConnection = psycopg2.connect(
+                
+                cls._var_poolConnectionPool = pool.SimpleConnectionPool(
+                    minconn=1,
+                    maxconn=10,
                     dbname=var_strDbname,
                     user=var_strUser,
                     password=var_strPassword,
                     host=var_strHost,
                     port=var_intPort
                 )
-                logger.info(f"Conexão com o banco de dados estabelecida com sucesso: {var_strUser}@{var_strHost}:{var_intPort}/{var_strDbname}")
+                logger.info(f"Connection pool criado: {var_strUser}@{var_strHost}:{var_intPort}/{var_strDbname}")
+            except Exception as e:
+                logger.error(f"Erro ao criar connection pool: {e}")
+                raise Exception(f"Erro ao criar connection pool: {e}")
+    
+    @classmethod
+    def conectar(cls):
+        """
+        Estabelece uma conexão com o banco de dados PostgreSQL usando pool.
+        Levanta exceção se não conseguir conectar.
+        """
+        if cls._var_connConnection is None or cls._var_connConnection.closed:
+            try:
+                cls._init_pool()
+                cls._var_connConnection = cls._var_poolConnectionPool.getconn()
+                logger.debug("Conexão obtida do pool")
             except Exception as e:
                 cls._var_connConnection = None
-                logger.error(f"Erro ao conectar ao banco de dados: {e}")
-                raise Exception(f"Erro ao conectar ao banco de dados: {e}")
+                logger.error(f"Erro ao obter conexão do pool: {e}")
+                raise Exception(f"Erro ao obter conexão do pool: {e}")
         
     @classmethod
     def desconectar(cls):
         """
-        Encerra a conexão com o banco de dados PostgreSQL.
+        Devolve a conexão ao pool em vez de fechar.
         """
         try:
-            if cls._var_connConnection:
-                cls._var_connConnection.close()
-                logger.info("Conexão com o banco de dados encerrada.")
+            if cls._var_connConnection and cls._var_poolConnectionPool:
+                cls._var_poolConnectionPool.putconn(cls._var_connConnection)
+                logger.debug("Conexão devolvida ao pool")
                 cls._var_connConnection = None
-            else:
-                logger.info("Nenhuma conexão ativa para encerrar.")
+            elif cls._var_connConnection:
+                cls._var_connConnection.close()
+                logger.debug("Conexão fechada (sem pool)")
+                cls._var_connConnection = None
         except Exception as e:
-            logger.error(f"Erro ao desconectar do banco de dados: {e}")
-            raise Exception(f"Erro ao desconectar do banco de dados: {e}")
+            logger.error(f"Erro ao devolver conexão ao pool: {e}")
+            raise Exception(f"Erro ao devolver conexão ao pool: {e}")
+    
+    @classmethod
+    def salvar_checkpoint(cls, arg_intPcId: int, arg_intUltimoIndice: int, arg_strTipo: str = "STEAM"):
+        """
+        Salva checkpoint do progresso de processamento.
+        
+        Parâmetros:
+        - arg_intPcId: ID do PC processando
+        - arg_intUltimoIndice: Último índice processado com sucesso
+        - arg_strTipo: Tipo de processamento (STEAM ou ITAD)
+        """
+        cls.conectar()
+        try:
+            var_strSQL = """
+            INSERT INTO processing_checkpoint (pc_id, ultimo_indice, tipo_processamento, timestamp)
+            VALUES (%s, %s, %s, NOW())
+            ON CONFLICT (pc_id, tipo_processamento) DO UPDATE SET
+                ultimo_indice = EXCLUDED.ultimo_indice,
+                timestamp = EXCLUDED.timestamp;
+            """
+            
+            with cls._var_connConnection.cursor() as cursor:
+                cursor.execute(var_strSQL, (arg_intPcId, arg_intUltimoIndice, arg_strTipo))
+                cls._var_connConnection.commit()
+                logger.info(f"Checkpoint salvo: PC {arg_intPcId}, índice {arg_intUltimoIndice:,}, tipo {arg_strTipo}")
+        except Exception as e:
+            logger.warning(f"Erro ao salvar checkpoint (tabela pode não existir): {e}")
+            cls._var_connConnection.rollback()
+        finally:
+            cls.desconectar()
+    
+    @classmethod
+    def recuperar_checkpoint(cls, arg_intPcId: int, arg_strTipo: str = "STEAM") -> int:
+        """
+        Recupera último checkpoint salvo para continuar processamento.
+        
+        Parâmetros:
+        - arg_intPcId: ID do PC
+        - arg_strTipo: Tipo de processamento (STEAM ou ITAD)
+        
+        Retorna:
+        - int: Último índice processado ou 0 se não houver checkpoint
+        """
+        cls.conectar()
+        try:
+            var_strSQL = """
+            SELECT ultimo_indice FROM processing_checkpoint
+            WHERE pc_id = %s AND tipo_processamento = %s;
+            """
+            
+            with cls._var_connConnection.cursor() as cursor:
+                cursor.execute(var_strSQL, (arg_intPcId, arg_strTipo))
+                var_result = cursor.fetchone()
+                
+                if var_result:
+                    var_intIndice = var_result[0]
+                    logger.info(f"Checkpoint recuperado: PC {arg_intPcId}, índice {var_intIndice:,}, tipo {arg_strTipo}")
+                    return var_intIndice
+                else:
+                    logger.info(f"Nenhum checkpoint encontrado para PC {arg_intPcId}, tipo {arg_strTipo}")
+                    return 0
+        except Exception as e:
+            logger.warning(f"Erro ao recuperar checkpoint (iniciando do zero): {e}")
+            return 0
+        finally:
+            cls.desconectar()
+    
+    @classmethod
+    def limpar_checkpoint(cls, arg_intPcId: int, arg_strTipo: str = "STEAM"):
+        """
+        Limpa checkpoint após conclusão bem-sucedida do processamento.
+        
+        Parâmetros:
+        - arg_intPcId: ID do PC
+        - arg_strTipo: Tipo de processamento
+        """
+        cls.conectar()
+        try:
+            var_strSQL = "DELETE FROM processing_checkpoint WHERE pc_id = %s AND tipo_processamento = %s;"
+            
+            with cls._var_connConnection.cursor() as cursor:
+                cursor.execute(var_strSQL, (arg_intPcId, arg_strTipo))
+                cls._var_connConnection.commit()
+                logger.info(f"Checkpoint limpo: PC {arg_intPcId}, tipo {arg_strTipo}")
+        except Exception as e:
+            logger.warning(f"Erro ao limpar checkpoint: {e}")
+            cls._var_connConnection.rollback()
+        finally:
+            cls.desconectar()
     
     @classmethod
     def criar_tabela(cls, arg_strSQL: str):
@@ -125,9 +233,24 @@ class PostgreSQL:
                 logger.warning("Nenhum dado válido para inserir após processamento.")
                 return
             
-            # Executa a inserção em batch
+            # Executa a inserção em batch otimizada com execute_values (3-5x mais rápido)
+            var_strSQLTemplate = """
+            INSERT INTO steam_raw (appid, detalhes, reviews, ultima_atualizacao)
+            VALUES %s
+            ON CONFLICT (appid) DO UPDATE SET
+                detalhes = COALESCE(EXCLUDED.detalhes, steam_raw.detalhes),
+                reviews = COALESCE(EXCLUDED.reviews, steam_raw.reviews),
+                ultima_atualizacao = EXCLUDED.ultima_atualizacao;
+            """
+            
             with cls._var_connConnection.cursor() as cursor:
-                cursor.executemany(var_strSQL, var_listValores)
+                execute_values(
+                    cursor, 
+                    var_strSQLTemplate, 
+                    var_listValores,
+                    template='(%s, %s, %s, %s)',
+                    page_size=200
+                )
                 var_intRowCount = cursor.rowcount
                 cls._var_connConnection.commit()
                 logger.info(f"Inserção em bulk concluída: {var_intRowCount} registros processados em steam_raw.")
@@ -183,6 +306,7 @@ class PostgreSQL:
             var_strSQL = f"""
             SELECT * FROM {arg_strNomeTabela};
             """
+            cls.conectar()
             with cls._var_connConnection.cursor() as cursor:
                 cursor.execute(var_strSQL)
                 var_resultados = cursor.fetchall()
@@ -192,6 +316,8 @@ class PostgreSQL:
         except Exception as e:
             logger.error(f"Erro ao buscar todos os dados da tabela '{arg_strNomeTabela}': {e}")
             raise Exception(f"Erro ao buscar todos os dados da tabela '{arg_strNomeTabela}': {e}")
+        finally:
+            cls.desconectar()
     
     @classmethod
     def buscar_jogos_desatualizados(cls, arg_strNomeTabela: str = "steam_raw", arg_intDiasAtualizacao: int = None, arg_intLimite: int = None) -> list[dict]:
@@ -231,7 +357,9 @@ class PostgreSQL:
         except Exception as e:
             logger.error(f"Erro ao buscar jogos desatualizados: {e}")
             return []
-    
+        finally:
+            cls.desconectar()
+
     @classmethod
     def buscar_appids_nao_processados_otimizado(cls, arg_intPcId: int = 1, arg_intTotalPcs: int = 1, arg_intLimite: int = None) -> list[int]:
         """
@@ -283,6 +411,8 @@ class PostgreSQL:
         except Exception as e:
             logger.error(f"Erro ao buscar AppIDs não processados: {e}")
             return []
+        finally:
+            cls.desconectar()
     
     @classmethod
     def buscar_appids_desatualizados_otimizado(cls, arg_intDiasAtualizacao: int = None, arg_intPcId: int = 1, arg_intTotalPcs: int = 1, arg_strNomeTabela: str = "steam_raw") -> list[int]:
@@ -335,7 +465,9 @@ class PostgreSQL:
         except Exception as e:
             logger.error(f"Erro ao buscar AppIDs desatualizados: {e}")
             return []
-    
+        finally:            
+            cls.desconectar()
+
     @classmethod
     def buscar_appids_sem_itad(cls, arg_intLimit: int = None) -> list:
         """
@@ -418,7 +550,10 @@ class PostgreSQL:
                 
         except Exception as e:
             raise Exception(f"Erro ao buscar AppIDs ITAD desatualizados: {e}")
-    
+
+        finally:
+            cls.desconectar()
+
     @classmethod
     def inserir_dados_itad_raw_bulk(cls, arg_dictDadosItad: dict[int, dict]) -> int:
         """
@@ -503,7 +638,10 @@ class PostgreSQL:
         except Exception as e:
             logger.error(f"Erro geral ao inserir dados ITAD em bulk: {e}\")")
             return var_intInseridos
-    
+
+        finally:
+            cls.desconectar()
+
     @classmethod
     def inserir_dados_itad_raw_historico_preco_bulk(cls, arg_dictDadosItad: dict[str, list[dict]]) -> int:
         """
@@ -559,6 +697,9 @@ class PostgreSQL:
             logger.error(f"Erro geral ao inserir dados históricos de preços: {e}")
             return var_intInseridos
         
+        finally:
+            cls.desconectar()
+
     @classmethod
     def inserir_dados_itad_raw_batched(cls, arg_dictDadosItad: dict[int, dict], arg_intBatchSize: int = 1000) -> int:
         """
@@ -667,7 +808,10 @@ class PostgreSQL:
         except Exception as e:
             logger.error(f"Erro ao inserir dados steam_generico: {e}")
             raise Exception(f"Erro ao inserir dados steam_generico: {e}")
-                 
+
+        finally:
+            cls.desconectar()
+
     @classmethod
     def buscar_itad_id_por_appid(cls, arg_listAppids: list) -> Generator[str | None, None, None]:
         """
@@ -783,3 +927,6 @@ class PostgreSQL:
             if cls._var_connConnection:
                 cls._var_connConnection.rollback()
             raise
+
+        finally:
+            cls.desconectar()
