@@ -1,7 +1,6 @@
 from prj_TCC_PREVISOR_STEAM.classes.framework.AllSettings import Settings
-from time import sleep
 from datetime import datetime
-import asyncio, random, json, logging, os, re, aiohttp, requests, traceback
+import asyncio, random, json, logging, os, aiohttp
 
 logger = logging.getLogger(__name__)
 
@@ -54,29 +53,29 @@ class SteamSpyClient:
 
             ## Return format for an app: ##
 
-            * appid - Steam Application ID. If it's 999999, then data for this application is hidden on developer's request, sorry.
-            * name - game's name
-            * developer - comma separated list of the developers of the game
-            * publisher - comma separated list of the publishers of the game
-            * score_rank - score rank of the game based on user reviews
-            * owners - owners of this application on Steam as a range.
-            * average_forever - average playtime since March 2009. In minutes.
-            * average_2weeks - average playtime in the last two weeks. In minutes.
-            * median_forever - median playtime since March 2009. In minutes.
-            * median_2weeks - median playtime in the last two weeks. In minutes.
-            * ccu - peak CCU yesterday.
-            * price - current US price in cents.
-            * initialprice - original US price in cents.
-            * discount - current discount in percents.
-            * tags - game's tags with votes in JSON array.
-            * languages - list of supported languages.
-            * genre - list of genres.
+            * appid - ID da aplicação da Steam. Se for 999999, então o dado da aplicação está oculta por conta da requisição, desculpa.
+            * name - Nome do jogo
+            * developer - Lista de Desenvolvedores do jogo separado por virgulas
+            * publisher - Lista de Distribuidores do jogo separado por virgulas
+            * score_rank - Ranke de Pontuação do jogo baseado em avaliações de usuários
+            * owners - Estimativa de quantas pessoas possuem o jogo.
+            * average_forever - Média de tempo jogado desde Março 2009. Em minutos.
+            * average_2weeks - Média de tempo jogado dentro de 2 semanas. Em minutos.
+            * median_forever - Mediana de tempo jogado desde Março 2009. Em minutos.
+            * median_2weeks - Mediana de tempo jogado dentro de 2 semanas. Em minutos.
+            * ccu - Pico global de usuários simultâneos de ontem.
+            * price - Valor do preço em US e em centavos.
+            * initialprice - Valor do preço original em US e em centavos.
+            * discount - Valor atual do desconto em porcentagem.
+            * tags - Tags do jogos como votos dentro de uma lista de JSON.
+            * languages - Lista de linguagens suportadas.
+            * genre - Lista de Generos.
         """
         var_intConcorrenciaPaginas = int(os.getenv("STEAMSPY_CONCURRENCY", "10"))  # 10 páginas paralelas
-        var_intMaxRetries = 3
-        var_intMaxPaginas = int(os.getenv("STEAMSPY_MAX_PAGES", "300"))  # ~273 páginas conhecidas + margem
+        var_intMaxRetries = int(os.getenv("STEAMSPY_MAX_RETRIES", "3"))  # Tentativas para erros temporários
+        var_intMaxPaginas = int(os.getenv("STEAMSPY_MAX_PAGES", "300"))
         
-        # ========== OTIMIZAÇÃO: Carrega dados locais para comparação ==========
+        # ========== Carrega dados locais para comparação ==========
         var_dictJogosLocais = {}  # {appid: name}
         var_strJsonPath = os.path.join(
             os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))),

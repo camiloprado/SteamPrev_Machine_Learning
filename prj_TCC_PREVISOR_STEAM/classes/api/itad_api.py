@@ -1,10 +1,9 @@
 from prj_TCC_PREVISOR_STEAM.classes.framework.AllSettings import Settings
 from prj_TCC_PREVISOR_STEAM.classes.SQL.postgre import PostgreSQL
 
-from typing import Any, Sequence
+from typing import Sequence
 from datetime import datetime, timedelta, timezone
-from time import sleep
-import asyncio, random, json, logging, os, re, aiohttp, requests, traceback
+import asyncio, random, logging, aiohttp
 
 logger = logging.getLogger(__name__)
 

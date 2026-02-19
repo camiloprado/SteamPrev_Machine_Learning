@@ -1,10 +1,10 @@
 from prj_TCC_PREVISOR_STEAM.classes.framework.AllSettings import Settings
 from prj_TCC_PREVISOR_STEAM.classes.SQL.postgre import PostgreSQL
 
-from typing import Any, Sequence
-from datetime import datetime, timedelta, timezone
-from time import sleep
-import asyncio, random, json, logging, os, re, aiohttp, requests, traceback
+from typing import Sequence
+from datetime import datetime
+import asyncio, random, logging, aiohttp, traceback
+from dotenv import load_dotenv
 
 logger = logging.getLogger(__name__)
 
@@ -55,7 +55,6 @@ class SteamClient:
         logger.info(f"Tempo Estimado para conclusão total do Batch: {(var_intTotalBatchesEstimado * cls._var_intDelay)/60:.1f} minutos")
         logger.info(f"================================\n")
         
-        var_dictAllResults = {}
         var_intCurrentIndex = 0
         var_intBatchNum = 0
         
@@ -187,6 +186,7 @@ class SteamClient:
             - var_dictStats (dict): Estatísticas do processamento (sucessos, ausentes, erros, taxa_efetiva).
         """
         try:
+            load_dotenv()
             var_dictConfigAPI = Settings.steam_api_details()
             var_intAsyncConcurrency = var_dictConfigAPI.get("Concurrency", 1)
             # Controle de concorrência
@@ -312,15 +312,13 @@ class SteamClient:
                 var_listOut = await asyncio.gather(*var_listTasks, return_exceptions=True)
                 logger.info("Busca assíncrona concluída.")
 
-            # Conta None's e filtra a lista de forma segura
-            var_intContNones = sum(1 for item in var_listOut if item is None)
+            # Filtra a lista de forma segura
             var_listOut = [item for item in var_listOut if item is not None]
             
             var_intTotal = len(arg_seqAppids)
             var_intTotal = 1 if var_intTotal == 0 else var_intTotal  # Evita divisão por zero
             var_intAusentes = sum(1 for item in var_listOut if item.get("data") == "AUSENTE")
             var_intSucesso = len(var_listOut) - var_intAusentes
-            var_intFalha = var_intTotal - var_intSucesso
             var_intErrosReais = var_intTotal - var_intSucesso - var_intAusentes
             var_intTotalProcessavel = var_intTotal - var_intAusentes
             var_floatTaxaSucesso = var_intSucesso / var_intTotalProcessavel if var_intTotalProcessavel != 0 else 1
@@ -328,7 +326,7 @@ class SteamClient:
             logger.info(f"{'='*50}")
             logger.info(f" Sucessos: {var_intSucesso} ({var_intSucesso/var_intTotal:.1%})")
             logger.info(f" AUSENTES: {var_intAusentes} ({var_intAusentes/var_intTotal:.1%}) ← Jogos não existem na store")
-            logger.info(f" Erros: {var_intErrosReais} ({var_intErrosReais/var_intTotal:.1%}) ← Verdadeiros erros")
+            logger.info(f" Erros: {var_intErrosReais} ({var_intErrosReais/var_intTotal:.1%}) ← Erros HTTPs")
             if var_intErrosReais > 0:
                 logger.info(f"   - 429 Too Many: {var_intErrosTooManyRequests} ({var_intErrosTooManyRequests/var_intErrosReais:.1%} dos erros)")
                 logger.info(f"   - Timeout: {var_intErrosTimeout} ({var_intErrosTimeout/var_intErrosReais:.1%} dos erros)")
@@ -584,7 +582,7 @@ class SteamClient:
             logger.info(f"{'='*50}")
             logger.info(f" Sucessos: {var_intSucesso} ({var_intSucesso/var_intTotal:.1%})")
             logger.info(f"  AUSENTES: {var_intAusentes} ({var_intAusentes/var_intTotal:.1%}) ← Jogos sem reviews")
-            logger.info(f" Erros: {var_intErrosReais} ({var_intErrosReais/var_intTotal:.1%}) ← Verdadeiros erros")
+            logger.info(f" Erros: {var_intErrosReais} ({var_intErrosReais/var_intTotal:.1%}) ← Erros HTTPs")
             if var_intErrosReais > 0:
                 logger.info(f"   - 429 Too Many: {var_intErrosTooManyRequests} ({var_intErrosTooManyRequests/var_intErrosReais:.1%} dos erros)")
                 logger.info(f"   - Timeout: {var_intErrosTimeout} ({var_intErrosTimeout/var_intErrosReais:.1%} dos erros)")

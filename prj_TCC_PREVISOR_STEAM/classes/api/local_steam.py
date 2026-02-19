@@ -1,10 +1,10 @@
 from prj_TCC_PREVISOR_STEAM.classes.framework.AllSettings import Settings
 from prj_TCC_PREVISOR_STEAM.classes.api.steamspy_api import SteamSpyClient
 
-from typing import Any, Sequence
-from datetime import datetime, timedelta, timezone
+from typing import Any
+from datetime import datetime, timedelta
 from time import sleep
-import asyncio, random, json, logging, os, re, aiohttp, requests, traceback
+import json, logging, os, requests
 
 logger = logging.getLogger(__name__)
 
@@ -140,9 +140,9 @@ class LocalClient:
                         logger.info(f"Usando arquivo JSON local como fallback...")
                         return cls._load_from_local_json()
                     
-                    var_listDataMesclada = cls.mesclar_dados(var_listDataNovos)  # Mescla novos dados do SteamSpy com cache existente
+                    # var_listDataMesclada = cls.mesclar_dados(var_listDataNovos)  # Mescla novos dados do SteamSpy com cache existente
                     
-                    return var_listDataMesclada
+                    return var_listDataNovos
                 
                 elif var_intStatusCode == 503:
                     logger.warning(f"Serviço Steam temporariamente indisponível (503 Service Unavailable)")
