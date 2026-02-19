@@ -280,13 +280,15 @@ class SteamClient:
                                 var_intErrosOutros += 1
                             else:
                                 logger.warning(f"AppID {arg_intAppid}: Erro HTTP status {e_http.status}")
+                                logger.error(f"Erro:\n{e_http.status} - {e_http.message if hasattr(e_http, 'message') else str(e_http)}")
                         return None
                     except asyncio.TimeoutError:
                         # Captura erro de timeout
                         var_intErrosTimeout += 1
                         return None
-                    except Exception:
+                    except Exception as e:
                         # Captura outros erros não classificados.
+                        logger.error(f"Erro não classificado para AppID {arg_intAppid}: {e}")
                         var_intErrosOutros += 1
                         return None
 
@@ -434,9 +436,9 @@ class SteamClient:
                 logger.warning("Nenhum dado válido para inserir neste batch.")
 
             # Aguarda entre batches (exceto no último)
-            if var_intBatchNum < var_intTotalBatches - 1:
-                logger.info(f"Aguardando {cls._var_intDelay}s antes do próximo batch...\n")
-                await asyncio.sleep(cls._var_intDelay)
+            # if var_intBatchNum < var_intTotalBatches - 1:
+            #     logger.info(f"Aguardando {cls._var_intDelay}s antes do próximo batch...\n")
+            #     await asyncio.sleep(cls._var_intDelay)
 
         logger.info(f"===========PROCESSAMENTO COMPLETO! (Reviews)==========")
         logger.info(f"Total processado: {var_intTotalItems:,} itens.")
@@ -525,7 +527,8 @@ class SteamClient:
                                             logger.info(f"AppID {arg_intAppid}: SUCESSO após retry em reviews")
                                             return var_dictSummary
                                 # Falha no retry
-                                logger.warning(f"AppID {arg_intAppid}: Falha após retries em reviews")
+                                logger.warning(f"AppID {arg_intAppid}: Falha após retries em reviews.")
+                                logger.error(f"Erro:\n{e_http.status} - {e_http.message if hasattr(e_http, 'message') else str(e_http)}")
                                 var_intErrosTooManyRequests += 1
                         return None
                     except asyncio.TimeoutError:
