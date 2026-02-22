@@ -21,7 +21,8 @@ class SteamClient:
     Cliente para interagir com a Steam API.
     """
     _var_intDelay = 180
-    
+    _var_intProcessados = 0
+
     # ------------------- Async bulk details com batches -------------------
     @classmethod
     async def fetch_details_bulk_batched(cls, arg_seqAppids: Sequence[int]) -> None:
@@ -151,6 +152,7 @@ class SteamClient:
                 async with arg_clientSession.get(url) as resp:
                     if resp.status == 429:
                         var_intWaitTime = (2 ** var_intAttempt) * cls._var_intDelay  # 120s, 240s, 480s
+                        logger.info(f"Processou {cls._var_intProcessados} do Batch.")
                         logger.warning(f"AppID {arg_intAppid}: 429 na tentativa {var_intAttempt+1}/{arg_intMaxRetries}. Aguardando {var_intWaitTime}s...")
                         await asyncio.sleep(var_intWaitTime)
                         continue
@@ -199,7 +201,8 @@ class SteamClient:
             var_intErrosTimeout = 0
             var_intErrosOutros = 0
             var_intAusentes = 0
-            
+            cls._var_intProcessados = 0
+
             async def worker(arg_clientSession: aiohttp.ClientSession, arg_intAppid: int) -> dict | str | None:
                 """
                 Worker assíncrono para buscar detalhes de um único appid.
@@ -225,6 +228,7 @@ class SteamClient:
                             if var_dictData and var_dictData.get(str(arg_intAppid), {}).get("success"):
                                 var_dictDetails = var_dictData[str(arg_intAppid)]
                                 var_dictDetails["APPID"] = arg_intAppid
+                                cls._var_intProcessados += 1
                                 return var_dictDetails
                             elif var_dictData and var_dictData.get(str(arg_intAppid), {}).get("success") is False:
                                 # Caso não retorne dados válidos (success=False ou dados ausentes)
@@ -269,6 +273,7 @@ class SteamClient:
                                     if var_dictRetryData.get(str(arg_intAppid), {}).get("success"):
                                         var_dictDetails = var_dictRetryData[str(arg_intAppid)]
                                         var_dictDetails["APPID"] = arg_intAppid
+                                        cls._var_intProcessados += 1
                                         return var_dictDetails
                                     elif var_dictRetryData.get(str(arg_intAppid), {}).get("success") is False:
                                         var_intAusentes += 1
@@ -470,6 +475,7 @@ class SteamClient:
             var_intErrosTimeout = 0
             var_intErrosOutros = 0
             var_intAusentes = 0
+            cls._var_intProcessados = 0
 
             async def worker(arg_clientSession: aiohttp.ClientSession, arg_intAppid: int) -> dict | None:
                 """
@@ -502,6 +508,7 @@ class SteamClient:
                                 if isinstance(var_dictSummary, dict):
                                     var_dictSummary = dict(var_dictSummary)
                                     var_dictSummary["appid"] = arg_intAppid
+                                    cls._var_intProcessados += 1
                                     return var_dictSummary
                             
                             # Caso não retorne dados válidos (success != 1 ou dados ausentes)
@@ -524,7 +531,9 @@ class SteamClient:
                                         if isinstance(var_dictSummary, dict):
                                             var_dictSummary = dict(var_dictSummary)
                                             var_dictSummary["appid"] = arg_intAppid
+                                            cls._var_intProcessados += 1
                                             logger.info(f"AppID {arg_intAppid}: SUCESSO após retry em reviews")
+
                                             return var_dictSummary
                                 # Falha no retry
                                 logger.warning(f"AppID {arg_intAppid}: Falha após retries em reviews.")
