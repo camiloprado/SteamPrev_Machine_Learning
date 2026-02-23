@@ -3,7 +3,7 @@ from prj_TCC_PREVISOR_STEAM.classes.SQL.postgre import PostgreSQL
 
 from typing import Sequence
 from datetime import datetime, timedelta, timezone
-import asyncio, random, logging, aiohttp
+import asyncio, random, logging, aiohttp, os
 
 logger = logging.getLogger(__name__)
 
@@ -15,6 +15,8 @@ class ITADClient:
     """
     Cliente para interagir com a Is There Any Deal API.
     """
+    _var_intDelay = 0
+    _var_intProcessados = 0
 
     @classmethod
     async def lookup_itad_ids_batched(cls, arg_seqAppids: Sequence[int]) -> dict[int, dict]:
@@ -29,8 +31,11 @@ class ITADClient:
         """
         var_dictConfigAPI = Settings.steam_api_itad()
         var_intBatchSize = var_dictConfigAPI.get("BatchSize", 200)
-        var_intDelay = var_dictConfigAPI.get("Delay", 120)
+        cls._var_intDelay = var_dictConfigAPI.get("Delay", 120)
         var_intAsyncConcurrency = var_dictConfigAPI.get("Concurrency", 3)
+
+        var_intBatchSizeMax = int(os.getenv("STEAM_BATCH_SIZE_ITAD_MAX", 1000))
+        var_intBatchSizeMin = int(os.getenv("STEAM_BATCH_SIZE_ITAD_MIN", 100))
 
         var_intTotalItems = len(arg_seqAppids)
         var_intTotalBatches = (var_intTotalItems + var_intBatchSize - 1) // var_intBatchSize
@@ -39,7 +44,7 @@ class ITADClient:
         logger.info(f"Total de itens: {var_intTotalItems:,}")
         logger.info(f"Tamanho do batch: {var_intBatchSize:,}")
         logger.info(f"Total de batches: {var_intTotalBatches}")
-        logger.info(f"Delay entre batches: {var_intDelay}s")
+        logger.info(f"Delay entre batches: {cls._var_intDelay}s")
         logger.info(f"Concorrência por batch: {var_intAsyncConcurrency}")
         logger.info(f"===============================================\n")
         
@@ -53,22 +58,43 @@ class ITADClient:
             logger.debug(f"Batch {var_intBatchNum + 1}/{var_intTotalBatches} - Processando itens {var_intStart + 1} a {var_intEnd} ({len(var_listBatch)} itens)...")
             
             # Processa o batch atual
-            var_dictBatchResults = await cls.lookup_itad_ids(var_listBatch)
+            var_dictResults, var_dictBatchStats = await cls.lookup_itad_ids(var_listBatch)
             
+            # Usa estatísticas retornadas para ajuste dinâmico do batch size
+            var_intAusentes = var_dictBatchStats["ausentes"]
+            var_intSucesso = var_dictBatchStats["sucessos"]
+            var_intErrosReais = var_dictBatchStats["erros_http"] + var_dictBatchStats["erros_timeout"] + var_dictBatchStats["erros_outros"]
+            var_intTotal = var_dictBatchStats["total"]
+            var_intTotalProcessavel = var_intTotal - var_intAusentes
+            var_floatTaxaSucesso = var_intSucesso / var_intTotalProcessavel if var_intTotalProcessavel != 0 else 1
+
+            # Log detalhado com valores corretos
+            logger.info(f"Batch {var_intBatchNum}: {var_intSucesso} sucessos, {var_intAusentes} ausentes, {var_intErrosReais} erros")
+
+            # Ajusta batch size dinamicamente
+            if var_floatTaxaSucesso > 0.95:  # >95% sucesso - aumenta batch
+                var_intNovoSize = min(int(var_intBatchSize * 1.2), var_intBatchSizeMax)
+                if var_intNovoSize != var_intBatchSize:
+                    logger.info(f"Taxa {var_floatTaxaSucesso:.1%} (excluiu {var_intAusentes} ausentes) - "
+                        f"Aumentando: {var_intBatchSize} → {var_intNovoSize}")
+                    var_intBatchSize = var_intNovoSize
+            elif var_floatTaxaSucesso < 0.70:  # <70% sucesso - reduz batch
+                var_intNovoSize = max(int(var_intBatchSize * 0.5), var_intBatchSizeMin)
+                if var_intNovoSize != var_intBatchSize:
+                    logger.warning(f"Taxa {var_floatTaxaSucesso:.1%} (excluiu {var_intAusentes} ausentes) - "
+                        f"Reduzindo: {var_intBatchSize} → {var_intNovoSize}")
+                    var_intBatchSize = var_intNovoSize
+
             # Acumula os resultados
-            if var_dictBatchResults:
-                PostgreSQL.inserir_dados_itad_raw_batched(var_dictBatchResults)
+            if var_dictResults:
+                var_dictAllResults.update(var_dictResults)
+                PostgreSQL.inserir_dados_itad_raw_batched(var_dictResults)
                 
-            # Aguarda entre batches (exceto no último)
-            if var_intBatchNum < var_intTotalBatches - 1:
-                logger.info(f"Aguardando {var_intDelay}s antes do próximo batch...\n")
-                await asyncio.sleep(var_intDelay)
-        
         logger.info(f"===========PROCESSAMENTO COMPLETO!==========")
         logger.info(f"Total processado: {len(var_dictAllResults):,} sucessos de {var_intTotalItems:,} itens ({len(var_dictAllResults)/var_intTotalItems:.2%})")
     
     @classmethod
-    async def lookup_itad_ids(cls, arg_seqAppids: Sequence[int]) -> dict[int, dict]:
+    async def lookup_itad_ids(cls, arg_seqAppids: Sequence[int]) -> tuple[dict[int, dict], dict]:
         """
         Realiza lookup de IDs na API do IsThereAnyDeal (ITAD) de forma assíncrona.
         
@@ -76,7 +102,9 @@ class ITADClient:
         - arg_seqAppids (Sequence[int]): Uma sequência de appids dos jogos.
         
         Retorna:
-        - var_dictResults (dict): Um dicionário mapeando appids para seus dados do ITAD.
+        - tuple: Uma tupla contendo:
+            - var_dictResults (dict): Um dicionário mapeando appids para seus dados do ITAD.
+            - var_dictStats (dict): Um dicionário com estatísticas do processamento.
         """
         if not Settings._var_strItadApiKey:
             raise RuntimeError("ITAD_API_KEY não definido")
@@ -140,14 +168,22 @@ class ITADClient:
                             return (arg_intAppid, None)
                             
                     except aiohttp.ClientError as e_http:
-                        # Captura erros específicos de HTTP (conexão, timeout, status).
-                        var_intErrosHTTP += 1
                         if hasattr(e_http, 'status'):
                             if e_http.status == 403:
                                 var_intErrosForbidden += 1
                             elif e_http.status == 429:
+                                var_dictRetryData = await cls._retry_with_backoff(arg_clientSession, arg_intAppid, arg_strTipo='lookup_ids')  # Retry para 429
+                                if var_dictRetryData:
+                                    # Sucesso no retry - processa os dados
+                                    if var_dictRetryData and var_dictRetryData.get("found"):
+                                        var_dictGame = var_dictRetryData.get("game", {})
+                                        if isinstance(var_dictGame, dict):
+                                            return (arg_intAppid, var_dictGame)
+                                        
+                                # Falhou mesmo com retry
                                 var_intErrosTooManyRequests += 1
                         return (arg_intAppid, None)
+                            
                     except asyncio.TimeoutError:
                         # Captura erro de timeout.
                         var_intErrosTimeout += 1
@@ -188,14 +224,23 @@ class ITADClient:
             
             var_intFalha = len(arg_seqAppids) - len(var_dictResults)
             logger.info(f"--- Busca concluída: ---")
-            logger.info(f"{len(var_dictResults)} sucesso(s) ({len(var_dictResults)/(len(arg_seqAppids)):.2%}),")
-            logger.info(f"{var_intFalha} falha(s) ({var_intFalha/len(arg_seqAppids):.2%}).")
+            logger.info(f"{len(var_dictResults)} sucesso(s) ({len(var_dictResults)/(len(arg_seqAppids) if len(arg_seqAppids) != 0 else 1):.2%}),")
+            logger.info(f"{var_intFalha} falha(s) ({var_intFalha/len(arg_seqAppids) if len(arg_seqAppids) != 0 else 1:.2%}).")
             logger.info(f"--- Detalhamento dos erros: ---")
             logger.info(f"* HTTP: {var_intErrosHTTP} (403 Forbidden: {var_intErrosForbidden}, 429 Too Many Requests: {var_intErrosTooManyRequests})")
             logger.info(f"* Timeout: {var_intErrosTimeout}")
             logger.info(f"* Não encontrados no ITAD: {var_intNaoEncontrados}")
             logger.info(f"* Outros: {var_intErrosOutros}")
-            return var_dictResults
+            var_dictEstatisticas = {
+                "total": len(arg_seqAppids),
+                "sucessos": len(var_dictResults),
+                "erros": var_intFalha,
+                "erros_http": var_intErrosHTTP,
+                "erros_timeout": var_intErrosTimeout,
+                "ausentes": var_intNaoEncontrados,
+                "erros_outros": var_intErrosOutros
+            }
+            return [var_dictResults, var_dictEstatisticas]  # Retorna também as estatísticas para ajuste de batch
         
         except Exception as e:
             logger.critical(f"Falha crítica ao buscar ITAD lookup em bulk: {e}")
@@ -216,16 +261,21 @@ class ITADClient:
         """
         var_dictConfigAPI = Settings.steam_api_itad()
         var_intBatchSize = var_dictConfigAPI.get("BatchSize", 200)
-        var_intDelay = var_dictConfigAPI.get("Delay", 120)
+        cls._var_intDelay = var_dictConfigAPI.get("Delay", 120)
         var_intAsyncConcurrency = var_dictConfigAPI.get("Concurrency", 1)
         var_intTotalItems = len(arg_seqItadPlain)
         var_intTotalBatches = (var_intTotalItems + var_intBatchSize - 1) // var_intBatchSize
-        
+        var_intBatchSizeMax = int(os.getenv("STEAM_BATCH_SIZE_ITAD_MAX", 1000))
+        var_intBatchSizeMin = int(os.getenv("STEAM_BATCH_SIZE_ITAD_MIN", 100))
+        var_listBatchTotal = []
+        for var_seqItadPlain in arg_seqItadPlain:
+            if var_seqItadPlain is not None and var_seqItadPlain != "":
+                var_listBatchTotal.append(var_seqItadPlain)
         logger.info(f"=== PROCESSAMENTO EM BATCHES (HISTÓRICO ITAD) ===")
         logger.info(f"Total de itens: {var_intTotalItems:,}")
         logger.info(f"Tamanho do batch: {var_intBatchSize:,}")
         logger.info(f"Total de batches: {var_intTotalBatches}")
-        logger.info(f"Delay entre batches: {var_intDelay}s")
+        logger.info(f"Delay entre batches: {cls._var_intDelay}s")
         logger.info(f"Concorrência por batch: {var_intAsyncConcurrency}")
         logger.info(f"Anos de histórico: {arg_intAnos}")
         logger.info(f"==================================================\n")
@@ -235,20 +285,40 @@ class ITADClient:
         for var_intBatchNum in range(var_intTotalBatches):
             var_intStart = var_intBatchNum * var_intBatchSize
             var_intEnd = min(var_intStart + var_intBatchSize, var_intTotalItems)
-            var_listBatch = arg_seqItadPlain[var_intStart:var_intEnd]
+            var_listBatch = var_listBatchTotal[var_intStart:var_intEnd]
             
             logger.debug(f"Batch {var_intBatchNum + 1}/{var_intTotalBatches} - Processando itens {var_intStart + 1} a {var_intEnd} ({len(var_listBatch)} itens)...")
             
             # Processa o batch atual
-            var_dictBatchResults = await cls.fetch_price_history_bulk(var_listBatch, arg_intAnos)
+            var_dictBatchResults, var_dictBatchStats = await cls.fetch_price_history_bulk(var_listBatch, arg_intAnos)
             var_dictAllResults.update(var_dictBatchResults)
             
-            # Aguarda entre batches (exceto no último)
-            if var_intBatchNum < var_intTotalBatches - 1:
-                logger.info(f"Aguardando {var_intDelay}s antes do próximo batch...\n")
-                await asyncio.sleep(var_intDelay)
+            # Usa estatísticas retornadas para ajuste dinâmico do batch size
+            var_intAusentes = var_dictBatchStats["ausentes"]
+            var_intSucesso = var_dictBatchStats["sucessos"]
+            var_intErrosReais = var_dictBatchStats["erros_http"] + var_dictBatchStats["erros_timeout"] + var_dictBatchStats["erros_outros"]
+            var_intTotal = var_dictBatchStats["total"]
+            var_intTotalProcessavel = var_intTotal - var_intAusentes
+            var_floatTaxaSucesso = var_intSucesso / var_intTotalProcessavel if var_intTotalProcessavel != 0 else 1
+
+            logger.info("")
+            logger.info(f"Batch {var_intBatchNum}: {var_intSucesso} sucessos, {var_intAusentes} ausentes, {var_intErrosReais} erros")
             PostgreSQL.inserir_dados_itad_raw_historico_preco_bulk(var_dictBatchResults)
             
+            # Ajusta batch size dinamicamente
+            if var_floatTaxaSucesso > 0.95:  # >95% sucesso - aumenta batch
+                var_intNovoSize = min(int(var_intBatchSize * 1.2), var_intBatchSizeMax)
+                if var_intNovoSize != var_intBatchSize:
+                    logger.info(f"Taxa {var_floatTaxaSucesso:.1%} (excluiu {var_intAusentes} ausentes) - "
+                        f"Aumentando: {var_intBatchSize} → {var_intNovoSize}")
+                    var_intBatchSize = var_intNovoSize
+            elif var_floatTaxaSucesso < 0.70:  # <70% sucesso - reduz batch
+                var_intNovoSize = max(int(var_intBatchSize * 0.5), var_intBatchSizeMin)
+                if var_intNovoSize != var_intBatchSize:
+                    logger.warning(f"Taxa {var_floatTaxaSucesso:.1%} (excluiu {var_intAusentes} ausentes) - "
+                        f"Reduzindo: {var_intBatchSize} → {var_intNovoSize}")
+                    var_intBatchSize = var_intNovoSize
+
         logger.info(f"===========PROCESSAMENTO COMPLETO!==========")
         logger.info(f"Total processado: {len(var_dictAllResults):,} sucessos de {var_intTotalItems:,} itens ({len(var_dictAllResults)/var_intTotalItems:.2%})")
         
@@ -256,7 +326,7 @@ class ITADClient:
     
     # ------------------- Async ITAD price history bulk -------------------
     @classmethod
-    async def fetch_price_history_bulk(cls, arg_seqItadPlain: Sequence[str], arg_intAnos: int = 5) -> dict:
+    async def fetch_price_history_bulk(cls, arg_seqItadPlain: Sequence[str], arg_intAnos: int = 5) -> tuple[dict, dict]:
         """
         Busca o histórico de preços de múltiplos jogos na API do IsThereAnyDeal (ITAD) de forma assíncrona.
 
@@ -265,7 +335,9 @@ class ITADClient:
         - arg_intAnos (int): O número de anos para buscar o histórico.
 
         Retorna:
-        - var_dictResults (dict): Um dicionário mapeando cada plain para seu histórico de preços.
+        - tuple: Uma tupla contendo:
+            - var_dictResults (dict): Um dicionário mapeando cada plain para seu histórico de preços.
+            - var_dictEstatisticas (dict): Um dicionário com estatísticas do processamento.
         """
         var_dictConfigAPI = Settings.steam_api_itad()
         var_intAsyncConcurrency = var_dictConfigAPI.get("Concurrency", 3)
@@ -303,6 +375,10 @@ class ITADClient:
                 async with var_semSemaphore:
                     # Pequena espera para evitar throttling
                     await asyncio.sleep(random.random() * 0.2)
+                    if not arg_strItadPlain:
+                        var_intAusentes += 1
+                        return None
+                    
                     var_dictParams = {
                         "key": Settings._var_strItadApiKey,
                         "id": arg_strItadPlain,
@@ -331,15 +407,19 @@ class ITADClient:
                             if e_http.status == 403:
                                 var_intErrosForbidden += 1
                             elif e_http.status == 429:
+                                var_listDataRetry = await cls._retry_with_backoff(arg_clientSession, arg_strItadPlain, arg_strTipo='preco', arg_strSince=var_strSince)  # Retry para 429
+                                if var_listDataRetry:
+                                    return var_listDataRetry
                                 var_intErrosTooManyRequests += 1
                         return None
                     except asyncio.TimeoutError:
                         # Captura erro de timeout.
                         var_intErrosTimeout += 1
                         return None
-                    except Exception:
+                    except Exception as err:
                         # Captura outros erros não classificados.
                         var_intErrosOutros += 1
+                        logger.error(f"Erro não classificado: {err}")
                         return None
 
             # Executa os workers assíncronos
@@ -371,15 +451,84 @@ class ITADClient:
             
             var_intFalha = len(arg_seqItadPlain) - len(var_dictResults)
             logger.info(f"--- Busca concluída: ---")
-            logger.info(f"{len(var_dictResults)} sucesso(s) ({len(var_dictResults)/(len(arg_seqItadPlain)):.2%}),")
-            logger.info(f"{var_intFalha} falha(s) ({var_intFalha/len(arg_seqItadPlain):.2%}).")
+            logger.info(f"{len(var_dictResults)} sucesso(s) ({len(var_dictResults)/(len(arg_seqItadPlain) if len(arg_seqItadPlain) > 0 else 1):.2%}),")
+            logger.info(f"{var_intFalha} falha(s) ({var_intFalha/len(arg_seqItadPlain) if len(arg_seqItadPlain) > 0 else 1:.2%}).")
             logger.info(f"--- Detalhamento dos erros: ---")
             logger.info(f"* HTTP: {var_intErrosHTTP} (403 Forbidden: {var_intErrosForbidden}, 429 Too Many Requests: {var_intErrosTooManyRequests})")
             logger.info(f"* Timeout: {var_intErrosTimeout}")
             logger.info(f"* Ausentes: {var_intAusentes}")
             logger.info(f"* Outros: {var_intErrosOutros}")
-            return var_dictResults
+
+            var_dictEstatisticas = {
+                "total": len(arg_seqItadPlain),
+                "sucessos": len(var_dictResults),
+                "erros": var_intFalha,
+                "erros_http": var_intErrosHTTP,
+                "erros_timeout": var_intErrosTimeout,
+                "ausentes": var_intAusentes,
+                "erros_outros": var_intErrosOutros
+            }
+
+            return var_dictResults, var_dictEstatisticas
         
         except Exception as e:
             logger.critical(f"Falha crítica ao buscar histórico ITAD em bulk: {e}")
             raise RuntimeError(f"Falha ao buscar histórico ITAD em bulk: {e}")
+
+    # ------------------- Método auxiliar para retry -------------------
+    @classmethod
+    async def _retry_with_backoff(cls, arg_clientSession: aiohttp.ClientSession, arg_anyId: int | str, arg_strTipo: str = 'lookup_ids', arg_intMaxRetries: int = 3, arg_strSince: str = None) -> dict | None:
+        """
+        Retry com backoff exponencial para erros 429 (Too Many Requests).
+        
+        Parâmetros:
+        - arg_clientSession (aiohttp.ClientSession): Sessão HTTP reutilizável.
+        - arg_anyId (int or str): ID do jogo (pode ser AppID ou ITAD Plain).
+        - arg_strTipo (str): Tipo de dados sendo buscado (preço ou lookup_ids) para logs mais claros.
+        - arg_intMaxRetries (int): Número máximo de tentativas.
+        - arg_strSince (str): Data mínima para histórico de preços.
+        Retorna:
+        - dict | None: Dados do jogo ou None se falhar.
+        """
+        if arg_strTipo == 'preco':
+            url = ITAD_HISTORY_URL
+            var_dictParams = {
+                        "key": Settings._var_strItadApiKey,
+                        "id": arg_anyId,
+                        "shops": "61",
+                        "country": "BR",
+                        "since": arg_strSince,
+                    }
+            
+        elif arg_strTipo == 'lookup_ids':
+            url = ITAD_LOOKUP_IDS_URL
+            var_dictParams = {
+                "key": Settings._var_strItadApiKey,
+                "appid": arg_anyId,
+            }
+
+        for var_intAttempt in range(arg_intMaxRetries):
+            try:
+                async with arg_clientSession.get(url, params=var_dictParams) as resp:
+                    if resp.status == 429:
+                        var_intWaitTime = (2 ** var_intAttempt) * cls._var_intDelay  # 120s, 240s, 480s
+                        logger.info(f"Processou {cls._var_intProcessados} do Batch.")
+                        logger.warning(f"AppID {arg_anyId}: 429 na tentativa {var_intAttempt+1}/{arg_intMaxRetries}. Aguardando {var_intWaitTime}s...")
+                        await asyncio.sleep(var_intWaitTime)
+                        continue
+                    if resp.status == 502:
+                        var_intWaitTime = (2 ** var_intAttempt) * cls._var_intDelay  # 120s, 240s, 480s
+                        logger.warning(f"AppID {arg_anyId}: 502 na tentativa {var_intAttempt+1}/{arg_intMaxRetries}. Aguardando {var_intWaitTime}s...")
+                        await asyncio.sleep(var_intWaitTime)
+                        continue
+                    elif resp.status == 200:
+                        return await resp.json()
+                    else:
+                        logger.warning(f"AppID {arg_anyId}: Status {resp.status} na tentativa {var_intAttempt+1}")
+                        return None
+            except Exception as e:
+                if var_intAttempt == arg_intMaxRetries - 1:
+                    logger.error(f"AppID {arg_anyId}: Falha após {arg_intMaxRetries} tentativas - {e}")
+                    return None
+                await asyncio.sleep(5)  # Espera 5s entre tentativas com erro
+        return None

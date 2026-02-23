@@ -611,8 +611,8 @@ class ProcessadorETL:
                 var_intInseridos = 0
                 var_intTotal = len(var_listDadosUnificados)
                 for var_dictDado in var_listDadosUnificados:
-                    var_floatPercentual = (var_intInseridos / var_intTotal) * 100
-                    if var_floatPercentual in [0, 25, 50, 75, 100]:
+                    var_floatPercentual = (var_intInseridos / var_intTotal * 100) if var_intTotal > 0 else 1
+                    if int(var_floatPercentual) in [0, 25, 50, 75, 100]:
                         logger.info(f"Inseridos {var_floatPercentual}% do total de {var_intTotal}")
                     try:
                         PostgreSQL.inserir_steam_unificado(var_dictDado)

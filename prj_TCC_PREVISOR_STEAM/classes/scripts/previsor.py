@@ -143,7 +143,7 @@ class Previsor:
         """
         try:
             PostgreSQL.conectar()
-            var_listDados = PostgreSQL.buscar_todos_dados(arg_strNomeTabela="steam_raw")
+            # var_listDados = PostgreSQL.buscar_todos_dados(arg_strNomeTabela="steam_raw")
 
             # Define o range de processamento por vez pelo .env
             var_intRange = int(os.getenv("RANGE_PROCESSAMENTO_ITAD_RAW", 5000))
@@ -217,6 +217,7 @@ class Previsor:
                 # Busca dados ITAD para os AppIDs
                 asyncio.run(ITADClient.lookup_itad_ids_batched(arg_seqAppids=var_listAppIDAtual))
                 
+                # Busca os IDs ITAD correspondentes aos AppIDs processados
                 var_listITADID = list(PostgreSQL.buscar_itad_id_por_appid(arg_listAppids=var_listAppIDAtual))
 
                 # Busca histórico de preços ITAD para os AppIDs

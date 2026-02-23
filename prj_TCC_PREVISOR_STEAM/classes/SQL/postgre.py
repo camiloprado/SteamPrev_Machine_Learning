@@ -749,8 +749,6 @@ class PostgreSQL:
         Retorna:
         - bool: True se inseriu dados, False se não havia jogos desatualizados
         """
-        cls.conectar()
-        
         try:
             # Verifica se há jogos desatualizados
             var_listDesatualizados = cls.buscar_jogos_desatualizados(arg_strNomeTabela="steam_generico")
@@ -791,6 +789,7 @@ class PostgreSQL:
                         ultima_atualizacao = EXCLUDED.ultima_atualizacao;
                     """
                     
+                    cls.conectar()
                     with cls._var_connConnection.cursor() as cursor:
                         cursor.execute(var_strSQL, (
                             var_intAppid,
@@ -824,6 +823,7 @@ class PostgreSQL:
         - Generator[str | None, None, None]: Generator que produz IDs ITAD correspondentes (um por vez).
                                               Retorna None para AppIDs sem mapeamento ITAD.
         """
+        cls.conectar()
         try:
             for var_intAppid in arg_listAppids:
                 var_strSQL = """
@@ -841,7 +841,8 @@ class PostgreSQL:
         except Exception as e:
             logger.error(f"Erro ao buscar IDs ITAD para AppIDs fornecidos: {e}")
             raise Exception(f"Erro ao buscar IDs ITAD para AppIDs fornecidos: {e}")
-        
+        finally:
+            cls.desconectar()
     # ============================================
     # MÉTODOS PARA STEAM_UNIFICADO (TABELA CONSOLIDADA)
     # ============================================
