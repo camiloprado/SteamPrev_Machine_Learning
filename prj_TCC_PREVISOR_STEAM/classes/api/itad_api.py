@@ -162,10 +162,14 @@ class ITADClient:
                                 var_dictGame = var_dictData.get("game", {})
                                 if isinstance(var_dictGame, dict):
                                     return (arg_intAppid, var_dictGame)
-                            
-                            # Jogo não encontrado no ITAD
-                            var_intNaoEncontrados += 1
-                            return (arg_intAppid, None)
+                            elif not var_dictData.get("found"):
+                                # Jogo não encontrado no ITAD
+                                var_intNaoEncontrados += 1
+                                return (arg_intAppid, "AUSENTE")  # Marca como ausente
+                            else:
+                                # Resposta inesperada
+                                var_intErrosOutros += 1
+                                return (arg_intAppid, None)
                             
                     except aiohttp.ClientError as e_http:
                         if hasattr(e_http, 'status'):
@@ -179,9 +183,14 @@ class ITADClient:
                                         var_dictGame = var_dictRetryData.get("game", {})
                                         if isinstance(var_dictGame, dict):
                                             return (arg_intAppid, var_dictGame)
-                                        
-                                # Falhou mesmo com retry
-                                var_intErrosTooManyRequests += 1
+                                elif not var_dictRetryData.get("found"):
+                                    var_intNaoEncontrados += 1
+                                    return (arg_intAppid, "AUSENTE")  # Marca como ausente após retry
+                                else:
+                                    # Falhou mesmo com retry
+                                    var_intErrosTooManyRequests += 1
+                                    return (arg_intAppid, None)
+                        var_intErrosHTTP += 1
                         return (arg_intAppid, None)
                             
                     except asyncio.TimeoutError:
@@ -221,6 +230,8 @@ class ITADClient:
                     var_intAppid, var_dictData = var_tupleResult
                     if var_dictData is not None:
                         var_dictResults[var_intAppid] = var_dictData
+                    elif var_dictData == "AUSENTE":
+                        var_dictResults[var_intAppid] = "AUSENTE"
             
             var_intFalha = len(arg_seqAppids) - len(var_dictResults)
             logger.info(f"--- Busca concluída: ---")
@@ -267,10 +278,12 @@ class ITADClient:
         var_intTotalBatches = (var_intTotalItems + var_intBatchSize - 1) // var_intBatchSize
         var_intBatchSizeMax = int(os.getenv("STEAM_BATCH_SIZE_ITAD_MAX", 1000))
         var_intBatchSizeMin = int(os.getenv("STEAM_BATCH_SIZE_ITAD_MIN", 100))
+
         var_listBatchTotal = []
         for var_seqItadPlain in arg_seqItadPlain:
-            if var_seqItadPlain is not None and var_seqItadPlain != "":
+            if var_seqItadPlain is not None and var_seqItadPlain != "" and var_seqItadPlain != "AUSENTE":
                 var_listBatchTotal.append(var_seqItadPlain)
+
         logger.info(f"=== PROCESSAMENTO EM BATCHES (HISTÓRICO ITAD) ===")
         logger.info(f"Total de itens: {var_intTotalItems:,}")
         logger.info(f"Tamanho do batch: {var_intBatchSize:,}")
