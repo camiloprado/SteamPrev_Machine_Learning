@@ -55,7 +55,7 @@ class ITADClient:
             var_intEnd = min(var_intStart + var_intBatchSize, var_intTotalItems)
             var_listBatch = arg_seqAppids[var_intStart:var_intEnd]
             
-            logger.debug(f"Batch {var_intBatchNum + 1}/{var_intTotalBatches} - Processando itens {var_intStart + 1} a {var_intEnd} ({len(var_listBatch)} itens)...")
+            logger.info(f"Batch {var_intBatchNum} (size={var_intBatchSize}) - Processando itens {var_intStart + 1} a {var_intEnd} ({len(var_listBatch)} itens)...")
             
             # Processa o batch atual
             var_dictResults, var_dictBatchStats = await cls.lookup_itad_ids(var_listBatch)
@@ -123,7 +123,8 @@ class ITADClient:
             var_intErrosTimeout = 0
             var_intErrosOutros = 0
             var_intNaoEncontrados = 0
-            
+            cls._var_intProcessados = 0
+
             async def worker(arg_clientSession: aiohttp.ClientSession, arg_intAppid: int) -> tuple[int, dict | None]:
                 """
                 Worker assíncrono para buscar dados ITAD de um único appid.
@@ -134,6 +135,24 @@ class ITADClient:
                 
                 Retorna:
                 - tuple: (appid, dados do ITAD ou None se não encontrado)
+                """
+                """Retorno JSON
+                {
+                    "found": true|false,
+                    "game": {
+                        "id": String contendo o ID dentro de ITAD. "018d937f-1ad7-728a-9596-0d9ab5464ef5",
+                        "slug": String contendo o nome do jogo com espaço transformados em "-". "enemy-territory-quake-wars",
+                        "title": String contendo o nome do jogo. "Enemy Territory: Quake Wars",
+                        "type": String contendo o tipo do jogo (normalmente "game"). "game"|null,
+                        "mature": Boolean indicando se o jogo é adulto. true|false,
+                        "assets": {
+                            "boxart": URL da imagem boxart do jogo (normalmente 600x900). "https://assets.isthereanydeal.com/018d937e-ffaf-736e-9842-0215cb593b35/boxart.jpg?t=1761616309",
+                            "banner145": URL da imagem banner do jogo (normalmente 145x50). "https://assets.isthereanydeal.com/018d937e-ffaf-736e-9842-0215cb593b35/banner145.jpg?t=1761616309",
+                            "banner300": URL da imagem banner do jogo (normalmente 300x100). "https://assets.isthereanydeal.com/018d937e-ffaf-736e-9842-0215cb593b35/banner300.jpg?t=1761616309",
+                            "banner400": URL da imagem banner do jogo (normalmente 400x150). "https://assets.isthereanydeal.com/018d937e-ffaf-736e-9842-0215cb593b35/banner400.jpg?t=1761616309",
+                            "banner600": URL da imagem banner do jogo (normalmente 600x225). "https://assets.isthereanydeal.com/018d937e-ffaf-736e-9842-0215cb593b35/banner600.jpg?t=1761616309"
+                        }
+                }
                 """
                 nonlocal var_intErrosHTTP, var_intErrosForbidden, var_intErrosTooManyRequests, var_intErrosTimeout, var_intErrosOutros, var_intNaoEncontrados
                 
@@ -161,11 +180,16 @@ class ITADClient:
                             if var_dictData and var_dictData.get("found"):
                                 var_dictGame = var_dictData.get("game", {})
                                 if isinstance(var_dictGame, dict):
+                                    cls._var_intProcessados += 1
                                     return (arg_intAppid, var_dictGame)
-                            
-                            # Jogo não encontrado no ITAD
-                            var_intNaoEncontrados += 1
-                            return (arg_intAppid, None)
+                            elif var_dictData and var_dictData.get("found") is False:
+                                # Jogo não encontrado no ITAD
+                                var_intNaoEncontrados += 1
+                                return (arg_intAppid, "AUSENTE")
+                            else:
+                                # Resposta inesperada
+                                var_intErrosOutros += 1
+                                return (arg_intAppid, None)
                             
                     except aiohttp.ClientError as e_http:
                         if hasattr(e_http, 'status'):
@@ -178,8 +202,11 @@ class ITADClient:
                                     if var_dictRetryData and var_dictRetryData.get("found"):
                                         var_dictGame = var_dictRetryData.get("game", {})
                                         if isinstance(var_dictGame, dict):
+                                            cls._var_intProcessados += 1
                                             return (arg_intAppid, var_dictGame)
-                                        
+                                    elif var_dictRetryData and var_dictRetryData.get("found") is False:
+                                        var_intNaoEncontrados += 1
+                                        return (arg_intAppid, "AUSENTE")
                                 # Falhou mesmo com retry
                                 var_intErrosTooManyRequests += 1
                         return (arg_intAppid, None)
@@ -219,8 +246,10 @@ class ITADClient:
             for var_tupleResult in var_listOut:
                 if isinstance(var_tupleResult, tuple) and len(var_tupleResult) == 2:
                     var_intAppid, var_dictData = var_tupleResult
-                    if var_dictData is not None:
+                    if var_dictData is not None and var_dictData != "AUSENTE":
                         var_dictResults[var_intAppid] = var_dictData
+                    elif var_dictData == "AUSENTE":
+                        var_dictResults[var_intAppid] = "AUSENTE"
             
             var_intFalha = len(arg_seqAppids) - len(var_dictResults)
             logger.info(f"--- Busca concluída: ---")
@@ -259,18 +288,21 @@ class ITADClient:
         Retorna:
         - var_dictAllResults (dict): Um dicionário mapeando cada plain para seu histórico de preços.
         """
+        var_listBatchTotal = []
+        for var_seqItadPlain in arg_seqItadPlain:
+            if var_seqItadPlain is not None and var_seqItadPlain != "" and var_seqItadPlain != "AUSENTE":
+                var_listBatchTotal.append(var_seqItadPlain)
+
         var_dictConfigAPI = Settings.steam_api_itad()
         var_intBatchSize = var_dictConfigAPI.get("BatchSize", 200)
         cls._var_intDelay = var_dictConfigAPI.get("Delay", 120)
         var_intAsyncConcurrency = var_dictConfigAPI.get("Concurrency", 1)
-        var_intTotalItems = len(arg_seqItadPlain)
+        var_intTotalItems = len(var_listBatchTotal)
         var_intTotalBatches = (var_intTotalItems + var_intBatchSize - 1) // var_intBatchSize
         var_intBatchSizeMax = int(os.getenv("STEAM_BATCH_SIZE_ITAD_MAX", 1000))
         var_intBatchSizeMin = int(os.getenv("STEAM_BATCH_SIZE_ITAD_MIN", 100))
-        var_listBatchTotal = []
-        for var_seqItadPlain in arg_seqItadPlain:
-            if var_seqItadPlain is not None and var_seqItadPlain != "":
-                var_listBatchTotal.append(var_seqItadPlain)
+
+
         logger.info(f"=== PROCESSAMENTO EM BATCHES (HISTÓRICO ITAD) ===")
         logger.info(f"Total de itens: {var_intTotalItems:,}")
         logger.info(f"Tamanho do batch: {var_intBatchSize:,}")
@@ -287,7 +319,7 @@ class ITADClient:
             var_intEnd = min(var_intStart + var_intBatchSize, var_intTotalItems)
             var_listBatch = var_listBatchTotal[var_intStart:var_intEnd]
             
-            logger.debug(f"Batch {var_intBatchNum + 1}/{var_intTotalBatches} - Processando itens {var_intStart + 1} a {var_intEnd} ({len(var_listBatch)} itens)...")
+            logger.info(f"Batch {var_intBatchNum} (size={var_intBatchSize}) - Processando itens {var_intStart + 1} a {var_intEnd} ({len(var_listBatch)} itens)...")
             
             # Processa o batch atual
             var_dictBatchResults, var_dictBatchStats = await cls.fetch_price_history_bulk(var_listBatch, arg_intAnos)
@@ -358,7 +390,8 @@ class ITADClient:
             var_intErrosTimeout = 0
             var_intErrosOutros = 0
             var_intAusentes = 0
-            
+            cls._var_intProcessados = 0
+
             async def worker(arg_clientSession: aiohttp.ClientSession, arg_strItadPlain: str) -> dict | None:
                 """
                 Worker assíncrono para buscar o histórico de preços de um único jogo.
@@ -370,6 +403,31 @@ class ITADClient:
                 Retorna:
                 - var_dictData (dict | None): Um dicionário com o histórico de preços ou None se não encontrado.
                 """
+                """Retorno JSON
+                [
+                    {
+                        "timestamp": String contendo a data e hora do registro de preço. "2026-02-21T19:16:20+01:00",
+                        "shop": {
+                            "id": String contendo o ID da loja. "61",
+                            "name": String contendo o nome da loja. "Steam",
+                        },
+                        "deal": {
+                            "price": {
+                                "amount": Float contendo o preço atual do jogo. 65.96,
+                                "amountInt": Inteiro contendo o preço atual do jogo em centavos. 6596,
+                                "currency": String contendo a moeda do preço. "USD"|"BRL",
+                            },
+                            "regular": {
+                                "amount": Float contendo o preço regular do jogo. 199.9,
+                                "amountInt": Inteiro contendo o preço regular do jogo em centavos. 19990,
+                                "currency": String contendo a moeda do preço regular. "USD"|"BRL",
+                            },
+                            "cut": Inteiro contendo a porcentagem de desconto. 67,
+                        }
+                    }, {...}
+                ]
+                """
+
                 nonlocal var_intErrosHTTP, var_intErrosForbidden, var_intErrosTooManyRequests, var_intErrosTimeout, var_intErrosOutros, var_intAusentes
                 
                 async with var_semSemaphore:
@@ -395,6 +453,7 @@ class ITADClient:
                             
                             # Verifica se os dados são válidos
                             if var_listData and var_listData is not None:
+                                cls._var_intProcessados += 1
                                 return var_listData
                             
                             # Caso não retorne dados válidos
@@ -409,6 +468,7 @@ class ITADClient:
                             elif e_http.status == 429:
                                 var_listDataRetry = await cls._retry_with_backoff(arg_clientSession, arg_strItadPlain, arg_strTipo='preco', arg_strSince=var_strSince)  # Retry para 429
                                 if var_listDataRetry:
+                                    cls._var_intProcessados += 1
                                     return var_listDataRetry
                                 var_intErrosTooManyRequests += 1
                         return None

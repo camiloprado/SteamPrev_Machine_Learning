@@ -577,13 +577,22 @@ class PostgreSQL:
             
             for var_intAppid, var_dictDados in arg_dictDadosItad.items():
                 try:
-                    # Extrai dados do ITAD
-                    var_strIdItad = var_dictDados.get("id")
-                    var_strSlug = var_dictDados.get("slug")
-                    var_strTitle = var_dictDados.get("title")
-                    var_strType = var_dictDados.get("type")
-                    var_boolMature = var_dictDados.get("mature", False)
-                    var_jsonAssets = json.dumps(var_dictDados.get("assets", {}))
+                    if var_dictDados == "AUSENTE":
+                        # Extrai dados do ITAD
+                        var_strIdItad = "AUSENTE"
+                        var_strSlug = "AUSENTE"
+                        var_strTitle = "AUSENTE"
+                        var_strType = "AUSENTE"
+                        var_boolMature = False
+                        var_jsonAssets = json.dumps({})
+                    else:
+                        # Extrai dados do ITAD
+                        var_strIdItad = var_dictDados.get("id")
+                        var_strSlug = var_dictDados.get("slug")
+                        var_strTitle = var_dictDados.get("title")
+                        var_strType = var_dictDados.get("type")
+                        var_boolMature = var_dictDados.get("mature", False)
+                        var_jsonAssets = json.dumps(var_dictDados.get("assets", {}))
                     
                     if not var_strIdItad:
                         logger.warning(f"AppID {var_intAppid}: ID ITAD ausente, pulando")
