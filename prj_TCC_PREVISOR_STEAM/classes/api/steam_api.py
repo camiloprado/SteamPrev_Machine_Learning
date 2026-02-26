@@ -1,3 +1,4 @@
+from prj_TCC_PREVISOR_STEAM.classes.SQL.postgre_steam import PostgreSQLSteam
 from prj_TCC_PREVISOR_STEAM.classes.framework.AllSettings import Settings
 from prj_TCC_PREVISOR_STEAM.classes.SQL.postgre import PostgreSQL
 
@@ -110,7 +111,7 @@ class SteamClient:
             
             # Insere no PostgreSQL (Docker) em vez de Supabase
             if var_listDetails:
-                PostgreSQL.inserir_dadosSteamRaw_Bulk(arg_listDados=var_listDetails)
+                PostgreSQLSteam.inserir_dadosSteamRaw_Bulk(arg_listDados=var_listDetails)
                 logger.info(f"Dados de detalhes inseridos com sucesso no PostgreSQL ({len(var_listDetails)} registros).")
             else:
                 logger.warning("Nenhum dado válido para inserir neste batch.")
@@ -213,6 +214,156 @@ class SteamClient:
                 
                 Retorna:
                 - var_dictDetails (dict | None): Um dicionário com os detalhes do jogo ou None se não encontrado.
+                """
+                """Retorno JSON:
+                {
+                    appid: {
+                        "success": True|False,
+                        "data": { 
+                            "type": "game"|"advertising"|"dlc"|"demo"|"episode"|"hardware"|"mod"|"music"|"series"|"video",
+                            "name": "Nome do Jogo",
+                            "steam_appid": 12345,
+                            "required_age": 0,
+                            "is_free": True|False,
+                            "detailed_description": "Descrição detalhada",
+                            "about_the_game": "Sobre o jogo",
+                            "short_description": "Descrição curta",
+                            "supported_languages": String contendo as linguagens (Vem com elementos HTML). ""Inglês<strong>*</strong>, Francês<strong>*</strong>, Alemão<strong>*</strong>, ...",
+                            "header_image": "URL da imagem",
+                            "capsule_image": "URL da imagem",
+                            "capsule_imagev5": "URL da imagem",
+                            "website": "URL do site"|null,
+                            "pc_requirements": { 
+                                "minimum": String contendo as recomendações (Vem com elementos HTML), 
+                                "recommended": String contendo as recomendações (Vem com elementos HTML)
+                            },
+                            "mac_requirements": { 
+                                "minimum": String contendo as recomendações (Vem com elementos HTML), 
+                                "recommended": String contendo as recomendações (Vem com elementos HTML) 
+                            },
+                            "linux_requirements": { 
+                                "minimum": String contendo as recomendações (Vem com elementos HTML), 
+                                "recommended": String contendo as recomendações (Vem com elementos HTML) 
+                            },
+                            "developers": Lista com nomes dos desenvolvedores. ["Dev1", "Dev2"],
+                            "publishers": Lista com nomes das distribuidoras. ["Publisher1", "Publisher2"],
+                            "price_overview": { 
+                                "currency": "USD"|"BRL"|..., 
+                                "initial": Valor inteiro (Necessario dividir por 100) - 2069, 
+                                "final": 2069, 
+                                "discount_percent": 0,
+                                "initial_formatted": "",
+                                "final_formatted": "R$20,69"
+                            },
+                            "packages": Lista de IDs interligadas ao jogos (DLCs). [12345, 67890],
+                            "package_groups": [
+                                {
+                                    "name": "Nome do pacote",
+                                    "title": "Título do pacote",
+                                    "description": "Descrição do pacote",
+                                    "selection_text": "Texto de seleção do pacote",
+                                    "save_text": "Texto de economia do pacote",
+                                    "display_type": 0,
+                                    "is_recurring_subscription": "false",
+                                    "subs": [
+                                        {
+                                            "packageid": 12345,
+                                            "percent_savings_text": "0%",
+                                            "percent_savings": 0,
+                                            "option_text": "Jogo base",
+                                            "option_description": "",
+                                            "can_get_free_license": "0",
+                                            "is_free_license": False,
+                                            "price_in_cents_with_discount": 2069
+                                        }
+                                    ]
+                            ],
+                            "platforms": { 
+                                "windows": True|False, 
+                                "mac": True|False, 
+                                "linux": True|False 
+                            },
+                            "metacritic": { 
+                                "score": 85, 
+                                "url": "URL do Metacritic" 
+                            },
+                            "categories": Lista com ID e descrição das categorias. 
+                            [ 
+                                { 
+                                    "id": 1, 
+                                    "description": "Categoria 1" 
+                                }, 
+                                {
+                                    "id": 2,
+                                    "description": "Categoria 2"
+                                }
+                            ],
+                            "genres": Lista com ID e descrição dos gêneros.
+                            [
+                                { 
+                                    "id": 1, 
+                                    "description": "Gênero 1" 
+                                }, 
+                                {
+                                    "id": 2,
+                                    "description": "Gênero 2"
+                                }
+                            ],
+                            "screenshots": Lista com ID e URLs das screenshots.
+                            [ 
+                                { 
+                                    "id": 1, 
+                                    "path_thumbnail": "URL da thumbnail", 
+                                    "path_full": "URL da imagem completa" 
+                                }, 
+                                ... 
+                            ],
+                            "movies": Lista com ID e URLs dos trailers.
+                            [
+                                { 
+                                    "id": 1, 
+                                    "name": "Trailer 1", 
+                                    "thumbnail": "URL da thumbnail", 
+                                    "dash_av1": "URL do vídeo em AV1",
+                                    "dash_h264": "URL do vídeo em H264",
+                                    "hls_h264": "URL do vídeo em HLS H264",
+                                    "highlight": True|False
+                                }, 
+                                ...
+                            ],
+                            "achievements": {
+                                "total": 50,
+                            },
+                            "recommendations": { "total": 1234 },
+                            "release_date": { 
+                                "coming_soon": True|False, 
+                                "date": "1/jan./2020" 
+                            },
+                            "support_info": { 
+                                "url": "URL de suporte", 
+                                "email": "Email de suporte" 
+                            },
+                            "background": "URL da imagem de fundo"
+                            "background_raw": "URL da imagem de fundo sem redimensionamento",
+                            "content_descriptors": {
+                                "ids": Lista de IDs dos content descriptors. [1, 2, 3],
+                                "notes": String com notas sobre os content descriptors. "Violência, Linguagem Forte, ...",
+                            }
+                            "ratings": {
+                                "dejus": {
+                                    "rating_generated": "1",
+                                    "rating"; "l",
+                                    "required_age": "0",
+                                    "banned": "0",
+                                    "use_age_gate": "0",
+                                    "descriptors": ""
+                                },
+                                "steam_germany": {...}
+                            }
+                            
+                        } ou {} se success=False
+                    }
+                }
                 """
                 nonlocal var_intErrosHTTP, var_intErrosForbidden, var_intErrosTooManyRequests, var_intErrosTimeout, var_intErrosOutros, var_intAusentes
                 async with var_semSemaphore:
@@ -435,15 +586,10 @@ class SteamClient:
 
             # Insere no PostgreSQL (Docker) em vez de Supabase
             if var_listReviews:
-                PostgreSQL.inserir_dadosSteamRaw_Bulk(arg_listDados=var_listReviews)
+                PostgreSQLSteam.inserir_dadosSteamRaw_Bulk(arg_listDados=var_listReviews)
                 logger.info(f"Dados de reviews inseridos com sucesso no PostgreSQL ({len(var_listReviews)} registros).")
             else:
                 logger.warning("Nenhum dado válido para inserir neste batch.")
-
-            # Aguarda entre batches (exceto no último)
-            # if var_intBatchNum < var_intTotalBatches - 1:
-            #     logger.info(f"Aguardando {cls._var_intDelay}s antes do próximo batch...\n")
-            #     await asyncio.sleep(cls._var_intDelay)
 
         logger.info(f"===========PROCESSAMENTO COMPLETO! (Reviews)==========")
         logger.info(f"Total processado: {var_intTotalItems:,} itens.")
@@ -487,6 +633,55 @@ class SteamClient:
 
                 Retorna:
                 - var_dictSummary (dict | None): Um dicionário com o resumo das reviews ou None se não encontrado.
+                """
+                """Retorno JSON:
+                {
+                    "success": 1|2,
+                    "query_summary": {
+                        "num_reviews": 1234,
+                        "review_score": 8,
+                        "review_score_desc": "Muito Positivas",
+                        "total_positive": 1000,
+                        "total_negative": 234,
+                        "total_reviews": 1234
+                    },
+                    "reviews": [
+                        {
+                            recommendationid: "1234567890",
+                            "author": {
+                                "steamid": "76561198000000000",
+                                "personaname": "Nome do Usuário",
+                                "persona_status": "offline",
+                                "profileurl": "URL do perfil",
+                                "num_games_owned": 10,
+                                "num_reviews": 5,
+                                "playtime_forever": 50,
+                                "playtime_last_two_weeks": 5,
+                                "playtime_at_review": 45,
+                                "last_played": 1609459200,
+                                "avatar": "URL do avatar",
+                            },
+                            "language": "brazilian",
+                            "appid": 12345,
+                            "review": "Texto da review",
+                            "timestamp_created": 1609459200,
+                            "timestamp_updated": 1609459200,
+                            "voted_up": True|False,
+                            "votes_up": 100,
+                            "votes_funny": 10,
+                            "weighted_vote_score": "0.95",
+                            "comment_count": 5,
+                            "steam_purchase": True|False,
+                            "received_for_free": True|False,
+                            "refounded": True|False,
+                            "written_during_early_access": True|False,
+                            "primarily_steam_deck": True|False,
+                            "app_release_date": "973065600",
+                            "reactions": [],
+                            "csgo_disclaimer": True|False
+                        }
+
+                }
                 """
                 nonlocal var_intErrosHTTP, var_intErrosForbidden, var_intErrosTooManyRequests, var_intErrosTimeout, var_intErrosOutros, var_intAusentes
                 

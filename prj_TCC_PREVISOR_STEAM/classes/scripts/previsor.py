@@ -2,6 +2,9 @@ from prj_TCC_PREVISOR_STEAM.classes.framework.AllSettings import Settings
 from prj_TCC_PREVISOR_STEAM.classes.api.steam_api import SteamClient
 from prj_TCC_PREVISOR_STEAM.classes.api.itad_api import ITADClient
 from prj_TCC_PREVISOR_STEAM.classes.SQL.postgre import PostgreSQL
+from prj_TCC_PREVISOR_STEAM.classes.SQL.postgre_steam import PostgreSQLSteam
+from prj_TCC_PREVISOR_STEAM.classes.SQL.postgre_itad import PostgreSQLITAD
+from prj_TCC_PREVISOR_STEAM.classes.SQL.postgre_checkpoint import PostgreSQLCheckpoint
 from prj_TCC_PREVISOR_STEAM.classes.limpeza.limpeza_dados import LimpezaDados
 
 from datetime import datetime
@@ -29,8 +32,6 @@ class Previsor:
         - None
         """
         try:
-            PostgreSQL.conectar()
-            
             # Define o range de processamento por vez pelo .env
             var_intRange = int(os.getenv("RANGE_PROCESSAMENTO_APPIDS_RAW", 1000))
             
@@ -49,7 +50,7 @@ class Previsor:
             # Busca apenas AppIDs não processados (LEFT JOIN no banco)
             # Já aplica filtro de divisão de trabalho entre PCs
             logger.info("Consultando AppIDs não processados...")
-            var_listAppIDParaProcessar = PostgreSQL.buscar_appids_nao_processados_otimizado(
+            var_listAppIDParaProcessar = PostgreSQLSteam.buscar_appids_nao_processados_otimizado(
                 arg_intPcId=var_intPcId,
                 arg_intTotalPcs=var_intTotalPcs
             )
@@ -61,7 +62,7 @@ class Previsor:
 
             # Busca AppIDs desatualizados e adiciona à lista
             logger.info("Consultando AppIDs desatualizados")
-            var_listAppIDDesatualizados = PostgreSQL.buscar_appids_desatualizados_otimizado(
+            var_listAppIDDesatualizados = PostgreSQLSteam.buscar_appids_desatualizados_otimizado(
                 arg_intPcId=var_intPcId,
                 arg_intTotalPcs=var_intTotalPcs
             )
@@ -87,7 +88,7 @@ class Previsor:
                 return
 
             # Recupera checkpoint se houver
-            var_intInicioCheckpoint = PostgreSQL.recuperar_checkpoint(var_intPcId, "STEAM")
+            var_intInicioCheckpoint = PostgreSQLCheckpoint.recuperar_checkpoint(var_intPcId, "STEAM")
             logger.info(f"Iniciando do índice: {var_intInicioCheckpoint:,}")
 
             # Itera sobre os aplicativos em lotes
@@ -112,7 +113,7 @@ class Previsor:
                 asyncio.run(SteamClient.fetch_reviews_summary_batched(arg_seqAppids=var_listAppIDAtual))
                 
                 # Salva checkpoint após batch bem-sucedido
-                PostgreSQL.salvar_checkpoint(var_intPcId, i + var_intRange, "STEAM")
+                PostgreSQLCheckpoint.salvar_checkpoint(var_intPcId, i + var_intRange, "STEAM")
                 
                 # Pausa entre lotes
                 if i + var_intRange < var_intTamanhoTotalFila:
@@ -120,15 +121,13 @@ class Previsor:
                     sleep(2)
             
             # Limpa checkpoint após conclusão total
-            PostgreSQL.limpar_checkpoint(var_intPcId, "STEAM")
+            PostgreSQLCheckpoint.limpar_checkpoint(var_intPcId, "STEAM")
             logger.info("Processamento Steam completo! Checkpoint limpo.")
             logger.info("Processamento concluído com sucesso!")
                 
         except Exception as e:
             logger.error(f"Erro ao alimentar o banco de dados PostgreSQL: {e}")
             raise Exception(f"Erro ao alimentar o banco de dados PostgreSQL: {e}")
-        finally:
-            PostgreSQL.desconectar()
             
     @classmethod
     def alimentar_banco_dados_ITAD_docker(cls):
@@ -142,9 +141,6 @@ class Previsor:
         - None
         """
         try:
-            PostgreSQL.conectar()
-            # var_listDados = PostgreSQL.buscar_todos_dados(arg_strNomeTabela="steam_raw")
-
             # Define o range de processamento por vez pelo .env
             var_intRange = int(os.getenv("RANGE_PROCESSAMENTO_ITAD_RAW", 5000))
             
@@ -162,7 +158,7 @@ class Previsor:
 
             # Busca AppIDs do steam_bd que ainda não têm dados no ITAD
             logger.info("Consultando AppIDs sem dados ITAD...")
-            var_listAppIDParaProcessar = PostgreSQL.buscar_appids_sem_itad()
+            var_listAppIDParaProcessar = PostgreSQLITAD.buscar_appids_sem_itad()
             
             var_strTexto = f"{10*'='} AppIDs para processar ITAD {10*'='}"
             logger.info(var_strTexto)
@@ -171,7 +167,7 @@ class Previsor:
 
             # Busca AppIDs ITAD desatualizados (>90 dias)
             logger.info("Consultando AppIDs ITAD desatualizados")
-            var_listAppIDDesatualizados = PostgreSQL.buscar_appids_itad_desatualizados(
+            var_listAppIDDesatualizados = PostgreSQLITAD.buscar_appids_itad_desatualizados(
                 arg_intPcId=var_intPcId,
                 arg_intTotalPcs=var_intTotalPcs
             )
@@ -197,7 +193,7 @@ class Previsor:
                 return
 
             # Recupera checkpoint se houver
-            var_intInicioCheckpoint = PostgreSQL.recuperar_checkpoint(var_intPcId, "ITAD")
+            var_intInicioCheckpoint = PostgreSQLCheckpoint.recuperar_checkpoint(var_intPcId, "ITAD")
             logger.info(f"Iniciando ITAD do índice: {var_intInicioCheckpoint:,}")
 
             # Itera sobre os aplicativos em lotes
@@ -218,13 +214,13 @@ class Previsor:
                 asyncio.run(ITADClient.lookup_itad_ids_batched(arg_seqAppids=var_listAppIDAtual))
                 
                 # Busca os IDs ITAD correspondentes aos AppIDs processados
-                var_listITADID = list(PostgreSQL.buscar_itad_id_por_appid(arg_listAppids=var_listAppIDAtual))
+                var_listITADID = list(PostgreSQLITAD.buscar_itad_id_por_appid(arg_listAppids=var_listAppIDAtual))
 
                 # Busca histórico de preços ITAD para os AppIDs
                 asyncio.run(ITADClient.fetch_price_history_bulk_batched(arg_seqItadPlain=var_listITADID))
                 
                 # Salva checkpoint após batch ITAD bem-sucedido
-                PostgreSQL.salvar_checkpoint(var_intPcId, i + var_intRange, "ITAD")
+                PostgreSQLCheckpoint.salvar_checkpoint(var_intPcId, i + var_intRange, "ITAD")
                 
                 # Pausa entre lotes
                 if i + var_intRange < var_intTamanhoTotalFila:
@@ -232,7 +228,7 @@ class Previsor:
                     sleep(2)
             
             # Limpa checkpoint após conclusão total ITAD
-            PostgreSQL.limpar_checkpoint(var_intPcId, "ITAD")
+            PostgreSQLCheckpoint.limpar_checkpoint(var_intPcId, "ITAD")
             logger.info("Processamento ITAD completo! Checkpoint limpo.")
             
             logger.info("Processamento ITAD concluído com sucesso!")
@@ -240,9 +236,7 @@ class Previsor:
         except Exception as e:
             logger.error(f"Erro ao alimentar o banco de dados ITAD (PostgreSQL): {e}")
             raise Exception(f"Erro ao alimentar o banco de dados ITAD (PostgreSQL): {e}")
-        finally:
-            PostgreSQL.desconectar()
-
+        
     @classmethod
     def alimentar_ITAD_historico_precos(cls):
         """
@@ -255,11 +249,11 @@ class Previsor:
         - None
         """
         try:
-            PostgreSQL.conectar()
+            PostgreSQLSteam.conectar()
             
             # Busca todos os dados ITAD
             logger.info("Consultando registros ITAD...")
-            var_listITAD = PostgreSQL.buscar_todos_dados(arg_strNomeTabela="itad_raw")
+            var_listITAD = PostgreSQLSteam.buscar_todos_dados(arg_strNomeTabela="itad_raw")
             
             # Filtra registros que precisam de atualização
             var_listITADID = []
