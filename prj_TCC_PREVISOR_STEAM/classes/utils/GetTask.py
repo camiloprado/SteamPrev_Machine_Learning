@@ -1,6 +1,7 @@
 from prj_TCC_PREVISOR_STEAM.classes.framework.AllSettings import Settings
 from prj_TCC_PREVISOR_STEAM.classes.api.local_steam import LocalClient
 from prj_TCC_PREVISOR_STEAM.classes.SQL.postgre import PostgreSQL
+from prj_TCC_PREVISOR_STEAM.classes.SQL.postgre_steam import PostgreSQLSteam
 from prj_TCC_PREVISOR_STEAM.classes.scripts.previsor import Previsor
 from prj_TCC_PREVISOR_STEAM.classes.scripts.ProcessadorETL import ProcessadorETL
 from prj_TCC_PREVISOR_STEAM.classes.limpeza.ProcessadorLimpeza import ProcessadorLimpeza
@@ -32,18 +33,20 @@ class GetTask:
             # Procura a lista genérica de apps na Steam
             try:
                 var_listDados = LocalClient.find_app_list()
-                PostgreSQL.inserir_dadosSteamGenerico(arg_listDadosGerais=var_listDados)
-            except:
+                PostgreSQLSteam.inserir_dadosSteamGenerico(arg_listDadosGerais=var_listDados)
+            except Exception as e:
+                logger.warning(f"Erro ao buscar lista de apps da Steam: {e}")
+                logger.warning("Tentando carregar lista de apps da Steam do arquivo local...")
                 # Se não encontrar, carrega do arquivo local
                 var_listDados = LocalClient.load_app_list()
 
             # Alimentação do banco de dados raw para o docker
-            if PostgreSQL.buscar_appids_desatualizados_otimizado():
-                Previsor.alimentar_banco_dados_raw_docker()
-                ProcessadorETL.processar_lote_unificado()
+            # if PostgreSQLSteam.buscar_appids_desatualizados_otimizado():
+            Previsor.alimentar_banco_dados_raw_docker()
+            ProcessadorETL.processar_lote_unificado()
 
             # Alimentação do banco de dados ITAD para o docker
-            if PostgreSQL.buscar_appids_desatualizados_otimizado(arg_strNomeTabela="itad_raw"):
+            if PostgreSQLSteam.buscar_appids_desatualizados_otimizado(arg_strNomeTabela="itad_raw"):
                 Previsor.alimentar_banco_dados_ITAD_docker()
                 Previsor.alimentar_ITAD_historico_precos()
 

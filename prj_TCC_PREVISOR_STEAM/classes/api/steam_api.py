@@ -1,3 +1,4 @@
+from prj_TCC_PREVISOR_STEAM.classes.SQL.postgre_steam import PostgreSQLSteam
 from prj_TCC_PREVISOR_STEAM.classes.framework.AllSettings import Settings
 from prj_TCC_PREVISOR_STEAM.classes.SQL.postgre import PostgreSQL
 
@@ -110,7 +111,7 @@ class SteamClient:
             
             # Insere no PostgreSQL (Docker) em vez de Supabase
             if var_listDetails:
-                PostgreSQL.inserir_dadosSteamRaw_Bulk(arg_listDados=var_listDetails)
+                PostgreSQLSteam.inserir_dadosSteamRaw_Bulk(arg_listDados=var_listDetails)
                 logger.info(f"Dados de detalhes inseridos com sucesso no PostgreSQL ({len(var_listDetails)} registros).")
             else:
                 logger.warning("Nenhum dado válido para inserir neste batch.")
@@ -585,15 +586,10 @@ class SteamClient:
 
             # Insere no PostgreSQL (Docker) em vez de Supabase
             if var_listReviews:
-                PostgreSQL.inserir_dadosSteamRaw_Bulk(arg_listDados=var_listReviews)
+                PostgreSQLSteam.inserir_dadosSteamRaw_Bulk(arg_listDados=var_listReviews)
                 logger.info(f"Dados de reviews inseridos com sucesso no PostgreSQL ({len(var_listReviews)} registros).")
             else:
                 logger.warning("Nenhum dado válido para inserir neste batch.")
-
-            # Aguarda entre batches (exceto no último)
-            # if var_intBatchNum < var_intTotalBatches - 1:
-            #     logger.info(f"Aguardando {cls._var_intDelay}s antes do próximo batch...\n")
-            #     await asyncio.sleep(cls._var_intDelay)
 
         logger.info(f"===========PROCESSAMENTO COMPLETO! (Reviews)==========")
         logger.info(f"Total processado: {var_intTotalItems:,} itens.")

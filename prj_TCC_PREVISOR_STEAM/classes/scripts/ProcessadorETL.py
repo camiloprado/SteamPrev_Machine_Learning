@@ -1,3 +1,4 @@
+from prj_TCC_PREVISOR_STEAM.classes.SQL.postgre_steam import PostgreSQLSteam
 from prj_TCC_PREVISOR_STEAM.classes.framework.AllSettings import Settings
 from prj_TCC_PREVISOR_STEAM.classes.SQL.postgre import PostgreSQL
 
@@ -556,9 +557,6 @@ class ProcessadorETL:
         
         Parâmetros:
         """
-        # Garante conexão com o Docker
-        PostgreSQL.conectar()
-        
         # Buscar dados brutos do Docker
         var_listDados = PostgreSQL.buscar_todos_dados(arg_strNomeTabela="steam_raw")
         logger.info(f"{len(var_listDados)} jogos encontrados no Docker.")
@@ -608,19 +606,8 @@ class ProcessadorETL:
         # Inserir em steam_unificado
         if var_listDadosUnificados:
             try:
-                var_intInseridos = 0
-                var_intTotal = len(var_listDadosUnificados)
-                for var_dictDado in var_listDadosUnificados:
-                    var_floatPercentual = (var_intInseridos / var_intTotal * 100) if var_intTotal > 0 else 1
-                    if int(var_floatPercentual) in [0, 25, 50, 75, 100]:
-                        logger.info(f"Inseridos {var_floatPercentual}% do total de {var_intTotal}")
-                    try:
-                        PostgreSQL.inserir_steam_unificado(var_dictDado)
-                        var_intInseridos += 1
-                    except Exception as e:
-                        logger.error(f"Erro ao inserir AppID {var_dictDado.get('appid')}: {e}")
+                PostgreSQLSteam.inserir_steam_unificado_batch(var_listDadosUnificados)
                 
-                logger.info(f"{var_intInseridos}/{len(var_listDadosUnificados)} jogos inseridos em steam_unificado!")
             except Exception as e:
                 logger.error(f"Erro ao inserir em steam_unificado: {e}")
         else:
