@@ -247,7 +247,7 @@ class Settings:
         cls._var_dictSettings["db_password"] = cls._var_strDBPassword
         cls._var_dictSettings["db_host"] = cls._var_strDBHost
         cls._var_dictSettings["db_port"] = cls._var_strDBPort
-        cls._var_dictSettings["dias_para_atualizacao"] = 90
+        cls._var_dictSettings["dias_para_atualizacao"] = os.getenv("TEMPO_ATUALIZACAO_DIAS", 30)
         
     @classmethod
     def remove_setting(cls, arg_strKey: str):

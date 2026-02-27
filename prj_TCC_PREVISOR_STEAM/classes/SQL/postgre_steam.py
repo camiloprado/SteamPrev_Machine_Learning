@@ -460,7 +460,7 @@ class PostgreSQLSteam(PostgreSQL):
                 logger.error("Conexão com banco de dados não estabelecida")
                 return []
             
-            var_intDias = arg_intDiasAtualizacao or Settings._var_dictSettings.get("dias_para_atualizacao", 30)
+            var_intDias = Settings._var_dictSettings.get("dias_para_atualizacao", 30)
             
             logger.info(f"Buscando AppIDs desatualizados (>{var_intDias} dias)...")
 

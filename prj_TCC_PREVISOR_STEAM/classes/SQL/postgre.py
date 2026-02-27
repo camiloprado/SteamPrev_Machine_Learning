@@ -133,7 +133,7 @@ class PostgreSQL:
         """
         cls.conectar()
         try:
-            var_intDias = arg_intDiasAtualizacao or Settings._var_dictSettings.get("dias_para_atualizacao", 30)
+            var_intDias = Settings._var_dictSettings.get("dias_para_atualizacao", 30)
             
             var_strSQL = f"""
             SELECT * FROM {arg_strNomeTabela}
