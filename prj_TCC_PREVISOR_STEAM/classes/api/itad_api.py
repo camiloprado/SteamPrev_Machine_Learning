@@ -1,5 +1,6 @@
 from prj_TCC_PREVISOR_STEAM.classes.framework.AllSettings import Settings
 from prj_TCC_PREVISOR_STEAM.classes.SQL.postgre import PostgreSQL
+from prj_TCC_PREVISOR_STEAM.classes.SQL.postgre_itad import PostgreSQLITAD
 
 from typing import Sequence
 from datetime import datetime, timedelta, timezone
@@ -88,7 +89,7 @@ class ITADClient:
             # Acumula os resultados
             if var_dictResults:
                 var_dictAllResults.update(var_dictResults)
-                PostgreSQL.inserir_dados_itad_raw_batched(var_dictResults)
+                PostgreSQLITAD.inserir_dados_itad_raw_batched(var_dictResults)
                 
         logger.info(f"===========PROCESSAMENTO COMPLETO!==========")
         logger.info(f"Total processado: {len(var_dictAllResults):,} sucessos de {var_intTotalItems:,} itens ({len(var_dictAllResults)/var_intTotalItems:.2%})")
@@ -253,7 +254,7 @@ class ITADClient:
             
             var_intFalha = len(arg_seqAppids) - len(var_dictResults)
             logger.info(f"--- Busca concluída: ---")
-            logger.info(f"{len(var_dictResults)} sucesso(s) ({len(var_dictResults)/(len(arg_seqAppids) if len(arg_seqAppids) != 0 else 1):.2%}),")
+            logger.info(f"{len(var_dictResults)-var_intNaoEncontrados} sucesso(s) ({len(var_dictResults)/(len(arg_seqAppids) if len(arg_seqAppids) != 0 else 1):.2%}),")
             logger.info(f"{var_intFalha} falha(s) ({var_intFalha/len(arg_seqAppids) if len(arg_seqAppids) != 0 else 1:.2%}).")
             logger.info(f"--- Detalhamento dos erros: ---")
             logger.info(f"* HTTP: {var_intErrosHTTP} (403 Forbidden: {var_intErrosForbidden}, 429 Too Many Requests: {var_intErrosTooManyRequests})")
@@ -262,7 +263,7 @@ class ITADClient:
             logger.info(f"* Outros: {var_intErrosOutros}")
             var_dictEstatisticas = {
                 "total": len(arg_seqAppids),
-                "sucessos": len(var_dictResults),
+                "sucessos": len(var_dictResults)-var_intNaoEncontrados,
                 "erros": var_intFalha,
                 "erros_http": var_intErrosHTTP,
                 "erros_timeout": var_intErrosTimeout,

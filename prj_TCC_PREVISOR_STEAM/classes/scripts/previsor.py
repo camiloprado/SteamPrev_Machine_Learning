@@ -249,12 +249,10 @@ class Previsor:
         - None
         """
         try:
-            PostgreSQLSteam.conectar()
-            
             # Busca todos os dados ITAD
             logger.info("Consultando registros ITAD...")
-            var_listITAD = PostgreSQLSteam.buscar_todos_dados(arg_strNomeTabela="itad_raw")
-            
+            var_listITAD = PostgreSQLITAD.buscar_itad_historico_preco_desatualizado()
+
             # Filtra registros que precisam de atualização
             var_listITADID = []
             var_intSemHistorico = 0
@@ -268,17 +266,6 @@ class Previsor:
                 var_strIdItad = var_dictItem['id_itad']
                 var_boolHistoricoVazio = not var_dictItem.get('historico_preco') or var_dictItem.get('historico_preco') in ['{}', '[]', None]
                 var_boolDesatualizado = False
-                
-                # Verifica se está desatualizado (>90 dias)
-                if var_dictItem.get('ultima_atualizacao'):
-                    try:
-                        var_dtUltimaAtualizacao = datetime.fromisoformat(str(var_dictItem['ultima_atualizacao']))
-                        var_intDiasDesdeAtualizacao = (datetime.now() - var_dtUltimaAtualizacao).days
-                        var_boolDesatualizado = var_intDiasDesdeAtualizacao > 90
-                    except:
-                        var_boolDesatualizado = True
-                else:
-                    var_boolDesatualizado = True
                 
                 # Adiciona à lista se histórico vazio OU desatualizado
                 if var_boolHistoricoVazio or var_boolDesatualizado:
