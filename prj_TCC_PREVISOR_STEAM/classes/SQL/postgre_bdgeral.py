@@ -56,9 +56,12 @@ class PostgreSQLBDGeral(PostgreSQL):
             cls.desconectar(var_connConnection)
 
     @classmethod
-    def buscar_dados_Geral(cls) -> list:
+    def buscar_dados_Geral(cls, arg_strFiltro: str = None) -> list:
         """
         Busca dados na tabela steam_geral.
+
+        Parâmetros:
+        - arg_strFiltro (str): Filtro opcional para a consulta SQL. Exemplo: "type = 'game' AND preco != 'Grátis'".
 
         Retorna:
         - list[dict]: Lista de dicionários com os dados dos jogos.
@@ -70,8 +73,14 @@ class PostgreSQLBDGeral(PostgreSQL):
             SELECT *
             FROM steam_unificado su
             LEFT JOIN steam_itad_mapping sim ON su.appid = sim.appid
-            LEFT JOIN itad_raw ir ON sim.id_itad = ir.id_itad;
+            LEFT JOIN itad_raw ir ON sim.id_itad = ir.id_itad
             """
+            if arg_strFiltro:
+                var_strSQLGeral += f"""
+                WHERE {arg_strFiltro};
+                """
+
+            var_strSQLGeral += ";"
 
             with var_connConnection.cursor() as var_curCursor:
                 var_curCursor.execute(var_strSQLGeral)
