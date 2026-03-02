@@ -56,13 +56,14 @@ class PostgreSQLBDGeral(PostgreSQL):
             cls.desconectar(var_connConnection)
 
     @classmethod
-    def buscar_dados_Geral(cls, arg_strFiltro: str = None) -> list:
+    def buscar_dados_Geral(cls, arg_strFiltro: str = None, arg_boolFiltroPadrao: bool = False) -> list:
         """
         Busca dados na tabela steam_geral.
 
         Parâmetros:
         - arg_strFiltro (str): Filtro opcional para a consulta SQL. Exemplo: "type = 'game' AND preco != 'Grátis'".
-
+        - arg_boolFiltroPadrao (bool): Se True, aplica um filtro padrão para buscar apenas jogos com preço diferente de "Gratuito" e que tenham mapeamento no ITAD.
+        
         Retorna:
         - list[dict]: Lista de dicionários com os dados dos jogos.
         """
@@ -70,17 +71,46 @@ class PostgreSQLBDGeral(PostgreSQL):
         
         try:
             var_strSQLGeral = """
-            SELECT *
+            SELECT
+                su.appid, 
+                sim.id_itad, 
+                su.nome, 
+                su.classificacao_etaria, 
+                su.linguagens, 
+                su.desenvolvedores, 
+                su.distribuidores, 
+                su.preco, 
+                su.metacritic_score, 
+                su.categorias, 
+                su.genero, 
+                su.data_lancamento, 
+                su.type, 
+                su.review_score, 
+                su.total_reviews, 
+                su.total_negative, 
+                su.total_positive, 
+                su.review_score_desc, 
+                ir.historico_preco
             FROM steam_unificado su
-            LEFT JOIN steam_itad_mapping sim ON su.appid = sim.appid
-            LEFT JOIN itad_raw ir ON sim.id_itad = ir.id_itad
+            INNER JOIN steam_itad_mapping sim ON su.appid = sim.appid
+            INNER JOIN itad_raw ir ON sim.id_itad = ir.id_itad
             """
-            if arg_strFiltro:
-                var_strSQLGeral += f"""
-                WHERE {arg_strFiltro};
-                """
 
-            var_strSQLGeral += ";"
+            if arg_boolFiltroPadrao:
+                var_strSQLGeral += f"""
+                WHERE su.type = 'game' 
+                    AND su.preco <> 'Gratuito' 
+                    AND sim.id_itad IS NOT NULL 
+                    AND sim.id_itad NOT IN ('', 'AUSENTE')
+                    AND ir.historico_preco IS NOT NULL
+                    """
+            else:
+                if arg_strFiltro:
+                    var_strSQLGeral += f"""
+                    WHERE {arg_strFiltro}
+                    """
+
+            var_strSQLGeral += "ORDER BY su.appid;"
 
             with var_connConnection.cursor() as var_curCursor:
                 var_curCursor.execute(var_strSQLGeral)
