@@ -22,7 +22,7 @@ class PostgreSQLBDGeral(PostgreSQL):
             var_strSQL = """
             CREATE TABLE IF NOT EXISTS steam_geral (
                 appid INTEGER PRIMARY KEY,
-                id_itad VARCHAR(100) FOREIGN KEY REFERENCES steam_itad_mapping(id_itad) ON DELETE SET NULL,
+                id_itad VARCHAR(100) REFERENCES public.itad_raw(id_itad) ON DELETE SET NULL,
                 nome VARCHAR(600) NOT NULL,
                 classificacao_etaria VARCHAR(50),
                 linguagens TEXT[],
@@ -162,9 +162,10 @@ class PostgreSQLBDGeral(PostgreSQL):
                 historico_precos = EXCLUDED.historico_precos,
                 ultima_atualizacao = CURRENT_TIMESTAMP;
             """
-
+            
             var_listValores = []
             for var_dictDado in arg_listDados:
+
                 var_listValores.append((
                     var_dictDado.get("appid"),
                     var_dictDado.get("id_itad"),
