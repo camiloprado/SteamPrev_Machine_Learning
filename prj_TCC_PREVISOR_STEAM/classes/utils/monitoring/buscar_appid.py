@@ -1,4 +1,4 @@
-from prj_TCC_PREVISOR_STEAM.classes.SQL.postgre import PostgreSQL
+from prj_TCC_PREVISOR_STEAM.classes.SQL.postgre_generico import PostgreSQL
 
 PostgreSQL.conectar()
 

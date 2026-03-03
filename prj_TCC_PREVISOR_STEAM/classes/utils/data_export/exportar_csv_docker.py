@@ -10,7 +10,7 @@ import json
 from datetime import datetime
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')))
 
-from prj_TCC_PREVISOR_STEAM.classes.SQL.postgre import PostgreSQL
+from prj_TCC_PREVISOR_STEAM.classes.SQL.postgre_generico import PostgreSQL
 from prj_TCC_PREVISOR_STEAM.classes.framework.AllSettings import Settings
 import logging
 

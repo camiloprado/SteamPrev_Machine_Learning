@@ -3,5 +3,10 @@
         "prj_TCC_PREVISOR_STEAM"
     ],
     "python.testing.unittestEnabled": false,
-    "python.testing.pytestEnabled": true
+    "python.testing.pytestEnabled": true,
+    "files.exclude": {
+        "**/*.pyc":{"when": "$(basename).py"},
+        "**/__pycache__": true,
+        "**/*.pytest_cache": true,
+    }
 }

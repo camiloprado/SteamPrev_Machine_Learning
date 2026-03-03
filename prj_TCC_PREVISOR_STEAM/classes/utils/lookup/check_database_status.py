@@ -5,7 +5,7 @@ import sys
 import os
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
-from prj_TCC_PREVISOR_STEAM.classes.SQL.postgre import PostgreSQL
+from prj_TCC_PREVISOR_STEAM.classes.SQL.postgre_generico import PostgreSQL
 
 def check_database_status():
     """Verifica status de todas as tabelas no banco PostgreSQL."""

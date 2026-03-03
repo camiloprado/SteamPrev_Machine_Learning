@@ -4,7 +4,7 @@ Usa batching para evitar sobrecarga de memória.
 """
 import json
 import time
-from prj_TCC_PREVISOR_STEAM.classes.SQL.postgre import PostgreSQL
+from prj_TCC_PREVISOR_STEAM.classes.SQL.postgre_generico import PostgreSQL
 import logging
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')

@@ -1,5 +1,5 @@
 from prj_TCC_PREVISOR_STEAM.classes.framework.AllSettings import Settings
-from prj_TCC_PREVISOR_STEAM.classes.SQL.postgre import PostgreSQL
+from prj_TCC_PREVISOR_STEAM.classes.SQL.postgre_generico import PostgreSQL
 from prj_TCC_PREVISOR_STEAM.classes.limpeza.ProcessadorLimpeza import ProcessadorLimpeza
 from prj_TCC_PREVISOR_STEAM.classes.limpeza.limpeza_dados import LimpezaDados
 
