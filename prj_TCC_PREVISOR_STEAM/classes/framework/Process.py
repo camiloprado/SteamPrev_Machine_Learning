@@ -19,10 +19,8 @@ class Process:
         Processa uma tarefa específica.
 
         Parâmetros:
-        - arg_listTask: A lista de tarefas a ser processada.
-
+        
         Retorna:
-        - Resultado do processamento da tarefa.
         """
         logger.info("="*60)
         logger.info("PROCESSANDO TAREFA")
