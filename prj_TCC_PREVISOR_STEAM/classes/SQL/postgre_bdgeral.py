@@ -12,50 +12,6 @@ class PostgreSQLBDGeral(PostgreSQL):
     """
     
     @classmethod
-    def criar_tabela_steam_geral(cls) -> None:
-        """
-        Cria a tabela steam_geral no banco de dados, se ainda não existir.
-        """
-        var_connConnection = cls.conectar()
-        
-        try:
-            var_strSQL = """
-            CREATE TABLE IF NOT EXISTS steam_geral (
-                appid INTEGER PRIMARY KEY,
-                id_itad VARCHAR(100) REFERENCES public.itad_raw(id_itad) ON DELETE SET NULL,
-                nome VARCHAR(600) NOT NULL,
-                classificacao_etaria VARCHAR(50),
-                linguagens TEXT[],
-                desenvolvedores TEXT[],
-                distribuidores TEXT[],
-                preco VARCHAR(50),
-                metacritic_score VARCHAR(10),
-                categorias TEXT[],
-                genero TEXT[],
-                data_lancamento VARCHAR(50),
-                type VARCHAR(50),
-                review_score INTEGER,
-                total_reviews INTEGER,
-                total_negative INTEGER,
-                total_positive INTEGER,
-                review_score_desc VARCHAR(255),
-                historico_precos JSONB,
-                ultima_atualizacao TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-            );
-            """
-            with var_connConnection.cursor() as cursor:
-                cursor.execute(var_strSQL)
-                var_connConnection.commit()
-                logger.info("Tabela steam_geral criada ou já existe.")
-        except Exception as e:
-            logger.error(f"Erro ao criar tabela steam_geral: {e}")
-            if var_connConnection:
-                var_connConnection.rollback()
-            raise Exception(f"Erro ao criar tabela steam_geral: {e}")
-        finally:
-            cls.desconectar(var_connConnection)
-
-    @classmethod
     def buscar_dados_Geral(cls, arg_strFiltro: str = None, arg_boolFiltroPadrao: bool = False) -> list:
         """
         Busca dados na tabela steam_geral.
