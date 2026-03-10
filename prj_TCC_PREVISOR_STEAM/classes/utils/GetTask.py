@@ -43,7 +43,7 @@ class GetTask:
             # Alimentação do banco de dados raw para o docker
             if PostgreSQLSteam.buscar_appids_desatualizados_otimizado():
                 Previsor.alimentar_banco_dados_raw_docker()
-                ProcessadorETL.processar_lote_unificado()
+            ProcessadorETL.processar_lote_unificado()
 
             # Alimentação do banco de dados ITAD para o docker
             if PostgreSQLSteam.buscar_appids_desatualizados_otimizado(arg_strNomeTabela="itad_raw"):

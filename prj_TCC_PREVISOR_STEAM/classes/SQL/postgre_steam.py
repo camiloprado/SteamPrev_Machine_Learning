@@ -489,5 +489,93 @@ class PostgreSQLSteam(PostgreSQL):
         except Exception as e:
             logger.error(f"Erro ao buscar AppIDs desatualizados: {e}")
             return []
-        finally:            
-            cls.desconectar(var_connConnection)
+        finally:  
+            if var_connConnection:          
+                cls.desconectar(var_connConnection)
+
+    @classmethod
+    def buscar_dados_categoria(cls):
+        """
+        Busca dados da tabela steam_categorias e retorna um dicionário com nome_categoria como chave e id_categoria como valor.
+
+        Parâmetros:
+
+        Retorna:
+        - var_dictCategorias: Dicionário com nome_categoria como chave e id_categoria como valor.
+        """
+
+        try:
+            var_strSQL = """
+            SELECT id_categoria, nome_categoria FROM steam_categorias;
+            """
+            var_connConnection = cls.conectar()
+            with var_connConnection.cursor() as cursor:
+                cursor.execute(var_strSQL)
+                var_listResultados = cursor.fetchall()
+                var_dictCategorias = {row[0]: row[1] for row in var_listResultados}
+                return var_dictCategorias
+            
+        except Exception as e:
+            logger.error(f"Erro ao buscar dados da tabela 'steam_categorias': {e}")
+            raise Exception(f"Erro ao buscar dados da tabela 'steam_categorias': {e}")
+        finally:
+            if var_connConnection:
+                cls.desconectar(var_connConnection)
+
+    @classmethod
+    def buscar_dados_genero(cls):
+        """
+        Busca dados da tabela steam_generos e retorna um dicionário com nome_genero como chave e id_genero como valor.
+
+        Parâmetros:
+
+        Retorna:
+        - var_dictGeneros: Dicionário com nome_genero como chave e id_genero como valor.
+        """
+
+        try:
+            var_strSQL = """
+            SELECT id_genero, nome_genero FROM steam_generos;
+            """
+            var_connConnection = cls.conectar()
+            with var_connConnection.cursor() as cursor:
+                cursor.execute(var_strSQL)
+                var_listResultados = cursor.fetchall()
+                var_dictGeneros = {row[0]: row[1] for row in var_listResultados}
+                return var_dictGeneros
+            
+        except Exception as e:
+            logger.error(f"Erro ao buscar dados da tabela 'steam_generos': {e}")
+            raise Exception(f"Erro ao buscar dados da tabela 'steam_generos': {e}")
+        finally:
+            if var_connConnection:
+                cls.desconectar(var_connConnection)
+
+    @classmethod
+    def buscar_dados_linguagens(cls):
+        """
+        Busca dados da tabela steam_linguagens e retorna um dicionário com nome_linguagem como chave e id_linguagem como valor.
+
+        Parâmetros:
+
+        Retorna:
+        - var_dictLinguagens: Dicionário com nome_linguagem como chave e id_linguagem como valor.
+        """
+
+        try:
+            var_strSQL = """
+            SELECT id_linguagem, nome_linguagem FROM steam_linguagens;
+            """
+            var_connConnection = cls.conectar()
+            with var_connConnection.cursor() as cursor:
+                cursor.execute(var_strSQL)
+                var_listResultados = cursor.fetchall()
+                var_dictLinguagens = {row[1]: row[0] for row in var_listResultados}
+                return var_dictLinguagens
+            
+        except Exception as e:
+            logger.error(f"Erro ao buscar dados da tabela 'steam_linguagens': {e}")
+            raise Exception(f"Erro ao buscar dados da tabela 'steam_linguagens': {e}")
+        finally:
+            if var_connConnection:
+                cls.desconectar(var_connConnection)
