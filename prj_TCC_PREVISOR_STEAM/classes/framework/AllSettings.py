@@ -248,6 +248,7 @@ class Settings:
         cls._var_dictSettings["db_host"] = cls._var_strDBHost
         cls._var_dictSettings["db_port"] = cls._var_strDBPort
         cls._var_dictSettings["dias_para_atualizacao"] = os.getenv("TEMPO_ATUALIZACAO_DIAS", 30)
+        cls._var_dictSettings["etl_processar_todos_dados"] = os.getenv("ETL_PROCESSAR_TODOS_DADOS", "False").lower() == "true"
         
     @classmethod
     def remove_setting(cls, arg_strKey: str):

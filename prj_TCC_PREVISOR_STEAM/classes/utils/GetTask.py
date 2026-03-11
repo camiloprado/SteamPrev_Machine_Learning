@@ -41,9 +41,12 @@ class GetTask:
                 var_listDados = LocalClient.load_app_list()
 
             # Alimentação do banco de dados raw para o docker
-            if PostgreSQLSteam.buscar_appids_desatualizados_otimizado():
+            var_listDadosRawDesatualizados = PostgreSQLSteam.buscar_appids_desatualizados_otimizado()
+            if var_listDadosRawDesatualizados:
                 Previsor.alimentar_banco_dados_raw_docker()
-            ProcessadorETL.processar_lote_unificado()
+                ProcessadorETL.processar_lote_unificado(var_listDadosRawDesatualizados)
+            if len(var_listDadosRawDesatualizados) == 0 and Settings._var_dictSettings["etl_processar_todos_dados"]:
+                ProcessadorETL.processar_lote_unificado()
 
             # Alimentação do banco de dados ITAD para o docker
             if PostgreSQLSteam.buscar_appids_desatualizados_otimizado(arg_strNomeTabela="itad_raw"):

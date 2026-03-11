@@ -141,15 +141,21 @@ class ProcessadorETL:
         return var_dictDadosEstruturados
     
     @staticmethod
-    def processar_lote_unificado() -> None:
+    def processar_lote_unificado(arg_listAppIDs: list = None) -> None:
         """
         Processa um lote de AppIDs do Docker para steam_unificado.
         Versão consolidada que mantém dados estruturados + JSONB.
         
         Parâmetros:
+        - arg_listAppIDs (list, optional): Lista de AppIDs para processar. Se None, processa todos os dados.
         """
-        # Buscar dados brutos do Docker
-        var_listDados = PostgreSQL.buscar_todos_dados(arg_strNomeTabela="steam_raw")
+        if arg_listAppIDs is None:
+            # Buscar dados brutos do Docker
+            var_listDados = PostgreSQL.buscar_todos_dados(arg_strNomeTabela="steam_raw")
+        else:
+            # Buscar dados brutos para os AppIDs especificados
+            var_listDados = PostgreSQLSteam.buscar_dados_por_appids(arg_listAppIDs, arg_strNomeTabela="steam_raw")
+        
         logger.info(f"{len(var_listDados)} jogos encontrados no Docker.")
         
         # Transformar dados

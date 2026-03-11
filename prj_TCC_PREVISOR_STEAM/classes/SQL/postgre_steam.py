@@ -579,3 +579,40 @@ class PostgreSQLSteam(PostgreSQL):
         finally:
             if var_connConnection:
                 cls.desconectar(var_connConnection)
+
+    @classmethod
+    def buscar_dados_por_appids(cls, arg_listAppIDs: list) -> list[dict]:
+        """
+        Busca dados de jogos na tabela steam_raw com base em uma lista de AppIDs.
+
+        Parâmetros:
+        - arg_listAppIDs (list): Lista de AppIDs para buscar.
+
+        Retorna:
+        - list[dict]: Lista de dicionários com os dados dos jogos encontrados.
+        """
+        try:
+            var_strSQL = """
+            SELECT appid, detalhes, reviews FROM steam_raw
+            WHERE appid = ANY(%s);
+            """
+            var_connConnection = cls.conectar()
+            with var_connConnection.cursor() as cursor:
+                cursor.execute(var_strSQL, (arg_listAppIDs,))
+                var_listResultados = cursor.fetchall()
+                var_listDados = []
+                for row in var_listResultados:
+                    var_dictDados = {
+                        "appid": row[0],
+                        "detalhes": json.loads(row[1]) if row[1] else None,
+                        "reviews": json.loads(row[2]) if row[2] else None
+                    }
+                    var_listDados.append(var_dictDados)
+                return var_listDados
+            
+        except Exception as e:
+            logger.error(f"Erro ao buscar dados por AppIDs: {e}")
+            raise Exception(f"Erro ao buscar dados por AppIDs: {e}")
+        finally:
+            if var_connConnection:
+                cls.desconectar(var_connConnection)
