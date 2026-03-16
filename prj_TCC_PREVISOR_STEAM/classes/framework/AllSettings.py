@@ -128,6 +128,10 @@ class Settings:
         Aguarda até que o container esteja healthy antes de continuar.
         """
         try:
+            logging.info("="*60)
+            logging.info("STATUS CONTAINER POSTGRES...")
+            logging.info("="*60)
+
             # Verifica se o container está rodando
             var_strResultCheck = subprocess.run(
                 ["docker", "inspect", "--format={{.State.Health.Status}}", "supabase-db"],
@@ -186,6 +190,10 @@ class Settings:
         except Exception as e:
             logging.warning(f"Erro ao iniciar PostgreSQL: {e}")
             return False
+        finally:
+            logging.info("="*60)
+            logging.info("FIM STATUS CONTAINER POSTGRES")
+            logging.info("="*60)
 
     @classmethod
     def configure_logging(cls):

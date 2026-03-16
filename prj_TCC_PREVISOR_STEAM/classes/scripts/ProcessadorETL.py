@@ -69,8 +69,8 @@ class ProcessadorETL:
         var_strNome = Limpar.extrair_campo_seguro(var_dictDetalhes, "name", arg_anyPadrao="Desconhecido")
         var_dictDadosTransformados["nome"] = LimparNome.normalizar_nome(var_strNome)
         
-        var_strClassificacaoEtaria = Limpar.extrair_campo_seguro(var_dictDetalhes, "required_age", arg_anyPadrao="")
-        var_dictDadosTransformados["classificacao_etaria"] = LimparIdade.processar_classificacao_etaria(var_strClassificacaoEtaria)
+        var_intClassificacaoEtaria = int(Limpar.extrair_campo_seguro(var_dictDetalhes, "required_age", arg_anyPadrao=0))
+        var_dictDadosTransformados["classificacao_etaria"] = LimparIdade.processar_classificacao_etaria(var_intClassificacaoEtaria)
 
         var_strLinguagensSuportadas = Limpar.extrair_campo_seguro(var_dictDetalhes, "supported_languages", arg_anyPadrao="")
         var_dictDadosTransformados['linguagens'] = LimparLinguagens.processar_linguagens_completo(var_strLinguagensSuportadas)
@@ -154,7 +154,7 @@ class ProcessadorETL:
             var_listDados = PostgreSQL.buscar_todos_dados(arg_strNomeTabela="steam_raw")
         else:
             # Buscar dados brutos para os AppIDs especificados
-            var_listDados = PostgreSQLSteam.buscar_dados_por_appids(arg_listAppIDs, arg_strNomeTabela="steam_raw")
+            var_listDados = PostgreSQLSteam.buscar_dados_por_appids(arg_listAppIDs)
         
         logger.info(f"{len(var_listDados)} jogos encontrados no Docker.")
         

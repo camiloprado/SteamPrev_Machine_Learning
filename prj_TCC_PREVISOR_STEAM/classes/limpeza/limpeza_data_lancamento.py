@@ -19,7 +19,7 @@ class LimparDataLancamento:
         Converte data de lançamento para formato ISO (YYYY-MM-DD).
         
         Parametros:
-        - arg_strDate (str): Data em diversos formatos (ex: "1/Nov/2000", "Nov 1, 2000", "2000-11-01", "2025", "abril de 2026")
+        - arg_dictDate (dict): Dicionário contendo a data de lançamento em diversos formatos, com chaves como "date" e "coming_soon".
         
         Retorna:
         - str: Data no formato ISO (YYYY-MM-DD) ou string vazia se inválida
@@ -32,69 +32,84 @@ class LimparDataLancamento:
         - "2025" -> "2025-01-01"
         - "abril de 2026" -> "2026-04-01"
         """
+        var_strDataFinal = "Desconhecido"  # Inicializa a variável
+        var_strDataLimpa = ""
+        
         try:
             if not isinstance(arg_dictDate, dict):
-                raise Exception(f"Esperado dict para data de lançamento, recebido {type(arg_dictDate)}")
+                raise Exception(f"Esperado dict para data de lançamento, recebido {type(arg_dictDate)}: {arg_dictDate}")
             
             var_dictMeses = cls._dicionario_traducao_data_lancamento()
             var_boolEmBreve = arg_dictDate.get("coming_soon")
             var_strData = arg_dictDate.get("date")
-            var_strData = var_strData.replace(' de ', '').lower().strip() if var_strData else "Desconhecido"
+            var_strData = var_strData.strip() if var_strData else "Desconhecido"
             
-            # Se for "coming soon" ou equivalente, e a data atual já passou da data indicada, considera como "EM BREVE"
-            # if var_boolEmBreve:
-            #     return "EM BREVE"
+            # Verificar se já está no formato ISO (YYYY-MM-DD)
+            if re.match(r'^\d{4}-\d{2}-\d{2}$', var_strData):
+                var_strDataFinal = var_strData
+                var_strDataLimpa = var_strData
+                return var_strDataFinal
+            
+            # Normalizar data: remover 'de' e converter para minúsculas
+            var_strDataLimpa = var_strData.replace(' de ', ' ').lower().strip()
+            
+            # Verificar se não é status textual (buscar em todas as chaves do dicionário)
+            for var_strKey, var_strValue in var_dictMeses.items():
+                if isinstance(var_strKey, tuple):
+                    if var_strDataLimpa in var_strKey:
+                        var_strDataFinal = var_strValue
+                        return var_strDataFinal
 
-            # Verificar se não é status textutal
-            if var_strData in var_dictMeses:
-                return var_dictMeses[var_strData]
-
-            # Verifica se é um texto de Trimestre ou similar
-            var_reMatchTrimestre = re.search(r'(q[1-4]|quarter\s*[1-4]|trimestre\s*[1-4])', var_strData, re.IGNORECASE)
-            var_reMatchTrimestre1 = re.search(r'q([1-4])\s+(\d{4})', var_strData, re.IGNORECASE)
+            # Verifica se é um texto de Trimestre ou similar (ex: "Q3 2020")
+            var_reMatchTrimestre1 = re.search(r'q([1-4])\s+(\d{4})', var_strDataLimpa, re.IGNORECASE)
 
             if var_reMatchTrimestre1:
-                var_strTrimestre = var_reMatchTrimestre.group(1)
-                var_strAno = var_reMatchTrimestre.group(2)
-                var_strDataTrimestre = var_dictMeses.get(var_strTrimestre.lower())
-                var_strData = var_strDataTrimestre.replace('<ANO>', var_strAno)
+                var_strTrimestre = var_reMatchTrimestre1.group(1)
+                var_strAno = var_reMatchTrimestre1.group(2)
+                var_strChaveTrimestre = 'q' + var_strTrimestre
+                
+                # Buscar o template de trimestre no dicionário
+                for var_strKey, var_strValue in var_dictMeses.items():
+                    if isinstance(var_strKey, tuple) and var_strChaveTrimestre in var_strKey:
+                        var_strDataFinal = var_strValue.replace('<ANO>', var_strAno)
+                        return var_strDataFinal
 
-            var_reMatchAno = re.search(r'\b(19\d{2}|20\d{2})\b', var_strData, re.IGNORECASE)
+            var_reMatchAno = re.search(r'\b(19\d{2}|20\d{2})\b', var_strDataLimpa, re.IGNORECASE)
             if not var_reMatchAno:
-                return "EM BREVE"
+                var_strDataFinal = "Desconhecido"
+                return var_strDataFinal
             
             var_strAno = var_reMatchAno.group(1)
 
             var_strMes = "01"
-            var_strDataLimpa = var_strData.replace('.', '').replace(',', '').lower()
+            var_strDataLimpa = var_strDataLimpa.replace('.', '').replace(',', '')
 
+            # Buscar mês no texto
             for var_strKey, var_intValue in var_dictMeses.items():
                 if isinstance(var_strKey, tuple):
+                    var_reSearch = None
                     for var_strAlias in var_strKey:
                         var_reSearch = re.search(r'\b' + re.escape(var_strAlias) + r'\b', var_strDataLimpa, re.IGNORECASE)
                         if var_reSearch:
+                            var_strMes = str(var_intValue)
                             break
-
-                    if not var_reSearch:
-                        continue
-                
-                # Usa \b para garantir que apanha a palavra exata
-                if var_reSearch:
-                    var_strMes = str(var_intValue)
-                    break
+                    
+                    if var_reSearch:
+                        break
+            
             var_strDia = "01"
             var_reMatchDia = re.search(r'\b(\d{1,2})\b', var_strDataLimpa)
             if var_reMatchDia:
                 var_strDia = var_reMatchDia.group(1).zfill(2)
 
             var_strDataFinal = f"{var_strAno}-{var_strMes}-{var_strDia}"
-            logger.info('='*20)
-            logger.info(f"Data original: {var_strData}, Data limpa: {var_strDataLimpa}, Data final processada: {var_strDataFinal}")
-            logger.info('='*20)
 
         except Exception as e:
             logger.warning(f"Erro ao processar data: {e}")
-            return ""
+            var_strDataFinal = "Desconhecido"
+        
+        finally:
+            return var_strDataFinal
 
     @classmethod
     def _dicionario_traducao_data_lancamento(cls) -> dict[str, str]:
@@ -128,30 +143,3 @@ class LimparDataLancamento:
             ('q3', 'quarter 3', 'trimestre 3'): '<ANO>-09-30',
             ('q4', 'quarter 4', 'trimestre 4'): '<ANO>-12-31',
         }
-    
-#TODO: REMOVER ABAIXO
-teste = [
-    # {"coming_soon": True, "date": "9/set./2027"}, DERAM CERTO
-    # {"coming_soon": False, "date": "1 Nov, 2000"}, DERAM CERTO
-    # {"coming_soon": False, "date": "Nov 1, 2000"}, DERAM CERTO
-    # {"coming_soon": False, "date": "1/Nov/2000"}, DERAM CERTO
-    {"coming_soon": False, "date": "2000-11-01"},
-    {"coming_soon": False, "date": "2025"},
-    {"coming_soon": False, "date": "dezembro de 2025"},
-    {"coming_soon": False, "date": "abril de 2026"},
-    {"coming_soon": False, "date": "abril de 2027"},
-    {"coming_soon": False, "date": "A ser anunciada"},
-    {"coming_soon": False, "date": "Coming soon"},
-    {"coming_soon": False, "date": "Em breve"},
-    {"coming_soon": False, "date": "mar??o de 2025"},
-    {"coming_soon": False, "date": "mar??o de 2026"},
-    {"coming_soon": False, "date": "Maybe"},
-    {"coming_soon": False, "date": "Q3 2020"},
-    {"coming_soon": False, "date": "September 2018"},
-    {"coming_soon": False, "date": "September 2026"},
-    {"coming_soon": False, "date": "To be announced"},
-]
-
-for item in teste:
-    LimparDataLancamento.processar_data_lancamento(item)
-

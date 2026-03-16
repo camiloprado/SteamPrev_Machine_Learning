@@ -15,7 +15,7 @@ CREATE TABLE IF NOT EXISTS steam_unificado (
     desenvolvedores TEXT[],
     distribuidores TEXT[],
     preco VARCHAR(50),
-    metacritic_score VARCHAR(10),
+    metacritic_score VARCHAR(20),
     categorias TEXT[],
     genero TEXT[],
     data_lancamento VARCHAR(50),

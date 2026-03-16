@@ -39,6 +39,9 @@ class ITADClient:
         var_intBatchSizeMin = int(os.getenv("STEAM_BATCH_SIZE_ITAD_MIN", 100))
 
         var_intTotalItems = len(arg_seqAppids)
+        if var_intTotalItems == 0:
+            logger.info("Nenhum AppID recebido para processamento ITAD.")
+            return {}
         var_intTotalBatches = (var_intTotalItems + var_intBatchSize - 1) // var_intBatchSize
         
         logger.info(f"=== PROCESSAMENTO EM BATCHES (ITAD LOOKUP) ===")
@@ -50,11 +53,17 @@ class ITADClient:
         logger.info(f"===============================================\n")
         
         var_dictAllResults = {}
-        
-        for var_intBatchNum in range(var_intTotalBatches):
-            var_intStart = var_intBatchNum * var_intBatchSize
+        var_intTotalSucessos = 0
+        var_intTotalAusentes = 0
+        var_intTotalErros = 0
+        var_intCurrentIndex = 0
+        var_intBatchNum = 0
+
+        while var_intCurrentIndex < var_intTotalItems:
+            var_intStart = var_intCurrentIndex
             var_intEnd = min(var_intStart + var_intBatchSize, var_intTotalItems)
             var_listBatch = arg_seqAppids[var_intStart:var_intEnd]
+            var_intBatchNum += 1
             
             logger.info(f"Batch {var_intBatchNum} (size={var_intBatchSize}) - Processando itens {var_intStart + 1} a {var_intEnd} ({len(var_listBatch)} itens)...")
             
@@ -68,6 +77,10 @@ class ITADClient:
             var_intTotal = var_dictBatchStats["total"]
             var_intTotalProcessavel = var_intTotal - var_intAusentes
             var_floatTaxaSucesso = var_intSucesso / var_intTotalProcessavel if var_intTotalProcessavel != 0 else 1
+
+            var_intTotalSucessos += var_intSucesso
+            var_intTotalAusentes += var_intAusentes
+            var_intTotalErros += var_intErrosReais
 
             # Log detalhado com valores corretos
             logger.info(f"Batch {var_intBatchNum}: {var_intSucesso} sucessos, {var_intAusentes} ausentes, {var_intErrosReais} erros")
@@ -90,9 +103,13 @@ class ITADClient:
             if var_dictResults:
                 var_dictAllResults.update(var_dictResults)
                 PostgreSQLITAD.inserir_dados_itad_raw_batched(var_dictResults)
+
+            var_intCurrentIndex = var_intEnd
                 
         logger.info(f"===========PROCESSAMENTO COMPLETO!==========")
-        logger.info(f"Total processado: {len(var_dictAllResults):,} sucessos de {var_intTotalItems:,} itens ({len(var_dictAllResults)/var_intTotalItems:.2%})")
+        logger.info(f"Total processado: {var_intTotalSucessos:,} sucessos de {var_intTotalItems:,} itens ({var_intTotalSucessos/var_intTotalItems:.2%})")
+        logger.info(f"Resumo final: {var_intTotalAusentes:,} ausentes e {var_intTotalErros:,} erros")
+        return var_dictAllResults
     
     @classmethod
     async def lookup_itad_ids(cls, arg_seqAppids: Sequence[int]) -> tuple[dict[int, dict], dict]:
@@ -299,6 +316,9 @@ class ITADClient:
         cls._var_intDelay = var_dictConfigAPI.get("Delay", 120)
         var_intAsyncConcurrency = var_dictConfigAPI.get("Concurrency", 1)
         var_intTotalItems = len(var_listBatchTotal)
+        if var_intTotalItems == 0:
+            logger.info("Nenhum ID ITAD válido para buscar histórico de preços.")
+            return {}
         var_intTotalBatches = (var_intTotalItems + var_intBatchSize - 1) // var_intBatchSize
         var_intBatchSizeMax = int(os.getenv("STEAM_BATCH_SIZE_ITAD_MAX", 1000))
         var_intBatchSizeMin = int(os.getenv("STEAM_BATCH_SIZE_ITAD_MIN", 100))
@@ -314,11 +334,17 @@ class ITADClient:
         logger.info(f"==================================================\n")
         
         var_dictAllResults = {}
-        
-        for var_intBatchNum in range(var_intTotalBatches):
-            var_intStart = var_intBatchNum * var_intBatchSize
+        var_intTotalSucessos = 0
+        var_intTotalAusentes = 0
+        var_intTotalErros = 0
+        var_intCurrentIndex = 0
+        var_intBatchNum = 0
+
+        while var_intCurrentIndex < var_intTotalItems:
+            var_intStart = var_intCurrentIndex
             var_intEnd = min(var_intStart + var_intBatchSize, var_intTotalItems)
             var_listBatch = var_listBatchTotal[var_intStart:var_intEnd]
+            var_intBatchNum += 1
             
             logger.info(f"Batch {var_intBatchNum} (size={var_intBatchSize}) - Processando itens {var_intStart + 1} a {var_intEnd} ({len(var_listBatch)} itens)...")
             
@@ -334,9 +360,13 @@ class ITADClient:
             var_intTotalProcessavel = var_intTotal - var_intAusentes
             var_floatTaxaSucesso = var_intSucesso / var_intTotalProcessavel if var_intTotalProcessavel != 0 else 1
 
+            var_intTotalSucessos += var_intSucesso
+            var_intTotalAusentes += var_intAusentes
+            var_intTotalErros += var_intErrosReais
+
             logger.info("")
             logger.info(f"Batch {var_intBatchNum}: {var_intSucesso} sucessos, {var_intAusentes} ausentes, {var_intErrosReais} erros")
-            PostgreSQL.inserir_dados_itad_raw_historico_preco_bulk(var_dictBatchResults)
+            PostgreSQLITAD.inserir_dados_itad_raw_historico_preco_bulk(var_dictBatchResults)
             
             # Ajusta batch size dinamicamente
             if var_floatTaxaSucesso > 0.95:  # >95% sucesso - aumenta batch
@@ -352,8 +382,11 @@ class ITADClient:
                         f"Reduzindo: {var_intBatchSize} → {var_intNovoSize}")
                     var_intBatchSize = var_intNovoSize
 
+            var_intCurrentIndex = var_intEnd
+
         logger.info(f"===========PROCESSAMENTO COMPLETO!==========")
-        logger.info(f"Total processado: {len(var_dictAllResults):,} sucessos de {var_intTotalItems:,} itens ({len(var_dictAllResults)/var_intTotalItems:.2%})")
+        logger.info(f"Total processado: {var_intTotalSucessos:,} sucessos de {var_intTotalItems:,} itens ({var_intTotalSucessos/var_intTotalItems:.2%})")
+        logger.info(f"Resumo final: {var_intTotalAusentes:,} ausentes e {var_intTotalErros:,} erros")
         
         return var_dictAllResults
     

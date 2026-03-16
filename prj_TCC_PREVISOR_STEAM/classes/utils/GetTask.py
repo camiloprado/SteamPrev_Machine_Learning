@@ -28,7 +28,10 @@ class GetTask:
         
         Retorna:
         """
-        logger.info("Criando a fila de tarefas.")
+        logger.info("="*60)
+        logger.info("CRIANDO FILA DE TAREFAS")
+        logger.info("="*60)
+
         try:
             # Procura a lista genérica de apps na Steam
             try:
@@ -45,7 +48,7 @@ class GetTask:
             if var_listDadosRawDesatualizados:
                 Previsor.alimentar_banco_dados_raw_docker()
                 ProcessadorETL.processar_lote_unificado(var_listDadosRawDesatualizados)
-            if len(var_listDadosRawDesatualizados) == 0 and Settings._var_dictSettings["etl_processar_todos_dados"]:
+            elif len(var_listDadosRawDesatualizados) == 0 and Settings._var_dictSettings["etl_processar_todos_dados"]:
                 ProcessadorETL.processar_lote_unificado()
 
             # Alimentação do banco de dados ITAD para o docker
@@ -69,6 +72,10 @@ class GetTask:
             import traceback
             logger.error(f"Traceback completo:\n{traceback.format_exc()}")
             raise Exception(f"Erro ao criar a fila de tarefas: {e}")
+        finally:
+            logger.info("="*60)
+            logger.info("FIM DA CRIAÇÃO DA FILA DE TAREFAS")
+            logger.info("="*60)
         
     @classmethod
     def abandona_fila(cls, arg_boolAbandonar: bool = True):

@@ -108,7 +108,7 @@ class LocalClient:
         
         for var_intTentativa in range(var_intMaxTentativas):
             try:
-                logger.info(f"Tentativa {var_intTentativa + 1}/{var_intMaxTentativas} - Buscando lista de aplicativos da Steam...")
+                logger.debug(f"Tentativa {var_intTentativa + 1}/{var_intMaxTentativas} - Buscando lista de aplicativos da Steam...")
                 
                 # Faz a requisição para a Steam (API descontinuada desde Nov/2024)
                 var_respResponse = requests.get(

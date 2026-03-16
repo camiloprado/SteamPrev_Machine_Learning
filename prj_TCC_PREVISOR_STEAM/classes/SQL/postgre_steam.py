@@ -338,7 +338,7 @@ class PostgreSQLSteam(PostgreSQL):
             for var_dictDados in arg_listDados:
                 var_tupleValores = (
                     var_dictDados.get('appid'),
-                    var_dictDados.get('nome', 'Desconhecido'),
+                    var_dictDados.get('nome'),
                     var_dictDados.get('classificacao_etaria'),
                     var_dictDados.get('linguagens'),
                     var_dictDados.get('desenvolvedores'),
@@ -374,7 +374,7 @@ class PostgreSQLSteam(PostgreSQL):
 
                     # Confirma a transação após a inserção em batch
                     var_connConnection.commit()
-                    logger.info(f"Inserção em bulk concluída: {var_intRowCount} registros processados em steam_raw.")
+                    logger.info(f"Inserção em bulk concluída: {var_intRowCount} registros processados em steam_unificado.")
 
         except Exception as e:
             logger.error(f"Erro ao inserir em steam_unificado batch: {e}")
@@ -602,10 +602,28 @@ class PostgreSQLSteam(PostgreSQL):
                 var_listResultados = cursor.fetchall()
                 var_listDados = []
                 for row in var_listResultados:
+                    var_dictDetalhes = None
+                    if row[1] and row[1] not in ("AUSENTE", "ausente"):
+                        try:
+                            var_dictDetalhes = json.loads(row[1]) if isinstance(row[1], str) else row[1]
+                        except (json.JSONDecodeError, TypeError) as e:
+                            logger.warning(f"AppID {row[0]}: Erro ao parsear detalhes como JSON - {e}")
+                            var_dictDetalhes = "AUSENTE"
+                    else:
+                        var_dictDetalhes = "AUSENTE"
+                    
+                    var_dictReviews = None
+                    if row[2] and row[2] not in ("AUSENTE", "ausente"):
+                        try:
+                            var_dictReviews = json.loads(row[2]) if isinstance(row[2], str) else row[2]
+                        except (json.JSONDecodeError, TypeError) as e:
+                            logger.warning(f"AppID {row[0]}: Erro ao parsear reviews como JSON - {e}")
+                            var_dictReviews = None
+                    
                     var_dictDados = {
                         "appid": row[0],
-                        "detalhes": json.loads(row[1]) if row[1] else None,
-                        "reviews": json.loads(row[2]) if row[2] else None
+                        "detalhes": var_dictDetalhes,
+                        "reviews": var_dictReviews
                     }
                     var_listDados.append(var_dictDados)
                 return var_listDados

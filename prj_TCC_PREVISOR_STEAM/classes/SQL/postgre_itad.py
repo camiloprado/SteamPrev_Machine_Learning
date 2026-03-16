@@ -101,7 +101,7 @@ class PostgreSQLITAD(PostgreSQL):
             cls.desconectar(var_connConnection)
 
     @classmethod
-    def inserir_dados_itad_raw_bulk(cls, arg_dictDadosItad: dict[int, dict]) -> int:
+    def inserir_dados_itad_raw_bulk(cls, arg_dictDadosItad: dict[int, dict]) -> None:
         """
         Insere ou atualiza dados na tabela itad_raw e steam_itad_mapping em bulk.
         
@@ -110,95 +110,109 @@ class PostgreSQLITAD(PostgreSQL):
                                     Estrutura esperada: {appid: {"id": str, "slug": str, "title": str, ...}}
         
         Retorna:
-        - int: Número de registros inseridos/atualizados
+        - None
         """
         var_connConnection = cls.conectar()
         try:
+            # Insere/atualiza na tabela itad_raw
+            var_strSQLItadRaw = """
+            INSERT INTO itad_raw (id_itad, slug, title, type, mature, assets, ultima_atualizacao)
+            VALUES (%s, %s, %s, %s, %s, %s::jsonb, %s)
+            ON CONFLICT (id_itad) 
+            DO UPDATE SET
+                slug = EXCLUDED.slug,
+                title = EXCLUDED.title,
+                type = EXCLUDED.type,
+                mature = EXCLUDED.mature,
+                assets = EXCLUDED.assets,
+                ultima_atualizacao = EXCLUDED.ultima_atualizacao;
+            """
+            var_listItadRaw = []  # Lista de tuplas para inserção em batch na itad_raw
+
+            # Insere/atualiza na tabela steam_itad_mapping
+            var_strSQLMapping = """
+            INSERT INTO steam_itad_mapping (appid, id_itad, slug, title)
+            VALUES (%s, %s, %s, %s)
+            ON CONFLICT (appid)
+            DO UPDATE SET
+                id_itad = EXCLUDED.id_itad,
+                slug = EXCLUDED.slug,
+                title = EXCLUDED.title;
+            """
+            var_listItadMapping = []  # Lista de tuplas para inserção em batch na steam_itad_mapping
+
             if not arg_dictDadosItad:
                 logger.warning("Nenhum dado ITAD fornecido para inserção")
-                return 0
+                return None
             
-            var_intInseridos = 0
             var_dateNow = datetime.now()
             
             for var_intAppid, var_dictDados in arg_dictDadosItad.items():
-                try:
-                    if var_dictDados == "AUSENTE":
-                        # Extrai dados do ITAD
-                        var_strIdItad = "AUSENTE"
-                        var_strSlug = "AUSENTE"
-                        var_strTitle = "AUSENTE"
-                        var_strType = "AUSENTE"
-                        var_boolMature = False
-                        var_jsonAssets = json.dumps({})
-                    else:
-                        # Extrai dados do ITAD
-                        var_strIdItad = var_dictDados.get("id")
-                        var_strSlug = var_dictDados.get("slug")
-                        var_strTitle = var_dictDados.get("title")
-                        var_strType = var_dictDados.get("type")
-                        var_boolMature = var_dictDados.get("mature", False)
-                        var_jsonAssets = json.dumps(var_dictDados.get("assets", {}))
-                    
-                    if not var_strIdItad:
-                        logger.warning(f"AppID {var_intAppid}: ID ITAD ausente, pulando")
-                        continue
-                    
-                    with var_connConnection.cursor() as cursor:
-                        # 1. Insere/atualiza na tabela itad_raw
-                        var_strSQLItadRaw = """
-                        INSERT INTO itad_raw (id_itad, slug, title, type, mature, assets, ultima_atualizacao)
-                        VALUES (%s, %s, %s, %s, %s, %s::jsonb, %s)
-                        ON CONFLICT (id_itad) 
-                        DO UPDATE SET
-                            slug = EXCLUDED.slug,
-                            title = EXCLUDED.title,
-                            type = EXCLUDED.type,
-                            mature = EXCLUDED.mature,
-                            assets = EXCLUDED.assets,
-                            ultima_atualizacao = EXCLUDED.ultima_atualizacao;
-                        """
-                        cursor.execute(var_strSQLItadRaw, (
-                            var_strIdItad, var_strSlug, var_strTitle, 
-                            var_strType, var_boolMature, var_jsonAssets, var_dateNow
-                        ))
-                        
-                        # 2. Insere/atualiza na tabela steam_itad_mapping
-                        var_strSQLMapping = """
-                        INSERT INTO steam_itad_mapping (appid, id_itad, slug, title)
-                        VALUES (%s, %s, %s, %s)
-                        ON CONFLICT (appid)
-                        DO UPDATE SET
-                            id_itad = EXCLUDED.id_itad,
-                            slug = EXCLUDED.slug,
-                            title = EXCLUDED.title;
-                        """
-                        cursor.execute(var_strSQLMapping, (
-                            var_intAppid, var_strIdItad, var_strSlug, var_strTitle
-                        ))
-                        
-                        # Commit individual para cada registro
-                        var_connConnection.commit()
-                        var_intInseridos += 1
-                        
-                except Exception as e:
-                    # Rollback em caso de erro
-                    var_connConnection.rollback()
-                    logger.error(f"Erro ao inserir AppID {var_intAppid} no ITAD: {e}")
+                if var_dictDados == "AUSENTE":
+                    # Extrai dados do ITAD
+                    var_strIdItad = "AUSENTE"
+                    var_strSlug = "AUSENTE"
+                    var_strTitle = "AUSENTE"
+                    var_strType = "AUSENTE"
+                    var_boolMature = False
+                    var_jsonAssets = json.dumps({})
+                else:
+                    # Extrai dados do ITAD
+                    var_strIdItad = var_dictDados.get("id")
+                    var_strSlug = var_dictDados.get("slug")
+                    var_strTitle = var_dictDados.get("title")
+                    var_strType = var_dictDados.get("type")
+                    var_boolMature = var_dictDados.get("mature", False)
+                    var_jsonAssets = json.dumps(var_dictDados.get("assets", {}))
+                
+                if not var_strIdItad:
+                    logger.warning(f"AppID {var_intAppid}: ID ITAD ausente, pulando")
                     continue
-            
-            logger.info(f"Inseridos/atualizados {var_intInseridos:,} registros no ITAD (itad_raw + steam_itad_mapping)")
-            return var_intInseridos
+                
+                var_listItadRaw.append((var_strIdItad, var_strSlug, var_strTitle, var_strType, var_boolMature, var_jsonAssets, var_dateNow))
+                var_listItadMapping.append((var_intAppid, var_strIdItad))
+
+            with var_connConnection.cursor() as cursor:
+                execute_values(
+                    cursor, 
+                    var_strSQLItadRaw,  # SQL com placeholder %s para os valores em batch
+                    var_listItadRaw, # Lista de tuplas com os valores a serem inseridos
+                    template='(%s, %s, %s, %s, %s, %s, %s)', # Define o template para os valores a serem inseridos
+                    page_size=200 # Ajuste o tamanho do lote conforme necessário para otimizar desempenho e evitar sobrecarga de memória
+                )
+                # Obtém o número de registros processados
+                var_intRowCountItadRaw = cursor.rowcount
+
+                # Confirma a transação após a inserção em batch
+                var_connConnection.commit()
+                logger.info(f"Inseridos/atualizados {var_intRowCountItadRaw:,} registros no ITAD Raw")
+                
+                execute_values(
+                    cursor, 
+                    var_strSQLMapping,  # SQL com placeholder %s para os valores em batch
+                    var_listItadMapping, # Lista de tuplas com os valores a serem inseridos
+                    template='(%s, %s)', # Define o template para os valores a serem inseridos
+                    page_size=200 # Ajuste o tamanho do lote conforme necessário para otimizar desempenho e evitar sobrecarga de memória
+                )
+                
+                # Obtém o número de registros processados
+                var_intRowCountItadMapping = cursor.rowcount
+
+                # Confirma a transação após a inserção em batch
+                var_connConnection.commit()
+                        
+                logger.info(f"Inseridos/atualizados {var_intRowCountItadMapping:,} registros no ITAD Mapping")
                 
         except Exception as e:
+            if var_connConnection:
+                var_connConnection.rollback()
             logger.error(f"Erro geral ao inserir dados ITAD em bulk: {e}\")")
-            return var_intInseridos
 
         finally:
             cls.desconectar(var_connConnection)
 
     @classmethod
-    def inserir_dados_itad_raw_historico_preco_bulk(cls, arg_dictDadosItad: dict[str, list[dict]]) -> int:
+    def inserir_dados_itad_raw_historico_preco_bulk(cls, arg_dictDadosItad: dict[str, list[dict]]) -> None:
         """
         Insere dados históricos de preços na tabela itad_raw em bulk.
         
@@ -206,57 +220,51 @@ class PostgreSQLITAD(PostgreSQL):
         - arg_dictDadosItad (dict): Dicionário mapeando ID_ITAD -> lista de registros históricos
         
         Retorna:
-        - int: Número de registros inseridos
+        - None
         """
         var_connConnection = cls.conectar()
         try:
             if not arg_dictDadosItad:
                 logger.warning("Nenhum dado histórico de preços fornecido para inserção")
-                return 0
+                return None
             
-            var_intInseridos = 0
+            var_listDadosItad = []
             var_dateNow = datetime.now()
+            var_intBatchSize = 1000
+
+            var_strSQLHistorico = """
+            UPDATE itad_raw
+            SET historico_preco = %s::jsonb,
+                ultima_atualizacao = %s
+            WHERE id_itad = %s;
+            """
 
             for var_strIDITAD, var_listHistorico in arg_dictDadosItad.items():
-                try:
-                    with var_connConnection.cursor() as cursor:
-                        var_strSQLHistorico = """
-                        UPDATE itad_raw
-                        SET historico_preco = %s::jsonb,
-                            ultima_atualizacao = %s
-                        WHERE id_itad = %s;
-                        """
-                        
-                        # Converte lista para JSON string
-                        var_strHistoricoJson = json.dumps(var_listHistorico) if var_listHistorico else None
-                        
-                        cursor.execute(var_strSQLHistorico, (var_strHistoricoJson, var_dateNow, var_strIDITAD))
-                        
-                        # Verifica se algum registro foi atualizado
-                        if cursor.rowcount > 0:
-                            var_connConnection.commit()
-                            var_intInseridos += 1
-                        else:
-                            logger.warning(f"ID_ITAD {var_strIDITAD} não encontrado em itad_raw (pulando)")
-                            var_connConnection.rollback()
+                # Converte lista para JSON string
+                var_strHistoricoJson = json.dumps(var_listHistorico) if var_listHistorico else None
+                var_listDadosItad.append((var_strHistoricoJson, var_dateNow, var_strIDITAD))
 
-                except Exception as e:
-                    var_connConnection.rollback()
-                    logger.error(f"Erro ao atualizar histórico de preços para ID_ITAD {var_strIDITAD}: {e}")
-                    continue
-            
-            logger.info(f"Inseridos {var_intInseridos:,} registros no itad_raw")
-            return var_intInseridos
+            var_intTotalAtualizados = 0
+            with var_connConnection.cursor() as cursor:
+                for var_intIndex in range(0, len(var_listDadosItad), var_intBatchSize):
+                    var_listLote = var_listDadosItad[var_intIndex:var_intIndex + var_intBatchSize]
+                    execute_batch(cursor, var_strSQLHistorico, var_listLote, page_size=200)
+                    var_intTotalAtualizados += cursor.rowcount
+
+            var_connConnection.commit()
+            logger.info(f"Histórico de preços ITAD atualizado para {var_intTotalAtualizados:,} registros")
                 
         except Exception as e:
+            if var_connConnection:
+                var_connConnection.rollback()
             logger.error(f"Erro geral ao inserir dados históricos de preços: {e}")
-            return var_intInseridos
         
         finally:
-            cls.desconectar(var_connConnection)
+            if var_connConnection:
+                cls.desconectar(var_connConnection)
 
     @classmethod
-    def inserir_dados_itad_raw_batched(cls, arg_dictDadosItad: dict[int, dict], arg_intBatchSize: int = 1000) -> int:
+    def inserir_dados_itad_raw_batched(cls, arg_dictDadosItad: dict[int, dict], arg_intBatchSize: int = 1000) -> None:
         """
         Insere dados ITAD em lotes para evitar timeout.
         
@@ -269,7 +277,7 @@ class PostgreSQLITAD(PostgreSQL):
         """
         var_connConnection = cls.conectar()
         if not arg_dictDadosItad:
-            return 0
+            return None
         
         var_dictITADRaw = {}  # Usa dicionário para deduplicar por id_itad
         var_listMapping = []
@@ -295,7 +303,7 @@ class PostgreSQLITAD(PostgreSQL):
                     var_jsonAssets = json.dumps(var_dictDados.get("assets", {}))
                 
                 if not var_strIdItad or var_strIdItad == "AUSENTE":
-                    logger.warning(f"AppID {var_intAppid}: ID ITAD ausente, pulando")
+                    logger.debug(f"AppID {var_intAppid}: ID ITAD ausente, pulando")
                     continue
                 
                 # Deduplica por id_itad - se já existe, mantém a primeira ocorrência
@@ -303,10 +311,14 @@ class PostgreSQLITAD(PostgreSQL):
                     var_dictITADRaw[var_strIdItad] = (var_strIdItad, var_strSlug, var_strTitle, var_strType, var_boolMature, var_jsonAssets, var_dateNow)
                 
                 # Mapping sempre adiciona (appid é único)
-                var_listMapping.append((var_intAppid, var_strIdItad, var_strSlug, var_strTitle))
+                var_listMapping.append((var_intAppid, var_strIdItad))
             
             # Converte dict para lista após deduplicação
             var_listITADRaw = list(var_dictITADRaw.values())
+            
+            if len(var_listITADRaw) == 0:
+                logger.warning("Nenhum dado ITAD válido para inserção após processamento")
+                return None
             
             # Log de deduplicação
             var_intTotalAppIDs = len(arg_dictDadosItad)
@@ -344,19 +356,17 @@ class PostgreSQLITAD(PostgreSQL):
 
                 # 2. Insere/atualiza na tabela steam_itad_mapping
                 var_strSQLMapping = """
-                INSERT INTO steam_itad_mapping (appid, id_itad, slug, title)
+                INSERT INTO steam_itad_mapping (appid, id_itad)
                 VALUES %s
                 ON CONFLICT (appid)
                 DO UPDATE SET
-                    id_itad = EXCLUDED.id_itad,
-                    slug = EXCLUDED.slug,
-                    title = EXCLUDED.title;
+                    id_itad = EXCLUDED.id_itad;
                 """
                 execute_values(
                     var_curCursor, 
                     var_strSQLMapping,  # SQL com placeholder %s para os valores em batch
                     var_listMapping, # Lista de tuplas com os valores a serem inseridos
-                    template='(%s, %s, %s, %s)', # Define o template para os valores a serem inseridos
+                    template='(%s, %s)', # Define o template para os valores a serem inseridos
                     page_size=200 # Ajuste o tamanho do lote conforme necessário para otimizar desempenho e evitar sobrecarga de memória
                 )
                 
@@ -423,20 +433,20 @@ class PostgreSQLITAD(PostgreSQL):
         try:
             var_intDias = Settings._var_dictSettings.get("dias_para_atualizacao", 30)
             var_strSQL = f"""
-            SELECT ir.id_itad, ir.historico_preco
+            SELECT ir.id_itad
                 FROM itad_raw ir
                 WHERE ir.ultima_atualizacao < CURRENT_DATE - INTERVAL '{var_intDias} days';
             """
-            
+            var_listITAD = []
             with var_connConnection.cursor() as cursor:
                 cursor.execute(var_strSQL)
                 var_listResultados = cursor.fetchall()
-                var_listITAD = [(row[0], row[1]) for row in var_listResultados]
                 
-            logger.info(f"Encontrados {len(var_listITAD):,} IDs ITAD com histórico de preços desatualizados")
-            return var_listITAD
+            logger.info(f"Encontrados {len(var_listResultados):,} IDs ITAD com histórico de preços desatualizados")
+            return var_listResultados
         except Exception as e:
             logger.error(f"Erro ao buscar IDs ITAD com histórico de preços desatualizado: {e}")
             raise Exception(f"Erro ao buscar IDs ITAD com histórico de preços desatualizado: {e}")
         finally:
-            cls.desconectar(var_connConnection)
+            if var_connConnection:
+                cls.desconectar(var_connConnection)
