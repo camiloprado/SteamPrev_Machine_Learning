@@ -38,10 +38,112 @@ class TreinarModelo:
     @classmethod
     def carregar_dados_treinamento(cls):
         """
-        Carrega o pipeline completo de limpeza dos dados para treinamento do modelo.
-        """
+        Carrega e prepara dados para treinamento supervisionado de regressão linear.
 
-        var_objPipeline = ProcessadorLimpeza.carregar_pipeline()
+        Estratégia:
+        - Usa dados recentes de steam_unificado + ITAD (janela configurável)
+        - Cria features numéricas estáveis
+        - Evita data leakage removendo o alvo das entradas
+        - Prioriza split temporal (sem embaralhar) quando há timestamp
+
+        Retorna:
+        - tuple[pd.DataFrame, pd.Series, pd.DataFrame, pd.Series]
+        """
+        try:
+            var_intDiasJanela = int(os.getenv("ML_JANELA_DIAS", "90"))
+            var_floatTestSize = float(os.getenv("ML_TEST_SIZE", "0.2"))
+            var_intMinRegistros = int(os.getenv("ML_MIN_REGISTROS_TREINO", "1000"))
+
+            logger.info(f"Preparando dados de treinamento (janela: {var_intDiasJanela} dias)...")
+
+            var_dfDados = cls.preparar_dataset_completo(arg_intDiasJanela=var_intDiasJanela)
+            if var_dfDados.empty:
+                raise ValueError("Dataset vazio para treinamento")
+
+            var_dfDados = cls.criar_features_engenharia(var_dfDados)
+
+            # Alvo de regressão: review_score (proxy de qualidade percebida)
+            var_serAlvo = pd.to_numeric(var_dfDados.get('review_score'), errors='coerce')
+
+            var_listFeaturesBase = [
+                'preco_numerico',
+                'metacritic_numerico',
+                'num_conquistas',
+                'num_dlcs',
+                'num_screenshots',
+                'num_movies',
+                'is_free',
+                'tem_demo',
+                'num_promocoes',
+                'desconto_medio',
+                'desconto_maximo',
+                'preco_mais_baixo',
+                'preco_mais_alto',
+                'dias_desde_ultima_promo',
+                'dias_desde_lancamento',
+            ]
+
+            var_listFeaturesDisponiveis = [
+                var_strCol for var_strCol in var_listFeaturesBase if var_strCol in var_dfDados.columns
+            ]
+            if not var_listFeaturesDisponiveis:
+                raise ValueError("Nenhuma feature numérica disponível para treinamento")
+
+            var_dfX = var_dfDados[var_listFeaturesDisponiveis].copy()
+            var_dfX = var_dfX.apply(pd.to_numeric, errors='coerce')
+            var_dfX = var_dfX.replace([np.inf, -np.inf], np.nan)
+
+            var_serMascaravalida = var_serAlvo.notna()
+            for var_strCol in var_dfX.columns:
+                var_serMascaravalida = var_serMascaravalida & var_dfX[var_strCol].notna()
+
+            var_dfX = var_dfX[var_serMascaravalida]
+            var_serY = var_serAlvo[var_serMascaravalida]
+
+            if len(var_dfX) < var_intMinRegistros:
+                raise ValueError(
+                    f"Registros insuficientes para treinamento: {len(var_dfX)} < {var_intMinRegistros}"
+                )
+
+            # Split temporal quando houver coluna de atualização disponível.
+            # Isso evita leakage entre treino/teste em dados com dependência temporal.
+            if 'ultima_atualizacao' in var_dfDados.columns:
+                var_serTempo = pd.to_datetime(var_dfDados.loc[var_dfX.index, 'ultima_atualizacao'], errors='coerce')
+                var_serTempo = var_serTempo.fillna(pd.Timestamp.min)
+                var_dfX = var_dfX.assign(_timestamp_split=var_serTempo.values)
+                var_dfX = var_dfX.sort_values('_timestamp_split')
+                var_serY = var_serY.loc[var_dfX.index]
+
+                var_intSplit = int(len(var_dfX) * (1 - var_floatTestSize))
+                var_intSplit = max(1, min(var_intSplit, len(var_dfX) - 1))
+
+                var_dfXTreino = var_dfX.iloc[:var_intSplit].drop(columns=['_timestamp_split'])
+                var_dfXTeste = var_dfX.iloc[var_intSplit:].drop(columns=['_timestamp_split'])
+                var_serYtreino = var_serY.iloc[:var_intSplit]
+                var_serYteste = var_serY.iloc[var_intSplit:]
+
+                logger.info("Split temporal aplicado (ordem por ultima_atualizacao)")
+            else:
+                # Fallback para split aleatório reproduzível quando não há coluna temporal.
+                var_intRandomState = int(os.getenv("ML_RANDOM_STATE", "42"))
+                var_dfXTreino, var_dfXTeste, var_serYtreino, var_serYteste = train_test_split(
+                    var_dfX,
+                    var_serY,
+                    test_size=var_floatTestSize,
+                    random_state=var_intRandomState,
+                )
+                logger.warning("Split temporal indisponível, fallback para split aleatório")
+
+            logger.info(
+                f"Dados de treino prontos: treino={len(var_dfXTreino):,}, teste={len(var_dfXTeste):,}, "
+                f"features={len(var_listFeaturesDisponiveis)}"
+            )
+
+            return var_dfXTreino, var_serYtreino, var_dfXTeste, var_serYteste
+
+        except Exception as e:
+            logger.error(f"Falha ao carregar dados de treinamento: {e}", exc_info=True)
+            raise
         
         
     @classmethod
@@ -300,7 +402,11 @@ class TreinarModelo:
         
         # Expande features extraídas em colunas
         var_dfFeatures = pd.json_normalize(var_dfUnificado['features_detalhes'])
-        var_dfCompleto = pd.concat([var_dfUnificado[['appid', 'nome', 'preco', 'review_score', 'total_reviews']], var_dfFeatures], axis=1)
+        var_listColunasBase = ['appid', 'nome', 'preco', 'review_score', 'total_reviews']
+        if 'ultima_atualizacao' in var_dfUnificado.columns:
+            var_listColunasBase.append('ultima_atualizacao')
+
+        var_dfCompleto = pd.concat([var_dfUnificado[var_listColunasBase], var_dfFeatures], axis=1)
         
         # Carrega e integra histórico de preços ITAD
         logger.info("Carregando histórico de preços ITAD...")

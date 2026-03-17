@@ -7,6 +7,8 @@ class TreinamentoAvaliacao:
     Classe responsável pelo treinamento e avaliação de modelos preditivos.
     """
 
+    var_molLinReg = LinearRegression()
+
     def __init__(cls):
         cls.var_molLinReg = LinearRegression()
         

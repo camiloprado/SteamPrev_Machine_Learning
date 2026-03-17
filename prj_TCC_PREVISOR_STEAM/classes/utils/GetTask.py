@@ -62,7 +62,11 @@ class GetTask:
             else:
                 logger.info("Pipeline de limpeza já está atualizado - Processamento ignorado")
             
-            ProcessadorTreinamento.executar_treinamento()
+            try:
+                ProcessadorTreinamento.executar_treinamento()
+            except Exception as e:
+                # Treinamento falhou, mas não deve interromper o fluxo principal de coleta/ETL.
+                logger.warning(f"Treinamento ML não executado nesta rodada: {e}")
             cls._var_listTaskQueue = [1]
             logger.info("Fila de tarefas criada com sucesso.")
             
@@ -115,7 +119,7 @@ class GetTask:
         """
         try:
             var_strCaminhoPipeline = os.path.join(
-                "prj_TCC_PREVISOR_STEAM/resources/models", 
+                "prj_TCC_PREVISOR_STEAM", "resources", "models", 
                 "pipeline_escalonamento.joblib"
             )
             
@@ -139,14 +143,14 @@ class GetTask:
             
             # Verificar se há novos dados no banco
             try:
-                PostgreSQL.conectar()
+                var_connConnection = PostgreSQL.conectar()
                 var_strSQL = """
                     SELECT MAX(ultima_atualizacao) 
                     FROM steam_unificado 
                     WHERE ultima_atualizacao >= %s;
                 """
                 
-                with PostgreSQL._var_connConnection.cursor() as cursor:
+                with var_connConnection.cursor() as cursor:
                     cursor.execute(var_strSQL, (var_dateDataPipeline,))
                     var_tupleResultado = cursor.fetchone()
                     
@@ -159,8 +163,8 @@ class GetTask:
                 # Em caso de erro, processar por segurança
                 return True
             finally:
-                if PostgreSQL._var_connConnection:
-                    PostgreSQL.desconectar()
+                if var_connConnection:
+                    PostgreSQL.desconectar(var_connConnection)
             
             logger.info("Pipeline de limpeza está atualizado")
             return False
@@ -193,7 +197,7 @@ class GetTask:
             logger.info("VERIFICANDO NECESSIDADE DE TREINAMENTO ML")
             logger.info("="*60)
             
-            PostgreSQL.conectar()
+            var_connConnection = PostgreSQL.conectar()
             
             # Verifica quantidade de dados nos últimos 90 dias
             var_strSQL = """
@@ -202,7 +206,7 @@ class GetTask:
                 WHERE ultima_atualizacao >= NOW() - INTERVAL '90 days';
             """
             
-            with PostgreSQL._var_connConnection.cursor() as cursor:
+            with var_connConnection.cursor() as cursor:
                 cursor.execute(var_strSQL)
                 var_intRegistros90Dias = cursor.fetchone()[0]
             
@@ -269,5 +273,5 @@ class GetTask:
             logger.error(f"Erro ao verificar/executar treinamento ML: {e}", exc_info=True)
             logger.warning("Continuando execução normal apesar do erro no treinamento ML")
         finally:
-            if PostgreSQL._var_connConnection:
-                PostgreSQL.desconectar()
+            if var_connConnection:
+                PostgreSQL.desconectar(var_connConnection)
