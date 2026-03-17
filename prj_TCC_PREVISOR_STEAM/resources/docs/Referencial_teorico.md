@@ -21,9 +21,26 @@
 
 ### 1.1 Machine Learning e Data Science
 
+#### Livros-base utilizados no desenvolvimento deste projeto
+
+1. **GÉRON, Aurélien. Mãos à Obra: Aprendizado de Máquina com Scikit-Learn, Keras e TensorFlow. 2. ed. Alta Books, 2019.**
+    - Base prática para construção de pipelines de ML com scikit-learn, validação e checklist de projeto.
+
+2. **HUYEN, Chip. Projetando Sistemas de Machine Learning: Processos Iterativos para Aplicações Prontas para Produção.**
+    - Base para desenho de sistemas de ML em produção: ciclo iterativo, monitoramento e operação contínua.
+
+3. **CARVALHO, André C. P. L. F.; MENEZES, Angelo Garangau; BONIDIA, Robson Parmezan. Ciência de Dados: Fundamentos e Aplicações.**
+    - Base conceitual para preparação de dados, qualidade, seleção de atributos e avaliação de modelos.
+
+4. **KLOSTERMAN, Stephen. Projetos de Ciência de Dados com Python: Abordagem de estudo de caso para criação de projetos de ciência de dados bem-sucedidos usando Python, pandas e scikit-learn.**
+    - Base para organização de fluxo de trabalho orientado a estudo de caso e implementação com pandas/scikit-learn.
+
+5. **FACELI, Katti; LORENA, Ana Carolina; ALMEIDA, Tiago Agostinho; CARVALHO, André C. P. L. F. Inteligência Artificial: Uma abordagem de Aprendizado de Máquina. 3. ed.**
+    - Base teórica para aprendizagem supervisionada, generalização, viés-variância e avaliação.
+
 #### Livros Fundamentais
 
-**1. GÉRON, Aurélien. Hands-On Machine Learning with Scikit-Learn, Keras, and TensorFlow. 3rd ed. O'Reilly Media, 2022.**
+**1. GÉRON, Aurélien. Mãos à Obra: Aprendizado de Máquina com Scikit-Learn, Keras e TensorFlow. 2. ed. Alta Books, 2019.**
 - **Relevância**: Referência principal para implementação de modelos com scikit-learn e XGBoost
 - **Capítulos-chave**: 
   - Cap. 2: End-to-End Machine Learning Project
@@ -171,7 +188,7 @@ SOBRENOME, Nome. Título: subtítulo. Edição. Local: Editora, ano.
 ```
 Exemplo:
 ```
-GÉRON, Aurélien. Hands-On Machine Learning with Scikit-Learn, Keras, and TensorFlow. 3. ed. Sebastopol: O'Reilly Media, 2022.
+GÉRON, Aurélien. Mãos à Obra: Aprendizado de Máquina com Scikit-Learn, Keras e TensorFlow. 2. ed. Rio de Janeiro: Alta Books, 2019.
 ```
 
 **Artigos científicos**:
@@ -628,7 +645,7 @@ FROM steam_unificado;
 
 #### 4.1.1 Fundamentos de Aprendizado Supervisionado
 
-Machine Learning (ML) é um subcampo da Inteligência Artificial que permite que sistemas aprendam padrões a partir de dados sem serem explicitamente programados (GÉRON, 2022). No contexto de **aprendizado supervisionado**, o algoritmo é treinado com dados rotulados (features + label) para aprender uma função $f: X \rightarrow Y$ que mapeia entradas para saídas.
+Machine Learning (ML) é um subcampo da Inteligência Artificial que permite que sistemas aprendam padrões a partir de dados sem serem explicitamente programados (GÉRON, 2019; FACELI et al., 2021). No contexto de **aprendizado supervisionado**, o algoritmo é treinado com dados rotulados (features + label) para aprender uma função $f: X \rightarrow Y$ que mapeia entradas para saídas.
 
 **Tipos de problemas**:
 - **Classificação**: Prever categoria discreta (ex: sucesso vs. fracasso)
@@ -860,7 +877,7 @@ cursor.executemany(
 
 ### 4.3 Engenharia de Features
 
-Feature engineering é o processo de criar novas features a partir de dados brutos para melhorar o desempenho de modelos de ML (GÉRON, 2022, Cap. 2).
+Feature engineering é o processo de criar novas features a partir de dados brutos para melhorar o desempenho de modelos de ML (GÉRON, 2019, Cap. 2; KLOSTERMAN, 2019).
 
 #### 4.3.1 Features Temporais
 
@@ -942,7 +959,7 @@ def extrair_features_detalhes(jsonb_detalhes):
 
 #### 4.4.1 Train/Test Split Temporal
 
-Para séries temporais e dados com dependência temporal, o split deve respeitar a ordem cronológica (GÉRON, 2022, Cap. 3):
+Para séries temporais e dados com dependência temporal, o split deve respeitar a ordem cronológica (GÉRON, 2019, Cap. 3; HUYEN, 2022):
 
 ```python
 # Ordena por data de atualização
@@ -1148,7 +1165,15 @@ EVANS, Eric. **Domain-Driven Design: Tackling Complexity in the Heart of Softwar
 
 FOWLER, Martin. **Patterns of Enterprise Application Architecture**. Boston: Addison-Wesley, 2002.
 
-GÉRON, Aurélien. **Hands-On Machine Learning with Scikit-Learn, Keras, and TensorFlow**. 3. ed. Sebastopol: O'Reilly Media, 2022.
+GÉRON, Aurélien. **Mãos à Obra: Aprendizado de Máquina com Scikit-Learn, Keras e TensorFlow**. 2. ed. Rio de Janeiro: Alta Books, 2019.
+
+HUYEN, Chip. **Projetando Sistemas de Machine Learning: Processos Iterativos para Aplicações Prontas para Produção**.
+
+CARVALHO, André C. P. L. F.; MENEZES, Angelo Garangau; BONIDIA, Robson Parmezan. **Ciência de Dados: Fundamentos e Aplicações**.
+
+KLOSTERMAN, Stephen. **Projetos de Ciência de Dados com Python: Abordagem de estudo de caso para criação de projetos de ciência de dados bem-sucedidos usando Python, pandas e scikit-learn**.
+
+FACELI, Katti; LORENA, Ana Carolina; ALMEIDA, Tiago Agostinho; CARVALHO, André C. P. L. F. **Inteligência Artificial: Uma abordagem de Aprendizado de Máquina**. 3. ed.
 
 HASTIE, Trevor; TIBSHIRANI, Robert; FRIEDMAN, Jerome. **The Elements of Statistical Learning: Data Mining, Inference, and Prediction**. 2. ed. New York: Springer, 2009.
 
@@ -1210,7 +1235,7 @@ ASSOCIAÇÃO BRASILEIRA DE NORMAS TÉCNICAS. **NBR 15287: Informação e documen
 ### Validação de Referências
 
 **Status**:
-- ✅ Livros fundamentais citados (Géron, Hastie, Kleppmann)
+- ✅ Livros-base adotados no projeto citados (Géron, Huyen, Carvalho et al., Klosterman, Faceli et al.)
 - ✅ Artigos seminais (XGBoost, LightGBM)
 - ✅ Normas ABNT completas
 - ⏳ Adicionar mais papers sobre game economics

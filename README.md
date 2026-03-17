@@ -1498,38 +1498,47 @@ shap.summary_plot(shap_values, X_test, plot_type="bar")
 ## 📚 Referências
 
 ### Livros
-1. **Géron, Aurélien**. *Mãos à Obra: Aprendizado de Máquina com Scikit-Learn, Keras e TensorFlow*. Alta Books, 2019.
-   - Base metodológica para pipeline de ML
+1. **Géron, Aurélien**. *Mãos à Obra: Aprendizado de Máquina com Scikit-Learn, Keras e TensorFlow*. 2. ed. Alta Books, 2019.
+   - Base para pipeline de ML, validação e boas práticas de modelagem com scikit-learn
 
-2. **Provost, Foster & Fawcett, Tom**. *Data Science para Negócios*. Alta Books, 2016.
-   - Aplicação de ML em contexto de negócios
+2. **Huyen, Chip**. *Projetando Sistemas de Machine Learning: Processos Iterativos para Aplicações Prontas para Produção*. O'Reilly/Alta Books.
+   - Base para desenho de pipeline orientado à produção, monitoramento e iteração contínua
+
+3. **Carvalho, André C. P. L. F.; Menezes, Angelo Garangau; Bonidia, Robson Parmezan**. *Ciência de Dados: Fundamentos e Aplicações*.
+   - Base conceitual de preparação de dados, análise e avaliação de modelos
+
+4. **Klosterman, Stephen**. *Projetos de Ciência de Dados com Python: Abordagem de estudo de caso para criação de projetos bem-sucedidos usando Python, pandas e scikit-learn*.
+   - Base de implementação prática e organização de fluxo de trabalho orientado a estudo de caso
+
+5. **Faceli, Katti; Lorena, Ana Carolina; Almeida, Tiago Agostinho; Carvalho, André C. P. L. F.** *Inteligência Artificial: Uma abordagem de Aprendizado de Máquina*. 3. ed.
+   - Base teórica para fundamentos de IA, classificação, regressão e generalização
 
 ### Papers
-3. **Chen, Tianqi & Guestrin, Carlos**. *XGBoost: A Scalable Tree Boosting System*. KDD 2016.
+6. **Chen, Tianqi & Guestrin, Carlos**. *XGBoost: A Scalable Tree Boosting System*. KDD 2016.
    - Fundamentos do XGBoost
 
-4. **Ke, Guolin et al**. *LightGBM: A Highly Efficient Gradient Boosting Decision Tree*. NIPS 2017.
+7. **Ke, Guolin et al**. *LightGBM: A Highly Efficient Gradient Boosting Decision Tree*. NIPS 2017.
    - Fundamentos do LightGBM
 
 ### APIs e Documentação
-5. **Steam Web API Documentation**. https://steamcommunity.com/dev
+8. **Steam Web API Documentation**. https://steamcommunity.com/dev
    - Referência oficial da Steam API
 
-6. **IsThereAnyDeal API**. https://isthereanydeal.com/dev
+9. **IsThereAnyDeal API**. https://isthereanydeal.com/dev
    - Documentação da ITAD API
 
-7. **Scikit-Learn Documentation**. https://scikit-learn.org
+10. **Scikit-Learn Documentation**. https://scikit-learn.org
    - Referência para ML em Python
 
 ### Datasets
-8. **Steam Games Dataset** (Kaggle). https://www.kaggle.com/datasets/nikdavis/steam-store-games
+11. **Steam Games Dataset** (Kaggle). https://www.kaggle.com/datasets/nikdavis/steam-store-games
    - Inspiração para features
 
 ### Metodologia
-9. **CRISP-DM** (Cross-Industry Standard Process for Data Mining)
+12. **CRISP-DM** (Cross-Industry Standard Process for Data Mining)
    - Framework para projetos de Data Science
 
-10. **Checklist de Machine Learning** (Géron, pg 579-582)
+13. **Checklist de Machine Learning** (Géron, pg 579-582)
     - Guia prático implementado no projeto
 
 ---
