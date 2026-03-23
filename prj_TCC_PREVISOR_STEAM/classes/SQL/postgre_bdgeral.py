@@ -36,7 +36,6 @@ class PostgreSQLBDGeral(PostgreSQL):
                 su.desenvolvedores, 
                 su.distribuidores, 
                 su.preco, 
-                su.metacritic_score, 
                 su.categorias, 
                 su.genero, 
                 su.data_lancamento, 
@@ -95,7 +94,7 @@ class PostgreSQLBDGeral(PostgreSQL):
         try:
             var_strSQLInsert = """
             INSERT INTO steam_geral (
-                appid, id_itad, nome, classificacao_etaria, linguagens, desenvolvedores, distribuidores, preco, metacritic_score, categorias, genero, data_lancamento, type, review_score, total_reviews, total_negative, total_positive, review_score_desc, historico_precos
+                appid, id_itad, nome, classificacao_etaria, linguagens, desenvolvedores, distribuidores, preco, categorias, genero, data_lancamento, type, review_score, total_reviews, total_negative, total_positive, review_score_desc, historico_precos
             ) VALUES %s
             ON CONFLICT (appid) DO UPDATE SET
                 id_itad = EXCLUDED.id_itad,
@@ -105,7 +104,6 @@ class PostgreSQLBDGeral(PostgreSQL):
                 desenvolvedores = EXCLUDED.desenvolvedores,
                 distribuidores = EXCLUDED.distribuidores,
                 preco = EXCLUDED.preco,
-                metacritic_score = EXCLUDED.metacritic_score,
                 categorias = EXCLUDED.categorias,
                 genero = EXCLUDED.genero,
                 data_lancamento = EXCLUDED.data_lancamento,
@@ -131,7 +129,6 @@ class PostgreSQLBDGeral(PostgreSQL):
                     var_dictDado.get("desenvolvedores"),
                     var_dictDado.get("distribuidores"),
                     var_dictDado.get("preco"),
-                    var_dictDado.get("metacritic_score"),
                     var_dictDado.get("categorias"),
                     var_dictDado.get("genero"),
                     var_dictDado.get("data_lancamento"),

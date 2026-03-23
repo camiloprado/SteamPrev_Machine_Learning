@@ -307,7 +307,7 @@ class PostgreSQLSteam(PostgreSQL):
             var_strSQL = """
             INSERT INTO steam_unificado (
                 appid, nome, classificacao_etaria, linguagens, desenvolvedores,
-                distribuidores, preco, metacritic_score, categorias, genero,
+                distribuidores, preco, categorias, genero,
                 data_lancamento, type, review_score, total_reviews, total_negative,
                 total_positive, review_score_desc, detalhes_completos, reviews_completos,
                 ultima_atualizacao
@@ -319,7 +319,6 @@ class PostgreSQLSteam(PostgreSQL):
                 desenvolvedores = EXCLUDED.desenvolvedores,
                 distribuidores = EXCLUDED.distribuidores,
                 preco = EXCLUDED.preco,
-                metacritic_score = EXCLUDED.metacritic_score,
                 categorias = EXCLUDED.categorias,
                 genero = EXCLUDED.genero,
                 data_lancamento = EXCLUDED.data_lancamento,
@@ -344,7 +343,6 @@ class PostgreSQLSteam(PostgreSQL):
                     var_dictDados.get('desenvolvedores'),
                     var_dictDados.get('distribuidores'),
                     var_dictDados.get('preco'),
-                    var_dictDados.get('metacritic_score'),
                     var_dictDados.get('categorias'),
                     var_dictDados.get('genero'),
                     var_dictDados.get('data_lancamento'),
@@ -366,7 +364,7 @@ class PostgreSQLSteam(PostgreSQL):
                         var_curCursor, 
                         var_strSQL,  # SQL com placeholder %s para os valores em batch
                         var_listValores, # Lista de tuplas com os valores a serem inseridos
-                        template='(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)', # Define o template para os valores a serem inseridos
+                        template='(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)', # Define o template para os valores a serem inseridos
                         page_size=200 # Ajuste o tamanho do lote conforme necessário para otimizar desempenho e evitar sobrecarga de memória
                     )
                     # Obtém o número de registros processados
