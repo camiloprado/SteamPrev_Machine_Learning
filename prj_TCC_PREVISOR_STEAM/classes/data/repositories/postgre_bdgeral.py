@@ -1,5 +1,5 @@
 from prj_TCC_PREVISOR_STEAM.classes.framework.AllSettings import Settings
-from prj_TCC_PREVISOR_STEAM.classes.SQL.postgre_generico import PostgreSQL
+from prj_TCC_PREVISOR_STEAM.classes.data.repositories.postgre_generico import PostgreSQL
 
 from psycopg2.extras import execute_batch, execute_values
 import json, logging
@@ -27,34 +27,14 @@ class PostgreSQLBDGeral(PostgreSQL):
         
         try:
             var_strSQLGeral = """
-            SELECT
-                su.appid, 
-                sim.id_itad, 
-                su.nome, 
-                su.classificacao_etaria, 
-                su.linguagens, 
-                su.desenvolvedores, 
-                su.distribuidores, 
-                su.preco, 
-                su.categorias, 
-                su.genero, 
-                su.data_lancamento, 
-                su.type, 
-                su.review_score, 
-                su.total_reviews, 
-                su.total_negative, 
-                su.total_positive, 
-                su.review_score_desc, 
-                ir.historico_preco
-            FROM steam_unificado su
-            INNER JOIN steam_itad_mapping sim ON su.appid = sim.appid
-            INNER JOIN itad_raw ir ON sim.id_itad = ir.id_itad
+            SELECT *
+            FROM steam_geral sg
             """
 
             if arg_boolFiltroPadrao:
                 var_strSQLGeral += f"""
-                WHERE su.type = 'game' 
-                    AND su.preco <> 'Gratuito' 
+                WHERE sg.type = 'game' 
+                    AND sg.preco <> 'Gratuito' 
                     AND sim.id_itad IS NOT NULL 
                     AND sim.id_itad NOT IN ('', 'AUSENTE')
                     AND ir.historico_preco IS NOT NULL
@@ -65,7 +45,7 @@ class PostgreSQLBDGeral(PostgreSQL):
                     WHERE {arg_strFiltro}
                     """
 
-            var_strSQLGeral += "ORDER BY su.appid;"
+            var_strSQLGeral += "ORDER BY sg.appid;"
 
             with var_connConnection.cursor() as var_curCursor:
                 var_curCursor.execute(var_strSQLGeral)

@@ -50,7 +50,7 @@ python sync_steam_unificado_supabase.py 500
 
 ### Via Python:
 ```python
-from prj_TCC_PREVISOR_STEAM.classes.SQL.supabase_db import SupabaseDB
+from prj_TCC_PREVISOR_STEAM.classes.data.repositories.supabase_db import SupabaseDB
 
 # Conectar
 SupabaseDB.conectar()

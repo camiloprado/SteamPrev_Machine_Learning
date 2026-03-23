@@ -102,7 +102,7 @@ xxxxxxxxxxxxx  supabase/postgres:15.8.1.085   Up 10 seconds  0.0.0.0:5432->5432/
 4. **Testar conexão:**
 ```bash
 cd ..
-python -c "from prj_TCC_PREVISOR_STEAM.classes.SQL.postgre import PostgreSQL; PostgreSQL.conectar(); print('✓ Conectado com sucesso!'); PostgreSQL.desconectar()"
+python -c "from prj_TCC_PREVISOR_STEAM.classes.data.repositories.postgre import PostgreSQL; PostgreSQL.conectar(); print('✓ Conectado com sucesso!'); PostgreSQL.desconectar()"
 ```
 
 ---
@@ -135,7 +135,7 @@ python prj_TCC_PREVISOR_STEAM/bot.py
 ```python
 # teste_pc1.py
 from prj_TCC_PREVISOR_STEAM.classes.scripts.previsor import Previsor
-from prj_TCC_PREVISOR_STEAM.classes.SQL.postgre import PostgreSQL
+from prj_TCC_PREVISOR_STEAM.classes.data.repositories.postgre import PostgreSQL
 
 # Buscar AppIDs não processados
 PostgreSQL.conectar()
@@ -154,7 +154,7 @@ Previsor.alimentar_banco_dados_raw_docker()
 ```python
 # teste_pc2.py
 from prj_TCC_PREVISOR_STEAM.classes.scripts.previsor import Previsor
-from prj_TCC_PREVISOR_STEAM.classes.SQL.postgre import PostgreSQL
+from prj_TCC_PREVISOR_STEAM.classes.data.repositories.postgre import PostgreSQL
 
 # Buscar AppIDs não processados
 PostgreSQL.conectar()
@@ -180,7 +180,7 @@ Previsor.alimentar_banco_dados_raw_docker()
 
 ### **Teste 1: Conexão com Docker**
 ```bash
-python -c "from prj_TCC_PREVISOR_STEAM.classes.SQL.postgre import PostgreSQL; PostgreSQL.conectar(); print('✓ Docker OK'); PostgreSQL.desconectar()"
+python -c "from prj_TCC_PREVISOR_STEAM.classes.data.repositories.postgre import PostgreSQL; PostgreSQL.conectar(); print('✓ Docker OK'); PostgreSQL.desconectar()"
 ```
 
 ### **Teste 2: Inserção de Teste**
@@ -199,7 +199,7 @@ COALESCE funcionou corretamente:
 
 ### **Teste 3: Contagem de Registros**
 ```bash
-python -c "from prj_TCC_PREVISOR_STEAM.classes.SQL.postgre import PostgreSQL; PostgreSQL.conectar(); cursor = PostgreSQL._var_connConnection.cursor(); cursor.execute('SELECT COUNT(*) FROM steam_raw'); print(f'Total de jogos em steam_raw: {cursor.fetchone()[0]}'); PostgreSQL.desconectar()"
+python -c "from prj_TCC_PREVISOR_STEAM.classes.data.repositories.postgre import PostgreSQL; PostgreSQL.conectar(); cursor = PostgreSQL._var_connConnection.cursor(); cursor.execute('SELECT COUNT(*) FROM steam_raw'); print(f'Total de jogos em steam_raw: {cursor.fetchone()[0]}'); PostgreSQL.desconectar()"
 ```
 
 ---
@@ -300,7 +300,7 @@ python prj_TCC_PREVISOR_STEAM/bot.py
 **Monitorar logs em tempo real:**
 ```bash
 # Verificar últimos 100 AppIDs inseridos
-python -c "from prj_TCC_PREVISOR_STEAM.classes.SQL.postgre import PostgreSQL; PostgreSQL.conectar(); cursor = PostgreSQL._var_connConnection.cursor(); cursor.execute('SELECT appid FROM steam_raw ORDER BY ultima_atualizacao DESC LIMIT 100'); print([r[0] for r in cursor.fetchall()]); PostgreSQL.desconectar()"
+python -c "from prj_TCC_PREVISOR_STEAM.classes.data.repositories.postgre import PostgreSQL; PostgreSQL.conectar(); cursor = PostgreSQL._var_connConnection.cursor(); cursor.execute('SELECT appid FROM steam_raw ORDER BY ultima_atualizacao DESC LIMIT 100'); print([r[0] for r in cursor.fetchall()]); PostgreSQL.desconectar()"
 ```
 
 ---

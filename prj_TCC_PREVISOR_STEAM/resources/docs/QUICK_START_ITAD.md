@@ -42,7 +42,7 @@ python -m prj_TCC_PREVISOR_STEAM.bot
 
 ### Opção 2: Manual (Python)
 ```python
-from prj_TCC_PREVISOR_STEAM.classes.SQL.postgre import PostgreSQL
+from prj_TCC_PREVISOR_STEAM.classes.data.repositories.postgre import PostgreSQL
 from prj_TCC_PREVISOR_STEAM.classes.api.steam_api import SteamClient
 import asyncio
 

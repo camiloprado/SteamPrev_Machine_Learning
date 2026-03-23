@@ -2,7 +2,7 @@
 import sys, os
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
-from prj_TCC_PREVISOR_STEAM.classes.SQL.postgre_generico import PostgreSQL
+from prj_TCC_PREVISOR_STEAM.classes.data.repositories.postgre_generico import PostgreSQL
 
 db = PostgreSQL()
 db.conectar()

@@ -102,7 +102,7 @@ Este projeto utiliza uma **arquitetura híbrida** para otimizar o armazenamento 
 ### Inserir Dados BRUTOS (Docker)
 
 ```python
-from prj_TCC_PREVISOR_STEAM.classes.SQL.postgre import PostgreSQL
+from prj_TCC_PREVISOR_STEAM.classes.data.repositories.postgre import PostgreSQL
 
 # Dados como vêm da Steam API
 dados_raw = {
@@ -128,7 +128,7 @@ PostgreSQL.inserir_dadosSteamRaw_Bulk([dados_raw])
 ### Inserir Dados ESTRUTURADOS (Supabase)
 
 ```python
-from prj_TCC_PREVISOR_STEAM.classes.SQL.supabase_db import SupabaseDB
+from prj_TCC_PREVISOR_STEAM.classes.data.repositories.supabase_db import SupabaseDB
 
 # Dados processados e estruturados
 dados_estruturados = {

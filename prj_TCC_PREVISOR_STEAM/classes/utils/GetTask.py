@@ -1,7 +1,8 @@
 from prj_TCC_PREVISOR_STEAM.classes.framework.AllSettings import Settings
 from prj_TCC_PREVISOR_STEAM.classes.api.local_steam import LocalClient
-from prj_TCC_PREVISOR_STEAM.classes.SQL.postgre_generico import PostgreSQL
-from prj_TCC_PREVISOR_STEAM.classes.SQL.postgre_steam import PostgreSQLSteam
+from prj_TCC_PREVISOR_STEAM.classes.data.repositories.postgre_generico import PostgreSQL
+from prj_TCC_PREVISOR_STEAM.classes.data.repositories.postgre_steam import PostgreSQLSteam
+from prj_TCC_PREVISOR_STEAM.classes.data.repositories.postgre_bdgeral import PostgreSQLBDGeral
 from prj_TCC_PREVISOR_STEAM.classes.data.previsor import Previsor
 from prj_TCC_PREVISOR_STEAM.classes.limpeza.ProcessadorETL import ProcessadorETL
 from prj_TCC_PREVISOR_STEAM.classes.scripts.ProcessadorLimpeza import ProcessadorLimpeza
@@ -55,6 +56,10 @@ class GetTask:
             if PostgreSQLSteam.buscar_appids_desatualizados_otimizado(arg_strNomeTabela="itad_raw"):
                 Previsor.alimentar_banco_dados_ITAD_docker()
                 Previsor.alimentar_ITAD_historico_precos()
+
+            if PostgreSQLBDGeral.buscar_appids_desatualizados_otimizado(arg_strNomeTabela="itad_historico_precos"):
+                Previsor.alimentar_ITAD_historico_precos()
+
 
             # Verificar se o .joblib de limpeza existe e se está atualizado
             if cls._verificar_necessidade_processamento_limpeza():

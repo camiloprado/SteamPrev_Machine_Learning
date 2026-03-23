@@ -1,5 +1,5 @@
 from prj_TCC_PREVISOR_STEAM.classes.framework.InitApplication import Settings
-from prj_TCC_PREVISOR_STEAM.classes.SQL.postgre_generico import PostgreSQL
+from prj_TCC_PREVISOR_STEAM.classes.data.repositories.postgre_generico import PostgreSQL
 import time
 import os
 

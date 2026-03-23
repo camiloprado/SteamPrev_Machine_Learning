@@ -6,7 +6,7 @@ import sys
 import os
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
-from prj_TCC_PREVISOR_STEAM.classes.SQL.supabase_db import SupabaseDB
+from prj_TCC_PREVISOR_STEAM.classes.data.repositories.supabase_db import SupabaseDB
 from dotenv import load_dotenv
 import logging
 

@@ -6,7 +6,7 @@ Execute este script para entender por que as colunas estão retornando total_uni
 import sys
 sys.path.append('D:\\Projeto_TCC_CC')
 
-from prj_TCC_PREVISOR_STEAM.classes.SQL.postgre_generico import PostgreSQL
+from prj_TCC_PREVISOR_STEAM.classes.data.repositories.postgre_generico import PostgreSQL
 import pandas as pd
 import logging
 

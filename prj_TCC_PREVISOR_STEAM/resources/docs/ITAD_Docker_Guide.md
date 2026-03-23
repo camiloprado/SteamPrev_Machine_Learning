@@ -143,7 +143,7 @@ ITAD_API_KEY=your_key_here          # Chave da API IsThereAnyDeal
 ## Exemplo de Uso Manual
 
 ```python
-from prj_TCC_PREVISOR_STEAM.classes.SQL.postgre import PostgreSQL
+from prj_TCC_PREVISOR_STEAM.classes.data.repositories.postgre import PostgreSQL
 from prj_TCC_PREVISOR_STEAM.classes.api.steam_api import SteamClient
 import asyncio
 

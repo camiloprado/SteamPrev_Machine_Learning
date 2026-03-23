@@ -185,7 +185,7 @@ CREATE TABLE steam_itad_mapping (
 
 ### Teste 1: Inserção Manual
 ```python
-from prj_TCC_PREVISOR_STEAM.classes.SQL.postgre import PostgreSQL
+from prj_TCC_PREVISOR_STEAM.classes.data.repositories.postgre import PostgreSQL
 
 PostgreSQL.conectar()
 

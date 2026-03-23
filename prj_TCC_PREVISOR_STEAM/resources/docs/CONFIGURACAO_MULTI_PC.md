@@ -237,4 +237,4 @@ BATCH_TESTE=10
 Se encontrar problemas, verifique:
 1. Logs em `logs/bot_*.log`
 2. Container PostgreSQL: `docker-compose logs db`
-3. Conexão Supabase: `python -c "from prj_TCC_PREVISOR_STEAM.classes.SQL.supabase_db import SupabaseDB; print('OK' if SupabaseDB._var_clientSupabase else 'ERRO')"`
+3. Conexão Supabase: `python -c "from prj_TCC_PREVISOR_STEAM.classes.data.repositories.supabase_db import SupabaseDB; print('OK' if SupabaseDB._var_clientSupabase else 'ERRO')"`

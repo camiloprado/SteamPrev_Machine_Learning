@@ -1,4 +1,4 @@
-from prj_TCC_PREVISOR_STEAM.classes.limpeza.ProcessadorLimpeza import ProcessadorLimpeza, MultiLabelBinarizerTransformer as MLBTransformer
+from prj_TCC_PREVISOR_STEAM.classes.scripts.ProcessadorLimpeza import ProcessadorLimpeza, MultiLabelBinarizerTransformer as MLBTransformer
 from sklearn.linear_model import LinearRegression
 from pandas import DataFrame, Series
 
