@@ -5,7 +5,6 @@ from prj_TCC_PREVISOR_STEAM.classes.SQL.postgre_generico import PostgreSQL
 from prj_TCC_PREVISOR_STEAM.classes.SQL.postgre_steam import PostgreSQLSteam
 from prj_TCC_PREVISOR_STEAM.classes.SQL.postgre_itad import PostgreSQLITAD
 from prj_TCC_PREVISOR_STEAM.classes.SQL.postgre_checkpoint import PostgreSQLCheckpoint
-from prj_TCC_PREVISOR_STEAM.classes.limpeza.limpeza_dados import LimpezaDados
 
 from datetime import datetime
 from time import sleep

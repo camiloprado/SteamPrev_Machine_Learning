@@ -2,9 +2,9 @@ from prj_TCC_PREVISOR_STEAM.classes.framework.AllSettings import Settings
 from prj_TCC_PREVISOR_STEAM.classes.api.local_steam import LocalClient
 from prj_TCC_PREVISOR_STEAM.classes.SQL.postgre_generico import PostgreSQL
 from prj_TCC_PREVISOR_STEAM.classes.SQL.postgre_steam import PostgreSQLSteam
-from prj_TCC_PREVISOR_STEAM.classes.scripts.previsor import Previsor
-from prj_TCC_PREVISOR_STEAM.classes.scripts.ProcessadorETL import ProcessadorETL
-from prj_TCC_PREVISOR_STEAM.classes.limpeza.ProcessadorLimpeza import ProcessadorLimpeza
+from prj_TCC_PREVISOR_STEAM.classes.data.previsor import Previsor
+from prj_TCC_PREVISOR_STEAM.classes.limpeza.ProcessadorETL import ProcessadorETL
+from prj_TCC_PREVISOR_STEAM.classes.scripts.ProcessadorLimpeza import ProcessadorLimpeza
 from prj_TCC_PREVISOR_STEAM.classes.treinamento.treinamento import TreinarModelo
 from prj_TCC_PREVISOR_STEAM.classes.treinamento.ProcessadorTreinamento import ProcessadorTreinamento
 

@@ -89,9 +89,6 @@ class ProcessadorETL:
             var_dictPreco = Limpar.extrair_campo_seguro(var_dictDetalhes, "price_overview", arg_anyPadrao={})
             var_dictDadosTransformados["preco"] = LimparPreco.processar_preco(var_dictPreco)
 
-            var_dictMetacritic = Limpar.extrair_campo_seguro(var_dictDetalhes, "metacritic", arg_anyPadrao={})
-            var_dictDadosTransformados["metacritic_score"] = LimparMetacritic.processar_metacritic(var_dictMetacritic)
-
         var_dictCategoria = Limpar.extrair_campo_seguro(var_dictDetalhes, "categories", arg_anyPadrao=[])
         var_dictDadosTransformados['categorias'] = LimparCategoria.processar_categoria_completo(var_dictCategoria)
 
