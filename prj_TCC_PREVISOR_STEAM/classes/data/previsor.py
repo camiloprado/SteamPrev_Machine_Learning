@@ -5,6 +5,7 @@ from prj_TCC_PREVISOR_STEAM.classes.data.repositories.postgre_generico import Po
 from prj_TCC_PREVISOR_STEAM.classes.data.repositories.postgre_steam import PostgreSQLSteam
 from prj_TCC_PREVISOR_STEAM.classes.data.repositories.postgre_itad import PostgreSQLITAD
 from prj_TCC_PREVISOR_STEAM.classes.data.repositories.postgre_checkpoint import PostgreSQLCheckpoint
+from prj_TCC_PREVISOR_STEAM.classes.data.repositories.postgre_bdgeral import PostgreSQLBDGeral
 
 from datetime import datetime
 from time import sleep
@@ -266,3 +267,33 @@ class Previsor:
         except Exception as e:
             logger.error(f"Erro ao alimentar o histórico de preços ITAD: {e}")
             raise Exception(f"Erro ao alimentar o histórico de preços ITAD: {e}")
+        
+    @classmethod
+    def alimentar_tabela_Geral(cls, var_boolTotal: bool = True, arg_listAppids: list = None) -> None:
+        """
+        Alimenta a tabela steam_geral com os dados mais recentes.
+
+        Parâmetros:
+        - var_boolTotal (bool): Se True, força a alimentação completa da tabela. Caso contrário, pode aplicar filtros para alimentar apenas parte dos dados.
+        - arg_listAppids (list): Lista de AppIDs para filtrar os dados.
+
+        Retorna:
+        - None
+        """
+        try:
+            logger.info("Iniciando alimentação da tabela steam_geral.")
+            if var_boolTotal:
+                logger.info("Alimentação completa selecionada. Buscando todos os dados para alimentar a tabela steam_geral.")
+                var_listDados = PostgreSQLBDGeral.buscar_dados_Geral()
+            else:
+                var_listDados = PostgreSQLBDGeral.buscar_dados_Geral_por_appid(arg_listAppIDs=arg_listAppids)
+            if var_listDados:
+                PostgreSQLBDGeral.inserir_dados_Geral_Bulk(var_listDados)
+                logger.info(f"Alimentação da tabela steam_geral concluída com sucesso. Total de registros processados: {len(var_listDados)}")
+            else:
+                logger.warning("Nenhum dado encontrado para alimentar a tabela steam_geral.")
+
+        except Exception as err:
+            logger.error(f"Erro ao alimentar a tabela steam_geral: {err}")
+            raise Exception(f"Erro ao alimentar a tabela steam_geral: {err}")
+        

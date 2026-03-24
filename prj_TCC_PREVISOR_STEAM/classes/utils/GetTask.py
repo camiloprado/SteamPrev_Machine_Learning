@@ -49,17 +49,17 @@ class GetTask:
             if var_listDadosRawDesatualizados:
                 Previsor.alimentar_banco_dados_raw_docker()
                 ProcessadorETL.processar_lote_unificado(var_listDadosRawDesatualizados)
+                Previsor.alimentar_tabela_Geral(arg_listAppids=var_listDadosRawDesatualizados, var_boolTotal=False)
             elif len(var_listDadosRawDesatualizados) == 0 and Settings._var_dictSettings["etl_processar_todos_dados"]:
                 ProcessadorETL.processar_lote_unificado()
-
+                Previsor.alimentar_tabela_Geral(var_boolTotal=True)
+            else:
+                logger.info("Nenhum dado desatualizado encontrado para processamento ETL.")
+                
             # Alimentação do banco de dados ITAD para o docker
             if PostgreSQLSteam.buscar_appids_desatualizados_otimizado(arg_strNomeTabela="itad_raw"):
                 Previsor.alimentar_banco_dados_ITAD_docker()
                 Previsor.alimentar_ITAD_historico_precos()
-
-            if PostgreSQLBDGeral.buscar_appids_desatualizados_otimizado(arg_strNomeTabela="itad_historico_precos"):
-                Previsor.alimentar_ITAD_historico_precos()
-
 
             # Verificar se o .joblib de limpeza existe e se está atualizado
             if cls._verificar_necessidade_processamento_limpeza():
