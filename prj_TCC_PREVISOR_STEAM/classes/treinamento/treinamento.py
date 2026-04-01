@@ -1,6 +1,5 @@
 from prj_TCC_PREVISOR_STEAM.classes.framework.AllSettings import Settings
 from prj_TCC_PREVISOR_STEAM.classes.data.repositories.postgre_generico import PostgreSQL
-from prj_TCC_PREVISOR_STEAM.classes.scripts.ProcessadorLimpeza import ProcessadorLimpeza
 from prj_TCC_PREVISOR_STEAM.classes.limpeza.limpeza_dados import LimpezaDados
 
 from sklearn.ensemble import RandomForestClassifier, RandomForestRegressor
