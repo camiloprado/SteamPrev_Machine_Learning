@@ -8,7 +8,7 @@
 
 ---
 
-## 📋 Índice
+## Índice
 
 1. [Visão Geral do Projeto](#visão-geral-do-projeto)
 2. [Objetivos e Justificativa](#objetivos-e-justificativa)
@@ -25,12 +25,12 @@
 
 ---
 
-## 🎯 Visão Geral do Projeto
+## Visão Geral do Projeto
 
 ### Descrição
-Sistema inteligente de análise e previsão para jogos da plataforma Steam utilizando técnicas de Machine Learning. O projeto coleta, processa e analisa dados de mais de 280.000 jogos para prever o potencial de sucesso de títulos com base em características como gênero, preço, desenvolvedor, reviews e histórico de preços.
+Sistema de análise e previsão para jogos da plataforma Steam, fundamentado em técnicas de aprendizado de máquina. O projeto coleta, processa e analisa dados de mais de 280.000 jogos com o objetivo de estimar o potencial de sucesso de títulos a partir de características como gênero, preço, desenvolvedor, avaliações e histórico de preços.
 
-### Problema de Negócio
+### Problema de Pesquisa
 Desenvolvedores e publishers de jogos enfrentam dificuldades em:
 - Prever o desempenho comercial de um jogo antes do lançamento
 - Definir estratégias de precificação adequadas
@@ -47,11 +47,11 @@ Um sistema automatizado que:
 
 ---
 
-## 🎯 Objetivos e Justificativa
+## Objetivos e Justificativa
 
 ### Objetivos Gerais
-- Desenvolver um sistema de previsão de sucesso de jogos na Steam utilizando ML
-- Implementar pipeline completo de coleta, processamento e análise de dados
+- Desenvolver um sistema de previsão de sucesso de jogos na Steam utilizando aprendizado de máquina
+- Implementar um pipeline completo de coleta, processamento e análise de dados
 - Criar modelos preditivos com desempenho superior a 75% de acurácia
 
 ### Objetivos Específicos
@@ -64,7 +64,7 @@ Um sistema automatizado que:
 2. **Processamento de Dados**:
    - ✅ Pipeline ETL para transformação de dados brutos
    - ✅ Limpeza e normalização de dados JSONB
-   - ✅ Arquitetura híbrida (local + cloud)
+   - ✅ Arquitetura centralizada em PostgreSQL local
    - ✅ Otimização de consultas SQL
 
 3. **Machine Learning**:
@@ -82,60 +82,114 @@ Um sistema automatizado que:
 ### Justificativa Acadêmica
 - **Relevância**: Mercado de jogos digitais movimenta bilhões de dólares anualmente
 - **Complexidade**: Integração de múltiplas fontes de dados e técnicas avançadas de ML
-- **Inovação**: Arquitetura híbrida e pipeline automatizado para dados em grande escala
+- **Inovação**: Arquitetura centralizada e pipeline automatizado para dados em grande escala
 - **Aplicabilidade**: Ferramenta útil para desenvolvedores indie e pequenas empresas
 
 ---
 
-## 🏗️ Arquitetura do Sistema
+## Arquitetura do Sistema
 
 ### Visão Arquitetural
 
-```
-┌──────────────────────────────────────────────────────────────────┐
-│                         FLUXO DE DADOS                           │
-└──────────────────────────────────────────────────────────────────┘
+O sistema adota uma arquitetura em camadas, com separação explícita entre aquisição, integração, persistência, processamento, aprendizado de máquina, orquestração e apresentação. Essa organização reduz o acoplamento entre os módulos, facilita a manutenção e permite a evolução independente de cada etapa do pipeline.
 
-    Steam API (280k+ jogos)          IsThereAnyDeal API
-           │                                  │
-           ├──────────────┬───────────────────┤
-           │              │                   │
-           ▼              ▼                   ▼
-    [DADOS BRUTOS]   [REVIEWS]        [PREÇOS/PROMOS]
-    Docker PostgreSQL Local (localhost:5432)
-    ├─ steam_raw (1226 MB)      - JSONB completo
-    ├─ itad_raw (178 MB)        - Histórico de preços
-    └─ steam_generico (25 MB)   - Índice de AppIDs
-           │
-           ├──────────[ PROCESSAMENTO ETL ]──────────┐
-           │                                         │
-           ▼                                         ▼
-    [LIMPEZA]                              [TRANSFORMAÇÃO]
-    - Remove duplicatas                    - Normalização
-    - Trata valores nulos                  - Conversão de tipos
-    - Validação de dados                   - Feature extraction
-           │                                         │
-           └──────────────┬──────────────────────────┘
-                          │
-                          ▼
-                  [DADOS LIMPOS]
-                  steam_unificado (1599 MB)
-                  - Estruturado + JSONB
-                  - 229,672 registros
-                  - Fonte principal para ML
-                          │
-                          ├──────────┬──────────┐
-                          │          │          │
-                          ▼          ▼          ▼
-                  [RandomForest] [XGBoost] [LightGBM]
-                          │          │          │
-                          └──────────┴──────────┘
-                                    │
-                                    ▼
-                            [PREDIÇÕES]
-                            - Sucesso estimado
-                            - Reviews previstas
-                            - Preço ótimo
+O fluxo inicia na coleta de dados externos, segue para o armazenamento bruto em PostgreSQL local, passa pelas rotinas de limpeza e transformação ETL e, em seguida, alimenta a camada de machine learning. Os resultados produzidos pelos modelos são expostos em dashboard e monitoramento operacional, enquanto o framework de orquestração coordena a execução ponta a ponta.
+
+### Diagrama de Arquitetura
+
+```mermaid
+flowchart TB
+   subgraph F[Fontes de Dados]
+      F1[Steam API]
+      F2[IsThereAnyDeal API]
+      F3[SteamSpy API]
+   end
+
+   subgraph I[Integração e Coleta]
+      I1[Adaptadores de API]
+      I2[Retry com Backoff]
+      I3[Checkpoint / Resiliência]
+   end
+
+   subgraph S[Persistência Bruta]
+      S1[(PostgreSQL Local)]
+      S2[steam_raw]
+      S3[itad_raw]
+      S4[steam_generico]
+   end
+
+   subgraph P[Processamento de Dados]
+      P1[Limpeza de Dados]
+      P2[Processador ETL]
+      P3[Validação e Normalização]
+      P4[steam_unificado]
+   end
+
+   subgraph M[Machine Learning]
+      M1[Feature Engineering]
+      M2[Preprocessing]
+      M3[Treinamento]
+      M4[Modelos]
+      M5[Avaliação]
+   end
+
+   subgraph O[Orquestração]
+      O1[AllSettings]
+      O2[Initialization]
+      O3[Loop Principal]
+      O4[Process]
+      O5[End]
+   end
+
+   subgraph V[Saída e Monitoramento]
+      V1[Streamlit Dashboard]
+      V2[Prometheus / Métricas]
+      V3[Logs]
+   end
+
+   F1 --> I1
+   F2 --> I1
+   F3 --> I1
+
+   I1 --> I2 --> I3
+   I3 --> S1
+
+   S1 --> S2
+   S1 --> S3
+   S1 --> S4
+
+   S2 --> P1
+   S3 --> P1
+   S4 --> P1
+   P1 --> P2 --> P3 --> P4
+
+   P4 --> M1 --> M2 --> M3 --> M4 --> M5
+
+   M5 --> V1
+   M5 --> V2
+   M5 --> V3
+
+   O1 --> O2 --> O3 --> O4 --> O5
+   O3 -. coordena .-> I3
+   O3 -. coordena .-> P2
+   O3 -. coordena .-> M2
+   O3 -. coordena .-> M5
+
+   classDef fontes fill:#EAF4FF,stroke:#1E5AA8,stroke-width:2px,color:#111
+   classDef integracao fill:#F7ECFF,stroke:#7A1FA2,stroke-width:2px,color:#111
+   classDef persistencia fill:#ECF8EE,stroke:#2E7D32,stroke-width:2px,color:#111
+   classDef processamento fill:#FFF4E5,stroke:#C96A00,stroke-width:2px,color:#111
+   classDef ml fill:#FDECF1,stroke:#A61B57,stroke-width:2px,color:#111
+   classDef orquestracao fill:#EEF1F4,stroke:#4C5B66,stroke-width:2px,color:#111
+   classDef saida fill:#F3F8E8,stroke:#5E8C2A,stroke-width:2px,color:#111
+
+   class F1,F2,F3 fontes
+   class I1,I2,I3 integracao
+   class S1,S2,S3,S4 persistencia
+   class P1,P2,P3,P4 processamento
+   class M1,M2,M3,M4,M5 ml
+   class O1,O2,O3,O4,O5 orquestracao
+   class V1,V2,V3 saida
 ```
 
 ### Componentes Principais
@@ -190,7 +244,7 @@ Ferramentas auxiliares:
 
 ---
 
-## 🛠️ Tecnologias e Dependências
+## Tecnologias e Dependências
 
 ### Stack Principal
 
@@ -269,7 +323,7 @@ pre-commit==3.8.0        # Git hooks
 
 ---
 
-## 📊 Pipeline de Dados
+## Pipeline de Dados
 
 ### Fluxo Completo
 
@@ -402,7 +456,7 @@ df['desconto_medio'] = df['itad_raw'].apply(extract_desconto_medio)
 
 ---
 
-## 🤖 Machine Learning
+## Aprendizado de Máquina
 
 ### Objetivo de Predição
 
@@ -638,7 +692,7 @@ registro = {
 PostgreSQL.inserir_historico_treinamento(registro)
 ```
 
-### Feature Importance
+### Importância das Features
 
 ```python
 # XGBoost
@@ -1380,7 +1434,7 @@ shap.summary_plot(shap_values, X_test, plot_type="bar")
 
 4. **Metodologia**
    - Coleta de dados (Steam API + ITAD)
-   - Arquitetura híbrida
+   - Arquitetura centralizada em PostgreSQL local
    - Pipeline de processamento
    - Algoritmos de ML
    - Métricas de avaliação
@@ -1412,7 +1466,7 @@ shap.summary_plot(shap_values, X_test, plot_type="bar")
 
 ---
 
-## 🚀 Melhorias Futuras
+## Melhorias Futuras
 
 ### Curto Prazo (1-3 meses)
 
@@ -1605,7 +1659,7 @@ shap.summary_plot(shap_values, X_test, plot_type="bar")
 - 📚 **Docs**: Backlog atualizado com correções detalhadas
 
 ### v2.0 - 12/02/2026
-- ✅ Arquitetura híbrida implementada
+- ✅ Arquitetura centralizada implementada
 - ✅ Pipeline completo de ML
 - ✅ Treinamento automatizado
 - ✅ Checkpoint system
@@ -1624,7 +1678,7 @@ shap.summary_plot(shap_values, X_test, plot_type="bar")
 
 ---
 
-## � Resumo Executivo - Status Março 2026
+## Resumo Executivo - Status Março 2026
 
 ### Conquistas Principais
 
@@ -1633,7 +1687,7 @@ shap.summary_plot(shap_values, X_test, plot_type="bar")
 - ✅ **229.672 jogos processados** para ML (83.5% de aproveitamento)
 - ✅ **99.7% de estabilidade** no pipeline ETL (último mês)
 - ✅ **3 algoritmos de ML** implementados e testados
-- ✅ **Arquitetura híbrida** funcional (local + cloud)
+- ✅ **Arquitetura centralizada** funcional (PostgreSQL local)
 - ✅ **Sistema de checkpoint** para resiliência
 - ✅ **Documentação completa** (13 arquivos .md)
 
@@ -1673,7 +1727,7 @@ shap.summary_plot(shap_values, X_test, plot_type="bar")
 
 ---
 
-## �📧 Contato
+## Contato
 
 **Camilo Prado**  
 Email: camilovgprado21@gmail.com  
