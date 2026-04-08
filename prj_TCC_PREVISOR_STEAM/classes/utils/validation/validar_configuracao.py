@@ -85,20 +85,7 @@ def validar_ambiente():
     
     print()
     
-    # 3. Verificar Supabase
-    print("☁️ Supabase:")
-    supabase_url = os.getenv("SUPABASE_URL")
-    supabase_key = os.getenv("SUPABASE_KEY")
-    
-    print_status(f"SUPABASE_URL: {supabase_url[:30]}...", supabase_url is not None)
-    print_status(f"SUPABASE_KEY: {'*' * 20}...", supabase_key is not None)
-    
-    if not supabase_url or not supabase_key:
-        erros.append("Credenciais Supabase não configuradas")
-    
-    print()
-    
-    # 4. Verificar configurações de processamento
+    # 3. Verificar configurações de processamento
     print("⚙️ Configurações de Processamento:")
     ambiente = os.getenv("AMBIENTE", "PRD")
     batch_size = os.getenv("RANGE_PROCESSAMENTO_APPIDS_RAW", "1000")

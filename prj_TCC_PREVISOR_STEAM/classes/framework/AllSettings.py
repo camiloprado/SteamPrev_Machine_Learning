@@ -202,10 +202,7 @@ class Settings:
         """
         # Obtém o nível de logging da variável de ambiente (padrão: INFO)
         var_strLogLevel = os.getenv("LOG_LEVEL", "INFO").upper()
-        var_strLogLevelSupabase = os.getenv("LOG_LEVEL_SUPABASE", "WARNING").upper()
         var_intLogLevel = getattr(logging, var_strLogLevel, logging.INFO)
-        var_intLogLevelSupabase = getattr(logging, var_strLogLevelSupabase, logging.WARNING)
-        var_logLogLevelSupabase = logging.WARNING
 
         # Cria o diretório de logs se não existir (dentro de prj_TCC_PREVISOR_STEAM)
         var_strBaseDir = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))  # prj_TCC_PREVISOR_STEAM
@@ -231,9 +228,7 @@ class Settings:
         logging.getLogger("aiohttp").setLevel(logging.WARNING)
         logging.getLogger("urllib3").setLevel(logging.WARNING)
         
-        # Desabilita logs HTTP do httpx (usado pelo Supabase)
-        logging.getLogger("httpx").setLevel(var_logLogLevelSupabase)
-        logging.getLogger("httpcore").setLevel(var_logLogLevelSupabase)
+
 
         cls._var_dictSettings["log_level"] = var_strLogLevel
 

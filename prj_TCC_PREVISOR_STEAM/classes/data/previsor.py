@@ -23,7 +23,6 @@ class Previsor:
     def alimentar_banco_dados_raw_docker(cls):
         """
         Alimenta o banco de dados PostgreSQL (Docker) com os dados coletados da API.
-        Versão otimizada que usa o PostgreSQL local em vez do Supabase.
         Suporta divisão de trabalho entre múltiplos PCs usando PC_ID.
 
         Parâmetros:
@@ -133,7 +132,6 @@ class Previsor:
     def alimentar_banco_dados_ITAD_docker(cls):
         """
         Alimenta o banco de dados PostgreSQL (Docker) com dados do ITAD.
-        Versão otimizada que usa o PostgreSQL local em vez do Supabase.
         
         Parâmetros:
         

@@ -76,7 +76,6 @@ Um sistema automatizado que:
 
 4. **Infraestrutura**:
    - ✅ Docker PostgreSQL para dados brutos
-   - ✅ Supabase Cloud para dados estruturados
    - ✅ Sistema de logs e monitoramento
    - ✅ Suporte multi-PC para processamento distribuído
 
@@ -163,7 +162,6 @@ Gerenciamento de banco de dados:
   - Checkpoint system para persistência
   - Bulk inserts otimizados
   - Queries parametrizadas
-- `supabase_db.py`: Supabase Cloud (REST API)
 
 #### 4. **ETL Pipeline** (`classes/scripts/`)
 Processamento e transformação:
@@ -221,7 +219,6 @@ unidecode==1.4.0         # Normalização de texto
 **Database**:
 ```python
 psycopg[binary]==3.2.1   # PostgreSQL adapter
-supabase==2.10.0         # Supabase Cloud client
 ```
 
 **API & HTTP**:
@@ -268,15 +265,7 @@ pre-commit==3.8.0        # Git hooks
 **Docker Compose** (`docker/docker-compose.yml`):
 - PostgreSQL 15
 - Kong API Gateway
-- Realtime subscriptions
-- Storage service
 - Pooler para conexões
-
-**Supabase Cloud**:
-- REST API automatizada
-- Dashboard web integrado
-- Backup automático
-- Auth & Row Level Security
 
 ---
 
@@ -749,7 +738,7 @@ Projeto_TCC_CC/
 │   │   ├── docs/                     # Documentação
 │   │   │   ├── ARQUITETURA_HIBRIDA.md
 │   │   │   ├── MELHORIAS_IMPLEMENTADAS.md
-│   │   │   ├── GUIA_STEAM_UNIFICADO_SUPABASE.md
+
 │   │   │   └── ... (12 documentos)
 │   │   ├── logs/                     # Logs da aplicação
 │   │   │   └── app.log
@@ -797,7 +786,6 @@ Projeto_TCC_CC/
 
 #### Infraestrutura
 - [x] Docker PostgreSQL configurado
-- [x] Supabase Cloud integrado
 - [x] Sistema de logs estruturado
 - [x] Variáveis de ambiente (.env)
 - [x] Configuração multi-PC
@@ -884,12 +872,6 @@ Projeto_TCC_CC/
   - Impacto ML: Features de preço podem melhorar modelo
   - Solução planejada: Integração com SteamDB como fonte alternativa
 
-#### Infraestrutura
-- ⚠️ **Supabase Cloud não utilizado para ML**
-  - Status: Dados exportados mas não sincronizados
-  - Motivo: PostgreSQL local mais rápido para treinamento
-  - Solução planejada: Sync incremental via Realtime subscriptions
-
 ### Próximos Passos (Roadmap)
 
 #### Sprint Atual (Março 2026)
@@ -954,7 +936,6 @@ else:
 
 #### ✅ Bug #2: Metacritic Score - VARCHAR(10) Insuficiente
 **Data**: 11/03/2026  
-**Arquivo**: `create_steam_unificado_supabase.sql`  
 **Problema**:  
 ```sql
 -- ANTES
@@ -1074,7 +1055,7 @@ Output: ['Inglês', 'Português (Brasil)', 'Chinês (Simplificado)', 'Espanhol (
 - [ ] Recommender system
 
 #### Integração
-- [ ] Supabase RPC para queries complexas
+- [ ] Sistema de cache distribuído
 - [ ] Webhooks para notificações
 - [ ] Integração com outros marketplaces (Epic, GOG)
 
@@ -1673,7 +1654,7 @@ shap.summary_plot(shap_values, X_test, plot_type="bar")
 **Processo:**
 1. **Checkpoint system**: Permite recuperação de falhas em coletas longas
 2. **Adaptive batch sizing**: Balanceia performance vs rate limiting
-3. **Separação local/cloud**: PostgreSQL local para ML, Supabase para backup
+3. **Arquitetura centralizante**: PostgreSQL local para centralizar todas as operações de dados
 4. **Documentação contínua**: Markdown facilita onboarding e manutenção
 
 **Machine Learning:**

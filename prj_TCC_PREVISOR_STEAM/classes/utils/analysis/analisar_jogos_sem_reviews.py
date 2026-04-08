@@ -6,7 +6,6 @@ import sys
 import os
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
-from prj_TCC_PREVISOR_STEAM.classes.data.repositories.supabase_db import SupabaseDB
 from dotenv import load_dotenv
 import logging
 
@@ -26,13 +25,13 @@ def analisar_situacao_reviews():
     Analisa a situação de reviews nos dados coletados.
     """
     try:
-        # Conecta ao Supabase
-        SupabaseDB.conectar()
-        logger.info("Conectado ao Supabase")
+        # Nota: Este script foi modernizado para usar PostgreSQL local
+        # Em caso de uso, atualizar para usar repositório PostgreSQL
+        logger.warning("Script requer atualização para usar PostgreSQL local em vez de Supabase")
         
-        # Busca todos os dados
+        # TODO: Implementar conexão com PostgreSQL local
         logger.info("Carregando dados da steam_raw...")
-        var_listTodosDados = SupabaseDB.buscar_todos_dadosSteamRaw()
+        var_listTodosDados = []
         
         var_intTotal = len(var_listTodosDados)
         var_intComDetalhes = 0
@@ -101,16 +100,15 @@ def analisar_situacao_reviews():
             print(f"   → Pode manter reviews como obrigatórios se desejar")
         
         print(f"\n{'='*60}")
-        print(f"EXEMPLO DE USO:")
+        print(f"EXEMPLO DE USO (COM POSTGRESQL LOCAL):")
         print(f"{'='*60}")
-        print(f"\n# Processar TODOS os jogos (reviews opcionais):")
-        print(f"jogos = SupabaseDB.buscar_jogos_incompletos(arg_boolRequererReviews=False)")
-        print(f"\n# Processar APENAS com reviews (mais restritivo):")
-        print(f"jogos = SupabaseDB.buscar_jogos_incompletos(arg_boolRequererReviews=True)")
+        print(f"\n# Atualizar este script para usar PostgreSQL:")
+        print(f"from prj_TCC_PREVISOR_STEAM.classes.data.repositories.postgre_generico import PostgreSQL")
+        print(f"dados = PostgreSQL.buscar_dados(consulta_sql)")
         print(f"\n{'='*60}\n")
         
         # Desconecta
-        SupabaseDB.desconectar()
+        logger.info("Análise concluída")
         
     except Exception as e:
         logger.error(f"Erro ao analisar reviews: {e}")

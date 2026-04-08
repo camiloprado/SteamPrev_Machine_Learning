@@ -109,7 +109,7 @@ class SteamClient:
                         f"Reduzindo: {var_intBatchSize} → {var_intNovoSize}")
                     var_intBatchSize = var_intNovoSize
             
-            # Insere no PostgreSQL (Docker) em vez de Supabase
+            # Insere os dados no PostgreSQL
             if var_listDetails:
                 PostgreSQLSteam.inserir_dadosSteamRaw_Bulk(arg_listDados=var_listDetails)
                 logger.info(f"Dados de detalhes inseridos com sucesso no PostgreSQL ({len(var_listDetails)} registros).")
@@ -584,7 +584,7 @@ class SteamClient:
             var_intErrosReais = len(var_listBatch) - len(var_listReviews) - var_intAusentesReviews
             logger.info(f"Batch {var_intBatchNum + 1}: {len(var_listReviews)} sucessos, {var_intAusentesReviews} ausentes, {var_intErrosReais} erros")
 
-            # Insere no PostgreSQL (Docker) em vez de Supabase
+            # Insere os dados no PostgreSQL
             if var_listReviews:
                 PostgreSQLSteam.inserir_dadosSteamRaw_Bulk(arg_listDados=var_listReviews)
                 logger.info(f"Dados de reviews inseridos com sucesso no PostgreSQL ({len(var_listReviews)} registros).")
