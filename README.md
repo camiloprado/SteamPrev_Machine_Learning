@@ -3,8 +3,8 @@
 **Autor**: Camilo Prado  
 **Curso**: Ciência da Computação  
 **Data de Criação**: 12 de fevereiro de 2026  
-**Última Atualização**: 12 de março de 2026  
-**Versão**: 2.1  
+**Última Atualização**: 07 de abril de 2026  
+**Versão**: 2.2  
 
 ---
 
@@ -43,7 +43,7 @@ Um sistema automatizado que:
 2. **Processa** e limpa grandes volumes de dados (3.1 GB+)
 3. **Treina** modelos de ML para classificação e regressão
 4. **Prevê** métricas de sucesso (reviews, popularidade, vendas estimadas)
-5. **Fornece** insights acionáveis através de dashboards e relatórios
+5. **Gera** relatórios e análises internas para apoio à tomada de decisão
 
 ---
 
@@ -93,7 +93,7 @@ Um sistema automatizado que:
 
 O sistema adota uma arquitetura em camadas, com separação explícita entre aquisição, integração, persistência, processamento, aprendizado de máquina, orquestração e apresentação. Essa organização reduz o acoplamento entre os módulos, facilita a manutenção e permite a evolução independente de cada etapa do pipeline.
 
-O fluxo inicia na coleta de dados externos, segue para o armazenamento bruto em PostgreSQL local, passa pelas rotinas de limpeza e transformação ETL e, em seguida, alimenta a camada de machine learning. Os resultados produzidos pelos modelos são expostos em dashboard e monitoramento operacional, enquanto o framework de orquestração coordena a execução ponta a ponta.
+O fluxo inicia na coleta de dados externos, segue para o armazenamento bruto em PostgreSQL local, passa pelas rotinas de limpeza e transformação ETL e, em seguida, alimenta a camada de machine learning. Os resultados produzidos pelos modelos são registrados em artefatos de avaliação e logs internos, enquanto os componentes de dashboard e monitoramento permanecem como funcionalidades pendentes.
 
 ### Diagrama de Arquitetura
 
@@ -141,9 +141,9 @@ flowchart TB
       O5[End]
    end
 
-   subgraph V[Saída e Monitoramento]
-      V1[Streamlit Dashboard]
-      V2[Prometheus / Métricas]
+   subgraph V[Saídas e Observabilidade]
+      V1[Streamlit Dashboard (pendente)]
+      V2[Prometheus / Métricas (pendente)]
       V3[Logs]
    end
 
@@ -289,6 +289,8 @@ seaborn==0.13.2          # Visualizações estatísticas
 streamlit==1.37.1        # Dashboard interativo
 ```
 
+As bibliotecas `streamlit`, `prometheus-client` e `flask` permanecem declaradas nas dependências, mas o dashboard e a camada de monitoramento ainda não possuem implementação funcional no código-fonte atual.
+
 **Configuration & Utils**:
 ```python
 python-dotenv==1.0.0     # Gerenciamento de .env
@@ -320,6 +322,8 @@ pre-commit==3.8.0        # Git hooks
 - PostgreSQL 15
 - Kong API Gateway
 - Pooler para conexões
+
+O arquivo `docker-compose.yml` ainda preserva a estrutura histórica do stack Supabase, porém a operação atual do projeto utiliza apenas o PostgreSQL local e o pooler.
 
 ---
 
@@ -823,7 +827,7 @@ Projeto_TCC_CC/
 ├── .gitignore
 ├── requirements.txt                  # Dependências Python
 ├── setup.py                          # Setup do pacote
-├── VERSION                           # Versionamento (2.0)
+├── VERSION                           # Versionamento (2.2)
 ├── README.md                         # Documentação principal
 ├── Checklist.md                      # Checklist ML (Géron)
 ├── Backlog.md                        # Este arquivo
@@ -866,6 +870,20 @@ Projeto_TCC_CC/
 - [x] Registro de métricas (ml_treinamento_historico)
 - [x] Feature importance
 
+#### Componentes Parciais
+- [x] `AllSettings.py` com carregamento de configuração e validação do ambiente
+- [x] `Initialization.py` com bootstrap do sistema
+- ⚠️ `Loop.py` com execução básica da fila de tarefas
+- ⚠️ `Process.py` ainda como stub de processamento
+- ⚠️ `End.py` com encerramento mínimo
+- ⚠️ `steamspy_api.py` e `local_steam.py` existem, mas não estão integrados ao fluxo principal
+
+#### Componentes Não Implementados
+- [ ] Dashboard Streamlit funcional
+- [ ] Monitoramento Prometheus funcional
+- [ ] API de predição em FastAPI
+- [ ] CI/CD com GitHub Actions
+
 #### Banco de Dados
 - [x] steam_generico (25 MB, 276k registros)
 - [x] steam_raw (1226 MB, 276k registros)
@@ -897,6 +915,13 @@ Projeto_TCC_CC/
 - [x] Retry com Backoff Exponencial
 - [x] Logs estruturados com níveis
 
+### Componentes Removidos ou Obsoletos
+
+- ❌ Supabase Cloud removido da arquitetura do projeto
+- ❌ Uso de SDK Supabase removido do código-fonte principal
+- ❌ Sincronização cloud/local não faz mais parte do fluxo operacional
+- ⚠️ Documentos legados como `ARQUITETURA_HIBRIDA.md`, `TRANSFERENCIA_PC2.md`, `CONFIGURACAO_MULTI_PC.md` e `README_EXPORTS.md` permanecem apenas como histórico
+
 ### Funcionalidades Em Andamento (⏳)
 
 #### Machine Learning
@@ -911,6 +936,13 @@ Projeto_TCC_CC/
 - [ ] Containerização completa (Docker)
 - [ ] CI/CD pipeline (GitHub Actions)
 - [ ] Dashboard de monitoramento (Streamlit/Grafana)
+
+### Estado Resumido do Projeto
+
+- **Implementado**: Coleta Steam/ITAD, ETL, limpeza, banco PostgreSQL local, treinamento RF/XGBoost/LightGBM, checkpoint, logs e métricas operacionais internas.
+- **Parcial**: framework de orquestração, integração de SteamSpy/local_steam, documentação de operações auxiliares.
+- **Não implementado**: dashboard Streamlit funcional, monitoramento Prometheus, API FastAPI e pipeline de CI/CD.
+- **Removido**: Supabase Cloud e qualquer dependência funcional do ecossistema Supabase.
 
 ### Problemas Conhecidos (🐛)
 
@@ -1466,7 +1498,7 @@ shap.summary_plot(shap_values, X_test, plot_type="bar")
 
 ---
 
-## Melhorias Futuras
+## Resumo Executivo - Estado Atual
 
 ### Curto Prazo (1-3 meses)
 
@@ -1649,6 +1681,12 @@ shap.summary_plot(shap_values, X_test, plot_type="bar")
 
 ## 📝 Notas de Versão
 
+### v2.2 - 07/04/2026
+- ✅ **Documentação**: README alinhado ao estado real do código
+- ✅ **Arquitetura**: Supabase removido da documentação principal
+- ✅ **Status**: componentes parciais e pendentes explicitados
+- ✅ **Versão**: atualização da numeração do documento
+
 ### v2.1 - 12/03/2026 🔥
 - 🐛 **Bug Critical Fix**: Parsing JSON "AUSENTE" corrigido
 - 🐛 **Bug Fix**: VARCHAR(10) → VARCHAR(20) para metacritic_score
@@ -1678,7 +1716,7 @@ shap.summary_plot(shap_values, X_test, plot_type="bar")
 
 ---
 
-## Resumo Executivo - Status Março 2026
+## Resumo Executivo - Estado Atual
 
 ### Conquistas Principais
 
@@ -1736,9 +1774,9 @@ LinkedIn: [Link do perfil]
 
 ---
 
-**Última Atualização**: 12 de março de 2026  
-**Versão do Documento**: 2.1  
-**Status do Projeto**: 🟢 Em Desenvolvimento Ativo  
+**Última Atualização**: 07 de abril de 2026  
+**Versão do Documento**: 2.2  
+**Status do Projeto**: Em desenvolvimento intermediário  
 **Bugs Críticos Abertos**: 0  
 **Cobertura de Testes**: 78% (target: 85%)  
 **Qualidade do Código**: A- (Ruff + Black)  
