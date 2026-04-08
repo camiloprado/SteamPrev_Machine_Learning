@@ -142,8 +142,8 @@ flowchart TB
    end
 
    subgraph V[Saídas e Observabilidade]
-      V1[Streamlit Dashboard (pendente)]
-      V2[Prometheus / Métricas (pendente)]
+      V1[Streamlit Dashboard - pendente]
+      V2[Prometheus Metricas - pendente]
       V3[Logs]
    end
 
