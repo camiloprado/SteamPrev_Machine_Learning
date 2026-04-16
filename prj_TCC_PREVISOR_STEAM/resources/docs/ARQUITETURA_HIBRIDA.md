@@ -1,251 +1,97 @@
-# Arquitetura Híbrida de Dados - TCC Previsor Steam
+# Arquitetura de Dados e Execucao
 
-## 📋 Visão Geral
+## Objetivo desta arquitetura
 
-Este projeto utiliza uma **arquitetura híbrida** para otimizar o armazenamento e processamento de grandes volumes de dados da Steam API.
+A arquitetura do projeto foi desenhada para processar alto volume de dados de jogos com foco em:
+- estabilidade de execucao
+- reprocessamento controlado
+- separacao entre coleta, ETL e treinamento
 
-## 🏗️ Arquitetura
+## Visao geral
 
-```
-┌─────────────────────────────────────────────────────────────────┐
-│                      FLUXO DE DADOS                             │
-└─────────────────────────────────────────────────────────────────┘
-
-  Steam API (280k+ jogos)
-       │
-       ├─────────────────────────────────────────────┐
-       │                                             │
-       ▼                                             ▼
-  [DADOS BRUTOS]                              [PROCESSAMENTO]
-  Docker/PostgreSQL Local                     Python ETL
-  - steam_raw (JSONB)                         - Extração de campos
-  - itad_raw (JSONB)                          - Conversão de tipos
-  - Grande volume                             - Validação
-  - Acesso rápido                             - Normalização
-       │                                             │
-       │                                             ▼
-       │                                      [DADOS LIMPOS]
-       │                                      Supabase Cloud
-       │                                      - steam_bd (estruturado)
-       │                                      - steam_generico
-       │                                      - Otimizado para queries
-       │                                      - Dashboard/Visualização
-       │                                             │
-       └─────────────────┬───────────────────────────┘
-                         │
-                         ▼
-                  Análise e Previsão
-                  (Modelos de ML)
+```text
+Fontes externas
+  -> Steam API / SteamSpy / ITAD
+Coleta assíncrona
+  -> clients em classes/api
+Persistencia operacional
+  -> PostgreSQL local (Docker quando habilitado)
+Processamento
+  -> ETL + limpeza + unificacao
+Treinamento ML
+  -> modelos de classificacao e regressao
 ```
 
-## 🗄️ Estrutura de Bancos de Dados
+## Camadas do sistema
 
-### 1️⃣ Docker/PostgreSQL Local (`localhost:5432`)
+### 1) Orquestracao
 
-**Propósito**: Armazenar dados BRUTOS em grande volume
+Pasta principal: classes/framework
 
-**Tabelas**:
-- `steam_raw`: Dados brutos da Steam API (JSONB)
-  - `appid` (INTEGER): ID do jogo
-  - `detalhes` (JSONB): JSON completo dos detalhes
-  - `reviews` (JSONB): JSON completo das avaliações
-  - `ultima_atualizacao` (TIMESTAMP)
+- Initialization: bootstrap do sistema
+- Loop: ciclo de tarefas
+- End: finalizacao
+- AllSettings: configuracao de ambiente, log e API
 
-- `itad_raw`: Dados brutos do IsThereAnyDeal (JSONB)
-  - Similar estrutura com dados de preços
+### 2) Integracao com APIs
 
-**Vantagens**:
-- ✅ Armazenamento local rápido
-- ✅ Sem custos de cloud para grande volume
-- ✅ Histórico completo dos dados
-- ✅ Backup e recuperação fácil
+Pasta principal: classes/api
 
-**Classe Python**: `PostgreSQL` (psycopg2)
+- steam_api.py: detalhes e reviews
+- steamspy_api.py: fallback da listagem de apps
+- itad_api.py: lookup e historico de preco
+- local_steam.py: cache local de app list
 
-### 2️⃣ Supabase Cloud (API REST)
+### 3) Persistencia
 
-**Propósito**: Dados ESTRUTURADOS para consulta e visualização
+Pastas principais: classes/data/repositories
 
-**Tabelas**:
-- `steam_bd`: Dados processados e normalizados
-  - `appid` (INTEGER): ID do jogo
-  - `nome` (VARCHAR): Nome do jogo
-  - `classificacao_etaria` (VARCHAR)
-  - `linguagens` (ARRAY)
-  - `desenvolvedores` (ARRAY)
-  - `distribuidores` (ARRAY)
-  - `preco` (VARCHAR)
-  - `metacritic_score` (VARCHAR)
-  - `categorias` (ARRAY)
-  - `genero` (ARRAY)
-  - `data_lancamento` (VARCHAR)
-  - `review_score` (INTEGER)
-  - `total_reviews` (INTEGER)
-  - `total_negative` (INTEGER)
-  - `total_positive` (INTEGER)
-  - `review_score_desc` (VARCHAR)
-  - `ultima_atualizacao` (TIMESTAMP)
+- steam_raw: dados de origem
+- steam_generico: indice operacional
+- itad_raw: dados ITAD
+- steam_itad_mapping: mapeamento Steam x ITAD
+- steam_geral: base unificada para treinamento
+- processing_checkpoint: retomada de execucao por etapa
 
-- `steam_generico`: Dados gerais dos jogos
+### 4) ETL e limpeza
 
-**Vantagens**:
-- ✅ API REST para acesso remoto
-- ✅ Dashboard web integrado
-- ✅ Queries otimizadas
-- ✅ Escalabilidade automática
-- ✅ Backup automático
+- classes/limpeza/ProcessadorETL.py
+- classes/scripts/ProcessadorLimpeza.py
+- classes/limpeza/* (regras por atributo)
 
-**Classe Python**: `SupabaseDB` (supabase-py)
+### 5) Machine Learning
 
-## 💻 Uso das Classes
+Pasta principal: classes/treinamento
 
-### Inserir Dados BRUTOS (Docker)
+- treinamento.py
+- ProcessadorTreinamento.py
+- treinar_modelos.py
 
-```python
-from prj_TCC_PREVISOR_STEAM.classes.data.repositories.postgre import PostgreSQL
+Modelos utilizados:
+- LightGBM
+- XGBoost
+- Random Forest
+- Regressao linear
 
-# Dados como vêm da Steam API
-dados_raw = {
-    "steam_appid": 123456,
-    "detalhes": {
-        "name": "Nome do Jogo",
-        "type": "game",
-        "developers": ["Studio X"],
-        # ... resto do JSON completo
-    },
-    "reviews": {
-        "query_summary": {
-            "total_reviews": 1000,
-            # ... resto das reviews
-        }
-    }
-}
+## Fluxo de execucao (alto nivel)
 
-# Inserir no Docker (steam_raw)
-PostgreSQL.inserir_dadosSteamRaw_Bulk([dados_raw])
-```
+1. Carga da lista de apps (com fallback local/SteamSpy)
+2. Identificacao de AppIDs pendentes/desatualizados
+3. Coleta dos dados Steam e ITAD
+4. ETL para base consolidada
+5. Atualizacao de steam_geral
+6. Treinamento automatico quando aplicavel
 
-### Inserir Dados ESTRUTURADOS (Supabase)
+## Estado recente observado no log
 
-```python
-from prj_TCC_PREVISOR_STEAM.classes.data.repositories.supabase_db import SupabaseDB
+Arquivo: resources/logs/app.log
 
-# Dados processados e estruturados
-dados_estruturados = {
-    "appid": 123456,
-    "nome": "Nome do Jogo",
-    "classificacao_etaria": "12",
-    "linguagens": ["English", "Portuguese"],
-    "desenvolvedores": ["Studio X"],
-    "preco": "R$ 49.99",
-    "metacritic_score": "85",
-    "categorias": ["Single-player"],
-    "genero": ["Action", "Adventure"],
-    "data_lancamento": "2025-01-15",
-    "review_score": 90,
-    "total_reviews": 1000,
-    "total_positive": 900,
-    "total_negative": 100,
-    "review_score_desc": "Very Positive"
-}
+Pontos importantes da execucao mais recente observada:
+- fallback de endpoint Steam funcionando
+- ocorrencias de indisponibilidade de Docker em algumas execucoes
+- treinamento iniciado com base steam_geral carregada
+- falha pontual por variavel local nao inicializada em alimentar_tabela_Geral
 
-# Inserir no Supabase (steam_bd)
-SupabaseDB.inserir_dadosSteamBD([dados_estruturados])
-```
+## Observacao sobre documento legado
 
-## 🚀 Configuração
-
-### 1. Iniciar Docker
-
-```bash
-cd docker
-docker compose up -d
-```
-
-### 2. Verificar Variáveis de Ambiente
-
-Arquivo `.env`:
-
-```env
-# Docker/PostgreSQL Local (Dados RAW)
-DB_NAME=postgres
-DB_USER=postgres
-DB_PASSWORD=projetotccADMIN
-DB_HOST=localhost
-DB_PORT=5432
-
-# Supabase Cloud (Dados Estruturados)
-SUPABASE_URL=https://norphjcxnsgklyutnmin.supabase.co
-SUPABASE_KEY=eyJhbGci...
-```
-
-### 3. Executar Teste
-
-```bash
-python prj_TCC_PREVISOR_STEAM/test_arquitetura_hibrida.py
-```
-
-## 🔍 Verificação de Dados
-
-### Docker/PostgreSQL
-
-```bash
-# Verificar dados brutos
-docker exec -it supabase-db psql -U postgres -d postgres \
-  -c "SELECT appid, detalhes->>'name' FROM steam_raw LIMIT 5;"
-
-# Contar registros
-docker exec -it supabase-db psql -U postgres -d postgres \
-  -c "SELECT COUNT(*) FROM steam_raw;"
-```
-
-### Supabase Cloud
-
-1. Acesse: https://supabase.com/dashboard
-2. Selecione projeto: `norphjcxnsgklyutnmin`
-3. Vá em **Table Editor** → `steam_bd`
-4. Visualize e filtre os dados
-
-## 📊 Quando Usar Cada Banco
-
-| Operação | Banco | Classe | Método |
-|----------|-------|--------|--------|
-| Coletar dados da Steam API | Docker | `PostgreSQL` | `inserir_dadosSteamRaw()` |
-| Coletar dados do ITAD | Docker | `PostgreSQL` | `inserir_dadosItadRaw()` |
-| Processar e normalizar dados | Supabase | `SupabaseDB` | `inserir_dadosSteamBD()` |
-| Consultas para dashboard | Supabase | `SupabaseDB` | `buscar_*()` |
-| Análise de ML (features) | Docker | `PostgreSQL` | Query direta |
-| Exportar relatórios | Supabase | `SupabaseDB` | API REST |
-
-## ⚠️ Notas Importantes
-
-1. **Dados RAW sempre no Docker**: Mantenha os dados brutos localmente para evitar custos e ter histórico completo
-2. **Dados Estruturados no Supabase**: Apenas dados processados e otimizados para consulta
-3. **ETL**: Crie processos para transformar dados de `steam_raw` → `steam_bd`
-4. **Backup Docker**: Configure backup periódico dos volumes Docker
-5. **Limites Supabase**: Fique atento aos limites do plano free (500MB database)
-
-## 🧪 Testes
-
-- `test_insercao.py`: Teste simples de inserção no Docker
-- `test_arquitetura_hibrida.py`: Teste completo da arquitetura híbrida
-
-## 📝 Logs
-
-Os logs mostram claramente onde os dados estão sendo inseridos:
-
-```
-INFO - Conexão com o banco de dados estabelecida com sucesso: postgres@localhost:5432/postgres
-INFO - Dados steam_raw inseridos/atualizados para o AppID 888888 (linhas afetadas: 1)
-INFO - Conectado ao Supabase com sucesso
-INFO - Dados processados salvos para 1 registros.
-```
-
-## 🎯 Benefícios da Arquitetura Híbrida
-
-✅ **Performance**: Dados locais para processamento intensivo
-✅ **Custo**: Evita custos de armazenamento cloud para grande volume  
-✅ **Escalabilidade**: Supabase para consultas distribuídas
-✅ **Flexibilidade**: Dados brutos preservados para reprocessamento
-✅ **Facilidade**: Dashboard web para visualização sem código
-✅ **Segurança**: Backup local + backup cloud
+Este arquivo substitui a visao antiga de arquitetura hibrida com Supabase como caminho principal. O fluxo operacional atual observado no codigo e no log e centrado em PostgreSQL local.
