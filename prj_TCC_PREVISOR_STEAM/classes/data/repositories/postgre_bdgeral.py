@@ -39,10 +39,10 @@ class PostgreSQLBDGeral(PostgreSQL):
                     su.total_reviews,
                     su.total_negative,
                     su.total_positive,
-                    su.review_score_desc,
+                    su.review_score_desc
             FROM steam_unificado su
             WHERE appid = ANY(%s)
-            AND type == 'game';
+            AND type = 'game';
             """
             var_connConnection = cls.conectar()
             with var_connConnection.cursor() as cursor:
