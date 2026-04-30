@@ -5,7 +5,6 @@ from prj_TCC_PREVISOR_STEAM.classes.data.repositories.postgre_steam import Postg
 from prj_TCC_PREVISOR_STEAM.classes.data.repositories.postgre_bdgeral import PostgreSQLBDGeral
 from prj_TCC_PREVISOR_STEAM.classes.data.previsor import Previsor
 from prj_TCC_PREVISOR_STEAM.classes.limpeza.ProcessadorETL import ProcessadorETL
-from prj_TCC_PREVISOR_STEAM.classes.scripts.ProcessadorLimpeza import ProcessadorLimpeza
 from prj_TCC_PREVISOR_STEAM.classes.treinamento.treinamento import TreinarModelo
 from prj_TCC_PREVISOR_STEAM.classes.treinamento.ProcessadorTreinamento import ProcessadorTreinamento
 
