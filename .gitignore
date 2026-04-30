@@ -18,4 +18,6 @@ prj_TCC_PREVISOR_STEAM/resources/logs/
 */resources/dados/exports
 */resources/dados/*.json
 !*/resources/dados/steam_applist.json
+*/resources/relatorios/*.csv
+*/resources/relatorios/*.png
 backup_public.sql
