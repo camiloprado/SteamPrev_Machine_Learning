@@ -118,8 +118,8 @@ class NormalizarModelos:
             logger.warning("Dataset de treinamento vazio após consulta da tabela steam_geral.")
         else:
             logger.info(f"Colunas disponíveis no dataset de treino: {list(cls._var_dfDadosTreinamento.columns)}")
-            logger.info("Amostra head(10) dos dados de treinamento:")
-            logger.info("\n%s", cls._var_dfDadosTreinamento.head(10).to_string(index=False))
+            logger.debug("Amostra head(10) dos dados de treinamento:")
+            logger.debug("\n%s", cls._var_dfDadosTreinamento.head(10).to_string(index=False))
 
         return cls._var_dfDadosTreinamento
 
@@ -391,9 +391,9 @@ class NormalizarModelos:
             raise ValueError("Nenhuma amostra temporal foi gerada a partir de historico_preco.")
 
         logger.info(f"Amostras temporais criadas: {len(cls._var_dfAmostrasTemporais)}")
-        logger.info(f"Colunas das amostras temporais: {list(cls._var_dfAmostrasTemporais.columns)}")
-        logger.info("Amostra head(10) das amostras temporais:")
-        logger.info("\n%s", cls._var_dfAmostrasTemporais.head(10).to_string(index=False))
+        logger.debug(f"Colunas das amostras temporais: {list(cls._var_dfAmostrasTemporais.columns)}")
+        logger.debug("Amostra head(10) das amostras temporais:")
+        logger.debug("\n%s", cls._var_dfAmostrasTemporais.head(10).to_string(index=False))
         
         return cls._var_dfAmostrasTemporais
 
