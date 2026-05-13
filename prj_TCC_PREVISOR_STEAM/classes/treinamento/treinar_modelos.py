@@ -15,13 +15,14 @@ from sklearn.metrics import (
 import xgboost as xgb
 import lightgbm as lgb
 import pandas as pd
+import joblib
 from pathlib import Path
 from datetime import datetime
 import os
 
 import logging
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger("treino.modelos")
 
 class Treinar_Modelos:
     """
@@ -1145,10 +1146,85 @@ class Treinar_Modelos:
         
         logger.info(f"MELHOR MODELO REGRESSÃO: {var_strMelhorRegressor} (RMSE: {var_floatMelhorRMSE:.2f} dias)")
         
-        logger.info("=" * 80)
+        logger.info("="*80)
         logger.info("TREINAMENTO CONCLUÍDO COM SUCESSO")
         logger.info("Matrizes de confusão salvas em: resources/relatorios/")
-        logger.info("=" * 80)
+        logger.info("="*80)
+
+        # Persiste todos os modelos em disco (opt-out via ML_SALVAR_MODELOS=False)
+        try:
+            var_dictTodosModelos = {
+                "classificacao": {
+                    "LightGBM": var_dictLGBM,
+                    "XGBoost": var_dictXGB,
+                    "RandomForest": var_dictRF,
+                },
+                "regressao": {
+                    "LightGBM": var_dictRegLGB,
+                    "XGBoost": var_dictRegXGB,
+                    "LinearRegression": var_dictReg,
+                },
+            }
+            cls._salvar_modelos(var_dictTodosModelos)
+        except Exception as e:
+            logger.warning(f"Falha ao salvar modelos em disco: {e}")
+
+    @classmethod
+    def _salvar_modelos(cls, arg_dictModelos: dict) -> None:
+        """
+        Persiste todos os modelos treinados em resources/models/.
+
+        Salva cada modelo com timestamp e mantém uma cópia <nome>_latest.joblib
+        para facilitar o carregamento em predições futuras.
+        Controlável via variável de ambiente ML_SALVAR_MODELOS (padrão: True).
+
+        Parâmetros:
+        - arg_dictModelos (dict): Dicionário com estrutura:
+            {
+                "classificacao": {"<AlgoName>": {"modelo": <modelo>, ...}, ...},
+                "regressao":     {"<AlgoName>": {"modelo": <modelo>, ...}, ...},
+            }
+
+        Retorna:
+        - None
+        """
+        var_strSalvar = (os.getenv("ML_SALVAR_MODELOS", "True") or "True").strip().lower()
+        if var_strSalvar in ("0", "false", "no", "nao"):
+            logger.info("ML_SALVAR_MODELOS=False — modelos não serão salvos em disco.")
+            return
+
+        var_pathModels = Path(__file__).resolve().parents[2] / "resources" / "models"
+        var_pathModels.mkdir(parents=True, exist_ok=True)
+        var_strTimestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+
+        logger.info("="*60)
+        logger.info("SALVANDO MODELOS EM DISCO")
+        logger.info(f"Diretório: {var_pathModels}")
+        logger.info("="*60)
+
+        for var_strTipo, var_dictAlgos in arg_dictModelos.items():
+            for var_strAlgo, var_dictResultado in var_dictAlgos.items():
+                var_objModelo = var_dictResultado.get("modelo")
+                if var_objModelo is None:
+                    logger.warning(f"Modelo ausente para {var_strTipo}/{var_strAlgo}. Pulando.")
+                    continue
+
+                # Arquivo com timestamp (histórico)
+                var_strNomeArq = f"modelo_{var_strTipo}_{var_strAlgo}_{var_strTimestamp}.joblib"
+                var_pathArq = var_pathModels / var_strNomeArq
+                joblib.dump(var_objModelo, var_pathArq)
+                logger.info(f"Salvo: {var_strNomeArq}")
+
+                # Cópia _latest (para uso imediato em predições)
+                var_strNomeLatest = f"modelo_{var_strTipo}_{var_strAlgo}_latest.joblib"
+                var_pathLatest = var_pathModels / var_strNomeLatest
+                joblib.dump(var_objModelo, var_pathLatest)
+                logger.info(f"Atualizado: {var_strNomeLatest}")
+
+        logger.info("="*60)
+        logger.info("MODELOS SALVOS COM SUCESSO")
+        logger.info("="*60)
+
 
 if __name__ == "__main__":
     Treinar_Modelos.executar_treinamento()
