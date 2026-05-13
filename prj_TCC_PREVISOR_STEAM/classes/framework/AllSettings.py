@@ -62,12 +62,16 @@ class Settings:
         var_intBatchesSizeMin: int = int(os.getenv("STEAM_BATCH_SIZE_DETAILS_MIN", "10"))
         var_intBatchesSizeMax: int = int(os.getenv("STEAM_BATCH_SIZE_DETAILS_MAX", "200"))
         var_intDelayBetweenBatches: int = int(os.getenv("STEAM_DELAY_BETWEEN_BATCHES_DETAILS", "180"))
+        var_intRetryBackoffBase: int = int(os.getenv("STEAM_RETRY_BACKOFF_BASE_DETAILS", str(var_intDelayBetweenBatches)))
         var_intAsyncConcurrency: int = int(os.getenv("STEAM_ASYNC_CONCURRENCY_DETAILS", "1"))
         return {
             "BatchSize": var_intBatchesSize,
             "BatchSizeMin": var_intBatchesSizeMin,
             "BatchSizeMax": var_intBatchesSizeMax,
+            # Legacy key (kept for backward compatibility)
             "Delay": var_intDelayBetweenBatches,
+            "DelayBetweenBatches": var_intDelayBetweenBatches,
+            "RetryBackoffBase": var_intRetryBackoffBase,
             "Concurrency": var_intAsyncConcurrency
         }
 
@@ -81,10 +85,14 @@ class Settings:
         """
         var_intBatchesSize: int = int(os.getenv("STEAM_BATCH_SIZE_ITAD", "200"))
         var_intDelayBetweenBatches: int = int(os.getenv("STEAM_DELAY_BETWEEN_BATCHES_ITAD", "120"))
+        var_intRetryBackoffBase: int = int(os.getenv("STEAM_RETRY_BACKOFF_BASE_ITAD", str(var_intDelayBetweenBatches)))
         var_intAsyncConcurrency: int = int(os.getenv("STEAM_ASYNC_CONCURRENCY_ITAD", "1"))
         return {
             "BatchSize": var_intBatchesSize,
+            # Legacy key (kept for backward compatibility)
             "Delay": var_intDelayBetweenBatches,
+            "DelayBetweenBatches": var_intDelayBetweenBatches,
+            "RetryBackoffBase": var_intRetryBackoffBase,
             "Concurrency": var_intAsyncConcurrency
         }
     
@@ -98,10 +106,14 @@ class Settings:
         """
         var_intBatchesSize: int = int(os.getenv("STEAM_BATCH_SIZE_REVIEWS", "500"))
         var_intDelayBetweenBatches: int = int(os.getenv("STEAM_DELAY_BETWEEN_BATCHES_REVIEWS", "60"))
+        var_intRetryBackoffBase: int = int(os.getenv("STEAM_RETRY_BACKOFF_BASE_REVIEWS", str(var_intDelayBetweenBatches)))
         var_intAsyncConcurrency: int = int(os.getenv("STEAM_ASYNC_CONCURRENCY_REVIEWS", "3"))
         return {
             "BatchSize": var_intBatchesSize,
+            # Legacy key (kept for backward compatibility)
             "Delay": var_intDelayBetweenBatches,
+            "DelayBetweenBatches": var_intDelayBetweenBatches,
+            "RetryBackoffBase": var_intRetryBackoffBase,
             "Concurrency": var_intAsyncConcurrency
         }
 
@@ -215,7 +227,7 @@ class Settings:
         # Configuração básica do logging
         logging.basicConfig(
             level=var_intLogLevel,
-            format='%(asctime)s - %(levelname)s - %(message)s',
+            format='%(asctime)s - %(levelname)s - %(name)s - %(message)s',
             datefmt='%Y-%m-%d %H:%M:%S',
             handlers=[
                 logging.StreamHandler(),  # Output para console

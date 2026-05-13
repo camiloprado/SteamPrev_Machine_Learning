@@ -8,7 +8,7 @@ from time import sleep
 from typing import Generator
 import psycopg2, json, logging
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger("db.itad")
 
 class PostgreSQLITAD(PostgreSQL):
     """

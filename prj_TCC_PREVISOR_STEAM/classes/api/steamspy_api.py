@@ -2,7 +2,7 @@ from prj_TCC_PREVISOR_STEAM.classes.framework.AllSettings import Settings
 from datetime import datetime
 import asyncio, random, json, logging, os, aiohttp
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger("steamspy")
 
 # Adicionar fonte alternativa:
 STEAMSPY_ALL_URL = "https://steamspy.com/api.php?request=all&page={var_intPage}"  # API ativa

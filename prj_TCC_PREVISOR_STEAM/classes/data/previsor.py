@@ -12,7 +12,7 @@ from time import sleep
 import json, logging, asyncio, os
 from typing import Dict, Any
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger("previsor")
 
 class Previsor:
     """
@@ -92,18 +92,14 @@ class Previsor:
 
             # Itera sobre os aplicativos em lotes
             for i in range(var_intInicioCheckpoint, var_intTamanhoTotalFila, var_intRange):
-                logger.info(f"Processando aplicativos de {i + 1} a {min(i + var_intRange, var_intTamanhoTotalFila)} de {var_intTamanhoTotalFila}")
+                logger.info(f"\nProcessando aplicativos de {i + 1} a {min(i + var_intRange, var_intTamanhoTotalFila)} de {var_intTamanhoTotalFila}")
                 logger.info(f"Progresso: {(i/var_intTamanhoTotalFila)*100:.1f}%")
-                logger.info(f"Tempo estimado restante: {((var_intTamanhoTotalFila - i) / var_intRange) * 2} minutos")
-                logger.info(f"----------------------------------------")
                 
                 # Carrega os aplicativos atuais
                 if var_intAmbiente == "HML":
                     var_listAppIDAtual = var_listAppIDParaProcessar[i:i+int(os.getenv("BATCH_TESTE", 20))]
                 else:
                     var_listAppIDAtual = var_listAppIDParaProcessar[i:i+var_intRange]
-                
-                logger.info(f"Número de IDs a processar neste lote: {len(var_listAppIDAtual)}")
                 
                 # Busca detalhes dos jogos
                 asyncio.run(SteamClient.fetch_details_bulk_batched(arg_seqAppids=var_listAppIDAtual))

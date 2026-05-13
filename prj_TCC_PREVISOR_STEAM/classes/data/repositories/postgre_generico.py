@@ -7,7 +7,7 @@ from time import sleep
 from typing import Generator
 import psycopg2, json, logging
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger("db.core")
 
 class PostgreSQL:
     """
@@ -60,6 +60,9 @@ class PostgreSQL:
                 cls._var_connConnection = None
                 logger.error(f"Erro ao obter conexão do pool: {e}")
                 raise Exception(f"Erro ao obter conexão do pool: {e}")
+        else:
+            logger.debug("Conexão já estabelecida")
+            return cls._var_connConnection
         
     @classmethod
     def desconectar(cls, arg_connConnection = None):

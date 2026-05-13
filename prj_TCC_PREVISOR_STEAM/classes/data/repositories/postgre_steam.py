@@ -5,7 +5,7 @@ from datetime import datetime
 from psycopg2.extras import execute_batch, execute_values
 import json, logging
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger("db.steam")
 
 class PostgreSQLSteam(PostgreSQL):
     """

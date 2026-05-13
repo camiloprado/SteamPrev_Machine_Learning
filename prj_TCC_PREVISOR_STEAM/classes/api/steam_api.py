@@ -3,7 +3,8 @@ from prj_TCC_PREVISOR_STEAM.classes.framework.AllSettings import Settings
 from prj_TCC_PREVISOR_STEAM.classes.data.repositories.postgre_generico import PostgreSQL
 
 from typing import Sequence
-from datetime import datetime
+from datetime import datetime, timezone
+from email.utils import parsedate_to_datetime
 import asyncio, random, logging, aiohttp, traceback
 from dotenv import load_dotenv
 
@@ -21,7 +22,8 @@ class SteamClient:
     """
     Cliente para interagir com a Steam API.
     """
-    _var_intDelay = 180
+    _var_intDelayBetweenBatches = 0
+    _var_intRetryBackoffBase = 0
     _var_intProcessados = 0
 
     # ------------------- Async bulk details com batches -------------------
@@ -37,25 +39,24 @@ class SteamClient:
         Retorna:
         - var_dictAllResults (dict): Um dicionário com todos os detalhes dos jogos.
         """
+        logger = logging.getLogger("steam.details")
         var_dictConfigAPI = Settings.steam_api_details()
         var_intBatchSizeInicial = var_dictConfigAPI.get("BatchSize", 50)
         var_intBatchSizeMin = var_dictConfigAPI.get("BatchSizeMin", 10)
         var_intBatchSizeMax = var_dictConfigAPI.get("BatchSizeMax", 200)
         var_intBatchSize = var_intBatchSizeInicial
-        cls._var_intDelay = var_dictConfigAPI.get("Delay", 180)
+        cls._var_intDelayBetweenBatches = var_dictConfigAPI.get("DelayBetweenBatches", var_dictConfigAPI.get("Delay", 180))
+        cls._var_intRetryBackoffBase = var_dictConfigAPI.get("RetryBackoffBase", cls._var_intDelayBetweenBatches)
         var_intAsyncConcurrency = var_dictConfigAPI.get("Concurrency", 1)
         var_intTentativaMaxima = var_dictConfigAPI.get("max_tentativas", 3)
         var_intTotalItems = len(arg_seqAppids)
         var_intTotalBatchesEstimado = (var_intTotalItems + var_intBatchSize - 1) // var_intBatchSize
-        logger.info(f"")
-        logger.info(f"=== PROCESSAMENTO EM BATCHES ===")
-        logger.info(f"Total de itens: {var_intTotalItems:,}")
-        logger.info(f"Tamanho do batch inicial: {var_intBatchSize:,}")
-        logger.info(f"Batches estimados: {var_intTotalBatchesEstimado} (pode variar com adaptive sizing)")
-        logger.info(f"Delay entre batches: {cls._var_intDelay}s")
-        logger.info(f"Concorrência por batch: {var_intAsyncConcurrency}")
-        logger.info(f"Tempo Estimado para conclusão total do Batch: {(var_intTotalBatchesEstimado * cls._var_intDelay)/60:.1f} minutos")
-        logger.info(f"================================\n")
+        logger.info(
+            "STEAM DETALHES (batches): "
+            f"Total itens={var_intTotalItems:,} Tamanho batch={var_intBatchSize:,} Total batches={var_intTotalBatchesEstimado} (estimado) "
+            f"Concorrência={var_intAsyncConcurrency} delayBatch={cls._var_intDelayBetweenBatches}s "
+            f"Tempo estimado={(var_intTotalBatchesEstimado * cls._var_intDelayBetweenBatches)/60:.1f}m"
+        )
         
         var_intCurrentIndex = 0
         var_intBatchNum = 0
@@ -66,7 +67,11 @@ class SteamClient:
             var_listBatch = arg_seqAppids[var_intStart:var_intEnd]
             var_intBatchNum += 1
             
-            logger.info(f"Batch {var_intBatchNum} (size={var_intBatchSize}) - Processando itens {var_intStart + 1} a {var_intEnd} ({len(var_listBatch)} itens)...")
+            logger.info(
+                "DETALHES batch "
+                f"{var_intBatchNum}/{var_intTotalBatchesEstimado}: itens {var_intStart + 1}-{var_intEnd} "
+                f"(n={len(var_listBatch)})"
+            )
             
             # Processa o batch atual e recebe estatísticas
             var_listBatchResults, var_dictBatchStats = await cls.fetch_details_bulk(var_listBatch)
@@ -93,26 +98,38 @@ class SteamClient:
             var_floatTaxaSucesso = var_dictBatchStats["taxa_efetiva"]
 
             # Log detalhado com valores corretos
-            logger.info(f"Batch {var_intBatchNum}: {len(var_listDetails)} sucessos, {var_intAusentes} ausentes, {var_intErrosReais} erros")
+            logger.info(
+                "DETALHES batch "
+                f"{var_intBatchNum}/{var_intTotalBatchesEstimado} resultado: "
+                f"sucesso={len(var_listDetails)} ausente={var_intAusentes} erros={var_intErrosReais} "
+                f"taxa={var_floatTaxaSucesso:.1%}"
+            )
 
             # Ajusta batch size dinamicamente
             if var_floatTaxaSucesso > 0.95:  # >95% sucesso - aumenta batch
                 var_intNovoSize = min(int(var_intBatchSize * 1.2), var_intBatchSizeMax)
                 if var_intNovoSize != var_intBatchSize:
-                    logger.info(f"Taxa {var_floatTaxaSucesso:.1%} (excluiu {var_intAusentes} ausentes) - "
-                        f"Aumentando: {var_intBatchSize} → {var_intNovoSize}")
+                    logger.debug(
+                        "DETALHES ajuste batchSize: "
+                        f"{var_intBatchSize} → {var_intNovoSize} (taxa={var_floatTaxaSucesso:.1%})"
+                    )
                     var_intBatchSize = var_intNovoSize
             elif var_floatTaxaSucesso < 0.70:  # <70% sucesso - reduz batch
                 var_intNovoSize = max(int(var_intBatchSize * 0.5), var_intBatchSizeMin)
                 if var_intNovoSize != var_intBatchSize:
-                    logger.warning(f"Taxa {var_floatTaxaSucesso:.1%} (excluiu {var_intAusentes} ausentes) - "
-                        f"Reduzindo: {var_intBatchSize} → {var_intNovoSize}")
+                    logger.warning(
+                        "DETALHES ajuste batchSize: "
+                        f"{var_intBatchSize} → {var_intNovoSize} (taxa={var_floatTaxaSucesso:.1%})"
+                    )
                     var_intBatchSize = var_intNovoSize
             
             # Insere os dados no PostgreSQL
             if var_listDetails:
                 PostgreSQLSteam.inserir_dadosSteamRaw_Bulk(arg_listDados=var_listDetails)
-                logger.info(f"Dados de detalhes inseridos com sucesso no PostgreSQL ({len(var_listDetails)} registros).")
+                logger.debug(
+                    "DETALHES inseridos no PostgreSQL: "
+                    f"registros={len(var_listDetails)}"
+                )
             else:
                 logger.warning("Nenhum dado válido para inserir neste batch.")
 
@@ -121,12 +138,15 @@ class SteamClient:
             
             # Aguarda entre batches (exceto no último)
             if var_intCurrentIndex < var_intTotalItems:
-                logger.info(f"Progresso: {var_intCurrentIndex:,}/{var_intTotalItems:,} ({var_intCurrentIndex/var_intTotalItems:.1%}).\n")
+                logger.debug(
+                    "DETALHES progresso: "
+                    f"{var_intCurrentIndex:,}/{var_intTotalItems:,} ({var_intCurrentIndex/var_intTotalItems:.1%})"
+                )
                 
-        logger.info(f"===========PROCESSAMENTO COMPLETO! (Detalhes)==========")
-        logger.info(f"Total de batches executados: {var_intBatchNum}")
-        logger.info(f"Total de itens processados: {var_intCurrentIndex:,} de {var_intTotalItems:,}")
-        logger.info(f"================================\n")
+        logger.info(
+            "STEAM DETALHES concluído: "
+            f"batches={var_intBatchNum} itens={var_intCurrentIndex:,}/{var_intTotalItems:,}"
+        )
 
     # ------------------- Método auxiliar para retry -------------------
     @classmethod
@@ -143,33 +163,69 @@ class SteamClient:
         Retorna:
         - dict | None: Dados do jogo ou None se falhar.
         """
+        logger = logging.getLogger(f"steam.{arg_strTipo}")
         if arg_strTipo == 'detalhes':
             url = f"{STEAM_DETAILS_URL}?appids={arg_intAppid}"
         elif arg_strTipo == 'reviews':
             url = STEAM_REVIEWS_URL.format(appid=arg_intAppid)
+
+        def _parse_retry_after_seconds(arg_resp: aiohttp.ClientResponse) -> int | None:
+            var_strRetryAfter = arg_resp.headers.get("Retry-After")
+            if not var_strRetryAfter:
+                return None
+
+            var_strRetryAfter = var_strRetryAfter.strip()
+
+            try:
+                var_floatSeconds = float(var_strRetryAfter)
+                if var_floatSeconds < 0:
+                    return None
+                return max(1, int(var_floatSeconds))
+            except ValueError:
+                pass
+
+            try:
+                var_dateRetryAt = parsedate_to_datetime(var_strRetryAfter)
+                if var_dateRetryAt.tzinfo is None:
+                    var_dateRetryAt = var_dateRetryAt.replace(tzinfo=timezone.utc)
+                var_dateNow = datetime.now(timezone.utc)
+                var_intSeconds = int((var_dateRetryAt - var_dateNow).total_seconds())
+                return max(1, var_intSeconds)
+            except Exception:
+                return None
             
         for var_intAttempt in range(arg_intMaxRetries):
             try:
                 async with arg_clientSession.get(url) as resp:
                     if resp.status == 429:
-                        var_intWaitTime = (2 ** var_intAttempt) * cls._var_intDelay  # 120s, 240s, 480s
-                        logger.info(f"Processou {cls._var_intProcessados} do Batch.")
-                        logger.warning(f"AppID {arg_intAppid}: 429 na tentativa {var_intAttempt+1}/{arg_intMaxRetries}. Aguardando {var_intWaitTime}s...")
+                        var_intWaitTime = _parse_retry_after_seconds(resp)
+                        if var_intWaitTime is None:
+                            var_intWaitTime = (2 ** var_intAttempt) * cls._var_intRetryBackoffBase
+                        logger.warning(
+                            f"STEAM retry ({arg_strTipo}) id={arg_intAppid} status=429 "
+                            f"tentativa={var_intAttempt+1}/{arg_intMaxRetries} espera={var_intWaitTime}s"
+                        )
                         await asyncio.sleep(var_intWaitTime)
                         continue
                     if resp.status == 502:
-                        var_intWaitTime = (2 ** var_intAttempt) * cls._var_intDelay  # 120s, 240s, 480s
-                        logger.warning(f"AppID {arg_intAppid}: 502 na tentativa {var_intAttempt+1}/{arg_intMaxRetries}. Aguardando {var_intWaitTime}s...")
+                        var_intWaitTime = (2 ** var_intAttempt) * cls._var_intRetryBackoffBase
+                        logger.warning(
+                            f"STEAM retry ({arg_strTipo}) id={arg_intAppid} status=502 "
+                            f"tentativa={var_intAttempt+1}/{arg_intMaxRetries} espera={var_intWaitTime}s"
+                        )
                         await asyncio.sleep(var_intWaitTime)
                         continue
                     elif resp.status == 200:
                         return await resp.json()
                     else:
-                        logger.warning(f"AppID {arg_intAppid}: Status {resp.status} na tentativa {var_intAttempt+1}")
+                        logger.debug(
+                            f"STEAM resposta id={arg_intAppid} status={resp.status} "
+                            f"tentativa={var_intAttempt+1}"
+                        )
                         return None
             except Exception as e:
                 if var_intAttempt == arg_intMaxRetries - 1:
-                    logger.error(f"AppID {arg_intAppid}: Falha após {arg_intMaxRetries} tentativas - {e}")
+                    logger.error(f"STEAM retry id={arg_intAppid}: Falha após {arg_intMaxRetries} tentativas - {e}")
                     return None
                 await asyncio.sleep(5)  # Espera 5s entre tentativas com erro
         return None
@@ -188,6 +244,7 @@ class SteamClient:
             - var_listResults (list[dict]): Lista de dicionários com os detalhes dos jogos (sem ausentes).
             - var_dictStats (dict): Estatísticas do processamento (sucessos, ausentes, erros, taxa_efetiva).
         """
+        logger = logging.getLogger("steam.details")
         try:
             load_dotenv()
             var_dictConfigAPI = Settings.steam_api_details()
@@ -464,11 +521,14 @@ class SteamClient:
                 timeout=var_timeout
             ) as var_respSession:
                 var_listTasks = [asyncio.create_task(worker(var_respSession, var_intAppid)) for var_intAppid in arg_seqAppids]
-                logger.info(f"Iniciando busca de 'DETALHES' assíncrona para {len(var_listTasks)} AppIDs com concorrência {var_intAsyncConcurrency}...")
+                logger.debug(
+                    "DETALHES async start: "
+                    f"tasks={len(var_listTasks)} conc={var_intAsyncConcurrency}"
+                )
                 
                 # Aguarda a conclusão de todas as tarefas
                 var_listOut = await asyncio.gather(*var_listTasks, return_exceptions=True)
-                logger.info("Busca assíncrona concluída.")
+                logger.debug("DETALHES async done")
 
             # Filtra a lista de forma segura
             var_listOut = [item for item in var_listOut if item is not None]
@@ -481,16 +541,17 @@ class SteamClient:
             var_intTotalProcessavel = var_intTotal - var_intAusentes
             var_floatTaxaSucesso = var_intSucesso / var_intTotalProcessavel if var_intTotalProcessavel != 0 else 1
 
-            logger.info(f"{'='*50}")
-            logger.info(f" Sucessos: {var_intSucesso} ({var_intSucesso/var_intTotal:.1%})")
-            logger.info(f" AUSENTES: {var_intAusentes} ({var_intAusentes/var_intTotal:.1%}) ← Jogos não existem na store")
-            logger.info(f" Erros: {var_intErrosReais} ({var_intErrosReais/var_intTotal:.1%}) ← Erros HTTPs")
-            if var_intErrosReais > 0:
-                logger.info(f"   - 429 Too Many: {var_intErrosTooManyRequests} ({var_intErrosTooManyRequests/var_intErrosReais:.1%} dos erros)")
-                logger.info(f"   - Timeout: {var_intErrosTimeout} ({var_intErrosTimeout/var_intErrosReais:.1%} dos erros)")
-            logger.info(f" Taxa Efetiva: {var_intSucesso}/{var_intTotalProcessavel if var_intTotalProcessavel != 0 else 1} = "
-                f"{var_floatTaxaSucesso:.1%} ← Base para ajuste de batch")
-            logger.info(f"{'='*50}")
+            logger.info(
+                "DETALHES async resumo: "
+                f"sucesso={var_intSucesso} ausente={var_intAusentes} erros={var_intErrosReais} "
+                f"taxa={var_floatTaxaSucesso:.1%} http429={var_intErrosTooManyRequests} "
+                f"timeout={var_intErrosTimeout}"
+            )
+            logger.debug(
+                "DETALHES async detalhes: "
+                f"http={var_intErrosHTTP} (403={var_intErrosForbidden}, 429={var_intErrosTooManyRequests}) "
+                f"timeout={var_intErrosTimeout} outros={var_intErrosOutros}"
+            )
             
             # Filtra apenas dados válidos antes de retornar
             var_listValidData = []
@@ -533,30 +594,33 @@ class SteamClient:
         Retorna:
         - var_dictAllResults (dict): Um dicionário mapeando appids para seus resumos de reviews.
         """
+        logger = logging.getLogger("steam.reviews")
         var_dictConfigAPI = Settings.steam_api_reviews()
         var_intBatchSize = var_dictConfigAPI.get("BatchSize", 200)
-        cls._var_intDelay = var_dictConfigAPI.get("Delay", 120)
+        cls._var_intDelayBetweenBatches = var_dictConfigAPI.get("DelayBetweenBatches", var_dictConfigAPI.get("Delay", 120))
+        cls._var_intRetryBackoffBase = var_dictConfigAPI.get("RetryBackoffBase", cls._var_intDelayBetweenBatches)
         var_intAsyncConcurrency = var_dictConfigAPI.get("Concurrency", 1)
         var_intTotalItems = len(arg_seqAppids)
         var_intTotalBatches = (var_intTotalItems + var_intBatchSize - 1) // var_intBatchSize
         var_intTentativaMaxima = var_dictConfigAPI.get("max_tentativas", 3)
 
-        logger.info(f"")
-        logger.info(f"=== PROCESSAMENTO EM BATCHES (REVIEWS) ===")
-        logger.info(f"Total de itens: {var_intTotalItems:,}")
-        logger.info(f"Tamanho do batch: {var_intBatchSize:,}")
-        logger.info(f"Total de batches: {var_intTotalBatches}")
-        logger.info(f"Delay entre batches: {cls._var_intDelay}s")
-        logger.info(f"Concorrência por batch: {var_intAsyncConcurrency}")
-        logger.info(f"Tempo Estimado para conclusão total do Batch: {(var_intTotalBatches * cls._var_intDelay)/60:.1f} minutos")
-        logger.info(f"==========================================\n")
+        logger.info(
+            "STEAM REVIEWS (batches): "
+            f"Total itens={var_intTotalItems:,} Tamanho batch={var_intBatchSize:,} Total batches={var_intTotalBatches} (estimado)"
+            f"Concorrência={var_intAsyncConcurrency} delayBatch={cls._var_intDelayBetweenBatches}s "
+            f"Tempo estimado={(var_intTotalBatches * cls._var_intDelayBetweenBatches)/60:.1f}m"
+        )
         
         for var_intBatchNum in range(var_intTotalBatches):
             var_intStart = var_intBatchNum * var_intBatchSize
             var_intEnd = min(var_intStart + var_intBatchSize, var_intTotalItems)
             var_listBatch = arg_seqAppids[var_intStart:var_intEnd]
 
-            logger.debug(f"Batch {var_intBatchNum + 1}/{var_intTotalBatches} - Processando itens {var_intStart + 1} a {var_intEnd} ({len(var_listBatch)} itens)...")
+            logger.info(
+                "REVIEWS batch "
+                f"{var_intBatchNum + 1}/{var_intTotalBatches}: itens {var_intStart + 1}-{var_intEnd} "
+                f"(n={len(var_listBatch)})"
+            )
 
             # Processa o batch atual
             var_listBatchResults = await cls.fetch_reviews_summary(var_listBatch)
@@ -582,17 +646,23 @@ class SteamClient:
 
             # Log detalhado do batch
             var_intErrosReais = len(var_listBatch) - len(var_listReviews) - var_intAusentesReviews
-            logger.info(f"Batch {var_intBatchNum + 1}: {len(var_listReviews)} sucessos, {var_intAusentesReviews} ausentes, {var_intErrosReais} erros")
+            logger.info(
+                "REVIEWS batch "
+                f"{var_intBatchNum + 1}/{var_intTotalBatches} resultado: "
+                f"sucesso={len(var_listReviews)} ausente={var_intAusentesReviews} erros={var_intErrosReais}"
+            )
 
             # Insere os dados no PostgreSQL
             if var_listReviews:
                 PostgreSQLSteam.inserir_dadosSteamRaw_Bulk(arg_listDados=var_listReviews)
-                logger.info(f"Dados de reviews inseridos com sucesso no PostgreSQL ({len(var_listReviews)} registros).")
+                logger.debug(
+                    "REVIEWS inseridos no PostgreSQL: "
+                    f"registros={len(var_listReviews)}"
+                )
             else:
                 logger.warning("Nenhum dado válido para inserir neste batch.")
 
-        logger.info(f"===========PROCESSAMENTO COMPLETO! (Reviews)==========")
-        logger.info(f"Total processado: {var_intTotalItems:,} itens.")
+        logger.info(f"STEAM REVIEWS concluído: itens={var_intTotalItems:,}")
         return None
     
     # ------------------- Async reviews summary -------------------
@@ -607,6 +677,7 @@ class SteamClient:
         Retorna:
         - var_dictResult (dict): Um dicionário mapeando appids para seus resumos de reviews.
         """
+        logger = logging.getLogger("steam.reviews")
         try:
             var_dictConfigAPI = Settings.steam_api_reviews()
             var_intAsyncConcurrency = var_dictConfigAPI.get("Concurrency", 1)
@@ -717,7 +788,9 @@ class SteamClient:
                                 var_intErrosForbidden += 1
                             elif e_http.status == 429:
                                 # Erro 429: Tenta retry com backoff exponencial
-                                logger.debug(f"AppID {arg_intAppid}: 429 detectado em reviews, iniciando retry com backoff...")
+                                logger.debug(
+                                    f"REVIEWS 429 detectado id={arg_intAppid}, iniciando retry"
+                                )
                                 var_dictRetryData = await cls._retry_with_backoff(arg_clientSession, arg_intAppid, arg_intMaxRetries=3, arg_strTipo='reviews')
                                 if var_dictRetryData:
                                     # Sucesso no retry - processa os dados
@@ -727,12 +800,15 @@ class SteamClient:
                                             var_dictSummary = dict(var_dictSummary)
                                             var_dictSummary["appid"] = arg_intAppid
                                             cls._var_intProcessados += 1
-                                            logger.info(f"AppID {arg_intAppid}: SUCESSO após retry em reviews")
+                                            logger.debug(f"REVIEWS retry sucesso id={arg_intAppid}")
 
                                             return var_dictSummary
                                 # Falha no retry
-                                logger.warning(f"AppID {arg_intAppid}: Falha após retries em reviews.")
-                                logger.error(f"Erro:\n{e_http.status} - {e_http.message if hasattr(e_http, 'message') else str(e_http)}")
+                                logger.warning(f"REVIEWS retry falhou id={arg_intAppid}")
+                                logger.debug(
+                                    f"REVIEWS erro http id={arg_intAppid}: {e_http.status} - "
+                                    f"{e_http.message if hasattr(e_http, 'message') else str(e_http)}"
+                                )
                                 var_intErrosTooManyRequests += 1
                         return None
                     except asyncio.TimeoutError:
@@ -760,11 +836,14 @@ class SteamClient:
                 timeout=var_timeout
             ) as var_respSession:
                 var_listTasks = [asyncio.create_task(worker(var_respSession, var_intAppid)) for var_intAppid in arg_seqAppids]
-                logger.info(f"Iniciando busca de 'REVIEWS' assíncrona para {len(var_listTasks)} AppIDs com concorrência {var_intAsyncConcurrency}...")
+                logger.debug(
+                    "REVIEWS async start: "
+                    f"tasks={len(var_listTasks)} conc={var_intAsyncConcurrency}"
+                )
                 
                 # Aguarda a conclusão de todas as tarefas
                 var_listOut = await asyncio.gather(*var_listTasks, return_exceptions=True)
-                logger.info("Busca assíncrona concluída.")
+                logger.debug("REVIEWS async done")
             
             # Filtra os resultados válidos e os retorna
             var_dictResult: dict[int, dict] = {}
@@ -786,17 +865,19 @@ class SteamClient:
             var_intSucesso = len(var_listReviews)
             var_intErrosReais = var_intTotal - var_intSucesso - var_intAusentes
             
-            logger.info(f"{'='*50}")
-            logger.info(f" Sucessos: {var_intSucesso} ({var_intSucesso/var_intTotal:.1%})")
-            logger.info(f"  AUSENTES: {var_intAusentes} ({var_intAusentes/var_intTotal:.1%}) ← Jogos sem reviews")
-            logger.info(f" Erros: {var_intErrosReais} ({var_intErrosReais/var_intTotal:.1%}) ← Erros HTTPs")
-            if var_intErrosReais > 0:
-                logger.info(f"   - 429 Too Many: {var_intErrosTooManyRequests} ({var_intErrosTooManyRequests/var_intErrosReais:.1%} dos erros)")
-                logger.info(f"   - Timeout: {var_intErrosTimeout} ({var_intErrosTimeout/var_intErrosReais:.1%} dos erros)")
             var_intTotalProcessavel = var_intTotal - var_intAusentes
             var_floatTaxaEfetiva = var_intSucesso / var_intTotalProcessavel if var_intTotalProcessavel != 0 else 1
-            logger.info(f" Taxa Efetiva: {var_intSucesso}/{var_intTotalProcessavel if var_intTotalProcessavel != 0 else 1} = {var_floatTaxaEfetiva:.1%}")
-            logger.info(f"{'='*50}")
+            logger.info(
+                "REVIEWS async resumo: "
+                f"sucesso={var_intSucesso} ausente={var_intAusentes} erros={var_intErrosReais} "
+                f"taxa={var_floatTaxaEfetiva:.1%} http429={var_intErrosTooManyRequests} "
+                f"timeout={var_intErrosTimeout}"
+            )
+            logger.debug(
+                "REVIEWS async detalhes: "
+                f"http={var_intErrosHTTP} (403={var_intErrosForbidden}, 429={var_intErrosTooManyRequests}) "
+                f"timeout={var_intErrosTimeout} outros={var_intErrosOutros}"
+            )
             return var_listReviews
         
         except Exception as e:

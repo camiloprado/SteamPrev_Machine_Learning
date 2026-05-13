@@ -18,7 +18,7 @@ import re, logging
 import unicodedata
 from datetime import datetime
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger("etl")
 
 class ProcessadorETL:
     """

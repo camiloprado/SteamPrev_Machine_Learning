@@ -1,4 +1,7 @@
 {
+    "python.defaultInterpreterPath": "${workspaceFolder}\\.venv\\Scripts\\python.exe",
+    "python.envFile": "${workspaceFolder}\\.env",
+    "python.terminal.activateEnvironment": true,
     "python.testing.pytestArgs": [
         "prj_TCC_PREVISOR_STEAM"
     ],

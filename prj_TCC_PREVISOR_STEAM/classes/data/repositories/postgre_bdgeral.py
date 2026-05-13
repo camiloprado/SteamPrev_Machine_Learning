@@ -4,7 +4,7 @@ from prj_TCC_PREVISOR_STEAM.classes.data.repositories.postgre_generico import Po
 from psycopg2.extras import execute_batch, execute_values
 import json, logging
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger("db.bdgeral")
 
 class PostgreSQLBDGeral(PostgreSQL):
     """
