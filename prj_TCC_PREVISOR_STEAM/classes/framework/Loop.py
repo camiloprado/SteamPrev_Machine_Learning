@@ -4,7 +4,7 @@ from prj_TCC_PREVISOR_STEAM.classes.utils.GetTask import GetTask
 from prj_TCC_PREVISOR_STEAM.classes.framework.Process import Process
 import logging
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger("framework.loop")
 
 class Loop:
     """
@@ -30,11 +30,9 @@ class Loop:
         while len(var_listFila) > 0:
             for var_intTentativa in range(Settings._var_dictSettings["max_tentativas"]):
                 try:
-                    # Lógica para executar a tarefa
                     Process.execute()
                     var_listFila.pop(0)
                     logger.info(f"Tarefa concluída. Tarefas restantes: {len(var_listFila)}")
-                    
                 except Exception as e:
                     var_strTraceback = e.__traceback__
                     if var_intTentativa == Settings._var_dictSettings["max_tentativas"] - 1:

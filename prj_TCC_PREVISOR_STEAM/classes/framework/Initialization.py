@@ -4,7 +4,7 @@ from prj_TCC_PREVISOR_STEAM.classes.framework.InitApplication import InitApplica
 
 import logging
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger("framework.init")
 
 class Initialization:
     """
