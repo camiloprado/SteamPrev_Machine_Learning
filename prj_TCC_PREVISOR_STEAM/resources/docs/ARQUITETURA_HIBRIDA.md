@@ -1,97 +1,118 @@
-# Arquitetura de Dados e Execucao
+# Arquitetura de Dados e Execução
 
 ## Objetivo desta arquitetura
 
 A arquitetura do projeto foi desenhada para processar alto volume de dados de jogos com foco em:
-- estabilidade de execucao
+- estabilidade de execução
 - reprocessamento controlado
-- separacao entre coleta, ETL e treinamento
+- separação entre coleta, ETL e treinamento
+- resiliência via checkpoint e retry com backoff
 
-## Visao geral
+## Visão geral
 
 ```text
 Fontes externas
   -> Steam API / SteamSpy / ITAD
 Coleta assíncrona
-  -> clients em classes/api
-Persistencia operacional
-  -> PostgreSQL local (Docker quando habilitado)
+  -> clients em classes/api/
+Persistência operacional
+  -> PostgreSQL local (Docker)
 Processamento
-  -> ETL + limpeza + unificacao
+  -> ETL + limpeza + unificação
 Treinamento ML
-  -> modelos de classificacao e regressao
+  -> modelos de classificação e regressão
+Saída
+  -> resources/relatorios/ (métricas, plots)
+  -> resources/models/ (modelos .joblib)
 ```
 
 ## Camadas do sistema
 
-### 1) Orquestracao
+### 1) Orquestração
 
-Pasta principal: classes/framework
+Pasta: `classes/framework/`
 
-- Initialization: bootstrap do sistema
-- Loop: ciclo de tarefas
-- End: finalizacao
-- AllSettings: configuracao de ambiente, log e API
+- `InitApplication.py`: bootstrap — inicia Docker, atualiza índice de apps (SteamSpy), cria fila
+- `Loop.py`: ciclo de tarefas — consome a fila e chama Process a cada iteração
+- `Process.py`: **pipeline completo** — coleta Steam, ETL, ITAD lookup, histórico de preços, treinamento ML
+- `End.py`: finalização e cleanup
+- `AllSettings.py`: configuração de ambiente, log e API
 
-### 2) Integracao com APIs
+### 2) Integração com APIs
 
-Pasta principal: classes/api
+Pasta: `classes/api/`
 
-- steam_api.py: detalhes e reviews
-- steamspy_api.py: fallback da listagem de apps
-- itad_api.py: lookup e historico de preco
-- local_steam.py: cache local de app list
+- `steam_api.py`: detalhes e reviews (detalhes batch assíncrono, retry 3x com 240s)
+- `steamspy_api.py`: fallback da listagem de apps (paralelização de 20 páginas simultâneas)
+- `itad_api.py`: lookup e histórico de preço
+- `local_steam.py`: cache local de app list (`resources/dados/steam_applist.json`)
 
-### 3) Persistencia
+### 3) Persistência
 
-Pastas principais: classes/data/repositories
+Pasta: `classes/data/repositories/`
 
-- steam_raw: dados de origem
-- steam_generico: indice operacional
-- itad_raw: dados ITAD
-- steam_itad_mapping: mapeamento Steam x ITAD
-- steam_geral: base unificada para treinamento
-- processing_checkpoint: retomada de execucao por etapa
+- `postgre_steam.py`: operações em `steam_raw` e `steam_generico`
+- `postgre_itad.py`: operações em `itad_raw` e `steam_itad_mapping`
+- `postgre_generico.py`: pool de conexões compartilhado e operações gerais
+- `postgre_bdgeral.py`: tabela `steam_geral` (base unificada para ML)
+- `postgre_checkpoint.py`: sistema de checkpoint por tipo (STEAM, ITAD) e PC_ID
+
+Tabelas no banco:
+- `steam_generico` — índice operacional de AppIDs
+- `steam_raw` — dados brutos JSONB (detalhes + reviews)
+- `steam_unificado` — dados ETL estruturados (fonte principal de ML)
+- `itad_raw` — histórico de preços ITAD
+- `steam_itad_mapping` — mapeamento Steam ↔ ITAD
+- `processing_checkpoint` — retomada de execução por etapa
 
 ### 4) ETL e limpeza
 
-- classes/limpeza/ProcessadorETL.py
-- classes/scripts/ProcessadorLimpeza.py
-- classes/limpeza/* (regras por atributo)
+- `classes/limpeza/ProcessadorETL.py` — orquestração ETL (steam_raw → steam_unificado)
+- `classes/limpeza/limpeza_dados.py` — regras de limpeza por domínio
+- `classes/data/previsor.py` — alimentação dos bancos raw (Steam e ITAD)
 
 ### 5) Machine Learning
 
-Pasta principal: classes/treinamento
+Pasta: `classes/treinamento/`
 
-- treinamento.py
-- ProcessadorTreinamento.py
-- treinar_modelos.py
+- `treinar_modelos.py` — classe `Treinar_Modelos` (LightGBM, XGBoost, RF, Regressão Linear)
+- `normalizar_modelos.py` — normalização dos dados e splits treino/teste
+- `ProcessadorTreinamento.py` — orquestrador de alto nível chamado pelo `Process`
+- `treinamento.py` — classe `TreinarModelo` com pipeline de feature engineering
 
 Modelos utilizados:
-- LightGBM
-- XGBoost
-- Random Forest
-- Regressao linear
+- LightGBM (classificação + regressão)
+- XGBoost (classificação + regressão)
+- Random Forest (classificação)
+- Regressão Linear (regressão)
 
-## Fluxo de execucao (alto nivel)
+Saída após treinamento:
+- `resources/relatorios/` — CSVs e PNGs (matrizes de confusão, resíduos, predito vs real)
+- `resources/models/` — arquivos `.joblib` com timestamp e cópia `_latest`
 
-1. Carga da lista de apps (com fallback local/SteamSpy)
-2. Identificacao de AppIDs pendentes/desatualizados
-3. Coleta dos dados Steam e ITAD
-4. ETL para base consolidada
-5. Atualizacao de steam_geral
-6. Treinamento automatico quando aplicavel
+## Fluxo de execução (alto nível)
 
-## Estado recente observado no log
+```
+InitApplication.execute()
+  └─ Settings.start_docker_postgres()         # garante container healthy
+  └─ GetTask.abandona_fila()                  # limpa fila anterior
+  └─ GetTask.criar_fila()
+       └─ LocalClient.find_app_list()         # busca lista de apps (SteamSpy fallback)
+       └─ PostgreSQLSteam.inserir_dadosSteamGenerico()  # atualiza steam_generico
+       └─ _var_listTaskQueue = [1]            # 1 tarefa na fila
 
-Arquivo: resources/logs/app.log
+Loop.execute()
+  └─ while fila não vazia:
+       └─ Process.execute()                   # pipeline completo por iteração
+            ├─ Etapa 1: alimentar_banco_dados_raw_docker()   # coleta Steam
+            ├─ Etapa 2: ProcessadorETL.processar_lote_unificado()  # ETL
+            ├─ Etapa 3: alimentar_banco_dados_ITAD_docker()  # ITAD lookup
+            ├─ Etapa 4: alimentar_ITAD_historico_precos()    # histórico
+            └─ Etapa 5: ProcessadorTreinamento.executar_treinamento()  # ML
+```
 
-Pontos importantes da execucao mais recente observada:
-- fallback de endpoint Steam funcionando
-- ocorrencias de indisponibilidade de Docker em algumas execucoes
-- treinamento iniciado com base steam_geral carregada
-- falha pontual por variavel local nao inicializada em alimentar_tabela_Geral
+## Observação sobre suporte multi-PC
 
-## Observacao sobre documento legado
+O sistema suporta distribuição via variáveis `PC_ID` e `TOTAL_PCS` no `.env`.
+O checkpoint garante que cada PC retome do ponto onde parou sem reprocessar AppIDs já concluídos.
 
-Este arquivo substitui a visao antiga de arquitetura hibrida com Supabase como caminho principal. O fluxo operacional atual observado no codigo e no log e centrado em PostgreSQL local.
