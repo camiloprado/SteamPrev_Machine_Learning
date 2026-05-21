@@ -92,7 +92,7 @@ class Previsor:
 
             # Itera sobre os aplicativos em lotes
             for i in range(var_intInicioCheckpoint, var_intTamanhoTotalFila, var_intRange):
-                logger.info(f"\nProcessando aplicativos de {i + 1} a {min(i + var_intRange, var_intTamanhoTotalFila)} de {var_intTamanhoTotalFila}")
+                logger.info(f"Processando aplicativos de {i + 1} a {min(i + var_intRange, var_intTamanhoTotalFila)} de {var_intTamanhoTotalFila}")
                 logger.info(f"Progresso: {(i/var_intTamanhoTotalFila)*100:.1f}%")
                 
                 # Carrega os aplicativos atuais

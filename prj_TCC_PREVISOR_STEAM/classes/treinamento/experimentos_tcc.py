@@ -9,6 +9,7 @@ pip install optuna shap fastapi uvicorn streamlit jupyter nbformat
 
 import os
 import logging
+import pandas as pd
 from datetime import datetime
 
 logger = logging.getLogger("treino.experimentos")
@@ -16,10 +17,18 @@ logger = logging.getLogger("treino.experimentos")
 # ====================================================================================
 # 1. Hyperparameter Tuning (Optuna / GridSearch para XGBoost)
 # ====================================================================================
-def otimizar_hiperparametros_xgboost(arg_dfX_train, arg_serY_train):
+def otimizar_hiperparametros_xgboost(arg_dfX_train: pd.DataFrame, arg_serY_train: pd.Series, arg_intNumeroTreinos: int = 20) -> dict:
     """
     Otimiza os hiperparâmetros do modelo XGBoost utilizando a biblioteca Optuna.
     Habilitar com ML_EXPERIMENTAL_OPTUNA=True
+
+    Parâmetros:
+    - arg_dfX_train (pd.DataFrame): DataFrame com os dados de treinamento.
+    - arg_serY_train (pd.Series): Série com os dados de treinamento.
+    - arg_intNumeroTreinos (int): Número de treinos a serem realizados.
+
+    Retorna:
+    - dict: Dicionário com os melhores hiperparâmetros encontrados.
     """
     try:
         import optuna
@@ -33,7 +42,7 @@ def otimizar_hiperparametros_xgboost(arg_dfX_train, arg_serY_train):
         X_tr, X_val, y_tr, y_val = train_test_split(arg_dfX_train, arg_serY_train, test_size=0.2, random_state=42)
         
         def objective(trial):
-            param = {
+            var_dictParametros = {
                 'verbosity': 0,
                 'objective': 'multi:softprob',
                 'num_class': 3,
@@ -44,64 +53,88 @@ def otimizar_hiperparametros_xgboost(arg_dfX_train, arg_serY_train):
                 'colsample_bytree': trial.suggest_float('colsample_bytree', 0.6, 1.0)
             }
             
-            modelo = xgb.XGBClassifier(**param, random_state=42)
-            modelo.fit(X_tr, y_tr)
-            preds = modelo.predict(X_val)
-            return f1_score(y_val, preds, average='macro')
+            var_objModelo = xgb.XGBClassifier(**var_dictParametros, random_state=42)
+            var_objModelo.fit(X_tr, y_tr)
+            var_objPreds = var_objModelo.predict(X_val)
+            return f1_score(y_val, var_objPreds, average='macro')
             
-        study = optuna.create_study(direction='maximize')
-        study.optimize(objective, n_trials=20) # 20 trials para demonstração
+        var_objStudy = optuna.create_study(direction='maximize')
+        var_objStudy.optimize(objective, n_trials=arg_intNumeroTreinos)
         
-        logger.info(f"Melhores hiperparâmetros encontrados: {study.best_params}")
-        return study.best_params
-    except ImportError:
+        logger.info(f"Melhores hiperparâmetros encontrados: {var_objStudy.best_params}")
+        return var_objStudy.best_params
+
+    except ImportError as var_objErro:
         logger.error("Biblioteca 'optuna' ou 'xgboost' não instalada. Instale com 'pip install optuna xgboost'.")
-        return None
+        os.system("pip install optuna xgboost")
+        return otimizar_hiperparametros_xgboost(arg_dfX_train, arg_serY_train, arg_intNumeroTreinos)
+    except Exception as e:
+        logger.error(f"Erro ao otimizar hiperparâmetros: {e}")
+        raise e
 
 # ====================================================================================
 # 2. SHAP Values (Explicabilidade dos modelos)
 # ====================================================================================
-def gerar_explicabilidade_shap(arg_modelo, arg_dfX_test, arg_strNomeModelo="XGBoost"):
+def gerar_explicabilidade_shap(arg_objModelo:object, arg_dfXTest:pd.DataFrame, arg_strNomeModelo:str="XGBoost") -> bool:
     """
     Gera gráficos de importância de features utilizando SHAP Values.
     Habilitar com ML_EXPERIMENTAL_SHAP=True
+    
+    Parâmetros:
+        arg_objModelo (object): Objeto do modelo treinado.
+        arg_dfXTest (pd.DataFrame): DataFrame com os dados de teste.
+        arg_strNomeModelo (str): Nome do modelo.
+    
+    Retorna:
+        bool: True se a explicabilidade foi gerada com sucesso, False caso contrário.
     """
     try:
         import shap
         import matplotlib.pyplot as plt
-        import pandas as pd
         
         logger.info(f"Gerando explicabilidade SHAP para o modelo {arg_strNomeModelo}...")
         
         # O ideal é usar uma amostra menor (ex: 5000) para calcular SHAP mais rápido
-        X_sample = arg_dfX_test.sample(min(5000, len(arg_dfX_test)), random_state=42) if isinstance(arg_dfX_test, pd.DataFrame) else arg_dfX_test[:5000]
+        var_dfXSample = arg_dfXTest.sample(min(5000, len(arg_dfXTest)), random_state=42) if isinstance(arg_dfXTest, pd.DataFrame) else arg_dfXTest[:5000]
         
         # Explainer Tree (funciona para XGBoost, LightGBM, RandomForest)
-        explainer = shap.TreeExplainer(arg_modelo)
-        shap_values = explainer.shap_values(X_sample)
+        var_objExplainer = shap.TreeExplainer(arg_objModelo)
+        var_serSHAPValues = var_objExplainer.shap_values(var_dfXSample)
         
         # Gera o Summary Plot
         plt.figure(figsize=(10, 6))
-        shap.summary_plot(shap_values, X_sample, show=False)
+        shap.summary_plot(var_serSHAPValues, var_dfXSample, show=False)
         
-        caminho_salvar = os.path.join("prj_TCC_PREVISOR_STEAM", "resources", "relatorios", f"shap_summary_{arg_strNomeModelo}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.png")
-        plt.savefig(caminho_salvar, bbox_inches='tight', dpi=300)
+        var_strCaminhoSalvar = os.path.join("prj_TCC_PREVISOR_STEAM", "resources", "relatorios", f"shap_summary_{arg_strNomeModelo}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.png")
+        plt.savefig(var_strCaminhoSalvar, bbox_inches='tight', dpi=300)
         plt.close()
         
-        logger.info(f"Gráfico SHAP salvo em: {caminho_salvar}")
+        logger.info(f"Gráfico SHAP salvo em: {var_strCaminhoSalvar}")
         return True
-    except ImportError:
+    except ImportError as var_objErro:
         logger.error("Biblioteca 'shap' não instalada. Instale com 'pip install shap'.")
-        return False
+        os.system("pip install shap")
+        return gerar_explicabilidade_shap(arg_objModelo, arg_dfXTest, arg_strNomeModelo)
+    except Exception as e:
+        logger.error(f"Erro ao gerar explicabilidade SHAP: {e}")
+        raise e
 
 # ====================================================================================
 # 3. Cross-Validation Temporal
 # ====================================================================================
-def avaliar_cross_validation_temporal(arg_modelo, arg_dfX, arg_serY):
+def avaliar_cross_validation_temporal(arg_objModelo:object, arg_dfX:pd.DataFrame, arg_serY:pd.Series) -> float:
     """
     Avalia o modelo utilizando particionamento temporal.
     Garante que não haverá vazamento de dados do futuro para o passado.
     Habilitar com ML_EXPERIMENTAL_CV_TEMPORAL=True
+    
+    Parâmetros:
+        arg_objModelo (object): Objeto do modelo treinado.
+        arg_dfX (pd.DataFrame): DataFrame com os dados de treinamento.
+        arg_serY (pd.Series): Série com os dados de treinamento.
+    
+    Retorna:
+        float: Média F1-Score da Cross-Validation Temporal.
     """
     try:
         from sklearn.model_selection import TimeSeriesSplit
@@ -110,22 +143,22 @@ def avaliar_cross_validation_temporal(arg_modelo, arg_dfX, arg_serY):
         
         logger.info("Executando Cross-Validation Temporal (TimeSeriesSplit)...")
         
-        tscv = TimeSeriesSplit(n_splits=5)
-        scores = []
+        var_objTscv = TimeSeriesSplit(n_splits=5)
+        var_listScores = []
         
-        for fold, (train_index, test_index) in enumerate(tscv.split(arg_dfX)):
-            X_train, X_test = arg_dfX.iloc[train_index], arg_dfX.iloc[test_index]
-            y_train, y_test = arg_serY.iloc[train_index], arg_serY.iloc[test_index]
+        for fold, (var_intTrainIndex, var_intTestIndex) in enumerate(var_objTscv.split(arg_dfX)):
+            var_dfXTrain, var_dfXTest = arg_dfX.iloc[var_intTrainIndex], arg_dfX.iloc[var_intTestIndex]
+            var_serYTrain, var_serYTest = arg_serY.iloc[var_intTrainIndex], arg_serY.iloc[var_intTestIndex]
             
-            arg_modelo.fit(X_train, y_train)
-            preds = arg_modelo.predict(X_test)
-            score = f1_score(y_test, preds, average='macro')
-            scores.append(score)
-            logger.info(f"Fold {fold+1} - F1-Score Macro: {score:.4f}")
+            arg_objModelo.fit(var_dfXTrain, var_serYTrain)
+            var_serPreds = arg_objModelo.predict(var_dfXTest)
+            var_floatScore = f1_score(var_serYTest, var_serPreds, average='macro')
+            var_listScores.append(var_floatScore)
+            logger.info(f"Fold {fold+1} - F1-Score Macro: {var_floatScore:.4f}")
             
-        media_score = np.mean(scores)
-        logger.info(f"Média F1-Score CV Temporal: {media_score:.4f}")
-        return media_score
+        var_floatMediaScore = np.mean(var_listScores)
+        logger.info(f"Média F1-Score CV Temporal: {var_floatMediaScore:.4f}")
+        return var_floatMediaScore
     except Exception as e:
         logger.error(f"Erro ao executar Cross-Validation Temporal: {e}")
         return None
@@ -137,6 +170,12 @@ def iniciar_api_rest():
     """
     Inicializa uma API REST com FastAPI para servir os modelos treinados (_latest.joblib).
     Habilitar com ML_EXPERIMENTAL_FASTAPI=True
+
+    Parâmetros:
+        None
+    
+    Retorna:
+        None
     """
     try:
         from fastapi import FastAPI
@@ -144,43 +183,79 @@ def iniciar_api_rest():
         import joblib
         
         logger.info("Configurando API REST FastAPI...")
-        app = FastAPI(title="Previsor Steam API", description="API de predições de preços do TCC")
+        var_objApp = FastAPI(title="Previsor Steam API", description="API de predições de preços do TCC")
         
         # Dicionário em memória para carregar os modelos on-demand
-        modelos = {}
+        var_dictModelos = {}
         
-        def carregar_modelo(nome_arquivo):
-            caminho = os.path.join("prj_TCC_PREVISOR_STEAM", "resources", "models", nome_arquivo)
-            if os.path.exists(caminho):
-                return joblib.load(caminho)
-            return None
+        def carregar_modelo(arg_strNomeArquivo:str) -> object:
+            """
+            Carrega o modelo do arquivo.
+            
+            Parâmetros:
+                arg_strNomeArquivo (str): Nome do arquivo do modelo.
+            
+            Retorna:
+                object: Objeto do modelo carregado.
+            """
+            try:
+                var_strCaminho = os.path.join("prj_TCC_PREVISOR_STEAM", "resources", "models", arg_strNomeArquivo)
+                if os.path.exists(var_strCaminho):
+                    return joblib.load(var_strCaminho)
+                return None
+            except Exception as e:
+                logger.error(f"Erro ao carregar modelo {arg_strNomeArquivo}: {e}")
+                return None
 
-        @app.get("/")
+        @var_objApp.get("/")
         def read_root():
+            """
+            Endpoint raiz da API.
+            
+            Parâmetros:
+                None
+            
+            Retorna:
+                dict: Status da API.
+            """
             return {"status": "API Previsor Steam operando normalmente."}
             
-        @app.post("/predict/direcao")
-        def predict_direcao(features: list):
+        @var_objApp.post("/predict/direcao")
+        def predict_direcao(arg_listFeatures: list):
+            """
+            Endpoint de predição de direção.
+            
+            Parâmetros:
+                arg_listFeatures (list): Lista de features para predição.
+            
+            Retorna:
+                dict: Predição de direção.
+            """
             # Carrega o XGBoost latest
-            if 'xgb_class' not in modelos:
-                modelos['xgb_class'] = carregar_modelo("modelo_classificacao_XGBoost_latest.joblib")
+            if 'xgb_class' not in var_dictModelos:
+                var_dictModelos['xgb_class'] = carregar_modelo("modelo_classificacao_XGBoost_latest.joblib")
                 
-            if modelos['xgb_class'] is None:
+            if var_dictModelos['xgb_class'] is None:
                 return {"error": "Modelo não encontrado"}
                 
             # Formata entrada e prediz
             import numpy as np
-            X = np.array(features).reshape(1, -1)
-            pred = modelos['xgb_class'].predict(X)
+            var_arrX = np.array(arg_listFeatures).reshape(1, -1)
+            var_serPred = var_dictModelos['xgb_class'].predict(var_arrX)
             # Mapeamento reverso simples
-            mapa = {0: "cai", 1: "mantem", 2: "sobe"}
-            return {"direcao_prevista": mapa.get(pred[0], "desconhecido")}
+            var_dictMapa = {0: "cai", 1: "mantem", 2: "sobe"}
+            return {"direcao_prevista": var_dictMapa.get(var_serPred[0], "desconhecido")}
 
         logger.info("Iniciando servidor Uvicorn na porta 8000...")
         # Isso irá bloquear a thread principal
-        uvicorn.run(app, host="0.0.0.0", port=8000)
-    except ImportError:
-        logger.error("Bibliotecas 'fastapi' ou 'uvicorn' não instaladas.")
+        uvicorn.run(var_objApp, host="[IP_ADDRESS]", port=8000)
+    except ImportError as var_objErro:
+        logger.error(f"Erro ao iniciar API REST: {var_objErro}")
+        os.system("pip install fastapi uvicorn python-multipart")
+        return iniciar_api_rest()
+    except Exception as var_objErro:
+        logger.error(f"Erro ao iniciar API REST: {var_objErro}")
+        raise var_objErro
 
 # ====================================================================================
 # 5. Dashboard Streamlit
@@ -189,12 +264,18 @@ def iniciar_dashboard_streamlit():
     """
     Gera dinamicamente um arquivo 'dashboard.py' e inicia o servidor do Streamlit.
     Habilitar com ML_EXPERIMENTAL_STREAMLIT=True
+
+    Parâmetros:
+        None
+    
+    Retorna:
+        None
     """
     try:
         logger.info("Criando e iniciando Dashboard Streamlit...")
-        dash_path = "dashboard_tcc_temp.py"
+        var_strCaminhoArquivo = "dashboard_tcc_temp.py"
         
-        conteudo = '''import streamlit as st
+        var_strConteudo = '''import streamlit as st
 import pandas as pd
 import os
 import joblib
@@ -231,11 +312,11 @@ else:
     st.sidebar.error("Modelo não encontrado.")
     st.warning("Execute o pipeline de treinamento primeiro.")
 '''
-        with open(dash_path, "w", encoding="utf-8") as f:
-            f.write(conteudo)
+        with open(var_strCaminhoArquivo, "w", encoding="utf-8") as f:
+            f.write(var_strConteudo)
             
         logger.info("Rodando 'streamlit run dashboard_tcc_temp.py'...")
-        os.system(f"streamlit run {dash_path}")
+        os.system(f"streamlit run {var_strCaminhoArquivo}")
     except Exception as e:
         logger.error(f"Erro ao criar/iniciar dashboard Streamlit: {e}")
 
@@ -246,14 +327,20 @@ def gerar_notebook_exploratorio():
     """
     Gera um arquivo .ipynb base estruturado para a apresentação do TCC.
     Habilitar com ML_EXPERIMENTAL_NOTEBOOK=True
+
+    Parâmetros:
+        None
+    
+    Retorna:
+        None
     """
     try:
         import nbformat as nbf
         
         logger.info("Gerando notebook de análise exploratória...")
-        nb = nbf.v4.new_notebook()
+        var_objNB = nbf.v4.new_notebook()
         
-        nb['cells'] = [
+        var_objNB['cells'] = [
             nbf.v4.new_markdown_cell("# 📊 Análise Exploratória - Previsor Steam TCC\\nEste notebook foi gerado automaticamente."),
             nbf.v4.new_markdown_cell("## 1. Importação de Dados e Bibliotecas"),
             nbf.v4.new_code_cell("import pandas as pd\\nimport matplotlib.pyplot as plt\\nimport seaborn as sns\\nimport json\\n\\n# Ajuste o caminho conforme necessidade\\ncaminho_dados = 'prj_TCC_PREVISOR_STEAM/resources/dados/steam_unificado_complete.json'"),
@@ -265,12 +352,15 @@ def gerar_notebook_exploratorio():
             nbf.v4.new_code_cell("# Lógica de exploração temporal")
         ]
         
-        caminho_ipynb = "Analise_Exploratoria_TCC.ipynb"
-        with open(caminho_ipynb, 'w', encoding='utf-8') as f:
-            nbf.write(nb, f)
+        var_strCaminhoArquivo = "Analise_Exploratoria_TCC.ipynb"
+        with open(var_strCaminhoArquivo, 'w', encoding='utf-8') as f:
+            nbf.write(var_objNB, f)
             
-        logger.info(f"Notebook gerado com sucesso em: {caminho_ipynb}")
+        logger.info(f"Notebook gerado com sucesso em: {var_strCaminhoArquivo}")
         return True
     except ImportError:
         logger.error("Biblioteca 'nbformat' não instalada. Instale com 'pip install nbformat'.")
+        return False
+    except Exception as var_objErro:
+        logger.error(f"Erro ao gerar notebook de análise exploratória: {var_objErro}")
         return False

@@ -6,7 +6,7 @@ joblib  # serialização de modelos treinados
 
 # ── Data Processing ───────────────────────────────────────────────────────────
 pandas==2.3.0
-numpy
+numpy<2.0.0
 unidecode==1.4.0
 matplotlib==3.10.3
 seaborn==0.13.2
@@ -29,3 +29,13 @@ pytest==8.0.0
 black==24.8.0
 ruff==0.6.4
 pre-commit==3.8.0
+
+# ── Experimentos TCC ──────────────────────────────────────────────────────────
+optuna
+shap
+fastapi
+uvicorn
+python-multipart
+streamlit
+jupyter
+nbformat

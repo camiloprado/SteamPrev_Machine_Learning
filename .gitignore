@@ -10,7 +10,10 @@
 *.log
 *.temp
 *temp_
+*.joblib
+*.ipynb
 prj_TCC_PREVISOR_STEAM/resources/logs/
+dashboard_tcc_temp.py
 /docker/volumes
 
 # Arquivos de dados exportados (muito grandes para git)

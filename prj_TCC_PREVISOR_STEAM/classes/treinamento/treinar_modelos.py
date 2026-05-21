@@ -1,5 +1,6 @@
 from prj_TCC_PREVISOR_STEAM.classes.framework.AllSettings import Settings
 from prj_TCC_PREVISOR_STEAM.classes.treinamento.normalizar_modelos import NormalizarModelos
+from prj_TCC_PREVISOR_STEAM.classes.treinamento import experimentos_tcc
 from sklearn.ensemble import RandomForestClassifier, RandomForestRegressor
 from sklearn.linear_model import LinearRegression
 from sklearn.metrics import (
@@ -268,7 +269,7 @@ class Treinar_Modelos:
             # tenta inferir do y_true
             arg_listLabelNames = sorted(list(pd.Series(arg_arrYTrue).dropna().unique()))
 
-        var_strTs = datetime.now().strftime("%Y%m%d_%H%M%S")
+        var_strTs = datetime.now().strftime("%Y%m%d")
         try:
             var_dfConfusionMatrix = pd.DataFrame(var_objConfusionMatrix, index=arg_listLabelNames, columns=arg_listLabelNames)
             logger.info(f"Matriz de confusão ({arg_strModelo} | {arg_strSplit}) - contagens:\n\n%s", var_dfConfusionMatrix.to_string())
@@ -1168,6 +1169,49 @@ class Treinar_Modelos:
             cls._salvar_modelos(var_dictTodosModelos)
         except Exception as e:
             logger.warning(f"Falha ao salvar modelos em disco: {e}")
+
+        # =====================================================================
+        # BLOCO DE EXPERIMENTOS TCC
+        # =====================================================================
+        var_dictSplits = NormalizarModelos._obter_splits()
+        
+        if str(os.getenv("ML_EXPERIMENTAL_OPTUNA", "False")).lower() in ("true", "1", "yes"):
+            try:
+                experimentos_tcc.otimizar_hiperparametros_xgboost(var_dictSplits["X_train"], var_dictSplits["y_train"], arg_intNumeroTreinos=5)
+            except Exception as e:
+                logger.error(f"Erro no experimento Optuna: {e}")
+
+        if str(os.getenv("ML_EXPERIMENTAL_SHAP", "False")).lower() in ("true", "1", "yes"):
+            try:
+                experimentos_tcc.gerar_explicabilidade_shap(var_dictXGB["modelo"], var_dictSplits["X_test"], arg_strNomeModelo="XGBoost_Classificacao")
+            except Exception as e:
+                logger.error(f"Erro no experimento SHAP: {e}")
+
+        if str(os.getenv("ML_EXPERIMENTAL_CV_TEMPORAL", "False")).lower() in ("true", "1", "yes"):
+            try:
+                var_dfX_full = pd.concat([var_dictSplits["X_train"], var_dictSplits["X_test"]])
+                var_serY_full = pd.concat([var_dictSplits["y_train"], var_dictSplits["y_test"]])
+                experimentos_tcc.avaliar_cross_validation_temporal(var_dictXGB["modelo"], var_dfX_full, var_serY_full)
+            except Exception as e:
+                logger.error(f"Erro no experimento CV Temporal: {e}")
+
+        if str(os.getenv("ML_EXPERIMENTAL_NOTEBOOK", "False")).lower() in ("true", "1", "yes"):
+            try:
+                experimentos_tcc.gerar_notebook_exploratorio()
+            except Exception as e:
+                logger.error(f"Erro no experimento Notebook: {e}")
+
+        if str(os.getenv("ML_EXPERIMENTAL_FASTAPI", "False")).lower() in ("true", "1", "yes"):
+            try:
+                experimentos_tcc.iniciar_api_rest()
+            except Exception as e:
+                logger.error(f"Erro no experimento FastAPI: {e}")
+
+        if str(os.getenv("ML_EXPERIMENTAL_STREAMLIT", "False")).lower() in ("true", "1", "yes"):
+            try:
+                experimentos_tcc.iniciar_dashboard_streamlit()
+            except Exception as e:
+                logger.error(f"Erro no experimento Streamlit: {e}")
 
     @classmethod
     def _salvar_modelos(cls, arg_dictModelos: dict) -> None:
