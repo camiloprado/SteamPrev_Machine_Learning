@@ -149,9 +149,9 @@ class NormalizarModelos:
             return np.nan
 
     @staticmethod
-    def _normalizar_historico(arg_listHistorico:list) -> list:
+    def _separar_historico(arg_listHistorico:list) -> list:
         """
-        Normaliza o histórico para uma lista de pontos com timestamp, preço e desconto.
+        Separar o histórico para uma lista de pontos com timestamp, preço e desconto.
 
         Parâmetros:
         - arg_listHistorico: Lista de pontos com timestamp, preço e desconto.
@@ -274,8 +274,8 @@ class NormalizarModelos:
 
         # Itera sobre cada linha do DataFrame de treinamento
         for _, var_dictRow in cls._var_dfDadosTreinamento.iterrows():
-            # Normaliza o histórico de preços
-            var_listHistorico = cls._normalizar_historico(var_dictRow.get("historico_preco"))
+            # Separa o histórico de preços
+            var_listHistorico = cls._separar_historico(var_dictRow.get("historico_preco"))
 
             # Verifica se o histórico tem pontos suficientes para a janela definida, caso contrário, ignora.
             if len(var_listHistorico) < (var_intJanela + 1):
