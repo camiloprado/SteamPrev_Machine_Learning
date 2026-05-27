@@ -1,10 +1,12 @@
 from prj_TCC_PREVISOR_STEAM.classes.framework.AllSettings import Settings
 from prj_TCC_PREVISOR_STEAM.classes.data.repositories.postgre_bdgeral import PostgreSQLBDGeral
 from sklearn.model_selection import train_test_split, GroupShuffleSplit
+from prj_TCC_PREVISOR_STEAM.classes.treinamento import experimentos_tcc
 
 import pandas as pd
 import numpy as np
 from datetime import datetime
+import os
 
 import logging
 
@@ -18,7 +20,7 @@ class NormalizarModelos:
     _var_dfDadosTreinamento = None
     _var_dfAmostrasTemporais = None
     _var_dictSplits = None
-    _var_intJanelaHistorico = 5
+    _var_intJanelaAnos = 5
     _var_floatThresholdDirecao = 0.03
 
     @classmethod
@@ -260,14 +262,30 @@ class NormalizarModelos:
         Retorna:
         - pd.DataFrame: DataFrame com as amostras temporais criadas.
         """
+
         # Verifica se os dados de treinamento já foram carregados, caso contrário, carrega-os.
         if cls._var_dfDadosTreinamento is None:
             cls.carregar_dados_treinamento()
 
+        # Hooks dos Experimentos da Classe Mantem
+        if os.getenv("ML_EXPERIMENTAL_MANTEM_HORIZONTE") == "30":
+            logger.info("Executando Experimento Mantem: Horizonte Fixo de 30 Dias")
+            cls._var_dfAmostrasTemporais = experimentos_tcc.gerar_amostras_horizonte_fixo(cls._var_dfDadosTreinamento, 30)
+            return cls._var_dfAmostrasTemporais
+        elif os.getenv("ML_EXPERIMENTAL_MANTEM_HORIZONTE") == "60":
+            logger.info("Executando Experimento Mantem: Horizonte Fixo de 60 Dias")
+            cls._var_dfAmostrasTemporais = experimentos_tcc.gerar_amostras_horizonte_fixo(cls._var_dfDadosTreinamento, 60)
+            return cls._var_dfAmostrasTemporais
+        elif os.getenv("ML_EXPERIMENTAL_MANTEM_AUMENTO") == "True":
+            logger.info("Executando Experimento Mantem: Data Augmentation")
+            cls._var_dfAmostrasTemporais = experimentos_tcc.gerar_amostras_data_augmentation(cls._var_dfDadosTreinamento)
+            return cls._var_dfAmostrasTemporais
+
         var_listAmostras = []
 
-        # Janela de histórico a ser considerada para criar as amostras temporais
-        var_intJanela = cls._var_intJanelaHistorico
+        # Janela de histórico a ser considerada (em anos e convertida para segundos)
+        var_intJanelaAnos = cls._var_intJanelaAnos
+        var_intJanelaSegundos = var_intJanelaAnos * 365 * 24 * 60 * 60
 
         # Threshold de variação de preço para classificar a direção como "cai", "mantem" ou "sobe"
         var_floatThreshold = cls._var_floatThresholdDirecao
@@ -277,8 +295,8 @@ class NormalizarModelos:
             # Separa o histórico de preços
             var_listHistorico = cls._separar_historico(var_dictRow.get("historico_preco"))
 
-            # Verifica se o histórico tem pontos suficientes para a janela definida, caso contrário, ignora.
-            if len(var_listHistorico) < (var_intJanela + 1):
+            # Verifica se o histórico tem pelo menos 2 pontos (um atual e um futuro) para gerar uma amostra
+            if len(var_listHistorico) < 2:
                 continue
 
             # Extrai o review score
@@ -287,13 +305,17 @@ class NormalizarModelos:
             # Extrai o preço atual do catálogo
             var_floatPrecoAtualCatalogo = cls._converter_preco_para_float(var_dictRow.get("preco"))
 
-            # Itera sobre o histórico a partir do ponto onde a janela completa pode ser formada
-            for var_intIdx in range(var_intJanela, len(var_listHistorico) - 1):
-                # Cria uma lista com os pontos do histórico que formam a janela
-                var_listJanela = var_listHistorico[var_intIdx - var_intJanela: var_intIdx + 1]
-
+            # Itera sobre o histórico a partir do índice 1 para ter histórico passado até o penúltimo item
+            for var_intIdx in range(1, len(var_listHistorico) - 1):
                 # Extrai o ponto atual
                 var_dictAtual = var_listHistorico[var_intIdx]
+                var_intTimestampAtual = var_dictAtual["timestamp"]
+
+                # Cria uma lista com os pontos do histórico que formam a janela de 5 anos
+                var_listJanela = [
+                    item for item in var_listHistorico[:var_intIdx + 1]
+                    if (var_intTimestampAtual - item["timestamp"]) <= var_intJanelaSegundos
+                ]
 
                 # Extrai o ponto futuro
                 var_dictFuturo = var_listHistorico[var_intIdx + 1]

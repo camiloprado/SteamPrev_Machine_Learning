@@ -364,3 +364,225 @@ def gerar_notebook_exploratorio():
     except Exception as var_objErro:
         logger.error(f"Erro ao gerar notebook de análise exploratória: {var_objErro}")
         return False
+
+# ====================================================================================
+# 7. Experimentos para Classe 'Mantem' (Horizonte Fixo e Data Augmentation)
+# ====================================================================================
+def gerar_amostras_horizonte_fixo(arg_dfDadosTreinamento: pd.DataFrame, arg_intDiasHorizonte: int = 30) -> pd.DataFrame:
+    """
+    Gera amostras temporais projetando um horizonte fixo no futuro para definir a classe.
+    Resolve o viés da classe "mantem" avaliando se o preço muda nos próximos N dias.
+    
+    Parâmetros:
+    - arg_dfDadosTreinamento (pd.DataFrame): DataFrame com dados de treinamento brutos.
+    - arg_intDiasHorizonte (int): Quantidade de dias no futuro para o horizonte de previsão.
+    
+    Retorna:
+    - pd.DataFrame: DataFrame com amostras temporais construídas.
+    """
+    import numpy as np
+    from prj_TCC_PREVISOR_STEAM.classes.treinamento.normalizar_modelos import NormalizarModelos
+    
+    logger.info(f"Gerando amostras com Horizonte Fixo de {arg_intDiasHorizonte} dias...")
+    var_listAmostras = []
+    var_intJanelaSegundos = 5 * 365 * 24 * 60 * 60 # 5 anos de histórico passado
+    var_intHorizonteSegundos = arg_intDiasHorizonte * 86400
+    var_floatThreshold = 0.03
+    
+    for _, var_dictRow in arg_dfDadosTreinamento.iterrows():
+        var_listHistorico = NormalizarModelos._separar_historico(var_dictRow.get("historico_preco"))
+        if len(var_listHistorico) < 1:
+            continue
+            
+        var_floatReviewScore = pd.to_numeric(var_dictRow.get("review_score"), errors="coerce")
+        var_floatPrecoAtualCatalogo = NormalizarModelos._converter_preco_para_float(var_dictRow.get("preco"))
+        
+        for var_intIdx in range(len(var_listHistorico)):
+            var_dictAtual = var_listHistorico[var_intIdx]
+            var_intTimestampAtual = var_dictAtual["timestamp"]
+            var_floatPrecoAtual = var_dictAtual["preco"]
+            
+            if var_floatPrecoAtual <= 0:
+                continue
+                
+            # Extração da Janela Histórica (últimos 5 anos)
+            var_listJanela = [
+                item for item in var_listHistorico[:var_intIdx + 1]
+                if (var_intTimestampAtual - item["timestamp"]) <= var_intJanelaSegundos
+            ]
+            
+            # --- NOVA LÓGICA DE CLASSIFICAÇÃO COM HORIZONTE ---
+            # Busca eventos que ocorrem dentro do horizonte futuro
+            var_listFuturo = [
+                item for item in var_listHistorico[var_intIdx + 1:]
+                if item["timestamp"] > var_intTimestampAtual and item["timestamp"] <= (var_intTimestampAtual + var_intHorizonteSegundos)
+            ]
+            
+            var_strDirecao = "mantem"
+            if var_listFuturo:
+                # Procura a maior variação no período (ex: se entrou em promoção)
+                var_floatMenorPreco = min([item["preco"] for item in var_listFuturo])
+                var_floatMaiorPreco = max([item["preco"] for item in var_listFuturo])
+                
+                var_floatVariacaoBaixa = (var_floatMenorPreco - var_floatPrecoAtual) / var_floatPrecoAtual
+                var_floatVariacaoAlta = (var_floatMaiorPreco - var_floatPrecoAtual) / var_floatPrecoAtual
+                
+                # Se teve desconto no período
+                if var_floatVariacaoBaixa <= -var_floatThreshold:
+                    var_strDirecao = "cai"
+                # Se só subiu no período (e não caiu)
+                elif var_floatVariacaoAlta >= var_floatThreshold:
+                    var_strDirecao = "sobe"
+            
+            # Alvo dias até desconto (permanece o mesmo formato)
+            var_intDiasProxDesconto = np.nan
+            for var_intJ in range(var_intIdx + 1, len(var_listHistorico)):
+                if var_listHistorico[var_intJ].get("desconto", 0) > 0:
+                    var_intDiasProxDesconto = int((var_listHistorico[var_intJ]["timestamp"] - var_dictAtual["timestamp"]) / 86400)
+                    break
+                    
+            var_listPrecosJanela = [item["preco"] for item in var_listJanela]
+            var_listDescontosJanela = [item["desconto"] for item in var_listJanela]
+            var_listTimestampsJanela = [item["timestamp"] for item in var_listJanela]
+            
+            var_intDiasDesdeUltimoDesconto = 9999
+            for var_intK in range(len(var_listJanela) - 1, -1, -1):
+                if var_listJanela[var_intK]["desconto"] > 0:
+                    var_intDiasDesdeUltimoDesconto = int((var_dictAtual["timestamp"] - var_listJanela[var_intK]["timestamp"]) / 86400)
+                    break
+                    
+            var_listAmostras.append({
+                "appid": var_dictRow.get("appid"),
+                "review_score": float(var_floatReviewScore) if pd.notna(var_floatReviewScore) else 0.0,
+                "preco_catalogo": float(var_floatPrecoAtualCatalogo) if pd.notna(var_floatPrecoAtualCatalogo) else 0.0,
+                "preco_atual_hist": var_floatPrecoAtual,
+                "preco_media_janela": float(np.mean(var_listPrecosJanela)),
+                "preco_std_janela": float(np.std(var_listPrecosJanela)),
+                "preco_min_janela": float(np.min(var_listPrecosJanela)),
+                "preco_max_janela": float(np.max(var_listPrecosJanela)),
+                "desconto_atual": float(var_dictAtual.get("desconto", 0.0)),
+                "desconto_medio_janela": float(np.mean(var_listDescontosJanela)),
+                "desconto_max_janela": float(np.max(var_listDescontosJanela)),
+                "num_promocoes_janela": int(sum(1 for d in var_listDescontosJanela if d > 0)),
+                "dias_janela": int((var_listTimestampsJanela[-1] - var_listTimestampsJanela[0]) / 86400) if var_listTimestampsJanela else 0,
+                "dias_desde_ultimo_desconto": var_intDiasDesdeUltimoDesconto,
+                "alvo_direcao_preco": var_strDirecao,
+                "alvo_dias_ate_desconto": var_intDiasProxDesconto,
+            })
+            
+    var_dfAmostras = pd.DataFrame(var_listAmostras)
+    logger.info(f"Amostras horizonte fixo criadas: {len(var_dfAmostras)} amostras.")
+    return var_dfAmostras
+
+def gerar_amostras_data_augmentation(arg_dfDadosTreinamento: pd.DataFrame) -> pd.DataFrame:
+    """
+    Gera amostras temporais injetando pontos sintéticos de 'mantem' quando há longos períodos
+    sem variação no preço.
+    
+    Parâmetros:
+    - arg_dfDadosTreinamento (pd.DataFrame): DataFrame com dados de treinamento brutos.
+    
+    Retorna:
+    - pd.DataFrame: DataFrame com amostras temporais construídas.
+    """
+    import numpy as np
+    from prj_TCC_PREVISOR_STEAM.classes.treinamento.normalizar_modelos import NormalizarModelos
+    
+    logger.info("Gerando amostras com Data Augmentation (Injeção de classe Mantem)...")
+    var_listAmostras = []
+    var_intJanelaSegundos = 5 * 365 * 24 * 60 * 60
+    var_floatThreshold = 0.03
+    
+    for _, var_dictRow in arg_dfDadosTreinamento.iterrows():
+        var_listHistorico = NormalizarModelos._separar_historico(var_dictRow.get("historico_preco"))
+        if len(var_listHistorico) < 2:
+            continue
+            
+        var_floatReviewScore = pd.to_numeric(var_dictRow.get("review_score"), errors="coerce")
+        var_floatPrecoAtualCatalogo = NormalizarModelos._converter_preco_para_float(var_dictRow.get("preco"))
+        
+        # 1. Expandir histórico com pontos sintéticos
+        var_listHistoricoExpandido = []
+        for var_intIdx in range(len(var_listHistorico) - 1):
+            var_dictAtual = var_listHistorico[var_intIdx]
+            var_dictFuturo = var_listHistorico[var_intIdx + 1]
+            
+            var_listHistoricoExpandido.append(var_dictAtual)
+            
+            # Se a diferença de dias for maior que 60 dias, criamos um ponto falso no meio
+            var_intDiffSegundos = var_dictFuturo["timestamp"] - var_dictAtual["timestamp"]
+            if var_intDiffSegundos > 60 * 86400:
+                var_intDiasSinteticos = int(var_intDiffSegundos / 86400) // 2
+                var_dictSintetico = {
+                    "timestamp": var_dictAtual["timestamp"] + (var_intDiasSinteticos * 86400),
+                    "preco": var_dictAtual["preco"],
+                    "desconto": var_dictAtual["desconto"]
+                }
+                var_listHistoricoExpandido.append(var_dictSintetico)
+                
+        var_listHistoricoExpandido.append(var_listHistorico[-1])
+        
+        # 2. Gerar amostras normalmente sobre o histórico expandido
+        for var_intIdx in range(1, len(var_listHistoricoExpandido) - 1):
+            var_dictAtual = var_listHistoricoExpandido[var_intIdx]
+            var_intTimestampAtual = var_dictAtual["timestamp"]
+            var_floatPrecoAtual = var_dictAtual["preco"]
+            var_dictFuturo = var_listHistoricoExpandido[var_intIdx + 1]
+            var_floatPrecoFuturo = var_dictFuturo["preco"]
+            
+            if var_floatPrecoAtual <= 0:
+                continue
+                
+            var_listJanela = [
+                item for item in var_listHistoricoExpandido[:var_intIdx + 1]
+                if (var_intTimestampAtual - item["timestamp"]) <= var_intJanelaSegundos
+            ]
+            
+            var_floatVariacao = (var_floatPrecoFuturo - var_floatPrecoAtual) / var_floatPrecoAtual
+            
+            if var_floatVariacao <= -var_floatThreshold:
+                var_strDirecao = "cai"
+            elif var_floatVariacao >= var_floatThreshold:
+                var_strDirecao = "sobe"
+            else:
+                var_strDirecao = "mantem"
+                
+            var_intDiasProxDesconto = np.nan
+            for var_intJ in range(var_intIdx + 1, len(var_listHistoricoExpandido)):
+                if var_listHistoricoExpandido[var_intJ].get("desconto", 0) > 0:
+                    var_intDiasProxDesconto = int((var_listHistoricoExpandido[var_intJ]["timestamp"] - var_dictAtual["timestamp"]) / 86400)
+                    break
+                    
+            var_listPrecosJanela = [item["preco"] for item in var_listJanela]
+            var_listDescontosJanela = [item["desconto"] for item in var_listJanela]
+            var_listTimestampsJanela = [item["timestamp"] for item in var_listJanela]
+            
+            var_intDiasDesdeUltimoDesconto = 9999
+            for var_intK in range(len(var_listJanela) - 1, -1, -1):
+                if var_listJanela[var_intK]["desconto"] > 0:
+                    var_intDiasDesdeUltimoDesconto = int((var_dictAtual["timestamp"] - var_listJanela[var_intK]["timestamp"]) / 86400)
+                    break
+                    
+            var_listAmostras.append({
+                "appid": var_dictRow.get("appid"),
+                "review_score": float(var_floatReviewScore) if pd.notna(var_floatReviewScore) else 0.0,
+                "preco_catalogo": float(var_floatPrecoAtualCatalogo) if pd.notna(var_floatPrecoAtualCatalogo) else 0.0,
+                "preco_atual_hist": var_floatPrecoAtual,
+                "preco_media_janela": float(np.mean(var_listPrecosJanela)),
+                "preco_std_janela": float(np.std(var_listPrecosJanela)),
+                "preco_min_janela": float(np.min(var_listPrecosJanela)),
+                "preco_max_janela": float(np.max(var_listPrecosJanela)),
+                "desconto_atual": float(var_dictAtual.get("desconto", 0.0)),
+                "desconto_medio_janela": float(np.mean(var_listDescontosJanela)),
+                "desconto_max_janela": float(np.max(var_listDescontosJanela)),
+                "num_promocoes_janela": int(sum(1 for d in var_listDescontosJanela if d > 0)),
+                "dias_janela": int((var_listTimestampsJanela[-1] - var_listTimestampsJanela[0]) / 86400) if var_listTimestampsJanela else 0,
+                "dias_desde_ultimo_desconto": var_intDiasDesdeUltimoDesconto,
+                "alvo_direcao_preco": var_strDirecao,
+                "alvo_dias_ate_desconto": var_intDiasProxDesconto,
+            })
+            
+    var_dfAmostras = pd.DataFrame(var_listAmostras)
+    logger.info(f"Amostras Data Augmentation criadas: {len(var_dfAmostras)} amostras.")
+    return var_dfAmostras
+

@@ -1173,6 +1173,13 @@ class Treinar_Modelos:
         # =====================================================================
         # BLOCO DE EXPERIMENTOS TCC
         # =====================================================================
+        if str(os.getenv("ML_EXPERIMENTAL_MANTEM_AVALIACAO", "False")).lower() in ("true", "1", "yes"):
+            try:
+                cls.executar_experimentos_mantem()
+            except Exception as e:
+                logger.error(f"Erro ao avaliar experimentos da classe mantem: {e}")
+
+
         var_dictSplits = NormalizarModelos._obter_splits()
         
         if str(os.getenv("ML_EXPERIMENTAL_OPTUNA", "False")).lower() in ("true", "1", "yes"):
@@ -1212,6 +1219,90 @@ class Treinar_Modelos:
                 experimentos_tcc.iniciar_dashboard_streamlit()
             except Exception as e:
                 logger.error(f"Erro no experimento Streamlit: {e}")
+
+    @classmethod
+    def executar_experimentos_mantem(cls) -> None:
+        """
+        Executa os experimentos para resolver o desbalanceamento da classe 'mantem'.
+        Testa: Baseline, Horizonte Fixo (30 dias), Horizonte Fixo (60 dias) e Data Augmentation.
+        Gera a Matriz de Confusão para cada um utilizando o XGBoost.
+        Habilitar com ML_EXPERIMENTAL_MANTEM_AVALIACAO=True
+        """
+        logger.info("="*60)
+        logger.info("INICIANDO AVALIAÇÃO DE EXPERIMENTOS DA CLASSE MANTEM")
+        logger.info("="*60)
+        
+        var_listExperimentos = [
+            {"nome": "Baseline (Atual)", "env_hz": "", "env_aug": ""},
+            {"nome": "Horizonte Fixo (30 dias)", "env_hz": "30", "env_aug": ""},
+            {"nome": "Horizonte Fixo (60 dias)", "env_hz": "60", "env_aug": ""},
+            {"nome": "Data Augmentation", "env_hz": "", "env_aug": "True"}
+        ]
+        
+        var_strOriginalHz = os.getenv("ML_EXPERIMENTAL_MANTEM_HORIZONTE", "")
+        var_strOriginalAug = os.getenv("ML_EXPERIMENTAL_MANTEM_AUMENTO", "")
+        
+        for var_dictExp in var_listExperimentos:
+            logger.info(f"--- Treinando XGBoost para: {var_dictExp['nome']} ---")
+            
+            # Força as variáveis de ambiente
+            if var_dictExp["env_hz"]:
+                os.environ["ML_EXPERIMENTAL_MANTEM_HORIZONTE"] = var_dictExp["env_hz"]
+            else:
+                os.environ.pop("ML_EXPERIMENTAL_MANTEM_HORIZONTE", None)
+                
+            if var_dictExp["env_aug"]:
+                os.environ["ML_EXPERIMENTAL_MANTEM_AUMENTO"] = var_dictExp["env_aug"]
+            else:
+                os.environ.pop("ML_EXPERIMENTAL_MANTEM_AUMENTO", None)
+                
+            # Limpa o cache do NormalizarModelos para forçar re-geração das amostras
+            NormalizarModelos._var_dfAmostrasTemporais = None
+            NormalizarModelos._var_dictSplits = None
+            
+            try:
+                # Obtém novos splits baseados no experimento
+                var_dictSplits = NormalizarModelos._obter_splits()
+                
+                # Treina XGBoost rápido
+                var_objModelo = xgb.XGBClassifier(
+                    n_estimators=100, max_depth=6, learning_rate=0.1, random_state=42
+                )
+                var_objModelo.fit(var_dictSplits["X_train"], var_dictSplits["y_train"])
+                
+                # Predição
+                var_arrPredTest = var_objModelo.predict(var_dictSplits["X_test"])
+                
+                # Exibe métricas e matriz de confusão
+                cls._log_confusion_matrix(
+                    arg_strModelo=f"XGBoost_{var_dictExp['nome']}",
+                    arg_arrYTrue=var_dictSplits["y_test"],
+                    arg_arrYPred=var_arrPredTest,
+                    arg_listLabelNames=["cai", "mantem", "sobe"],
+                    arg_strSplit="teste_experimento",
+                    arg_boolSalvarCsv=True
+                )
+            except Exception as e:
+                logger.error(f"Falha ao executar experimento {var_dictExp['nome']}: {e}")
+                
+        # Restaura variáveis de ambiente originais
+        if var_strOriginalHz:
+            os.environ["ML_EXPERIMENTAL_MANTEM_HORIZONTE"] = var_strOriginalHz
+        else:
+            os.environ.pop("ML_EXPERIMENTAL_MANTEM_HORIZONTE", None)
+            
+        if var_strOriginalAug:
+            os.environ["ML_EXPERIMENTAL_MANTEM_AUMENTO"] = var_strOriginalAug
+        else:
+            os.environ.pop("ML_EXPERIMENTAL_MANTEM_AUMENTO", None)
+            
+        # Limpa o cache novamente para não interferir em treinos futuros
+        NormalizarModelos._var_dfAmostrasTemporais = None
+        NormalizarModelos._var_dictSplits = None
+        
+        logger.info("="*60)
+        logger.info("FIM DA AVALIAÇÃO DE EXPERIMENTOS DA CLASSE MANTEM")
+        logger.info("="*60)
 
     @classmethod
     def _salvar_modelos(cls, arg_dictModelos: dict) -> None:
