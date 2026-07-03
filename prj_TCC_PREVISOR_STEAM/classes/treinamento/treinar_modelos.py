@@ -62,7 +62,7 @@ class Treinar_Modelos:
         return {
             "accuracy": var_floatAcc,           # Taxa global de acerto
             "precision_macro": var_floatPrecision,  # Precisão equilibrada entre classes
-            "f1_macro": var_floatF1,           # Score F1 equilibrado (PRINCIPAL PARA TCC)
+            "f1_macro": var_floatF1,           # Score F1 equilibrado
             "error_count": var_intErros,       # Contagem absoluta de erros
             "error_rate": var_floatErroTaxa,   # Taxa relativa de erros (%)
         }

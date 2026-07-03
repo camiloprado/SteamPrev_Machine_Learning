@@ -18,7 +18,7 @@ class NormalizarModelos:
     _var_dfDadosTreinamento = None
     _var_dfAmostrasTemporais = None
     _var_dictSplits = None
-    _var_intJanelaHistorico = 5
+    _var_intAnosJanelaHistorico = 5
     _var_floatThresholdDirecao = 0.03
 
     @classmethod
@@ -266,8 +266,9 @@ class NormalizarModelos:
 
         var_listAmostras = []
 
-        # Janela de histórico a ser considerada para criar as amostras temporais
-        var_intJanela = cls._var_intJanelaHistorico
+        # Janela de histórico em anos a ser considerada para criar as amostras temporais
+        var_intAnosJanela = cls._var_intAnosJanelaHistorico
+        var_intSegundosJanela = var_intAnosJanela * 365 * 86400
 
         # Threshold de variação de preço para classificar a direção como "cai", "mantem" ou "sobe"
         var_floatThreshold = cls._var_floatThresholdDirecao
@@ -277,8 +278,8 @@ class NormalizarModelos:
             # Separa o histórico de preços
             var_listHistorico = cls._separar_historico(var_dictRow.get("historico_preco"))
 
-            # Verifica se o histórico tem pontos suficientes para a janela definida, caso contrário, ignora.
-            if len(var_listHistorico) < (var_intJanela + 1):
+            # Verifica se o histórico tem ao menos 2 pontos (atual e futuro) para calcular o alvo
+            if len(var_listHistorico) < 2:
                 continue
 
             # Extrai o review score
@@ -287,13 +288,15 @@ class NormalizarModelos:
             # Extrai o preço atual do catálogo
             var_floatPrecoAtualCatalogo = cls._converter_preco_para_float(var_dictRow.get("preco"))
 
-            # Itera sobre o histórico a partir do ponto onde a janela completa pode ser formada
-            for var_intIdx in range(var_intJanela, len(var_listHistorico) - 1):
-                # Cria uma lista com os pontos do histórico que formam a janela
-                var_listJanela = var_listHistorico[var_intIdx - var_intJanela: var_intIdx + 1]
-
+            # Itera sobre o histórico
+            for var_intIdx in range(len(var_listHistorico) - 1):
                 # Extrai o ponto atual
                 var_dictAtual = var_listHistorico[var_intIdx]
+                var_intTimestampAtual = var_dictAtual["timestamp"]
+                var_intTimestampLimite = var_intTimestampAtual - var_intSegundosJanela
+
+                # Cria uma lista com os pontos do histórico que formam a janela de até X anos
+                var_listJanela = [item for item in var_listHistorico[:var_intIdx + 1] if item["timestamp"] >= var_intTimestampLimite]
 
                 # Extrai o ponto futuro
                 var_dictFuturo = var_listHistorico[var_intIdx + 1]
