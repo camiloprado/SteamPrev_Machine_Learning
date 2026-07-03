@@ -2,6 +2,7 @@
 import pandas as pd
 import psycopg2
 from psycopg2.extras import RealDictCursor
+import os
 
 # Conectar ao PostgreSQL
 conn = psycopg2.connect(
@@ -9,7 +10,7 @@ conn = psycopg2.connect(
     port=5432,
     database="postgres",
     user="postgres",
-    password="Fkmij62uDMmZ3nM1"
+    password=os.getenv("DB_PASSWORD", "postgres")
 )
 
 # Buscar 5 registros com arrays
