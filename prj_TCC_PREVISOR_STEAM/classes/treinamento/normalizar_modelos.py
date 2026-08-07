@@ -423,6 +423,23 @@ class NormalizarModelos:
                 # =============================================================
                 # FEATURES
                 # =============================================================
+                var_dtAtual = datetime.fromtimestamp(var_intTimestampAtual)
+                var_intMesAtual = var_dtAtual.month
+                var_intDiaDoAno = var_dtAtual.timetuple().tm_yday
+                
+                # Datas fixas das grandes promoções (Day of Year)
+                var_listDiasGrandesPromocoes = [75, 177, 327, 355] # Spring, Summer, Autumn, Winter
+                
+                # Calcula a distância em dias para a próxima grande promoção
+                var_intDiasProxPromo = 999
+                for var_intDiaPromo in var_listDiasGrandesPromocoes:
+                    if var_intDiaPromo >= var_intDiaDoAno:
+                        var_intDiasProxPromo = min(var_intDiasProxPromo, var_intDiaPromo - var_intDiaDoAno)
+                
+                # Se passou do dia 355, a próxima é o Spring do ano que vem (365 - dia_atual + 75)
+                if var_intDiasProxPromo == 999:
+                    var_intDiasProxPromo = (365 - var_intDiaDoAno) + 75
+                
                 var_listPrecosJanela = [var_dictItem["preco"] for var_dictItem in var_listJanela]
                 var_listDescontosJanela = [var_dictItem.get("desconto", 0) for var_dictItem in var_listJanela]
                 var_listTimestampsJanela = [var_dictItem["timestamp"] for var_dictItem in var_listJanela]
@@ -480,6 +497,9 @@ class NormalizarModelos:
                         "num_promocoes_janela": var_intTotalDescontosJanela,                                        # Conta o número de promoções na janela.
                         "dias_janela": var_intDiasJanela,                                                           # Calcula o número de dias na janela.
                         "dias_desde_ultimo_desconto": var_intDiasDesdeUltimoDesconto,                               # Extrai os dias desde o último desconto.
+                        "mes_atual": var_intMesAtual,                                                               # Extrai o mês atual
+                        "dia_do_ano": var_intDiaDoAno,                                                              # Extrai o dia do ano
+                        "dias_para_proxima_grande_promo": var_intDiasProxPromo,                                     # Dias até a proxima grande Sale
                         # Alvos de classificação
                         "alvo_direcao_preco": var_strDirecaoProxEvento,                                             # Direção do próximo evento (cai/mantem/sobe).
                         # Alvo de regressão
@@ -533,21 +553,24 @@ class NormalizarModelos:
 
         # Lista de features para treinamento (sem desconto_atual — sempre 0 após filtro)
         var_listFeatures = [
-            "review_score",
-            "preco_catalogo",
-            "preco_atual_hist",
-            "preco_media_janela",
-            "preco_std_janela",
-            "preco_min_janela",
-            "preco_max_janela",
-            "frequencia_descontos_por_ano",
-            "dias_no_preco_atual",
-            "ratio_preco_atual_vs_minimo",
-            "desconto_medio_janela",
-            "desconto_max_janela",
-            "num_promocoes_janela",
-            "dias_janela",
-            "dias_desde_ultimo_desconto",
+            "review_score",                                                                                 # Positivo/Negativo
+            "preco_catalogo",                                                                               # Preço original
+            "preco_atual_hist",                                                                             # Preço atual do jogo na steam
+            "preco_media_janela",                                                                           # Preço médio dos ultimos 180 dias
+            "preco_std_janela",                                                                             # Desvio padrão dos ultimos 180 dias
+            "preco_min_janela",                                                                             # Preço mínimo dos ultimos 180 dias
+            "preco_max_janela",                                                                             # Preço máximo dos ultimos 180 dias
+            "frequencia_descontos_por_ano",                                                                 # Frequência de descontos por ano
+            "dias_no_preco_atual",                                                                          # Dias no preço atual
+            "ratio_preco_atual_vs_minimo",                                                                  # Razão entre preço atual e mínimo
+            "desconto_medio_janela",                                                                        # Desconto médio na janela
+            "desconto_max_janela",                                                                          # Desconto máximo na janela
+            "num_promocoes_janela",                                                                         # Número de promoções na janela
+            "dias_janela",                                                                                  # Dias na janela
+            "dias_desde_ultimo_desconto",                                                                   # Dias desde o último desconto
+            "mes_atual",                                                                                    # Mês atual
+            "dia_do_ano",                                                                                   # Dia do ano
+            "dias_para_proxima_grande_promo",                                                               # Dias até a próxima grande promoção
         ]
 
         cls._log_estatisticas_treinamento(var_dfDataframeCopy, var_listFeatures)
