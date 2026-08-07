@@ -4,21 +4,20 @@ Projeto de TCC em Ciência da Computação voltado para engenharia de dados e ma
 
 ## Sobre o projeto
 
-O sistema coleta dados de jogos em larga escala (Steam API, SteamSpy e ITAD), transforma os dados em uma base analítica e treina modelos preditivos para apoiar decisões de preço e potencial de sucesso.
+O sistema coleta dados de jogos em larga escala (Steam API, SteamSpy e ITAD), transforma os dados em uma base analítica rica (Pipeline ETL) e treina Modelos de Machine Learning (Classificação e Regressão) para apoiar decisões de negócios em relação ao histórico de preços.
 
-Pontos centrais do trabalho:
-- Pipeline de dados com foco em volume e resiliência
-- Integração assíncrona com múltiplas fontes externas
-- ETL para padronização de dados brutos e semiestruturados
-- Treinamento de modelos (LightGBM, XGBoost, Random Forest e regressão)
+**Arquitetura:**
+- **Data Engineering (Fábrica):** O projeto realiza toda a coleta, limpeza e construção de amostras temporais com features complexas (estabilidade de preço, sazonalidade global, frequências de eventos).
+- **Machine Learning:** Os classificadores prevêem a direção do preço ("sobe", "cai" ou "mantém") em horizontes fixos (30, 60, 90 dias). O regressor contínuo prevê, de forma estrita, **"Faltam quantos dias para a próxima promoção?"**.
+
+Os artefatos de IA gerados pelo treinamento (`.joblib`) são exportados para consumo independente.
 
 ## Destaques técnicos
 
-- Processamento em lotes com ajuste dinâmico
-- Retry com backoff para APIs externas
-- Checkpoint para retomada de execução
-- PostgreSQL local como núcleo operacional
-- Limpeza e transformação orientadas a reprocessamento
+- **Sazonalidade Injetada:** O motor da IA calcula as distâncias para o calendário fixo de liquidações mundiais da Steam (Spring, Summer, Autumn e Winter Sale).
+- **Mitigação de Outliers:** Uso prático de clipping e balanceamento estatístico para estabilizar os modelos.
+- **Processamento em lotes:** Integração massiva e resiliente às APIs externas, suportando retry com backoff.
+- **Banco e Persistência:** Baseado centralmente em um banco relacional PostgreSQL gerado via Docker.
 
 ## Stack e dependências
 
@@ -46,15 +45,14 @@ A documentação foi organizada por assunto em arquivos já existentes no reposi
 
 - Referencial e estrutura do artigo: [prj_TCC_PREVISOR_STEAM/resources/docs/Referencial_teorico.md](prj_TCC_PREVISOR_STEAM/resources/docs/Referencial_teorico.md)
 
-## Estado atual (com base no log mais recente)
+## Estado Atual e Status
 
-Referência: [prj_TCC_PREVISOR_STEAM/resources/logs/app.log](prj_TCC_PREVISOR_STEAM/resources/logs/app.log)
+> **Status:** O desenvolvimento bruto e a construção dos modelos preditivos (`Normalização` e `Treinamento`) estão **Concluídos e Otimizados**.
 
-Resumo objetivo do cenário observado:
-- Endpoint antigo de app list da Steam retorna 404; fallback para SteamSpy está ativo
-- Há execuções que falham ao iniciar Docker quando o engine não está disponível
-- Após ambiente saudável, o pipeline volta a rodar e carrega dados de treino
-- Existe falha registrada em alimentar steam_geral por variável local não inicializada em execução específica
+A pipeline flui livremente através de todos os estágios. Os dados são limpos, cruzados e as amostras temporais são formatadas para gerar as *features*. Os modelos (XGBoost, LightGBM, Random Forest) rodam de ponta a ponta avaliando pontuações com métricas de negócio reais (RMSE, MAE e F1-Score).
+Por ser a "Fábrica", este projeto agora atua passivamente gerando os binários treinados `.joblib` e os relatórios comparativos em CSV/PNG.
+
+*(Nota: Próximos passos globais incluem criar um novo bot isolado de frontend para consumir esses treinamentos e prever eventos em tempo real)*
 
 ## Execução local (passo a passo)
 
