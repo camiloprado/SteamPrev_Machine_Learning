@@ -461,14 +461,27 @@ class Treinar_Modelos:
             if arg_boolSalvarPng:
                 var_pathRelatorios = cls._obter_diretorio_relatorios()
                 var_strBaseName = f"regressao_{arg_strModelo}_predito_vs_real_{arg_strTs}"
+                
+                # Salvar Gráfico PNG
                 var_pathPng = var_pathRelatorios / f"{var_strBaseName}.png"
                 var_objFig.savefig(var_pathPng, dpi=max(72, int(arg_intDpi)))
                 logger.info(f"Plot regressão (predito vs real) salvo: {var_pathPng}")
+
+                # Salvar CSV com os dados da regressão
+                var_pathCsv = var_pathRelatorios / f"{var_strBaseName}.csv"
+                var_dfRegDados = pd.DataFrame({
+                    "Valor_Real": var_arrYReal,
+                    "Valor_Predito": var_arrYPred,
+                    "Residual": var_arrYReal - var_arrYPred,
+                    "Media_Ideal": var_arrYReal  # A linha ideal seria Predito == Real
+                })
+                var_dfRegDados.to_csv(var_pathCsv, index=False)
+                logger.info(f"Dados da regressão (CSV) salvos: {var_pathCsv}")
             
             if arg_boolMostrar:
                 plt.show()
         except Exception as e:
-            logger.warning(f"Falha ao gerar plot predito vs real ({arg_strModelo}): {e}")
+            logger.warning(f"Falha ao gerar plot/csv predito vs real ({arg_strModelo}): {e}")
         finally:
             try:
                 plt.close("all")
@@ -652,7 +665,7 @@ class Treinar_Modelos:
         # Obtém dados normalizados para regressão
         var_dictSplits = NormalizarModelos._obter_splits()
 
-        # Instancia XGBoost para regressão (saída contínua)
+        # Instancia XGBoost para regressão (saída contínua) usando Pseudo Huber Loss
         var_objModelo = xgb.XGBRegressor(
             n_estimators=300,           # 300 iterações de boosting
             learning_rate=0.05,         # Aprendizado conservador
@@ -825,137 +838,52 @@ class Treinar_Modelos:
         }
 
     @classmethod
-    def treinar_modelo_random_forest(cls) -> dict:
+    def treinar_modelo_random_forest(cls, arg_strHorizonte: str = "prox_evento") -> dict:
         """
         Método para treinar o modelo de Random Forest.
 
         Parâmetros:
+        - arg_strHorizonte (str): Horizonte temporal para treinamento.
 
         Retorna:
         - dict: Dicionário contendo o modelo treinado, acurácia, F1-macro e tamanhos dos conjuntos de treino e teste.
         """
-        # Obtém dados normalizados para CLASSIFICAÇÃO
-        # X_train, y_train = features e rótulos do treino
-        # X_test, y_test = features e rótulos do teste
-        var_dictSplits = NormalizarModelos._obter_splits()
+        var_dictSplits = NormalizarModelos._obter_splits(arg_strHorizonte)
 
-        # Instancia Random Forest com 300 árvores
-        # Cada árvore independente = diversidade = robustez
         var_objModelo = RandomForestClassifier(
-            n_estimators=300,      # 300 árvores de decisão
-            max_depth=12,          # Cada árvore tem profundidade máxima 12 (controla complexidade)
-            n_jobs=-1,             # -1 = usa todos os cores disponíveis
-            random_state=42,       # Seed para reprodutibilidade
+            n_estimators=300,
+            max_depth=12,
+            min_samples_split=5,
+            min_samples_leaf=2,
+            max_features="sqrt",
+            random_state=42,
+            n_jobs=-1,
+            class_weight="balanced_subsample",
         )
         
-        # TREINA: cada árvore aprende com features aleatórios
         var_objModelo.fit(var_dictSplits["X_train"], var_dictSplits["y_train"])
-        
-        # PREDIZ no treino: cada árvore vota, vence a classe com mais votos
         var_arrPredTrain = var_objModelo.predict(var_dictSplits["X_train"])
-        
-        # PREDIZ no teste: usa as 300 árvores treinadas para dados novos
         var_arrPredTest = var_objModelo.predict(var_dictSplits["X_test"])
 
-        # Calcula métricas (accuracy, precision, f1, erros) apenas no TESTE
         var_dictMetricas = cls._metricas_classificacao(var_dictSplits["y_test"], var_arrPredTest)
 
-        # Log detalhado: treino vs teste com detecção de overfitting
         cls._log_metricas_treino_teste_classificacao(
-            arg_strModelo="Random Forest",
+            arg_strModelo=f"Random Forest ({arg_strHorizonte})",
             arg_yTrain=var_dictSplits["y_train"],
             arg_yPredTrain=var_arrPredTrain,
             arg_yTest=var_dictSplits["y_test"],
             arg_yPredTest=var_arrPredTest,
         )
 
-        # Log matriz de confusão: como o modelo confundiu cada classe
-        # Salva em CSV (contagens + normalizado) e PNG (heatmap visual)
         cls._log_confusion_matrix(
-            arg_strModelo="RandomForest",           # Nome para arquivo
-            arg_arrYTrue=var_dictSplits["y_test"],  # Rótulos verdadeiros
-            arg_arrYPred=var_arrPredTest,           # Rótulos preditos
-            arg_listLabels=[0, 1, 2],               # Classes (cai, mantem, sobe)
-            arg_listLabelNames=["cai", "mantem", "sobe"],  # Nomes legíveis
-            arg_strSplit="teste"                    # Indica que é no conjunto de teste
-        )
-        
-        # Retorna dicionário com tudo para tabela comparativa final
-        return {
-            "modelo": var_objModelo,               # Modelo treinado (300 árvores)
-            **var_dictMetricas,                    # Expande: accuracy, precision, f1, errors
-            "train_size": var_dictSplits["X_train"].shape[0],  # Tamanho do treino
-            "test_size": var_dictSplits["X_test"].shape[0],    # Tamanho do teste
-        }
-
-    @classmethod
-    def treinar_modelo_xgboost(cls) -> dict:
-        """
-        Método para treinar o modelo de XGBoost.
-
-        Parâmetros:
-
-        Retorna:
-        - dict: Dicionário contendo o modelo treinado, acurácia, F1-macro e tamanhos dos conjuntos de treino e teste.
-        """
-        # Obtém dados normalizados para classificação
-        var_dictSplits = NormalizarModelos._obter_splits()
-
-        # Instancia XGBoost para classificação multiclasse (3 classes)
-        var_objModelo = xgb.XGBClassifier(
-            objective="multi:softprob",        # Softmax para 3+ classes (probs somam 1)
-            num_class=3,                       # 3 classes: cai, mantem, sobe
-            eval_metric="mlogloss",            # Métrica de avaliação (log loss para multiclasse)
-            n_estimators=300,                  # 300 iterações de boosting
-            learning_rate=0.05,                # Aprendizado conservador (evita overfitting)
-            max_depth=8,                       # Árvores rasas (12 em RF, 8 em XGB)
-            subsample=0.9,                     # Usa 90% das amostras por iteração
-            colsample_bytree=0.9,              # Usa 90% das features por iteração
-            random_state=42,                   # Reprodutibilidade
-        )
-
-        # TREINA com EARLY STOPPING (parada se não melhorar)
-        try:
-            # Tenta treinar com early stopping (requer dataset de validação)
-            var_objModelo.fit(
-                var_dictSplits["X_train"],
-                var_dictSplits["y_train"],
-                eval_set=[(var_dictSplits["X_test"], var_dictSplits["y_test"])],  # Valida no teste
-                verbose=False,                 # Sem logs intermediários (mais limpo)
-                early_stopping_rounds=50,      # Para se 50 rounds sem melhoria
-            )
-        except TypeError:
-            # Se a versão do XGB não suporta early stopping, treina normalmente
-            var_objModelo.fit(var_dictSplits["X_train"], var_dictSplits["y_train"])
-
-        # PREDIZ no treino
-        var_arrPredTrain = var_objModelo.predict(var_dictSplits["X_train"])
-        
-        # PREDIZ no teste
-        var_arrPredTest = var_objModelo.predict(var_dictSplits["X_test"])
-
-        # Calcula métricas apenas no TESTE
-        var_dictMetricas = cls._metricas_classificacao(var_dictSplits["y_test"], var_arrPredTest)
-
-        # Log detalhado: treino vs teste com detecção de overfitting
-        cls._log_metricas_treino_teste_classificacao(
-            arg_strModelo="XGBoost",
-            arg_yTrain=var_dictSplits["y_train"],
-            arg_yPredTrain=var_arrPredTrain,
-            arg_yTest=var_dictSplits["y_test"],
-            arg_yPredTest=var_arrPredTest,
-        )
-
-        # Log matriz de confusão
-        cls._log_confusion_matrix(
-            arg_strModelo="XGBoost",
+            arg_strModelo=f"RandomForest_{arg_strHorizonte}",
             arg_arrYTrue=var_dictSplits["y_test"],
             arg_arrYPred=var_arrPredTest,
             arg_listLabels=[0, 1, 2],
             arg_listLabelNames=["cai", "mantem", "sobe"],
+            arg_strSplit="teste"
         )
         
-        # Retorna dicionário para tabela comparativa
         return {
             "modelo": var_objModelo,
             **var_dictMetricas,
@@ -964,73 +892,131 @@ class Treinar_Modelos:
         }
 
     @classmethod
-    def treinar_modelo_lightgbm(cls) -> dict:
+    def treinar_modelo_xgboost(cls, arg_strHorizonte: str = "prox_evento") -> dict:
         """
-        Método para treinar o modelo de LightGBM.
+        Método para treinar o modelo de XGBoost.
 
         Parâmetros:
+        - arg_strHorizonte (str): Horizonte temporal para treinamento.
 
         Retorna:
         - dict: Dicionário contendo o modelo treinado, acurácia, F1-macro e tamanhos dos conjuntos de treino e teste.
         """
-        # Obtém dados normalizados para classificação
-        var_dictSplits = NormalizarModelos._obter_splits()
+        var_dictSplits = NormalizarModelos._obter_splits(arg_strHorizonte)
 
-        # Instancia LightGBM para classificação multiclasse
-        var_objModelo = lgb.LGBMClassifier(
-            objective="multiclass",             # Classificação em 3+ classes
-            num_class=3,                        # 3 classes: cai, mantem, sobe
-            n_estimators=300,                   # 300 iterações de boosting
-            learning_rate=0.05,                 # Aprendizado conservador
-            num_leaves=31,                      # Máximo de folhas por árvore (complexidade)
-            subsample=0.9,                      # Usa 90% das amostras
-            colsample_bytree=0.9,               # Usa 90% das features
-            random_state=42,                    # Reprodutibilidade
-            verbose=-1,                         # Silencioso (sem logs de treinamento)
+        var_objModelo = xgb.XGBClassifier(
+            objective="multi:softprob",
+            num_class=3,
+            eval_metric="mlogloss",
+            n_estimators=300,
+            learning_rate=0.05,
+            max_depth=8,
+            subsample=0.9,
+            colsample_bytree=0.9,
+            random_state=42,
         )
 
-        # TREINA com EARLY STOPPING
+        from sklearn.utils.class_weight import compute_sample_weight
+        var_arrSampleWeights = compute_sample_weight("balanced", var_dictSplits["y_train"])
+        
         try:
-            # Tenta treinar com early stopping
             var_objModelo.fit(
                 var_dictSplits["X_train"],
                 var_dictSplits["y_train"],
-                eval_set=[(var_dictSplits["X_test"], var_dictSplits["y_test"])],  # Validação
-                eval_metric="multi_logloss",   # Métrica de parada
-                callbacks=[lgb.early_stopping(stopping_rounds=50, verbose=False)],  # Para se não melhorar
+                sample_weight=var_arrSampleWeights,
+                eval_set=[(var_dictSplits["X_test"], var_dictSplits["y_test"])],
+                verbose=False,
+                early_stopping_rounds=50,
             )
         except TypeError:
-            # Fallback se a sintaxe for diferente em versão anterior do LGB
-            var_objModelo.fit(var_dictSplits["X_train"], var_dictSplits["y_train"])
+            var_objModelo.fit(var_dictSplits["X_train"], var_dictSplits["y_train"], sample_weight=var_arrSampleWeights)
 
-        # PREDIZ no treino
         var_arrPredTrain = var_objModelo.predict(var_dictSplits["X_train"])
-        
-        # PREDIZ no teste
         var_arrPredTest = var_objModelo.predict(var_dictSplits["X_test"])
 
-        # Calcula métricas apenas no TESTE
         var_dictMetricas = cls._metricas_classificacao(var_dictSplits["y_test"], var_arrPredTest)
 
-        # Log detalhado: treino vs teste com detecção de overfitting
         cls._log_metricas_treino_teste_classificacao(
-            arg_strModelo="LightGBM",
+            arg_strModelo=f"XGBoost ({arg_strHorizonte})",
             arg_yTrain=var_dictSplits["y_train"],
             arg_yPredTrain=var_arrPredTrain,
             arg_yTest=var_dictSplits["y_test"],
             arg_yPredTest=var_arrPredTest,
         )
 
-        # Log matriz de confusão
         cls._log_confusion_matrix(
-            arg_strModelo="LightGBM",
+            arg_strModelo=f"XGBoost_{arg_strHorizonte}",
             arg_arrYTrue=var_dictSplits["y_test"],
             arg_arrYPred=var_arrPredTest,
             arg_listLabels=[0, 1, 2],
             arg_listLabelNames=["cai", "mantem", "sobe"],
         )
         
-        # Retorna dicionário para tabela comparativa
+        return {
+            "modelo": var_objModelo,
+            **var_dictMetricas,
+            "train_size": var_dictSplits["X_train"].shape[0],
+            "test_size": var_dictSplits["X_test"].shape[0],
+        }
+
+    @classmethod
+    def treinar_modelo_lightgbm(cls, arg_strHorizonte: str = "prox_evento") -> dict:
+        """
+        Método para treinar o modelo de LightGBM.
+
+        Parâmetros:
+        - arg_strHorizonte (str): Horizonte temporal para treinamento.
+
+        Retorna:
+        - dict: Dicionário contendo o modelo treinado, acurácia, F1-macro e tamanhos dos conjuntos de treino e teste.
+        """
+        var_dictSplits = NormalizarModelos._obter_splits(arg_strHorizonte)
+
+        var_objModelo = lgb.LGBMClassifier(
+            objective="multiclass",
+            num_class=3,
+            n_estimators=300,
+            learning_rate=0.05,
+            num_leaves=31,
+            subsample=0.9,
+            colsample_bytree=0.9,
+            random_state=42,
+            verbose=-1,
+            class_weight="balanced",
+        )
+
+        try:
+            var_objModelo.fit(
+                var_dictSplits["X_train"],
+                var_dictSplits["y_train"],
+                eval_set=[(var_dictSplits["X_test"], var_dictSplits["y_test"])],
+                eval_metric="multi_logloss",
+                callbacks=[lgb.early_stopping(stopping_rounds=50, verbose=False)],
+            )
+        except TypeError:
+            var_objModelo.fit(var_dictSplits["X_train"], var_dictSplits["y_train"])
+
+        var_arrPredTrain = var_objModelo.predict(var_dictSplits["X_train"])
+        var_arrPredTest = var_objModelo.predict(var_dictSplits["X_test"])
+
+        var_dictMetricas = cls._metricas_classificacao(var_dictSplits["y_test"], var_arrPredTest)
+
+        cls._log_metricas_treino_teste_classificacao(
+            arg_strModelo=f"LightGBM ({arg_strHorizonte})",
+            arg_yTrain=var_dictSplits["y_train"],
+            arg_yPredTrain=var_arrPredTrain,
+            arg_yTest=var_dictSplits["y_test"],
+            arg_yPredTest=var_arrPredTest,
+        )
+
+        cls._log_confusion_matrix(
+            arg_strModelo=f"LightGBM_{arg_strHorizonte}",
+            arg_arrYTrue=var_dictSplits["y_test"],
+            arg_arrYPred=var_arrPredTest,
+            arg_listLabels=[0, 1, 2],
+            arg_listLabelNames=["cai", "mantem", "sobe"],
+        )
+        
         return {
             "modelo": var_objModelo,
             **var_dictMetricas,
@@ -1041,7 +1027,7 @@ class Treinar_Modelos:
     @classmethod
     def executar_treinamento(cls):
         """
-        Método para executar o treinamento de todos os modelos.
+        Método para executar o treinamento de todos os modelos para todos os horizontes temporais.
 
         Parâmetros:
 
@@ -1051,100 +1037,63 @@ class Treinar_Modelos:
         logger.info("INICIANDO TREINAMENTO DE MODELOS DE CLASSIFICAÇÃO E REGRESSÃO")
         logger.info("=" * 80)
         
-        # Treina LightGBM (gradual boosting, mais rápido)
-        var_dictLGBM = Treinar_Modelos.treinar_modelo_lightgbm()
-        
-        # Treina XGBoost (extreme gradient boosting, mais poderoso)
-        var_dictXGB = Treinar_Modelos.treinar_modelo_xgboost()
-        
-        # Treina Random Forest (múltiplas árvores independentes, mais robusto)
-        var_dictRF = Treinar_Modelos.treinar_modelo_random_forest()
-        
-        # Treina Regressão Linear (dias até desconto)
+        var_listHorizontes = NormalizarModelos.obter_horizontes_disponiveis()
+        var_dictModelosClassificacao = {}
+
+        for var_strHorizonte in var_listHorizontes:
+            logger.info("=" * 80)
+            logger.info(f"TREINANDO CLASSIFICADORES - HORIZONTE: {var_strHorizonte}")
+            logger.info("=" * 80)
+            
+            var_dictLGBM = Treinar_Modelos.treinar_modelo_lightgbm(arg_strHorizonte=var_strHorizonte)
+            var_dictXGB = Treinar_Modelos.treinar_modelo_xgboost(arg_strHorizonte=var_strHorizonte)
+            var_dictRF = Treinar_Modelos.treinar_modelo_random_forest(arg_strHorizonte=var_strHorizonte)
+            
+            var_dictModelosClassificacao[var_strHorizonte] = {
+                "LightGBM": var_dictLGBM,
+                "XGBoost": var_dictXGB,
+                "RandomForest": var_dictRF,
+            }
+
+            logger.info("-" * 80)
+            logger.info(f"RESUMO COMPARATIVO - {var_strHorizonte.upper()}")
+            logger.info(f"{'Modelo':<18} | {'Accuracy':>10} | {'Precision':>10} | {'F1-Score':>10} | Dataset")
+            logger.info("-" * 80)
+            
+            for var_strNome, var_dictMetricas in var_dictModelosClassificacao[var_strHorizonte].items():
+                logger.info(
+                    f"{var_strNome:<18} | {var_dictMetricas['accuracy']:>10.4f} | "
+                    f"{var_dictMetricas['precision_macro']:>10.4f} | {var_dictMetricas['f1_macro']:>10.4f} | "
+                    f"{var_dictMetricas['train_size']:,} treino / {var_dictMetricas['test_size']:,} teste"
+                )
+            
+            var_strMelhorModelo = max(var_dictModelosClassificacao[var_strHorizonte].items(), key=lambda x: x[1]['f1_macro'])[0]
+            var_floatMelhorF1 = var_dictModelosClassificacao[var_strHorizonte][var_strMelhorModelo]['f1_macro']
+            logger.info(f"MELHOR MODELO ({var_strHorizonte}): {var_strMelhorModelo} (F1-Score: {var_floatMelhorF1:.4f})")
+            
+        logger.info("=" * 80)
+        logger.info("TREINANDO REGRESSORES (DIAS ATÉ DESCONTO)")
+        logger.info("=" * 80)
+
         var_dictReg = Treinar_Modelos.treinar_modelo_regressao_linear()
-        
-        # Treina XGBoost Regressão (dias até desconto)
         var_dictRegXGB = Treinar_Modelos.treinar_modelo_xgboost_regressao()
-        
-        # Treina LightGBM Regressão (dias até desconto)
         var_dictRegLGB = Treinar_Modelos.treinar_modelo_lightgbm_regressao()
 
-        # Tabela comparativa final - MODELOS DE CLASSIFICAÇÃO
-        logger.info("=" * 80)
-        logger.info("RESUMO COMPARATIVO - MODELOS DE CLASSIFICAÇÃO (DIREÇÃO DE PREÇO)")
-        logger.info("=" * 80)
-        
-        # Cabeçalho da tabela
-        logger.info(f"{'Modelo':<18} | {'Accuracy':>10} | {'Precision':>10} | {'F1-Score':>10} | Dataset")
         logger.info("-" * 80)
-        
-        # Linha LightGBM com métricas
-        logger.info(
-            f"{'LightGBM':<18} | {var_dictLGBM['accuracy']:>10.4f} | "
-            f"{var_dictLGBM['precision_macro']:>10.4f} | {var_dictLGBM['f1_macro']:>10.4f} | "
-            f"{var_dictLGBM['train_size']:,} treino / {var_dictLGBM['test_size']:,} teste"
-        )
-        
-        # Linha XGBoost com métricas
-        logger.info(
-            f"{'XGBoost':<18} | {var_dictXGB['accuracy']:>10.4f} | "
-            f"{var_dictXGB['precision_macro']:>10.4f} | {var_dictXGB['f1_macro']:>10.4f} | "
-            f"{var_dictXGB['train_size']:,} treino / {var_dictXGB['test_size']:,} teste"
-        )
-        
-        # Linha Random Forest com métricas
-        logger.info(
-            f"{'Random Forest':<18} | {var_dictRF['accuracy']:>10.4f} | "
-            f"{var_dictRF['precision_macro']:>10.4f} | {var_dictRF['f1_macro']:>10.4f} | "
-            f"{var_dictRF['train_size']:,} treino / {var_dictRF['test_size']:,} teste"
-        )
-        
-        # Identifica melhor modelo
-        # Cria dicionário com nome e resultados de cada modelo
-        var_dictModelos = {"LightGBM": var_dictLGBM, "XGBoost": var_dictXGB, "Random Forest": var_dictRF}
-        
-        # Identifica qual modelo tem o MAIOR F1-Score
-        # F1 é melhor que Accuracy porque penaliza tanto falsos positivos quanto falsos negativos
-        var_strMelhorModelo = max(var_dictModelos.items(), key=lambda x: x[1]['f1_macro'])[0]
-        var_floatMelhorF1 = var_dictModelos[var_strMelhorModelo]['f1_macro']
-        
-        logger.info(f"MELHOR MODELO: {var_strMelhorModelo} (F1-Score: {var_floatMelhorF1:.4f})")
-        
-        # Regressão Linear
-        logger.info("=" * 80)
-        logger.info("RESUMO COMPARATIVO - MODELOS DE REGRESSÃO (DIAS ATÉ DESCONTO)")
-        logger.info("=" * 80)
-        
-        # Cabeçalho da tabela de regressão
+        logger.info("RESUMO COMPARATIVO - REGRESSÃO")
         logger.info(f"{'Modelo':<18} | {'RMSE (dias)':>12} | {'MAE (dias)':>11} | {'MSE':>10} | Dataset")
         logger.info("-" * 80)
         
-        # Linha LightGBM Regressão
-        logger.info(
-            f"{'LightGBM':<18} | {var_dictRegLGB['rmse']:>12.2f} | "
-            f"{var_dictRegLGB['mae']:>11.2f} | {var_dictRegLGB['mse']:>10.2f} | "
-            f"{var_dictRegLGB['train_size']:,} treino / {var_dictRegLGB['test_size']:,} teste"
-        )
+        var_dictRegressores = {"LightGBM": var_dictRegLGB, "XGBoost": var_dictRegXGB, "LinearRegression": var_dictReg}
+        for var_strNome, var_dictMetricas in var_dictRegressores.items():
+            logger.info(
+                f"{var_strNome:<18} | {var_dictMetricas['rmse']:>12.2f} | "
+                f"{var_dictMetricas['mae']:>11.2f} | {var_dictMetricas['mse']:>10.2f} | "
+                f"{var_dictMetricas['train_size']:,} treino / {var_dictMetricas['test_size']:,} teste"
+            )
         
-        # Linha XGBoost Regressão
-        logger.info(
-            f"{'XGBoost':<18} | {var_dictRegXGB['rmse']:>12.2f} | "
-            f"{var_dictRegXGB['mae']:>11.2f} | {var_dictRegXGB['mse']:>10.2f} | "
-            f"{var_dictRegXGB['train_size']:,} treino / {var_dictRegXGB['test_size']:,} teste"
-        )
-        
-        # Linha Regressão Linear
-        logger.info(
-            f"{'Linear Regression':<18} | {var_dictReg['rmse']:>12.2f} | "
-            f"{var_dictReg['mae']:>11.2f} | {var_dictReg['mse']:>10.2f} | "
-            f"{var_dictReg['train_size']:,} treino / {var_dictReg['test_size']:,} teste"
-        )
-        
-        # Identifica melhor regressor
-        var_dictRegressores = {"LightGBM": var_dictRegLGB, "XGBoost": var_dictRegXGB, "Linear Regression": var_dictReg}
         var_strMelhorRegressor = min(var_dictRegressores.items(), key=lambda x: x[1]['rmse'])[0]
         var_floatMelhorRMSE = var_dictRegressores[var_strMelhorRegressor]['rmse']
-        
         logger.info(f"MELHOR MODELO REGRESSÃO: {var_strMelhorRegressor} (RMSE: {var_floatMelhorRMSE:.2f} dias)")
         
         logger.info("="*80)
@@ -1152,19 +1101,10 @@ class Treinar_Modelos:
         logger.info("Matrizes de confusão salvas em: resources/relatorios/")
         logger.info("="*80)
 
-        # Persiste todos os modelos em disco (opt-out via ML_SALVAR_MODELOS=False)
         try:
             var_dictTodosModelos = {
-                "classificacao": {
-                    "LightGBM": var_dictLGBM,
-                    "XGBoost": var_dictXGB,
-                    "RandomForest": var_dictRF,
-                },
-                "regressao": {
-                    "LightGBM": var_dictRegLGB,
-                    "XGBoost": var_dictRegXGB,
-                    "LinearRegression": var_dictReg,
-                },
+                "classificacao": var_dictModelosClassificacao,
+                "regressao": var_dictRegressores,
             }
             cls._salvar_modelos(var_dictTodosModelos)
         except Exception as e:
@@ -1173,7 +1113,7 @@ class Treinar_Modelos:
         # =====================================================================
         # BLOCO DE EXPERIMENTOS TCC
         # =====================================================================
-        var_dictSplits = NormalizarModelos._obter_splits()
+        var_dictSplits = NormalizarModelos._obter_splits("30d")
         
         if str(os.getenv("ML_EXPERIMENTAL_OPTUNA", "False")).lower() in ("true", "1", "yes"):
             try:
@@ -1183,7 +1123,7 @@ class Treinar_Modelos:
 
         if str(os.getenv("ML_EXPERIMENTAL_SHAP", "False")).lower() in ("true", "1", "yes"):
             try:
-                experimentos_tcc.gerar_explicabilidade_shap(var_dictXGB["modelo"], var_dictSplits["X_test"], arg_strNomeModelo="XGBoost_Classificacao")
+                experimentos_tcc.gerar_explicabilidade_shap(var_dictModelosClassificacao["30d"]["XGBoost"]["modelo"], var_dictSplits["X_test"], arg_strNomeModelo="XGBoost_Classificacao_30d")
             except Exception as e:
                 logger.error(f"Erro no experimento SHAP: {e}")
 
@@ -1191,7 +1131,7 @@ class Treinar_Modelos:
             try:
                 var_dfX_full = pd.concat([var_dictSplits["X_train"], var_dictSplits["X_test"]])
                 var_serY_full = pd.concat([var_dictSplits["y_train"], var_dictSplits["y_test"]])
-                experimentos_tcc.avaliar_cross_validation_temporal(var_dictXGB["modelo"], var_dfX_full, var_serY_full)
+                experimentos_tcc.avaliar_cross_validation_temporal(var_dictModelosClassificacao["30d"]["XGBoost"]["modelo"], var_dfX_full, var_serY_full)
             except Exception as e:
                 logger.error(f"Erro no experimento CV Temporal: {e}")
 
@@ -1218,16 +1158,8 @@ class Treinar_Modelos:
         """
         Persiste todos os modelos treinados em resources/models/.
 
-        Salva cada modelo com timestamp e mantém uma cópia <nome>_latest.joblib
-        para facilitar o carregamento em predições futuras.
-        Controlável via variável de ambiente ML_SALVAR_MODELOS (padrão: True).
-
         Parâmetros:
-        - arg_dictModelos (dict): Dicionário com estrutura:
-            {
-                "classificacao": {"<AlgoName>": {"modelo": <modelo>, ...}, ...},
-                "regressao":     {"<AlgoName>": {"modelo": <modelo>, ...}, ...},
-            }
+        - arg_dictModelos (dict)
 
         Retorna:
         - None
@@ -1246,21 +1178,35 @@ class Treinar_Modelos:
         logger.info(f"Diretório: {var_pathModels}")
         logger.info("="*60)
 
-        for var_strTipo, var_dictAlgos in arg_dictModelos.items():
-            for var_strAlgo, var_dictResultado in var_dictAlgos.items():
+        if "classificacao" in arg_dictModelos:
+            for var_strHorizonte, var_dictAlgos in arg_dictModelos["classificacao"].items():
+                for var_strAlgo, var_dictResultado in var_dictAlgos.items():
+                    var_objModelo = var_dictResultado.get("modelo")
+                    if var_objModelo is None:
+                        continue
+
+                    var_strNomeArq = f"modelo_classificacao_{var_strAlgo}_{var_strHorizonte}_{var_strTimestamp}.joblib"
+                    var_pathArq = var_pathModels / var_strNomeArq
+                    joblib.dump(var_objModelo, var_pathArq)
+                    logger.info(f"Salvo: {var_strNomeArq}")
+
+                    var_strNomeLatest = f"modelo_classificacao_{var_strAlgo}_{var_strHorizonte}_latest.joblib"
+                    var_pathLatest = var_pathModels / var_strNomeLatest
+                    joblib.dump(var_objModelo, var_pathLatest)
+                    logger.info(f"Atualizado: {var_strNomeLatest}")
+
+        if "regressao" in arg_dictModelos:
+            for var_strAlgo, var_dictResultado in arg_dictModelos["regressao"].items():
                 var_objModelo = var_dictResultado.get("modelo")
                 if var_objModelo is None:
-                    logger.warning(f"Modelo ausente para {var_strTipo}/{var_strAlgo}. Pulando.")
                     continue
 
-                # Arquivo com timestamp (histórico)
-                var_strNomeArq = f"modelo_{var_strTipo}_{var_strAlgo}_{var_strTimestamp}.joblib"
+                var_strNomeArq = f"modelo_regressao_{var_strAlgo}_{var_strTimestamp}.joblib"
                 var_pathArq = var_pathModels / var_strNomeArq
                 joblib.dump(var_objModelo, var_pathArq)
                 logger.info(f"Salvo: {var_strNomeArq}")
 
-                # Cópia _latest (para uso imediato em predições)
-                var_strNomeLatest = f"modelo_{var_strTipo}_{var_strAlgo}_latest.joblib"
+                var_strNomeLatest = f"modelo_regressao_{var_strAlgo}_latest.joblib"
                 var_pathLatest = var_pathModels / var_strNomeLatest
                 joblib.dump(var_objModelo, var_pathLatest)
                 logger.info(f"Atualizado: {var_strNomeLatest}")
@@ -1268,7 +1214,6 @@ class Treinar_Modelos:
         logger.info("="*60)
         logger.info("MODELOS SALVOS COM SUCESSO")
         logger.info("="*60)
-
 
 if __name__ == "__main__":
     Treinar_Modelos.executar_treinamento()
