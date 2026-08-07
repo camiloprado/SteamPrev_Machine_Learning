@@ -17,7 +17,7 @@ print("="*80)
 # Conectar e buscar amostra
 conn = psycopg2.connect(
     host="127.0.0.1", port=5432, database="postgres",
-    user="postgres", password="Fkmij62uDMmZ3nM1"
+    user="postgres", password=os.getenv("DB_PASSWORD", "postgres")
 )
 
 with conn.cursor(cursor_factory=RealDictCursor) as cursor:

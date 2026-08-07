@@ -15,6 +15,9 @@
 prj_TCC_PREVISOR_STEAM/resources/logs/
 dashboard_tcc_temp.py
 /docker/volumes
+/docker/.env
+/docker/docker-compose.yml
+/docker/Dockerfile
 
 # Arquivos de dados exportados (muito grandes para git)
 */resources/dados/*.csv
@@ -24,3 +27,30 @@ dashboard_tcc_temp.py
 */resources/relatorios/*.csv
 */resources/relatorios/*.png
 backup_public.sql
+
+# -------------------------------------------------------------------
+# Adições para dados sensíveis, logs e ambientes extras
+# -------------------------------------------------------------------
+
+# Arquivos de log da aplicação (contêm caminhos, erros e talvez dados sensíveis)
+bot_error.txt
+bot_output.txt
+
+# Arquivos de chaves, certificados e credenciais
+*.pem
+*.key
+*.cert
+*.crt
+secrets.json
+credentials.json
+client_secret.json
+
+# Bancos de dados locais (podem conter dados sensíveis)
+*.db
+*.sqlite
+*.sqlite3
+
+# Ambientes virtuais extras (ex: .venv-1 que foi encontrado na raiz)
+/.venv*/
+/env/
+/venv/

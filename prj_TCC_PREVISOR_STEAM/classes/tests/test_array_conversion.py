@@ -4,6 +4,7 @@ Script de teste rápido para verificar conversão de arrays PostgreSQL
 import pandas as pd
 import psycopg2
 import logging
+import os
 
 logging.basicConfig(level=logging.INFO, format='%(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
@@ -14,7 +15,7 @@ conn = psycopg2.connect(
     port=5432,
     database="postgres",
     user="postgres",
-    password="Fkmij62uDMmZ3nM1"
+    password=os.getenv("DB_PASSWORD", "postgres")
 )
 
 cursor = conn.cursor()
