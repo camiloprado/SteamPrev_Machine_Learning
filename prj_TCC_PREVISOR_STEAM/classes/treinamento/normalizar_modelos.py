@@ -673,6 +673,31 @@ class NormalizarModelos:
         logger.info(f"Regressão: Treino={var_dfXrTrain.shape[0]:,} amostras | Teste={var_dfXrTest.shape[0]:,} amostras")
 
         # =================================================================
+        # REGRESSÃO — SPLITS POR HORIZONTE (30d, 60d, 90d)
+        # =================================================================
+        # Capa o alvo de regressão no limite do horizonte.
+        # Amostras com desconto além do horizonte recebem valor = cap.
+        var_dictRegressaoHorizontes = {}
+        var_dictMapDiasHorizonteReg = {"30d": 30, "60d": 60, "90d": 90}
+
+        for var_strHorizReg, var_intDiasCap in var_dictMapDiasHorizonteReg.items():
+            var_serYrTrainH = var_serYrTrain.clip(upper=var_intDiasCap)
+            var_serYrTestH = var_serYrTest.clip(upper=var_intDiasCap)
+
+            var_dictRegressaoHorizontes[var_strHorizReg] = {
+                "Xr_train": var_dfXrTrain,
+                "Xr_test": var_dfXrTest,
+                "yr_train": var_serYrTrainH,
+                "yr_test": var_serYrTestH,
+            }
+
+            logger.info(
+                f"Regressão ({var_strHorizReg}, cap={var_intDiasCap}d): "
+                f"Treino={var_dfXrTrain.shape[0]:,} | Teste={var_dfXrTest.shape[0]:,} | "
+                f"y_train max={float(var_serYrTrainH.max()):.0f} | y_test max={float(var_serYrTestH.max()):.0f}"
+            )
+
+        # =================================================================
         # CACHE FINAL
         # =================================================================
         cls._var_dictSplits = {
@@ -683,6 +708,7 @@ class NormalizarModelos:
                 "yr_train": var_serYrTrain,
                 "yr_test": var_serYrTest,
             },
+            "regressao_horizontes": var_dictRegressaoHorizontes,
         }
 
     @classmethod
@@ -710,7 +736,12 @@ class NormalizarModelos:
             )
 
         var_dictHorizonte = cls._var_dictSplits["horizontes"][arg_strHorizonte]
-        var_dictRegressao = cls._var_dictSplits["regressao"]
+
+        # Usa splits de regressão específicos do horizonte se disponíveis
+        if arg_strHorizonte in cls._var_dictSplits.get("regressao_horizontes", {}):
+            var_dictRegressao = cls._var_dictSplits["regressao_horizontes"][arg_strHorizonte]
+        else:
+            var_dictRegressao = cls._var_dictSplits["regressao"]
 
         return {
             "X_train": var_dictHorizonte["X_train"],

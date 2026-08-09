@@ -1,6 +1,7 @@
 from prj_TCC_PREVISOR_STEAM.classes.framework.AllSettings import Settings
 from prj_TCC_PREVISOR_STEAM.classes.treinamento.normalizar_modelos import NormalizarModelos
 from prj_TCC_PREVISOR_STEAM.classes.treinamento import experimentos_tcc
+from prj_TCC_PREVISOR_STEAM.classes.treinamento.exportar_modelos import ExportarModelos
 from sklearn.ensemble import RandomForestClassifier, RandomForestRegressor
 from sklearn.linear_model import LinearRegression
 from sklearn.metrics import (
@@ -553,7 +554,7 @@ class Treinar_Modelos:
                 pass
     
     @classmethod
-    def treinar_modelo_regressao_linear(cls) -> dict:
+    def treinar_modelo_regressao_linear(cls, arg_strHorizonte: str = "30d") -> dict:
         """
         Método para treinar o modelo de Regressão Linear.
 
@@ -565,7 +566,7 @@ class Treinar_Modelos:
         # Obtém dados normalizados: X_train, X_test, y_train, y_test
         # Xr_train = features de REGRESSÃO no treino (r = regressão)
         # yr_train = alvo de REGRESSÃO no treino (dias até desconto)
-        var_dictSplits = NormalizarModelos._obter_splits()
+        var_dictSplits = NormalizarModelos._obter_splits(arg_strHorizonte)
 
         # Instancia modelo de regressão linear vazio
         var_objModelo = LinearRegression()
@@ -601,7 +602,7 @@ class Treinar_Modelos:
 
         # Log detalhado: treino vs teste com status de overfitting
         cls._log_metricas_treino_teste_regressao(
-            arg_strModelo="Regressão Linear (dias até desconto)",
+            arg_strModelo=f"Regressão Linear ({arg_strHorizonte})",
             arg_yTrain=var_dictSplits["yr_train"],
             arg_yPredTrain=var_arrPredTrain,
             arg_yTest=var_dictSplits["yr_test"],
@@ -610,7 +611,7 @@ class Treinar_Modelos:
 
         # Log resumido para tabela final
         logger.info(
-            "Regressão linear (dias até desconto) - "
+            f"Regressão linear ({arg_strHorizonte}) - "
             f"RMSE: {var_floatRmse:.2f} dias | "
             f"MAE: {var_floatMae:.2f} dias | "
             f"MSE: {var_floatMse:.2f}"
@@ -622,7 +623,7 @@ class Treinar_Modelos:
             if var_boolSalvarPng or var_boolMostrar:
                 var_strTs = datetime.now().strftime("%Y%m%d_%H%M%S")
                 cls._plot_regressao_predito_vs_real(
-                    arg_strModelo="Linear",
+                    arg_strModelo=f"Linear_{arg_strHorizonte}",
                     arg_arrYReal=var_dictSplits["yr_test"],
                     arg_arrYPred=var_arrPredTest,
                     arg_strTs=var_strTs,
@@ -631,7 +632,7 @@ class Treinar_Modelos:
                     arg_intDpi=var_intDpi,
                 )
                 cls._plot_regressao_residuos(
-                    arg_strModelo="Linear",
+                    arg_strModelo=f"Linear_{arg_strHorizonte}",
                     arg_arrYReal=var_dictSplits["yr_test"],
                     arg_arrYPred=var_arrPredTest,
                     arg_strTs=var_strTs,
@@ -653,7 +654,7 @@ class Treinar_Modelos:
         }
 
     @classmethod
-    def treinar_modelo_xgboost_regressao(cls) -> dict:
+    def treinar_modelo_xgboost_regressao(cls, arg_strHorizonte: str = "30d") -> dict:
         """
         Método para treinar o modelo de XGBoost para REGRESSÃO.
 
@@ -663,7 +664,7 @@ class Treinar_Modelos:
         - dict: Dicionário contendo o modelo treinado, RMSE, MAE, MSE e tamanhos dos conjuntos.
         """
         # Obtém dados normalizados para regressão
-        var_dictSplits = NormalizarModelos._obter_splits()
+        var_dictSplits = NormalizarModelos._obter_splits(arg_strHorizonte)
 
         # Instancia XGBoost para regressão (saída contínua) usando Pseudo Huber Loss
         var_objModelo = xgb.XGBRegressor(
@@ -696,7 +697,7 @@ class Treinar_Modelos:
 
         # Log detalhado: treino vs teste
         cls._log_metricas_treino_teste_regressao(
-            arg_strModelo="XGBoost (dias até desconto)",
+            arg_strModelo=f"XGBoost Regressão ({arg_strHorizonte})",
             arg_yTrain=var_dictSplits["yr_train"],
             arg_yPredTrain=var_arrPredTrain,
             arg_yTest=var_dictSplits["yr_test"],
@@ -705,7 +706,7 @@ class Treinar_Modelos:
 
         # Log resumido
         logger.info(
-            "XGBoost (dias até desconto) - "
+            f"XGBoost Regressão ({arg_strHorizonte}) - "
             f"RMSE: {var_dictMetricas['rmse']:.2f} dias | "
             f"MAE: {var_dictMetricas['mae']:.2f} dias | "
             f"MSE: {var_dictMetricas['mse']:.2f}"
@@ -717,7 +718,7 @@ class Treinar_Modelos:
             if var_boolSalvarPng or var_boolMostrar:
                 var_strTs = datetime.now().strftime("%Y%m%d_%H%M%S")
                 cls._plot_regressao_predito_vs_real(
-                    arg_strModelo="XGBoost",
+                    arg_strModelo=f"XGBoost_{arg_strHorizonte}",
                     arg_arrYReal=var_dictSplits["yr_test"],
                     arg_arrYPred=var_arrPredTest,
                     arg_strTs=var_strTs,
@@ -726,7 +727,7 @@ class Treinar_Modelos:
                     arg_intDpi=var_intDpi,
                 )
                 cls._plot_regressao_residuos(
-                    arg_strModelo="XGBoost",
+                    arg_strModelo=f"XGBoost_{arg_strHorizonte}",
                     arg_arrYReal=var_dictSplits["yr_test"],
                     arg_arrYPred=var_arrPredTest,
                     arg_strTs=var_strTs,
@@ -745,7 +746,7 @@ class Treinar_Modelos:
         }
 
     @classmethod
-    def treinar_modelo_lightgbm_regressao(cls) -> dict:
+    def treinar_modelo_lightgbm_regressao(cls, arg_strHorizonte: str = "30d") -> dict:
         """
         Método para treinar o modelo de LightGBM para REGRESSÃO.
 
@@ -755,7 +756,7 @@ class Treinar_Modelos:
         - dict: Dicionário contendo o modelo treinado, RMSE, MAE, MSE e tamanhos dos conjuntos.
         """
         # Obtém dados normalizados para regressão
-        var_dictSplits = NormalizarModelos._obter_splits()
+        var_dictSplits = NormalizarModelos._obter_splits(arg_strHorizonte)
 
         # Instancia LightGBM para regressão (saída contínua)
         var_objModelo = lgb.LGBMRegressor(
@@ -789,7 +790,7 @@ class Treinar_Modelos:
 
         # Log detalhado: treino vs teste
         cls._log_metricas_treino_teste_regressao(
-            arg_strModelo="LightGBM (dias até desconto)",
+            arg_strModelo=f"LightGBM Regressão ({arg_strHorizonte})",
             arg_yTrain=var_dictSplits["yr_train"],
             arg_yPredTrain=var_arrPredTrain,
             arg_yTest=var_dictSplits["yr_test"],
@@ -798,7 +799,7 @@ class Treinar_Modelos:
 
         # Log resumido
         logger.info(
-            "LightGBM (dias até desconto) - "
+            f"LightGBM Regressão ({arg_strHorizonte}) - "
             f"RMSE: {var_dictMetricas['rmse']:.2f} dias | "
             f"MAE: {var_dictMetricas['mae']:.2f} dias | "
             f"MSE: {var_dictMetricas['mse']:.2f}"
@@ -810,7 +811,7 @@ class Treinar_Modelos:
             if var_boolSalvarPng or var_boolMostrar:
                 var_strTs = datetime.now().strftime("%Y%m%d_%H%M%S")
                 cls._plot_regressao_predito_vs_real(
-                    arg_strModelo="LightGBM",
+                    arg_strModelo=f"LightGBM_{arg_strHorizonte}",
                     arg_arrYReal=var_dictSplits["yr_test"],
                     arg_arrYPred=var_arrPredTest,
                     arg_strTs=var_strTs,
@@ -819,7 +820,7 @@ class Treinar_Modelos:
                     arg_intDpi=var_intDpi,
                 )
                 cls._plot_regressao_residuos(
-                    arg_strModelo="LightGBM",
+                    arg_strModelo=f"LightGBM_{arg_strHorizonte}",
                     arg_arrYReal=var_dictSplits["yr_test"],
                     arg_arrYPred=var_arrPredTest,
                     arg_strTs=var_strTs,
@@ -1071,31 +1072,39 @@ class Treinar_Modelos:
             var_floatMelhorF1 = var_dictModelosClassificacao[var_strHorizonte][var_strMelhorModelo]['f1_macro']
             logger.info(f"MELHOR MODELO ({var_strHorizonte}): {var_strMelhorModelo} (F1-Score: {var_floatMelhorF1:.4f})")
             
-        logger.info("=" * 80)
-        logger.info("TREINANDO REGRESSORES (DIAS ATÉ DESCONTO)")
-        logger.info("=" * 80)
+        var_dictModelosRegressao = {}
 
-        var_dictReg = Treinar_Modelos.treinar_modelo_regressao_linear()
-        var_dictRegXGB = Treinar_Modelos.treinar_modelo_xgboost_regressao()
-        var_dictRegLGB = Treinar_Modelos.treinar_modelo_lightgbm_regressao()
+        for var_strHorizonte in var_listHorizontes:
+            logger.info("=" * 80)
+            logger.info(f"TREINANDO REGRESSORES - HORIZONTE: {var_strHorizonte}")
+            logger.info("=" * 80)
 
-        logger.info("-" * 80)
-        logger.info("RESUMO COMPARATIVO - REGRESSÃO")
-        logger.info(f"{'Modelo':<18} | {'RMSE (dias)':>12} | {'MAE (dias)':>11} | {'MSE':>10} | Dataset")
-        logger.info("-" * 80)
-        
-        var_dictRegressores = {"LightGBM": var_dictRegLGB, "XGBoost": var_dictRegXGB, "LinearRegression": var_dictReg}
-        for var_strNome, var_dictMetricas in var_dictRegressores.items():
-            logger.info(
-                f"{var_strNome:<18} | {var_dictMetricas['rmse']:>12.2f} | "
-                f"{var_dictMetricas['mae']:>11.2f} | {var_dictMetricas['mse']:>10.2f} | "
-                f"{var_dictMetricas['train_size']:,} treino / {var_dictMetricas['test_size']:,} teste"
-            )
-        
-        var_strMelhorRegressor = min(var_dictRegressores.items(), key=lambda x: x[1]['rmse'])[0]
-        var_floatMelhorRMSE = var_dictRegressores[var_strMelhorRegressor]['rmse']
-        logger.info(f"MELHOR MODELO REGRESSÃO: {var_strMelhorRegressor} (RMSE: {var_floatMelhorRMSE:.2f} dias)")
-        
+            var_dictReg = Treinar_Modelos.treinar_modelo_regressao_linear(arg_strHorizonte=var_strHorizonte)
+            var_dictRegXGB = Treinar_Modelos.treinar_modelo_xgboost_regressao(arg_strHorizonte=var_strHorizonte)
+            var_dictRegLGB = Treinar_Modelos.treinar_modelo_lightgbm_regressao(arg_strHorizonte=var_strHorizonte)
+
+            var_dictModelosRegressao[var_strHorizonte] = {
+                "LightGBM": var_dictRegLGB,
+                "XGBoost": var_dictRegXGB,
+                "LinearRegression": var_dictReg,
+            }
+
+            logger.info("-" * 80)
+            logger.info(f"RESUMO COMPARATIVO - REGRESSÃO ({var_strHorizonte.upper()})")
+            logger.info(f"{'Modelo':<18} | {'RMSE (dias)':>12} | {'MAE (dias)':>11} | {'MSE':>10} | Dataset")
+            logger.info("-" * 80)
+
+            for var_strNome, var_dictMetricas in var_dictModelosRegressao[var_strHorizonte].items():
+                logger.info(
+                    f"{var_strNome:<18} | {var_dictMetricas['rmse']:>12.2f} | "
+                    f"{var_dictMetricas['mae']:>11.2f} | {var_dictMetricas['mse']:>10.2f} | "
+                    f"{var_dictMetricas['train_size']:,} treino / {var_dictMetricas['test_size']:,} teste"
+                )
+
+            var_strMelhorRegressor = min(var_dictModelosRegressao[var_strHorizonte].items(), key=lambda x: x[1]['rmse'])[0]
+            var_floatMelhorRMSE = var_dictModelosRegressao[var_strHorizonte][var_strMelhorRegressor]['rmse']
+            logger.info(f"MELHOR MODELO REGRESSÃO ({var_strHorizonte}): {var_strMelhorRegressor} (RMSE: {var_floatMelhorRMSE:.2f} dias)")
+
         logger.info("="*80)
         logger.info("TREINAMENTO CONCLUÍDO COM SUCESSO")
         logger.info("Matrizes de confusão salvas em: resources/relatorios/")
@@ -1104,11 +1113,17 @@ class Treinar_Modelos:
         try:
             var_dictTodosModelos = {
                 "classificacao": var_dictModelosClassificacao,
-                "regressao": var_dictRegressores,
+                "regressao": var_dictModelosRegressao,
             }
             cls._salvar_modelos(var_dictTodosModelos)
         except Exception as e:
             logger.warning(f"Falha ao salvar modelos em disco: {e}")
+
+        # Exportar melhores modelos com nomenclatura padronizada
+        try:
+            ExportarModelos.exportar(var_dictTodosModelos)
+        except Exception as e:
+            logger.warning(f"Falha ao exportar modelos padronizados: {e}")
 
         # =====================================================================
         # BLOCO DE EXPERIMENTOS TCC
@@ -1196,20 +1211,21 @@ class Treinar_Modelos:
                     logger.info(f"Atualizado: {var_strNomeLatest}")
 
         if "regressao" in arg_dictModelos:
-            for var_strAlgo, var_dictResultado in arg_dictModelos["regressao"].items():
-                var_objModelo = var_dictResultado.get("modelo")
-                if var_objModelo is None:
-                    continue
+            for var_strHorizonte, var_dictAlgos in arg_dictModelos["regressao"].items():
+                for var_strAlgo, var_dictResultado in var_dictAlgos.items():
+                    var_objModelo = var_dictResultado.get("modelo")
+                    if var_objModelo is None:
+                        continue
 
-                var_strNomeArq = f"modelo_regressao_{var_strAlgo}_{var_strTimestamp}.joblib"
-                var_pathArq = var_pathModels / var_strNomeArq
-                joblib.dump(var_objModelo, var_pathArq)
-                logger.info(f"Salvo: {var_strNomeArq}")
+                    var_strNomeArq = f"modelo_regressao_{var_strAlgo}_{var_strHorizonte}_{var_strTimestamp}.joblib"
+                    var_pathArq = var_pathModels / var_strNomeArq
+                    joblib.dump(var_objModelo, var_pathArq)
+                    logger.info(f"Salvo: {var_strNomeArq}")
 
-                var_strNomeLatest = f"modelo_regressao_{var_strAlgo}_latest.joblib"
-                var_pathLatest = var_pathModels / var_strNomeLatest
-                joblib.dump(var_objModelo, var_pathLatest)
-                logger.info(f"Atualizado: {var_strNomeLatest}")
+                    var_strNomeLatest = f"modelo_regressao_{var_strAlgo}_{var_strHorizonte}_latest.joblib"
+                    var_pathLatest = var_pathModels / var_strNomeLatest
+                    joblib.dump(var_objModelo, var_pathLatest)
+                    logger.info(f"Atualizado: {var_strNomeLatest}")
 
         logger.info("="*60)
         logger.info("MODELOS SALVOS COM SUCESSO")
