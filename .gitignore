@@ -1,5 +1,6 @@
 /.venv/
 /.env
+/.env.local
 /.vscode/
 /prj_TCC_PREVISOR_STEAM.egg-info
 *__pycache__/
@@ -12,6 +13,8 @@
 *temp_
 *.joblib
 *.ipynb
+prj_TCC_PREVISOR_STEAM/resources/models/export/
+
 prj_TCC_PREVISOR_STEAM/resources/logs/
 dashboard_tcc_temp.py
 /docker/volumes
