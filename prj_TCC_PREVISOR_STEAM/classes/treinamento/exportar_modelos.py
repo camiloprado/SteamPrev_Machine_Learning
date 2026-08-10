@@ -17,7 +17,8 @@ Uso:
     # Ou via linha de comando (re-exporta dos modelos _latest existentes, sem métricas)
     python -m prj_TCC_PREVISOR_STEAM.classes.treinamento.exportar_modelos
 """
-
+from prj_TCC_PREVISOR_STEAM.classes.framework.AllSettings import AllSettings
+from prj_TCC_PREVISOR_STEAM.classes.utils.model_registry import ModelRegistry
 import hashlib
 import json
 import logging
@@ -283,7 +284,7 @@ if __name__ == "__main__":
         for var_strAlgo in var_listAlgosClass:
             var_pathLatest = var_pathModels / f"modelo_classificacao_{var_strAlgo}_{var_strHorizonte}_latest.joblib"
             if var_pathLatest.exists():
-                var_objModelo = joblib.load(var_pathLatest)
+                var_objModelo = ModelRegistry.get_model(var_pathLatest)
                 var_dictModelos["classificacao"][var_strHorizonte][var_strAlgo] = {
                     "modelo": var_objModelo,
                     "f1_macro": 0.0,
@@ -299,7 +300,7 @@ if __name__ == "__main__":
                 # Fallback para naming sem horizonte (modelos antigos)
                 var_pathLatest = var_pathModels / f"modelo_regressao_{var_strAlgo}_latest.joblib"
             if var_pathLatest.exists():
-                var_objModelo = joblib.load(var_pathLatest)
+                var_objModelo = ModelRegistry.get_model(var_pathLatest)
                 var_dictModelos["regressao"][var_strHorizonte][var_strAlgo] = {
                     "modelo": var_objModelo,
                     "rmse": 0.0,

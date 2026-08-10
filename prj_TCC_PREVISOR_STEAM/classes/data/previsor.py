@@ -22,6 +22,13 @@ class Previsor:
     @classmethod
     def alimentar_banco_dados_raw_docker(cls):
         """
+        Wrapper síncrono que chama a execução assíncrona do pipeline de coleta da Steam.
+        """
+        asyncio.run(cls._alimentar_banco_dados_raw_docker_async())
+
+    @classmethod
+    async def _alimentar_banco_dados_raw_docker_async(cls):
+        """
         Alimenta o banco de dados PostgreSQL (Docker) com os dados coletados da API.
         Suporta divisão de trabalho entre múltiplos PCs usando PC_ID.
 
@@ -101,11 +108,11 @@ class Previsor:
                 else:
                     var_listAppIDAtual = var_listAppIDParaProcessar[i:i+var_intRange]
                 
-                # Busca detalhes dos jogos
-                asyncio.run(SteamClient.fetch_details_bulk_batched(arg_seqAppids=var_listAppIDAtual))
-                
-                # Busca reviews dos jogos
-                asyncio.run(SteamClient.fetch_reviews_summary_batched(arg_seqAppids=var_listAppIDAtual))
+                # Aguarda as tarefas assíncronas concorrentemente sem reconstruir o Event Loop
+                await asyncio.gather(
+                    SteamClient.fetch_details_bulk_batched(arg_seqAppids=var_listAppIDAtual), # Busca detalhes dos jogos
+                    SteamClient.fetch_reviews_summary_batched(arg_seqAppids=var_listAppIDAtual) # Busca reviews dos jogos
+                )
                 
                 # Salva checkpoint após batch bem-sucedido
                 PostgreSQLCheckpoint.salvar_checkpoint(var_intPcId, i + var_intRange, "STEAM")
@@ -113,7 +120,7 @@ class Previsor:
                 # Pausa entre lotes
                 if i + var_intRange < var_intTamanhoTotalFila:
                     logger.info("Aguardando 2 segundos antes do próximo lote...")
-                    sleep(2)
+                    await asyncio.sleep(2)
             
             # Limpa checkpoint após conclusão total
             PostgreSQLCheckpoint.limpar_checkpoint(var_intPcId, "STEAM")

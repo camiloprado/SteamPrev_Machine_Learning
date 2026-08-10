@@ -5,6 +5,8 @@ from prj_TCC_PREVISOR_STEAM.classes.limpeza.ProcessadorETL import ProcessadorETL
 from prj_TCC_PREVISOR_STEAM.classes.treinamento.ProcessadorTreinamento import ProcessadorTreinamento
 
 import logging
+import psycopg2
+from aiohttp.client_exceptions import ClientError
 
 logger = logging.getLogger("framework.process")
 
@@ -44,6 +46,12 @@ class Process:
                 Previsor.alimentar_banco_dados_raw_docker()
             else:
                 logger.info("Etapa 1/5 — Coleta Steam: nenhum AppID desatualizado. Pulando.")
+        except ClientError as e_http:
+            # Graceful Degradation: Steam API instável, segue com ETL dos dados já em cache
+            logger.warning(f" Etapa 1 parcialmente interrompida. API da Steam instável: {e_http}. Seguindo para o ETL.")
+        except psycopg2.Error as e_db:
+            logger.critical(f" Banco de Dados offline ou falha crítica. Erro: {e_db}")
+            return  # Aborta ciclo atual se o banco cair
         except Exception as e:
             logger.error(f"Etapa 1/5 — Coleta Steam falhou: {e}", exc_info=True)
 
