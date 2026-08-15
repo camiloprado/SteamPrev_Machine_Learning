@@ -554,7 +554,7 @@ class Treinar_Modelos:
                 pass
     
     @classmethod
-    def treinar_modelo_regressao_linear(cls, arg_strHorizonte: str = "30d") -> dict:
+    def treinar_modelo_regressao_linear(cls, arg_strHorizonte: str = "30d", arg_strAlvo: str = "dias") -> dict:
         """
         Método para treinar o modelo de Regressão Linear.
 
@@ -573,7 +573,9 @@ class Treinar_Modelos:
         
         # TREINA: ajusta os pesos do modelo aos dados de treino
         # O modelo encontra: y = a0 + a1*x1 + a2*x2 + ... + an*xn (reta multidimensional)
-        var_objModelo.fit(var_dictSplits["Xr_train"], var_dictSplits["yr_train"])
+        var_serYTrain = var_dictSplits["yr_train"] if arg_strAlvo == "dias" else var_dictSplits["yr_desc_train"]
+        var_serYTest = var_dictSplits["yr_test"] if arg_strAlvo == "dias" else var_dictSplits["yr_desc_test"]
+        var_objModelo.fit(var_dictSplits["Xr_train"], var_serYTrain)
         
         # PREDIZ no treino: usa o modelo treinado para fazer predições
         var_arrPredTrain = var_objModelo.predict(var_dictSplits["Xr_train"])
@@ -583,37 +585,33 @@ class Treinar_Modelos:
 
         # Calcula RMSE (Raiz do Erro Quadrático Médio)
         # Métrica principal para regressão: quanto menor, melhor
-        # Interpretação: erro médio em "dias"
+        # Interpretação: erro médio em "dias" ou "%" dependendo do alvo
         if root_mean_squared_error is not None:
-            # Se sklearn tiver função nativa RMSE, usa ela (mais recente)
-            var_floatRmse = root_mean_squared_error(var_dictSplits["yr_test"], var_arrPredTest)
+            var_floatRmse = root_mean_squared_error(var_serYTest, var_arrPredTest)
         else:
-            # Se não, calcula manualmente: sqrt(MSE)
-            # Compatibilidade com sklearn antigo
-            var_floatRmse = mean_squared_error(var_dictSplits["yr_test"], var_arrPredTest) ** 0.5
+            var_floatRmse = mean_squared_error(var_serYTest, var_arrPredTest) ** 0.5
 
         # Calcula MSE (Erro Quadrático Médio)
-        # Penaliza erros grandes (ao quadrado) mais do que linearly
-        var_floatMse = mean_squared_error(var_dictSplits["yr_test"], var_arrPredTest)
+        var_floatMse = mean_squared_error(var_serYTest, var_arrPredTest)
         
         # Calcula MAE (Erro Médio Absoluto)
-        # Mais "robusto" que MSE: não penaliza tanto outliers
-        var_floatMae = mean_absolute_error(var_dictSplits["yr_test"], var_arrPredTest)
+        var_floatMae = mean_absolute_error(var_serYTest, var_arrPredTest)
 
         # Log detalhado: treino vs teste com status de overfitting
         cls._log_metricas_treino_teste_regressao(
-            arg_strModelo=f"Regressão Linear ({arg_strHorizonte})",
-            arg_yTrain=var_dictSplits["yr_train"],
+            arg_strModelo=f"Regressão Linear ({arg_strHorizonte}, {arg_strAlvo})",
+            arg_yTrain=var_serYTrain,
             arg_yPredTrain=var_arrPredTrain,
-            arg_yTest=var_dictSplits["yr_test"],
+            arg_yTest=var_serYTest,
             arg_yPredTest=var_arrPredTest,
         )
 
         # Log resumido para tabela final
+        var_strUnidade = "dias" if arg_strAlvo == "dias" else "%"
         logger.info(
-            f"Regressão linear ({arg_strHorizonte}) - "
-            f"RMSE: {var_floatRmse:.2f} dias | "
-            f"MAE: {var_floatMae:.2f} dias | "
+            f"Regressão linear ({arg_strHorizonte}, {arg_strAlvo}) - "
+            f"RMSE: {var_floatRmse:.2f} {var_strUnidade} | "
+            f"MAE: {var_floatMae:.2f} {var_strUnidade} | "
             f"MSE: {var_floatMse:.2f}"
         )
 
@@ -623,8 +621,8 @@ class Treinar_Modelos:
             if var_boolSalvarPng or var_boolMostrar:
                 var_strTs = datetime.now().strftime("%Y%m%d_%H%M%S")
                 cls._plot_regressao_predito_vs_real(
-                    arg_strModelo=f"Linear_{arg_strHorizonte}",
-                    arg_arrYReal=var_dictSplits["yr_test"],
+                    arg_strModelo=f"Linear_{arg_strHorizonte}_{arg_strAlvo}",
+                    arg_arrYReal=var_serYTest,
                     arg_arrYPred=var_arrPredTest,
                     arg_strTs=var_strTs,
                     arg_boolSalvarPng=var_boolSalvarPng,
@@ -632,8 +630,8 @@ class Treinar_Modelos:
                     arg_intDpi=var_intDpi,
                 )
                 cls._plot_regressao_residuos(
-                    arg_strModelo=f"Linear_{arg_strHorizonte}",
-                    arg_arrYReal=var_dictSplits["yr_test"],
+                    arg_strModelo=f"Linear_{arg_strHorizonte}_{arg_strAlvo}",
+                    arg_arrYReal=var_serYTest,
                     arg_arrYPred=var_arrPredTest,
                     arg_strTs=var_strTs,
                     arg_boolSalvarPng=var_boolSalvarPng,
@@ -654,7 +652,7 @@ class Treinar_Modelos:
         }
 
     @classmethod
-    def treinar_modelo_xgboost_regressao(cls, arg_strHorizonte: str = "30d") -> dict:
+    def treinar_modelo_xgboost_regressao(cls, arg_strHorizonte: str = "30d", arg_strAlvo: str = "dias") -> dict:
         """
         Método para treinar o modelo de XGBoost para REGRESSÃO.
 
@@ -676,39 +674,44 @@ class Treinar_Modelos:
             random_state=42,            # Reprodutibilidade
         )
 
+        # Resolve o alvo correto ANTES do try/except
+        var_serYTrain = var_dictSplits["yr_train"] if arg_strAlvo == "dias" else var_dictSplits["yr_desc_train"]
+        var_serYTest = var_dictSplits["yr_test"] if arg_strAlvo == "dias" else var_dictSplits["yr_desc_test"]
+
         # TREINA com early stopping
         try:
             var_objModelo.fit(
                 var_dictSplits["Xr_train"],
-                var_dictSplits["yr_train"],
-                eval_set=[(var_dictSplits["Xr_test"], var_dictSplits["yr_test"])],
+                var_serYTrain,
+                eval_set=[(var_dictSplits["Xr_test"], var_serYTest)],
                 verbose=False,
                 early_stopping_rounds=50,
             )
         except TypeError:
-            var_objModelo.fit(var_dictSplits["Xr_train"], var_dictSplits["yr_train"])
+            var_objModelo.fit(var_dictSplits["Xr_train"], var_serYTrain)
 
         # PREDIZ no treino e teste
         var_arrPredTrain = var_objModelo.predict(var_dictSplits["Xr_train"])
         var_arrPredTest = var_objModelo.predict(var_dictSplits["Xr_test"])
 
         # Calcula métricas no teste
-        var_dictMetricas = cls._metricas_regressao(var_dictSplits["yr_test"], var_arrPredTest)
+        var_dictMetricas = cls._metricas_regressao(var_serYTest, var_arrPredTest)
 
         # Log detalhado: treino vs teste
         cls._log_metricas_treino_teste_regressao(
-            arg_strModelo=f"XGBoost Regressão ({arg_strHorizonte})",
-            arg_yTrain=var_dictSplits["yr_train"],
+            arg_strModelo=f"XGBoost Regressão ({arg_strHorizonte}, {arg_strAlvo})",
+            arg_yTrain=var_serYTrain,
             arg_yPredTrain=var_arrPredTrain,
-            arg_yTest=var_dictSplits["yr_test"],
+            arg_yTest=var_serYTest,
             arg_yPredTest=var_arrPredTest,
         )
 
         # Log resumido
+        var_strUnidade = "dias" if arg_strAlvo == "dias" else "%"
         logger.info(
-            f"XGBoost Regressão ({arg_strHorizonte}) - "
-            f"RMSE: {var_dictMetricas['rmse']:.2f} dias | "
-            f"MAE: {var_dictMetricas['mae']:.2f} dias | "
+            f"XGBoost Regressão ({arg_strHorizonte}, {arg_strAlvo}) - "
+            f"RMSE: {var_dictMetricas['rmse']:.2f} {var_strUnidade} | "
+            f"MAE: {var_dictMetricas['mae']:.2f} {var_strUnidade} | "
             f"MSE: {var_dictMetricas['mse']:.2f}"
         )
 
@@ -718,8 +721,8 @@ class Treinar_Modelos:
             if var_boolSalvarPng or var_boolMostrar:
                 var_strTs = datetime.now().strftime("%Y%m%d_%H%M%S")
                 cls._plot_regressao_predito_vs_real(
-                    arg_strModelo=f"XGBoost_{arg_strHorizonte}",
-                    arg_arrYReal=var_dictSplits["yr_test"],
+                    arg_strModelo=f"XGBoost_{arg_strHorizonte}_{arg_strAlvo}",
+                    arg_arrYReal=var_serYTest,
                     arg_arrYPred=var_arrPredTest,
                     arg_strTs=var_strTs,
                     arg_boolSalvarPng=var_boolSalvarPng,
@@ -727,8 +730,8 @@ class Treinar_Modelos:
                     arg_intDpi=var_intDpi,
                 )
                 cls._plot_regressao_residuos(
-                    arg_strModelo=f"XGBoost_{arg_strHorizonte}",
-                    arg_arrYReal=var_dictSplits["yr_test"],
+                    arg_strModelo=f"XGBoost_{arg_strHorizonte}_{arg_strAlvo}",
+                    arg_arrYReal=var_serYTest,
                     arg_arrYPred=var_arrPredTest,
                     arg_strTs=var_strTs,
                     arg_boolSalvarPng=var_boolSalvarPng,
@@ -746,7 +749,7 @@ class Treinar_Modelos:
         }
 
     @classmethod
-    def treinar_modelo_lightgbm_regressao(cls, arg_strHorizonte: str = "30d") -> dict:
+    def treinar_modelo_lightgbm_regressao(cls, arg_strHorizonte: str = "30d", arg_strAlvo: str = "dias") -> dict:
         """
         Método para treinar o modelo de LightGBM para REGRESSÃO.
 
@@ -769,39 +772,44 @@ class Treinar_Modelos:
             verbose=-1,                 # Silencioso
         )
 
+        # Resolve o alvo correto ANTES do try/except
+        var_serYTrain = var_dictSplits["yr_train"] if arg_strAlvo == "dias" else var_dictSplits["yr_desc_train"]
+        var_serYTest = var_dictSplits["yr_test"] if arg_strAlvo == "dias" else var_dictSplits["yr_desc_test"]
+
         # TREINA com early stopping
         try:
             var_objModelo.fit(
                 var_dictSplits["Xr_train"],
-                var_dictSplits["yr_train"],
-                eval_set=[(var_dictSplits["Xr_test"], var_dictSplits["yr_test"])],
+                var_serYTrain,
+                eval_set=[(var_dictSplits["Xr_test"], var_serYTest)],
                 eval_metric="rmse",
                 callbacks=[lgb.early_stopping(stopping_rounds=50, verbose=False)],
             )
         except TypeError:
-            var_objModelo.fit(var_dictSplits["Xr_train"], var_dictSplits["yr_train"])
+            var_objModelo.fit(var_dictSplits["Xr_train"], var_serYTrain)
 
         # PREDIZ no treino e teste
         var_arrPredTrain = var_objModelo.predict(var_dictSplits["Xr_train"])
         var_arrPredTest = var_objModelo.predict(var_dictSplits["Xr_test"])
 
         # Calcula métricas no teste
-        var_dictMetricas = cls._metricas_regressao(var_dictSplits["yr_test"], var_arrPredTest)
+        var_dictMetricas = cls._metricas_regressao(var_serYTest, var_arrPredTest)
 
         # Log detalhado: treino vs teste
         cls._log_metricas_treino_teste_regressao(
-            arg_strModelo=f"LightGBM Regressão ({arg_strHorizonte})",
-            arg_yTrain=var_dictSplits["yr_train"],
+            arg_strModelo=f"LightGBM Regressão ({arg_strHorizonte}, {arg_strAlvo})",
+            arg_yTrain=var_serYTrain,
             arg_yPredTrain=var_arrPredTrain,
-            arg_yTest=var_dictSplits["yr_test"],
+            arg_yTest=var_serYTest,
             arg_yPredTest=var_arrPredTest,
         )
 
         # Log resumido
+        var_strUnidade = "dias" if arg_strAlvo == "dias" else "%"
         logger.info(
-            f"LightGBM Regressão ({arg_strHorizonte}) - "
-            f"RMSE: {var_dictMetricas['rmse']:.2f} dias | "
-            f"MAE: {var_dictMetricas['mae']:.2f} dias | "
+            f"LightGBM Regressão ({arg_strHorizonte}, {arg_strAlvo}) - "
+            f"RMSE: {var_dictMetricas['rmse']:.2f} {var_strUnidade} | "
+            f"MAE: {var_dictMetricas['mae']:.2f} {var_strUnidade} | "
             f"MSE: {var_dictMetricas['mse']:.2f}"
         )
 
@@ -811,8 +819,8 @@ class Treinar_Modelos:
             if var_boolSalvarPng or var_boolMostrar:
                 var_strTs = datetime.now().strftime("%Y%m%d_%H%M%S")
                 cls._plot_regressao_predito_vs_real(
-                    arg_strModelo=f"LightGBM_{arg_strHorizonte}",
-                    arg_arrYReal=var_dictSplits["yr_test"],
+                    arg_strModelo=f"LightGBM_{arg_strHorizonte}_{arg_strAlvo}",
+                    arg_arrYReal=var_serYTest,
                     arg_arrYPred=var_arrPredTest,
                     arg_strTs=var_strTs,
                     arg_boolSalvarPng=var_boolSalvarPng,
@@ -820,8 +828,8 @@ class Treinar_Modelos:
                     arg_intDpi=var_intDpi,
                 )
                 cls._plot_regressao_residuos(
-                    arg_strModelo=f"LightGBM_{arg_strHorizonte}",
-                    arg_arrYReal=var_dictSplits["yr_test"],
+                    arg_strModelo=f"LightGBM_{arg_strHorizonte}_{arg_strAlvo}",
+                    arg_arrYReal=var_serYTest,
                     arg_arrYPred=var_arrPredTest,
                     arg_strTs=var_strTs,
                     arg_boolSalvarPng=var_boolSalvarPng,
@@ -1072,21 +1080,36 @@ class Treinar_Modelos:
             var_floatMelhorF1 = var_dictModelosClassificacao[var_strHorizonte][var_strMelhorModelo]['f1_macro']
             logger.info(f"MELHOR MODELO ({var_strHorizonte}): {var_strMelhorModelo} (F1-Score: {var_floatMelhorF1:.4f})")
             
-        var_dictModelosRegressao = {}
+        var_dictModelosRegressaoDias = {}
+        var_dictModelosRegressaoDesconto = {}
 
         for var_strHorizonte in var_listHorizontes:
             logger.info("=" * 80)
-            logger.info(f"TREINANDO REGRESSORES - HORIZONTE: {var_strHorizonte}")
+            logger.info(f"TREINANDO REGRESSORES (DIAS) - HORIZONTE: {var_strHorizonte}")
             logger.info("=" * 80)
 
-            var_dictReg = Treinar_Modelos.treinar_modelo_regressao_linear(arg_strHorizonte=var_strHorizonte)
-            var_dictRegXGB = Treinar_Modelos.treinar_modelo_xgboost_regressao(arg_strHorizonte=var_strHorizonte)
-            var_dictRegLGB = Treinar_Modelos.treinar_modelo_lightgbm_regressao(arg_strHorizonte=var_strHorizonte)
+            var_dictReg = Treinar_Modelos.treinar_modelo_regressao_linear(arg_strHorizonte=var_strHorizonte, arg_strAlvo="dias")
+            var_dictRegXGB = Treinar_Modelos.treinar_modelo_xgboost_regressao(arg_strHorizonte=var_strHorizonte, arg_strAlvo="dias")
+            var_dictRegLGB = Treinar_Modelos.treinar_modelo_lightgbm_regressao(arg_strHorizonte=var_strHorizonte, arg_strAlvo="dias")
 
-            var_dictModelosRegressao[var_strHorizonte] = {
+            var_dictModelosRegressaoDias[var_strHorizonte] = {
                 "LightGBM": var_dictRegLGB,
                 "XGBoost": var_dictRegXGB,
                 "LinearRegression": var_dictReg,
+            }
+            
+            logger.info("=" * 80)
+            logger.info(f"TREINANDO REGRESSORES (DESCONTO) - HORIZONTE: {var_strHorizonte}")
+            logger.info("=" * 80)
+            
+            var_dictRegDesc = Treinar_Modelos.treinar_modelo_regressao_linear(arg_strHorizonte=var_strHorizonte, arg_strAlvo="desconto")
+            var_dictRegXGBDesc = Treinar_Modelos.treinar_modelo_xgboost_regressao(arg_strHorizonte=var_strHorizonte, arg_strAlvo="desconto")
+            var_dictRegLGBDesc = Treinar_Modelos.treinar_modelo_lightgbm_regressao(arg_strHorizonte=var_strHorizonte, arg_strAlvo="desconto")
+            
+            var_dictModelosRegressaoDesconto[var_strHorizonte] = {
+                "LightGBM": var_dictRegLGBDesc,
+                "XGBoost": var_dictRegXGBDesc,
+                "LinearRegression": var_dictRegDesc,
             }
 
             logger.info("-" * 80)
@@ -1094,15 +1117,15 @@ class Treinar_Modelos:
             logger.info(f"{'Modelo':<18} | {'RMSE (dias)':>12} | {'MAE (dias)':>11} | {'MSE':>10} | Dataset")
             logger.info("-" * 80)
 
-            for var_strNome, var_dictMetricas in var_dictModelosRegressao[var_strHorizonte].items():
+            for var_strNome, var_dictMetricas in var_dictModelosRegressaoDias[var_strHorizonte].items():
                 logger.info(
                     f"{var_strNome:<18} | {var_dictMetricas['rmse']:>12.2f} | "
                     f"{var_dictMetricas['mae']:>11.2f} | {var_dictMetricas['mse']:>10.2f} | "
                     f"{var_dictMetricas['train_size']:,} treino / {var_dictMetricas['test_size']:,} teste"
                 )
 
-            var_strMelhorRegressor = min(var_dictModelosRegressao[var_strHorizonte].items(), key=lambda x: x[1]['rmse'])[0]
-            var_floatMelhorRMSE = var_dictModelosRegressao[var_strHorizonte][var_strMelhorRegressor]['rmse']
+            var_strMelhorRegressor = min(var_dictModelosRegressaoDias[var_strHorizonte].items(), key=lambda x: x[1]["rmse"])[0]
+            var_floatMelhorRMSE = var_dictModelosRegressaoDias[var_strHorizonte][var_strMelhorRegressor]["rmse"]
             logger.info(f"MELHOR MODELO REGRESSÃO ({var_strHorizonte}): {var_strMelhorRegressor} (RMSE: {var_floatMelhorRMSE:.2f} dias)")
 
         logger.info("="*80)
@@ -1113,7 +1136,8 @@ class Treinar_Modelos:
         try:
             var_dictTodosModelos = {
                 "classificacao": var_dictModelosClassificacao,
-                "regressao": var_dictModelosRegressao,
+                "regressao_dias": var_dictModelosRegressaoDias,
+                "regressao_desconto": var_dictModelosRegressaoDesconto,
             }
             cls._salvar_modelos(var_dictTodosModelos)
         except Exception as e:
@@ -1210,19 +1234,25 @@ class Treinar_Modelos:
                     joblib.dump(var_objModelo, var_pathLatest)
                     logger.info(f"Atualizado: {var_strNomeLatest}")
 
-        if "regressao" in arg_dictModelos:
-            for var_strHorizonte, var_dictAlgos in arg_dictModelos["regressao"].items():
+        # As chaves reais em arg_dictModelos são "regressao_dias" e "regressao_desconto"
+        # (ver executar_treinamento -> var_dictTodosModelos). Iterar sobre as duas garante
+        # que ambos os regressores sejam persistidos em disco com nomes que os distinguem.
+        for var_strTipoRegressao in ("regressao_dias", "regressao_desconto"):
+            if var_strTipoRegressao not in arg_dictModelos:
+                continue
+
+            for var_strHorizonte, var_dictAlgos in arg_dictModelos[var_strTipoRegressao].items():
                 for var_strAlgo, var_dictResultado in var_dictAlgos.items():
                     var_objModelo = var_dictResultado.get("modelo")
                     if var_objModelo is None:
                         continue
 
-                    var_strNomeArq = f"modelo_regressao_{var_strAlgo}_{var_strHorizonte}_{var_strTimestamp}.joblib"
+                    var_strNomeArq = f"modelo_{var_strTipoRegressao}_{var_strAlgo}_{var_strHorizonte}_{var_strTimestamp}.joblib"
                     var_pathArq = var_pathModels / var_strNomeArq
                     joblib.dump(var_objModelo, var_pathArq)
                     logger.info(f"Salvo: {var_strNomeArq}")
 
-                    var_strNomeLatest = f"modelo_regressao_{var_strAlgo}_{var_strHorizonte}_latest.joblib"
+                    var_strNomeLatest = f"modelo_{var_strTipoRegressao}_{var_strAlgo}_{var_strHorizonte}_latest.joblib"
                     var_pathLatest = var_pathModels / var_strNomeLatest
                     joblib.dump(var_objModelo, var_pathLatest)
                     logger.info(f"Atualizado: {var_strNomeLatest}")

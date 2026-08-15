@@ -5,10 +5,11 @@ Avalia os modelos treinados, seleciona o melhor por categoria/horizonte,
 e exporta com nomenclatura padronizada para distribuição via GitHub Releases.
 
 Nomenclatura de saída:
-    Classificação: modelo_classificacao_30d.joblib, modelo_classificacao_60d.joblib, modelo_classificacao_90d.joblib
-    Regressão:     modelo_regressao_30d.joblib, modelo_regressao_60d.joblib, modelo_regressao_90d.joblib
-    Geral:         modelo_latest.joblib (melhor classificador geral)
-    Metadados:     manifest.json
+    Classificação:        modelo_classificacao_30d.joblib, modelo_classificacao_60d.joblib, modelo_classificacao_90d.joblib
+    Regressão (dias):     modelo_regressao_dias_30d.joblib, modelo_regressao_dias_60d.joblib, modelo_regressao_dias_90d.joblib
+    Regressão (desconto): modelo_regressao_desconto_30d.joblib, modelo_regressao_desconto_60d.joblib, modelo_regressao_desconto_90d.joblib
+    Geral:                modelo_latest.joblib (melhor classificador geral)
+    Metadados:             manifest.json (inclui o contrato de saída dos modelos — ver "output_contract")
 
 Uso:
     # Chamado automaticamente ao final do treinamento
@@ -17,7 +18,6 @@ Uso:
     # Ou via linha de comando (re-exporta dos modelos _latest existentes, sem métricas)
     python -m prj_TCC_PREVISOR_STEAM.classes.treinamento.exportar_modelos
 """
-from prj_TCC_PREVISOR_STEAM.classes.framework.AllSettings import AllSettings
 from prj_TCC_PREVISOR_STEAM.classes.utils.model_registry import ModelRegistry
 import hashlib
 import json
@@ -79,7 +79,8 @@ class ExportarModelos:
             Estrutura esperada:
             {
                 "classificacao": {horizonte: {algo: {modelo, accuracy, f1_macro, ...}}},
-                "regressao": {horizonte: {algo: {modelo, rmse, mae, mse, ...}}}
+                "regressao_dias": {horizonte: {algo: {modelo, rmse, mae, mse, ...}}},
+                "regressao_desconto": {horizonte: {algo: {modelo, rmse, mae, mse, ...}}}
             }
 
         Retorna:
@@ -97,6 +98,37 @@ class ExportarModelos:
             "exported_at": datetime.now().isoformat(),
             "github_repo": "camiloprado/SteamPrev_Machine_Learning",
             "models": {},
+            # Contrato de saída: como a extensão deve interpretar cada modelo.
+            # Sem isso, quem consome o .joblib não tem como saber a ordem das
+            # classes nem a escala do desconto — precisa ser descoberto lendo
+            # o código de treinamento, o que não deveria ser necessário.
+            "output_contract": {
+                "classificacao": {
+                    "classes_ordem": ["cai", "mantem", "sobe"],
+                    "uso": (
+                        "modelo.predict_proba(X)[0] retorna [P(cai), P(mantem), P(sobe)] "
+                        "nesta ordem — mapeia direto para as 3 barras de porcentagem."
+                    ),
+                },
+                "regressao_dias": {
+                    "unidade": "dias",
+                    "descricao": (
+                        "Dias estimados até a próxima promoção, capados no horizonte "
+                        "escolhido (30/60/90 dias)."
+                    ),
+                },
+                "regressao_desconto": {
+                    "unidade": "percentual (0-100)",
+                    "origem": "campo 'cut' da API ITAD",
+                    "descricao": "Percentual de desconto esperado na próxima promoção.",
+                    "formula_preco_estimado": (
+                        "preco_estimado = preco_atual * (1 - desconto_previsto / 100). "
+                        "O modelo não prevê um preço absoluto — a extensão precisa "
+                        "calcular o valor médio combinando este percentual com o preço "
+                        "atual do jogo, que ela já possui."
+                    ),
+                },
+            },
         }
 
         var_floatMelhorF1Global = -1.0
@@ -182,45 +214,47 @@ class ExportarModelos:
         # =====================================================================
         # REGRESSÃO — Seleciona melhor modelo por horizonte (menor RMSE)
         # =====================================================================
-        if "regressao" in arg_dictModelos:
-            for var_strHorizonte, var_dictAlgos in arg_dictModelos["regressao"].items():
-                var_strMelhorAlgoReg = None
-                var_floatMelhorRMSE = float("inf")
+        for var_strRegType in ["regressao_dias", "regressao_desconto"]:
+            if var_strRegType in arg_dictModelos:
+                for var_strHorizonte, var_dictAlgos in arg_dictModelos[var_strRegType].items():
+                    var_strMelhorAlgoReg = None
+                    var_floatMelhorRMSE = float("inf")
 
-                for var_strAlgo, var_dictResultado in var_dictAlgos.items():
-                    var_floatRMSE = var_dictResultado.get("rmse", float("inf"))
-                    if var_floatRMSE < var_floatMelhorRMSE:
-                        var_floatMelhorRMSE = var_floatRMSE
-                        var_strMelhorAlgoReg = var_strAlgo
+                    for var_strAlgo, var_dictResultado in var_dictAlgos.items():
+                        var_floatRMSE = var_dictResultado.get("rmse", float("inf"))
+                        if var_floatRMSE < var_floatMelhorRMSE:
+                            var_floatMelhorRMSE = var_floatRMSE
+                            var_strMelhorAlgoReg = var_strAlgo
 
-                if var_strMelhorAlgoReg is None:
-                    logger.warning(f"Nenhum modelo de regressão encontrado para horizonte: {var_strHorizonte}")
-                    continue
+                    if var_strMelhorAlgoReg is None:
+                        logger.warning(f"Nenhum modelo de regressão encontrado para {var_strRegType} - horizonte: {var_strHorizonte}")
+                        continue
 
-                var_objModeloReg = var_dictAlgos[var_strMelhorAlgoReg]["modelo"]
-                var_strNomeArqReg = f"modelo_regressao_{var_strHorizonte}.joblib"
-                var_pathArqReg = var_pathExport / var_strNomeArqReg
+                    var_objModeloReg = var_dictAlgos[var_strMelhorAlgoReg]["modelo"]
+                    var_strNomeArqReg = f"modelo_{var_strRegType}_{var_strHorizonte}.joblib"
+                    var_pathArqReg = var_pathExport / var_strNomeArqReg
 
-                joblib.dump(var_objModeloReg, var_pathArqReg)
-                var_strHashReg = cls._calcular_sha256(var_pathArqReg)
+                    joblib.dump(var_objModeloReg, var_pathArqReg)
+                    var_strHashReg = cls._calcular_sha256(var_pathArqReg)
 
-                var_dictManifest["models"][var_strNomeArqReg] = {
-                    "algorithm": var_strMelhorAlgoReg,
-                    "type": "regressao",
-                    "horizon": var_strHorizonte,
-                    "metrics": {
-                        "rmse": round(var_floatMelhorRMSE, 6),
-                        "mae": round(var_dictAlgos[var_strMelhorAlgoReg].get("mae", 0.0), 6),
-                        "mse": round(var_dictAlgos[var_strMelhorAlgoReg].get("mse", 0.0), 6),
-                    },
-                    "sha256": var_strHashReg,
-                    "size_bytes": var_pathArqReg.stat().st_size,
-                }
+                    var_dictManifest["models"][var_strNomeArqReg] = {
+                        "algorithm": var_strMelhorAlgoReg,
+                        "type": var_strRegType,
+                        "horizon": var_strHorizonte,
+                        "metrics": {
+                            "rmse": round(var_floatMelhorRMSE, 6),
+                            "mae": round(var_dictAlgos[var_strMelhorAlgoReg].get("mae", 0.0), 6),
+                            "mse": round(var_dictAlgos[var_strMelhorAlgoReg].get("mse", 0.0), 6),
+                        },
+                        "sha256": var_strHashReg,
+                        "size_bytes": var_pathArqReg.stat().st_size,
+                    }
 
-                logger.info(
-                    f"✅ Exportado: {var_strNomeArqReg} "
-                    f"(Algoritmo: {var_strMelhorAlgoReg}, RMSE: {var_floatMelhorRMSE:.2f} dias)"
-                )
+                    var_strMetricName = "dias" if var_strRegType == "regressao_dias" else "%"
+                    logger.info(
+                        f"✅ Exportado: {var_strNomeArqReg} "
+                        f"(Algoritmo: {var_strMelhorAlgoReg}, RMSE: {var_floatMelhorRMSE:.2f} {var_strMetricName})"
+                    )
 
         # =====================================================================
         # MANIFEST — Salva metadados da exportação
@@ -273,8 +307,11 @@ if __name__ == "__main__":
         logger.error(f"Diretório de modelos não encontrado: {var_pathModels}")
         sys.exit(1)
 
-    # Constrói dict simulado com modelos _latest (sem métricas reais)
-    var_dictModelos: dict = {"classificacao": {}, "regressao": {}}
+    # Constrói dict simulado com modelos _latest (sem métricas reais).
+    # As chaves aqui precisam bater exatamente com o que ExportarModelos.exportar()
+    # espera e com o que Treinar_Modelos._salvar_modelos() efetivamente grava em disco:
+    # "classificacao", "regressao_dias" e "regressao_desconto".
+    var_dictModelos: dict = {"classificacao": {}, "regressao_dias": {}, "regressao_desconto": {}}
     var_listHorizontes = ["30d", "60d", "90d"]
     var_listAlgosClass = ["LightGBM", "XGBoost", "RandomForest"]
     var_listAlgosReg = ["LightGBM", "XGBoost", "LinearRegression"]
@@ -293,26 +330,25 @@ if __name__ == "__main__":
                 }
                 logger.info(f"Carregado: {var_pathLatest.name}")
 
-        var_dictModelos["regressao"][var_strHorizonte] = {}
-        for var_strAlgo in var_listAlgosReg:
-            var_pathLatest = var_pathModels / f"modelo_regressao_{var_strAlgo}_{var_strHorizonte}_latest.joblib"
-            if not var_pathLatest.exists():
-                # Fallback para naming sem horizonte (modelos antigos)
-                var_pathLatest = var_pathModels / f"modelo_regressao_{var_strAlgo}_latest.joblib"
-            if var_pathLatest.exists():
-                var_objModelo = ModelRegistry.get_model(var_pathLatest)
-                var_dictModelos["regressao"][var_strHorizonte][var_strAlgo] = {
-                    "modelo": var_objModelo,
-                    "rmse": 0.0,
-                    "mae": 0.0,
-                    "mse": 0.0,
-                }
-                logger.info(f"Carregado: {var_pathLatest.name}")
+        for var_strTipoRegressao in ("regressao_dias", "regressao_desconto"):
+            var_dictModelos[var_strTipoRegressao][var_strHorizonte] = {}
+            for var_strAlgo in var_listAlgosReg:
+                var_pathLatest = var_pathModels / f"modelo_{var_strTipoRegressao}_{var_strAlgo}_{var_strHorizonte}_latest.joblib"
+                if var_pathLatest.exists():
+                    var_objModelo = ModelRegistry.get_model(var_pathLatest)
+                    var_dictModelos[var_strTipoRegressao][var_strHorizonte][var_strAlgo] = {
+                        "modelo": var_objModelo,
+                        "rmse": 0.0,
+                        "mae": 0.0,
+                        "mse": 0.0,
+                    }
+                    logger.info(f"Carregado: {var_pathLatest.name}")
 
     var_boolTemClassificacao = any(var_dictModelos["classificacao"].values())
-    var_boolTemRegressao = any(var_dictModelos["regressao"].values())
+    var_boolTemRegressaoDias = any(var_dictModelos["regressao_dias"].values())
+    var_boolTemRegressaoDesconto = any(var_dictModelos["regressao_desconto"].values())
 
-    if not var_boolTemClassificacao and not var_boolTemRegressao:
+    if not var_boolTemClassificacao and not var_boolTemRegressaoDias and not var_boolTemRegressaoDesconto:
         logger.error("Nenhum modelo _latest encontrado para exportar.")
         sys.exit(1)
 

@@ -262,23 +262,191 @@ class NormalizarModelos:
             return None
 
     @classmethod
+    def _extrair_alvo_proximo_evento(cls, arg_dictAtual: dict, arg_listHistorico: list, arg_intIdx: int, arg_floatThreshold: float) -> str:
+        """
+        Classifica a direção do próximo evento de preço (cai, mantém ou sobe).
+
+        Parâmetros:
+        - arg_dictAtual (dict): Ponto atual do histórico com chave "preco".
+        - arg_listHistorico (list): Lista completa de pontos do histórico.
+        - arg_intIdx (int): Índice do ponto atual no histórico.
+        - arg_floatThreshold (float): Limiar de variação para classificar direção.
+
+        Retorna:
+        - str: "cai", "mantem" ou "sobe".
+        """
+        var_floatPrecoAtual = arg_dictAtual["preco"]
+        var_dictFuturo = arg_listHistorico[arg_intIdx + 1]
+        var_floatPrecoFuturo = var_dictFuturo["preco"]
+        var_floatVariacao = (var_floatPrecoFuturo - var_floatPrecoAtual) / var_floatPrecoAtual
+        
+        if var_floatVariacao <= -arg_floatThreshold:
+            return "cai"
+        elif var_floatVariacao >= arg_floatThreshold:
+            return "sobe"
+        return "mantem"
+
+    @classmethod
+    def _extrair_alvos_horizonte(cls, arg_intTimestampAtual: int, arg_floatPrecoAtual: float, arg_listHistorico: list, arg_intIdx: int, arg_listDiasHorizonte: list, arg_intMaxTimestampGlobal: int, arg_floatThreshold: float) -> dict:
+        """
+        Gera alvos de classificação para horizontes fixos (30d, 60d, 90d).
+
+        Para cada horizonte, verifica se haverá desconto dentro da janela futura.
+        Se sim, classifica como "cai". Caso contrário, compara o preço final.
+
+        Parâmetros:
+        - arg_intTimestampAtual (int): Timestamp epoch do ponto atual.
+        - arg_floatPrecoAtual (float): Preço no ponto atual.
+        - arg_listHistorico (list): Lista completa de pontos do histórico.
+        - arg_intIdx (int): Índice do ponto atual no histórico.
+        - arg_listDiasHorizonte (list): Lista de horizontes em dias (ex: [30, 60, 90]).
+        - arg_intMaxTimestampGlobal (int): Timestamp máximo global do dataset.
+        - arg_floatThreshold (float): Limiar de variação para classificar direção.
+
+        Retorna:
+        - dict: Dicionário com chaves "alvo_direcao_Xd" e valores "cai"/"mantem"/"sobe"/NaN.
+        """
+        var_dictAlvosHorizonte = {}
+        for var_intDiasH in arg_listDiasHorizonte:
+            var_intTimestampHorizonte = arg_intTimestampAtual + (var_intDiasH * 86400)
+            
+            var_listPontosHorizonte = [
+                var_dictPonto for var_dictPonto in arg_listHistorico[arg_intIdx + 1:]
+                if var_dictPonto["timestamp"] <= var_intTimestampHorizonte
+            ]
+            
+            if not var_listPontosHorizonte:
+                if (arg_intMaxTimestampGlobal - arg_intTimestampAtual) >= (var_intDiasH * 86400):
+                    var_dictAlvosHorizonte[f"alvo_direcao_{var_intDiasH}d"] = "mantem"
+                else:
+                    var_dictAlvosHorizonte[f"alvo_direcao_{var_intDiasH}d"] = np.nan
+                continue
+                
+            var_boolTemDesconto = any(
+                var_dictPonto.get("desconto", 0.0) > 0.0 for var_dictPonto in var_listPontosHorizonte
+            )
+            
+            if var_boolTemDesconto:
+                var_dictAlvosHorizonte[f"alvo_direcao_{var_intDiasH}d"] = "cai"
+            else:
+                var_floatPrecoFimH = var_listPontosHorizonte[-1]["preco"]
+                var_floatVarH = (var_floatPrecoFimH - arg_floatPrecoAtual) / arg_floatPrecoAtual
+                
+                if var_floatVarH <= -arg_floatThreshold:
+                    var_dictAlvosHorizonte[f"alvo_direcao_{var_intDiasH}d"] = "cai"
+                elif var_floatVarH >= arg_floatThreshold:
+                    var_dictAlvosHorizonte[f"alvo_direcao_{var_intDiasH}d"] = "sobe"
+                else:
+                    var_dictAlvosHorizonte[f"alvo_direcao_{var_intDiasH}d"] = "mantem"
+                    
+        return var_dictAlvosHorizonte
+
+    @classmethod
+    def _extrair_alvos_regressao(cls, arg_intTimestampAtual: int, arg_listHistorico: list, arg_intIdx: int) -> tuple:
+        """
+        Extrai os alvos de regressão: dias até o próximo desconto e profundidade (%) do desconto.
+
+        Percorre os pontos futuros no histórico até encontrar o primeiro com desconto > 0.
+        O campo de dias é limitado a 365.
+
+        Parâmetros:
+        - arg_intTimestampAtual (int): Timestamp epoch do ponto atual.
+        - arg_listHistorico (list): Lista completa de pontos do histórico.
+        - arg_intIdx (int): Índice do ponto atual no histórico.
+
+        Retorna:
+        - tuple: (dias_ate_desconto, desconto_esperado_percentual). Ambos NaN se não houver desconto futuro.
+        """
+        var_intDiasProxDesconto = np.nan
+        var_floatDescontoEsperado = np.nan
+        for var_intJ in range(arg_intIdx + 1, len(arg_listHistorico)):
+            var_dictPontoFuturo = arg_listHistorico[var_intJ]
+            if var_dictPontoFuturo.get("desconto", 0.0) > 0.0:
+                var_intDiasBruto = int((var_dictPontoFuturo["timestamp"] - arg_intTimestampAtual) / 86400)
+                var_intDiasProxDesconto = min(var_intDiasBruto, 365)
+                var_floatDescontoEsperado = float(var_dictPontoFuturo.get("desconto", 0.0))
+                break
+        return var_intDiasProxDesconto, var_floatDescontoEsperado
+
+    @classmethod
+    def _extrair_features(cls, arg_intTimestampAtual: int, arg_floatPrecoAtual: float, arg_listJanela: list, arg_listHistorico: list, arg_intIdx: int) -> dict:
+        """
+        Extrai as features estatísticas e temporais a partir da janela de histórico.
+
+        Calcula métricas como média, desvio padrão, mínimo e máximo de preços,
+        frequência de descontos, dias desde o último desconto, prox. grande promoção, etc.
+
+        Parâmetros:
+        - arg_intTimestampAtual (int): Timestamp epoch do ponto atual.
+        - arg_floatPrecoAtual (float): Preço no ponto atual.
+        - arg_listJanela (list): Pontos do histórico dentro da janela temporal.
+        - arg_listHistorico (list): Lista completa de pontos do histórico.
+        - arg_intIdx (int): Índice do ponto atual no histórico.
+
+        Retorna:
+        - dict: Dicionário com todas as features calculadas.
+        """
+        var_dtAtual = datetime.fromtimestamp(arg_intTimestampAtual)
+        var_intMesAtual = var_dtAtual.month
+        var_intDiaDoAno = var_dtAtual.timetuple().tm_yday
+        
+        var_listDiasGrandesPromocoes = [75, 177, 327, 355]
+        var_intDiasProxPromo = 999
+        for var_intDiaPromo in var_listDiasGrandesPromocoes:
+            if var_intDiaPromo >= var_intDiaDoAno:
+                var_intDiasProxPromo = min(var_intDiasProxPromo, var_intDiaPromo - var_intDiaDoAno)
+                
+        if var_intDiasProxPromo == 999:
+            var_intDiasProxPromo = (365 - var_intDiaDoAno) + 75
+            
+        var_listPrecosJanela = [var_dictItem["preco"] for var_dictItem in arg_listJanela]
+        var_listDescontosJanela = [var_dictItem.get("desconto", 0.0) for var_dictItem in arg_listJanela]
+        var_listTimestampsJanela = [var_dictItem["timestamp"] for var_dictItem in arg_listJanela]
+
+        var_intDiasDesdeUltimoDesconto = 9999
+        for var_intK in range(len(arg_listJanela) - 1, -1, -1):
+            if arg_listJanela[var_intK].get("desconto", 0.0) > 0.0:
+                var_intDiasDesdeUltimoDesconto = int((arg_intTimestampAtual - arg_listJanela[var_intK]["timestamp"]) / 86400)
+                break
+                
+        var_intDiasNoPrecoAtual = 0
+        for var_intK in range(arg_intIdx - 1, -1, -1):
+            var_floatPrecoPonto = arg_listHistorico[var_intK]["preco"]
+            if var_floatPrecoPonto > 0 and abs(var_floatPrecoPonto - arg_floatPrecoAtual) / arg_floatPrecoAtual < 0.01:
+                var_intDiasNoPrecoAtual = int((arg_intTimestampAtual - arg_listHistorico[var_intK]["timestamp"]) / 86400)
+            else:
+                break
+                
+        var_intTotalDescontosJanela = sum(1 for var_intDesconto in var_listDescontosJanela if var_intDesconto > 0)
+        var_intDiasJanela = max(1, int((var_listTimestampsJanela[-1] - var_listTimestampsJanela[0]) / 86400))
+        var_floatFreqDescontosAno = (var_intTotalDescontosJanela / var_intDiasJanela) * 365 if var_intDiasJanela > 0 else 0.0
+        
+        var_floatPrecoMinJanela = float(np.min(var_listPrecosJanela))
+        var_floatRatioPrecoVsMin = arg_floatPrecoAtual / var_floatPrecoMinJanela if var_floatPrecoMinJanela > 0 else 1.0
+        
+        return {
+            "preco_media_janela": float(np.mean(var_listPrecosJanela)),
+            "preco_std_janela": float(np.std(var_listPrecosJanela)),
+            "preco_min_janela": var_floatPrecoMinJanela,
+            "preco_max_janela": float(np.max(var_listPrecosJanela)),
+            "frequencia_descontos_por_ano": var_floatFreqDescontosAno,
+            "dias_no_preco_atual": var_intDiasNoPrecoAtual,
+            "ratio_preco_atual_vs_minimo": var_floatRatioPrecoVsMin,
+            "desconto_medio_janela": float(np.mean(var_listDescontosJanela)),
+            "desconto_max_janela": float(np.max(var_listDescontosJanela)),
+            "num_promocoes_janela": var_intTotalDescontosJanela,
+            "dias_janela": var_intDiasJanela,
+            "dias_desde_ultimo_desconto": var_intDiasDesdeUltimoDesconto,
+            "mes_atual": var_intMesAtual,
+            "dia_do_ano": var_intDiaDoAno,
+            "dias_para_proxima_grande_promo": var_intDiasProxPromo,
+        }
+
+    @classmethod
     def _construir_amostras_temporais(cls) -> pd.DataFrame:
         """
         Cria amostras supervisionadas temporais para direção de preço e dias até desconto.
-
-        Filtra apenas pontos SEM desconto ativo (preço-base) para evitar data leakage,
-        onde a feature desconto_atual revelaria diretamente o alvo.
-
-        Gera alvos para múltiplos horizontes temporais:
-        - Próximo evento: direção do próximo ponto no histórico.
-        - 30, 60, 90 dias: se haverá desconto dentro do horizonte.
-
-        Parâmetros:
-
-        Retorna:
-        - pd.DataFrame: DataFrame com as amostras temporais criadas.
         """
-        # Verifica se os dados de treinamento já foram carregados, caso contrário, carrega-os.
         if cls._var_dfDadosTreinamento is None:
             cls.carregar_dados_treinamento()
 
@@ -289,246 +457,68 @@ class NormalizarModelos:
         logger.info(f"Max Timestamp Global encontrado: {var_intMaxTimestampGlobal}")
         
         var_listAmostras = []
-
-        # Janela de histórico em anos a ser considerada para criar as amostras temporais
         var_intAnosJanela = cls._var_intAnosJanelaHistorico
         var_intSegundosJanela = var_intAnosJanela * 365 * 86400
-
-        # Threshold de variação de preço para classificar a direção como "cai", "mantem" ou "sobe"
         var_floatThreshold = cls._var_floatThresholdDirecao
-
-        # Horizontes fixos em dias para alvos adicionais
         var_listDiasHorizonte = [30, 60, 90]
-
-        # Contadores para log
         var_intAmostrasDescartadas = 0
         var_intAmostrasGeradas = 0
 
-        # Itera sobre cada linha do DataFrame de treinamento
         for _, var_dictRow in cls._var_dfDadosTreinamento.iterrows():
-            # Separa o histórico de preços
             var_listHistorico = cls._separar_historico(var_dictRow.get("historico_preco"))
-
-            # Verifica se o histórico tem ao menos 2 pontos (atual e futuro) para calcular o alvo
             if len(var_listHistorico) < 2:
                 continue
 
-            # Extrai o review score
             var_floatReviewScore = pd.to_numeric(var_dictRow.get("review_score"), errors="coerce")
-
-            # Extrai o preço atual do catálogo
             var_floatPrecoAtualCatalogo = cls._converter_preco_para_float(var_dictRow.get("preco"))
 
-            # Itera sobre o histórico
             for var_intIdx in range(len(var_listHistorico) - 1):
                 var_dictAtual = var_listHistorico[var_intIdx]
-
-                # =============================================================
-                # FILTRO PRINCIPAL: Apenas pontos SEM desconto ativo
-                # =============================================================
-                # Isso evita data leakage: quando desconto > 0, o próximo ponto
-                # quase sempre "sobe" (volta ao preço normal), tornando a
-                # predição trivial e inflando a acurácia artificialmente (~98%).
-                if var_dictAtual.get("desconto", 0) > 0:
+                if var_dictAtual.get("desconto", 0.0) > 0.0:
                     var_intAmostrasDescartadas += 1
                     continue
 
                 var_intTimestampAtual = var_dictAtual["timestamp"]
-                var_intTimestampLimite = var_intTimestampAtual - var_intSegundosJanela
-
-                # Extrai o preço atual
                 var_floatPrecoAtual = var_dictAtual["preco"]
-
-                # Se o preço atual for zero ou negativo, ignora esta amostra
-                if var_floatPrecoAtual <= 0:
+                if var_floatPrecoAtual <= 0.0:
                     continue
 
-                # Cria uma lista com os pontos do histórico que formam a janela de até X anos
+                var_intTimestampLimite = var_intTimestampAtual - var_intSegundosJanela
                 var_listJanela = [
                     var_dictItem for var_dictItem in var_listHistorico[:var_intIdx + 1]
                     if var_dictItem["timestamp"] >= var_intTimestampLimite
                 ]
 
-                # =============================================================
-                # ALVO: Próximo Evento (primeiro ponto significativo futuro)
-                # =============================================================
-                var_dictFuturo = var_listHistorico[var_intIdx + 1]
-                var_floatPrecoFuturo = var_dictFuturo["preco"]
-                var_floatVariacao = (var_floatPrecoFuturo - var_floatPrecoAtual) / var_floatPrecoAtual
+                var_strDirecaoProxEvento = cls._extrair_alvo_proximo_evento(var_dictAtual, var_listHistorico, var_intIdx, var_floatThreshold)
+                var_dictAlvosHorizonte = cls._extrair_alvos_horizonte(var_intTimestampAtual, var_floatPrecoAtual, var_listHistorico, var_intIdx, var_listDiasHorizonte, var_intMaxTimestampGlobal, var_floatThreshold)
+                var_intDiasProxDesconto, var_floatDescontoEsperado = cls._extrair_alvos_regressao(var_intTimestampAtual, var_listHistorico, var_intIdx)
+                var_dictFeatures = cls._extrair_features(var_intTimestampAtual, var_floatPrecoAtual, var_listJanela, var_listHistorico, var_intIdx)
 
-                # Classifica a direção do preço com base na variação e no threshold definido
-                if var_floatVariacao <= -var_floatThreshold:
-                    var_strDirecaoProxEvento = "cai"
-                elif var_floatVariacao >= var_floatThreshold:
-                    var_strDirecaoProxEvento = "sobe"
-                else:
-                    var_strDirecaoProxEvento = "mantem"
-
-                # =============================================================
-                # ALVOS: Horizontes fixos (30, 60, 90 dias)
-                # =============================================================
-                # Para cada horizonte, verifica se haverá desconto dentro da
-                # janela futura. Se sim → "cai". Se não, compara preço final.
-                var_dictAlvosHorizonte = {}
-                for var_intDiasH in var_listDiasHorizonte:
-                    var_intTimestampHorizonte = var_intTimestampAtual + (var_intDiasH * 86400)
-
-                    # Pontos futuros dentro do horizonte
-                    var_listPontosHorizonte = [
-                        var_dictPonto for var_dictPonto in var_listHistorico[var_intIdx + 1:]
-                        if var_dictPonto["timestamp"] <= var_intTimestampHorizonte
-                    ]
-
-                    if not var_listPontosHorizonte:
-                        # Verifica se temos dados suficientes no histórico global para cobrir o horizonte
-                        if (var_intMaxTimestampGlobal - var_intTimestampAtual) >= (var_intDiasH * 86400):
-                            var_dictAlvosHorizonte[f"alvo_direcao_{var_intDiasH}d"] = "mantem"
-                        else:
-                            # Fim do histórico global alcançado antes da janela fechar
-                            var_dictAlvosHorizonte[f"alvo_direcao_{var_intDiasH}d"] = np.nan
-                        continue
-
-                    # Se QUALQUER ponto no horizonte tem desconto > 0 → "cai"
-                    var_boolTemDesconto = any(
-                        var_dictPonto.get("desconto", 0) > 0 for var_dictPonto in var_listPontosHorizonte
-                    )
-
-                    if var_boolTemDesconto:
-                        var_dictAlvosHorizonte[f"alvo_direcao_{var_intDiasH}d"] = "cai"
-                    else:
-                        # Sem desconto: compara preço do último ponto no horizonte
-                        var_floatPrecoFimH = var_listPontosHorizonte[-1]["preco"]
-                        var_floatVarH = (var_floatPrecoFimH - var_floatPrecoAtual) / var_floatPrecoAtual
-
-                        if var_floatVarH <= -var_floatThreshold:
-                            var_dictAlvosHorizonte[f"alvo_direcao_{var_intDiasH}d"] = "cai"
-                        elif var_floatVarH >= var_floatThreshold:
-                            var_dictAlvosHorizonte[f"alvo_direcao_{var_intDiasH}d"] = "sobe"
-                        else:
-                            var_dictAlvosHorizonte[f"alvo_direcao_{var_intDiasH}d"] = "mantem"
-
-                # =============================================================
-                # ALVO REGRESSÃO: Dias até o próximo desconto
-                # =============================================================
-                var_intDiasProxDesconto = np.nan
-                for var_intJ in range(var_intIdx + 1, len(var_listHistorico)):
-                    var_dictPontoFuturo = var_listHistorico[var_intJ]
-                    if var_dictPontoFuturo.get("desconto", 0) > 0:
-                        var_intDiasBruto = int(
-                            (var_dictPontoFuturo["timestamp"] - var_intTimestampAtual) / 86400
-                        )
-                        var_intDiasProxDesconto = min(var_intDiasBruto, 365)
-                        break
-
-                # =============================================================
-                # FEATURES
-                # =============================================================
-                var_dtAtual = datetime.fromtimestamp(var_intTimestampAtual)
-                var_intMesAtual = var_dtAtual.month
-                var_intDiaDoAno = var_dtAtual.timetuple().tm_yday
-                
-                # Datas fixas das grandes promoções (Day of Year)
-                var_listDiasGrandesPromocoes = [75, 177, 327, 355] # Spring, Summer, Autumn, Winter
-                
-                # Calcula a distância em dias para a próxima grande promoção
-                var_intDiasProxPromo = 999
-                for var_intDiaPromo in var_listDiasGrandesPromocoes:
-                    if var_intDiaPromo >= var_intDiaDoAno:
-                        var_intDiasProxPromo = min(var_intDiasProxPromo, var_intDiaPromo - var_intDiaDoAno)
-                
-                # Se passou do dia 355, a próxima é o Spring do ano que vem (365 - dia_atual + 75)
-                if var_intDiasProxPromo == 999:
-                    var_intDiasProxPromo = (365 - var_intDiaDoAno) + 75
-                
-                var_listPrecosJanela = [var_dictItem["preco"] for var_dictItem in var_listJanela]
-                var_listDescontosJanela = [var_dictItem.get("desconto", 0) for var_dictItem in var_listJanela]
-                var_listTimestampsJanela = [var_dictItem["timestamp"] for var_dictItem in var_listJanela]
-
-                # Feature: dias desde o último desconto
-                var_intDiasDesdeUltimoDesconto = 9999
-                for var_intK in range(len(var_listJanela) - 1, -1, -1):
-                    if var_listJanela[var_intK].get("desconto", 0) > 0:
-                        var_intDiasDesdeUltimoDesconto = int(
-                            (var_intTimestampAtual - var_listJanela[var_intK]["timestamp"]) / 86400
-                        )
-                        break
-
-                # Feature: dias no preço atual (estabilidade do preço)
-                # Mede há quantos dias o preço está neste valor sem mudança significativa.
-                var_intDiasNoPrecoAtual = 0
-                for var_intK in range(var_intIdx - 1, -1, -1):
-                    var_floatPrecoPonto = var_listHistorico[var_intK]["preco"]
-                    if var_floatPrecoPonto > 0 and abs(var_floatPrecoPonto - var_floatPrecoAtual) / var_floatPrecoAtual < 0.01:
-                        var_intDiasNoPrecoAtual = int(
-                            (var_intTimestampAtual - var_listHistorico[var_intK]["timestamp"]) / 86400
-                        )
-                    else:
-                        break
-
-                # Feature: frequência de descontos por ano na janela
-                # Quantifica a tendência histórica do jogo ter promoções.
-                var_intTotalDescontosJanela = sum(1 for var_intDesconto in var_listDescontosJanela if var_intDesconto > 0)
-                var_intDiasJanela = max(1, int(
-                    (var_listTimestampsJanela[-1] - var_listTimestampsJanela[0]) / 86400
-                ))
-                var_floatFreqDescontosAno = (var_intTotalDescontosJanela / var_intDiasJanela) * 365 if var_intDiasJanela > 0 else 0.0
-
-                # Feature: ratio preço atual vs mínimo histórico na janela
-                # Se o preço atual está longe do mínimo, há mais "espaço" para desconto.
-                var_floatPrecoMinJanela = float(np.min(var_listPrecosJanela))
-                var_floatRatioPrecoVsMin = var_floatPrecoAtual / var_floatPrecoMinJanela if var_floatPrecoMinJanela > 0 else 1.0
-
-                # Adiciona a amostra criada à lista de amostras.
-                var_listAmostras.append(
-                    {
-                        "appid": var_dictRow.get("appid"),                                                        # Mantém o appid para referência.
-                        "review_score": float(var_floatReviewScore) if pd.notna(var_floatReviewScore) else 0.0,    # Extrai o review score.
-                        "preco_catalogo": float(var_floatPrecoAtualCatalogo) if pd.notna(var_floatPrecoAtualCatalogo) else 0.0,  # Extrai o preço atual do catálogo.
-                        "preco_atual_hist": var_floatPrecoAtual,                                                   # Extrai o preço atual do histórico.
-                        "preco_media_janela": float(np.mean(var_listPrecosJanela)),                                 # Calcula a média dos preços na janela.
-                        "preco_std_janela": float(np.std(var_listPrecosJanela)),                                    # Calcula o desvio padrão dos preços na janela.
-                        "preco_min_janela": var_floatPrecoMinJanela,                                                # Calcula o mínimo dos preços na janela.
-                        "preco_max_janela": float(np.max(var_listPrecosJanela)),                                    # Calcula o máximo dos preços na janela.
-                        "frequencia_descontos_por_ano": var_floatFreqDescontosAno,                                  # Frequência anualizada de promoções na janela.
-                        "dias_no_preco_atual": var_intDiasNoPrecoAtual,                                             # Há quantos dias o preço está estável.
-                        "ratio_preco_atual_vs_minimo": var_floatRatioPrecoVsMin,                                    # Razão entre preço atual e mínimo na janela.
-                        "desconto_medio_janela": float(np.mean(var_listDescontosJanela)),                           # Calcula a média dos descontos na janela.
-                        "desconto_max_janela": float(np.max(var_listDescontosJanela)),                              # Calcula o máximo dos descontos na janela.
-                        "num_promocoes_janela": var_intTotalDescontosJanela,                                        # Conta o número de promoções na janela.
-                        "dias_janela": var_intDiasJanela,                                                           # Calcula o número de dias na janela.
-                        "dias_desde_ultimo_desconto": var_intDiasDesdeUltimoDesconto,                               # Extrai os dias desde o último desconto.
-                        "mes_atual": var_intMesAtual,                                                               # Extrai o mês atual
-                        "dia_do_ano": var_intDiaDoAno,                                                              # Extrai o dia do ano
-                        "dias_para_proxima_grande_promo": var_intDiasProxPromo,                                     # Dias até a proxima grande Sale
-                        # Alvos de classificação
-                        "alvo_direcao_preco": var_strDirecaoProxEvento,                                             # Direção do próximo evento (cai/mantem/sobe).
-                        # Alvo de regressão
-                        "alvo_dias_ate_desconto": var_intDiasProxDesconto,                                          # Dias até o próximo desconto.
-                        # Alvos de horizontes fixos
-                        **var_dictAlvosHorizonte,                                                                    # alvo_direcao_30d, alvo_direcao_60d, alvo_direcao_90d
-                    }
-                )
+                var_dictAmostra = {
+                    "appid": var_dictRow.get("appid"),
+                    "review_score": float(var_floatReviewScore) if pd.notna(var_floatReviewScore) else 0.0,
+                    "preco_catalogo": float(var_floatPrecoAtualCatalogo) if pd.notna(var_floatPrecoAtualCatalogo) else 0.0,
+                    "preco_atual_hist": var_floatPrecoAtual,
+                    **var_dictFeatures,
+                    "alvo_direcao_preco": var_strDirecaoProxEvento,
+                    "alvo_dias_ate_desconto": var_intDiasProxDesconto,
+                    "alvo_desconto_esperado": var_floatDescontoEsperado,
+                    **var_dictAlvosHorizonte,
+                }
+                var_listAmostras.append(var_dictAmostra)
                 var_intAmostrasGeradas += 1
 
-        # Converte a lista de amostras para um DataFrame.
         cls._var_dfAmostrasTemporais = pd.DataFrame(var_listAmostras)
-
-        # Verifica se foram criadas amostras temporais, caso contrário, lança um erro.
         if cls._var_dfAmostrasTemporais.empty:
             raise ValueError("Nenhuma amostra temporal foi gerada a partir de historico_preco.")
 
         logger.info(f"Amostras temporais criadas: {var_intAmostrasGeradas:,}")
         logger.info(f"Amostras descartadas (desconto ativo no ponto de origem): {var_intAmostrasDescartadas:,}")
 
-        # Log distribuição de alvos por horizonte
         for var_strHorizonte, var_strColuna in cls._var_dictMapHorizonteColuna.items():
             if var_strColuna in cls._var_dfAmostrasTemporais.columns:
                 var_serDist = cls._var_dfAmostrasTemporais[var_strColuna].value_counts(dropna=False)
                 logger.info(f"Distribuição alvo ({var_strHorizonte}): {var_serDist.to_dict()}")
-
-        logger.debug(f"Colunas das amostras temporais: {list(cls._var_dfAmostrasTemporais.columns)}")
-        logger.debug("Amostra head(10) das amostras temporais:")
-        logger.debug("\n%s", cls._var_dfAmostrasTemporais.head(10).to_string(index=False))
 
         return cls._var_dfAmostrasTemporais
 
@@ -669,6 +659,8 @@ class NormalizarModelos:
         var_dfXrTest = var_dfReg[var_boolTesteMaskReg][var_listFeatures].fillna(0.0)
         var_serYrTrain = pd.to_numeric(var_dfReg[var_boolTreinoMaskReg]["alvo_dias_ate_desconto"], errors="coerce")
         var_serYrTest = pd.to_numeric(var_dfReg[var_boolTesteMaskReg]["alvo_dias_ate_desconto"], errors="coerce")
+        var_serYrDescTrain = pd.to_numeric(var_dfReg[var_boolTreinoMaskReg]["alvo_desconto_esperado"], errors="coerce")
+        var_serYrDescTest = pd.to_numeric(var_dfReg[var_boolTesteMaskReg]["alvo_desconto_esperado"], errors="coerce")
 
         logger.info(f"Regressão: Treino={var_dfXrTrain.shape[0]:,} amostras | Teste={var_dfXrTest.shape[0]:,} amostras")
 
@@ -689,6 +681,8 @@ class NormalizarModelos:
                 "Xr_test": var_dfXrTest,
                 "yr_train": var_serYrTrainH,
                 "yr_test": var_serYrTestH,
+                "yr_desc_train": var_serYrDescTrain,
+                "yr_desc_test": var_serYrDescTest,
             }
 
             logger.info(
@@ -707,6 +701,8 @@ class NormalizarModelos:
                 "Xr_test": var_dfXrTest,
                 "yr_train": var_serYrTrain,
                 "yr_test": var_serYrTest,
+                "yr_desc_train": var_serYrDescTrain,
+                "yr_desc_test": var_serYrDescTest,
             },
             "regressao_horizontes": var_dictRegressaoHorizontes,
         }
@@ -752,4 +748,6 @@ class NormalizarModelos:
             "Xr_test": var_dictRegressao["Xr_test"],
             "yr_train": var_dictRegressao["yr_train"],
             "yr_test": var_dictRegressao["yr_test"],
+            "yr_desc_train": var_dictRegressao["yr_desc_train"],
+            "yr_desc_test": var_dictRegressao["yr_desc_test"],
         }
