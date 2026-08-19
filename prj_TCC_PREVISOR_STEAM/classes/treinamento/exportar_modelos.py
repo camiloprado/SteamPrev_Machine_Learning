@@ -19,9 +19,11 @@ Uso:
     python -m prj_TCC_PREVISOR_STEAM.classes.treinamento.exportar_modelos
 """
 from prj_TCC_PREVISOR_STEAM.classes.utils.model_registry import ModelRegistry
+from prj_TCC_PREVISOR_STEAM.classes.treinamento.publicar_modelos_github import publicar_modelos
 import hashlib
 import json
 import logging
+import os
 import shutil
 from datetime import datetime
 from pathlib import Path
@@ -269,6 +271,27 @@ class ExportarModelos:
         logger.info("EXPORTAÇÃO CONCLUÍDA COM SUCESSO")
         logger.info("=" * 60)
 
+        # =====================================================================
+        # PUBLICAÇÃO AUTOMÁTICA NO GITHUB RELEASES
+        # Ativada por ML_AUTO_PUBLISH=True no .env (ou variável de ambiente).
+        # Requer também GITHUB_TOKEN configurado.
+        # =====================================================================
+        var_boolAutoPublish = str(os.getenv("ML_AUTO_PUBLISH", "False")).lower() in ("true", "1", "yes")
+        if var_boolAutoPublish:
+            try:
+                logger.info(" ML_AUTO_PUBLISH=True — iniciando publicação no GitHub Releases...")
+                publicar_modelos(arg_pathExport=var_pathExport)
+            except Exception as var_errPublish:
+                # Publicação nunca bloqueia a exportação
+                logger.warning(f" Publicação automática falhou (exportação concluída): {var_errPublish}")
+        else:
+            logger.info(
+                "  Publicação automática desativada. "
+                "Para ativar, defina ML_AUTO_PUBLISH=True e GITHUB_TOKEN no .env, "
+                "ou execute manualmente:\n"
+                "   python -m prj_TCC_PREVISOR_STEAM.classes.treinamento.publicar_modelos_github"
+            )
+
         return var_pathExport
 
     @classmethod
@@ -352,4 +375,24 @@ if __name__ == "__main__":
         logger.error("Nenhum modelo _latest encontrado para exportar.")
         sys.exit(1)
 
+    import argparse
+    var_objParser = argparse.ArgumentParser()
+    var_objParser.add_argument(
+        "--publish", action="store_true",
+        help="Publica no GitHub Releases após exportar (requer GITHUB_TOKEN)"
+    )
+    var_objParser.add_argument(
+        "--dry-run", action="store_true",
+        help="Simula publicação sem fazer upload"
+    )
+    var_objArgs, _ = var_objParser.parse_known_args()
+
     ExportarModelos.exportar(var_dictModelos)
+
+    if var_objArgs.publish or var_objArgs.dry_run:
+        var_pathExportDir = Path(__file__).resolve().parents[2] / "resources" / "models" / "export"
+        publicar_modelos(
+            arg_pathExport=var_pathExportDir,
+            arg_boolDryRun=var_objArgs.dry_run,
+        )
+        sys.exit(0)
