@@ -5,6 +5,7 @@ from sklearn.model_selection import train_test_split, GroupShuffleSplit
 import pandas as pd
 import numpy as np
 from datetime import datetime
+import os
 
 import logging
 
@@ -18,7 +19,14 @@ class NormalizarModelos:
     _var_dfDadosTreinamento = None
     _var_dfAmostrasTemporais = None
     _var_dictSplits = None
-    _var_intAnosJanelaHistorico = 5
+
+    # Janela histórica configurável via env.
+    # ML_JANELA_ANOS (int)  → número de anos de histórico usados nas features (padrão: 5).
+    # ML_JANELA_EXTENDIDA (bool) → quando True, dobra a janela para capturar ciclos mais longos.
+    # Exemplo de uso: ML_JANELA_ANOS=5 ML_JANELA_EXTENDIDA=True → janela efetiva de 10 anos.
+    _var_intAnosJanelaHistorico: int = int(os.getenv("ML_JANELA_ANOS", "5"))
+    _var_boolJanelaExtendida: bool = str(os.getenv("ML_JANELA_EXTENDIDA", "False")).lower() in ("true", "1", "yes")
+
     _var_floatThresholdDirecao = 0.03
     _var_listHorizontes = ["30d", "60d", "90d"]
     _var_dictMapHorizonteColuna = {
@@ -347,7 +355,7 @@ class NormalizarModelos:
         Extrai os alvos de regressão: dias até o próximo desconto e profundidade (%) do desconto.
 
         Percorre os pontos futuros no histórico até encontrar o primeiro com desconto > 0.
-        O campo de dias é limitado a 365.
+        O campo de dias é limitado a REGRESSAO_MAX_DIAS (padrão 90 dias) para evitar distorção por outliers.
 
         Parâmetros:
         - arg_intTimestampAtual (int): Timestamp epoch do ponto atual.
@@ -363,7 +371,8 @@ class NormalizarModelos:
             var_dictPontoFuturo = arg_listHistorico[var_intJ]
             if var_dictPontoFuturo.get("desconto", 0.0) > 0.0:
                 var_intDiasBruto = int((var_dictPontoFuturo["timestamp"] - arg_intTimestampAtual) / 86400)
-                var_intDiasProxDesconto = min(var_intDiasBruto, 365)
+                var_intMaxDias = int(os.getenv("REGRESSAO_MAX_DIAS", 90))
+                var_intDiasProxDesconto = min(var_intDiasBruto, var_intMaxDias)
                 var_floatDescontoEsperado = float(var_dictPontoFuturo.get("desconto", 0.0))
                 break
         return var_intDiasProxDesconto, var_floatDescontoEsperado
@@ -409,11 +418,19 @@ class NormalizarModelos:
                 var_intDiasDesdeUltimoDesconto = int((arg_intTimestampAtual - arg_listJanela[var_intK]["timestamp"]) / 86400)
                 break
                 
+        # Janela efetiva: dobra quando ML_JANELA_EXTENDIDA=True (captura ciclos históricos mais longos).
+        var_intAnosEfetivos = cls._var_intAnosJanelaHistorico * 2 if cls._var_boolJanelaExtendida else cls._var_intAnosJanelaHistorico
+        var_intSegundosJanelaNoPreco = var_intAnosEfetivos * 365 * 86400
+        var_intTimestampLimiteNoPreco = arg_intTimestampAtual - var_intSegundosJanelaNoPreco
         var_intDiasNoPrecoAtual = 0
         for var_intK in range(arg_intIdx - 1, -1, -1):
-            var_floatPrecoPonto = arg_listHistorico[var_intK]["preco"]
+            var_dictPontoK = arg_listHistorico[var_intK]
+            # Para ao atingir o limite da janela configurada
+            if var_dictPontoK["timestamp"] < var_intTimestampLimiteNoPreco:
+                break
+            var_floatPrecoPonto = var_dictPontoK["preco"]
             if var_floatPrecoPonto > 0 and abs(var_floatPrecoPonto - arg_floatPrecoAtual) / arg_floatPrecoAtual < 0.01:
-                var_intDiasNoPrecoAtual = int((arg_intTimestampAtual - arg_listHistorico[var_intK]["timestamp"]) / 86400)
+                var_intDiasNoPrecoAtual = int((arg_intTimestampAtual - var_dictPontoK["timestamp"]) / 86400)
             else:
                 break
                 
