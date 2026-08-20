@@ -38,11 +38,13 @@ class PostgreSQLITAD(PostgreSQL):
             ORDER BY sg.appid
             """
             
+            var_listParams = []
             if arg_intLimit:
-                var_strSQL += f" LIMIT {arg_intLimit}"
-            
+                var_strSQL += " LIMIT %s"
+                var_listParams.append(arg_intLimit)
+
             with var_connConnection.cursor() as cursor:
-                cursor.execute(var_strSQL)
+                cursor.execute(var_strSQL, var_listParams or None)
                 var_listResultados = [row[0] for row in cursor.fetchall()]
             
             return var_listResultados
@@ -73,20 +75,22 @@ class PostgreSQLITAD(PostgreSQL):
             logger.info(f"Buscando AppIDs ITAD desatualizados (>{var_intDias} dias)...")
             
             var_strSQL = f"""
-            SELECT sim.appid 
+            SELECT sim.appid
             FROM steam_itad_mapping sim
             JOIN itad_raw ir ON sim.id_itad = ir.id_itad
             WHERE ultima_atualizacao < CURRENT_DATE - INTERVAL '{var_intDias} days'
             """
-            
+
+            var_listParams = []
             # Aplica filtro de PC se necessário
             if arg_intTotalPcs > 1:
-                var_strSQL += f" AND MOD(sim.appid, {arg_intTotalPcs}) = {arg_intPcId - 1}"
-            
+                var_strSQL += " AND MOD(sim.appid, %s) = %s"
+                var_listParams.extend([arg_intTotalPcs, arg_intPcId - 1])
+
             var_strSQL += ";"
-            
+
             with var_connConnection.cursor() as cursor:
-                cursor.execute(var_strSQL)
+                cursor.execute(var_strSQL, var_listParams or None)
                 var_listResultados = cursor.fetchall()
                 var_listAppids = [row[0] for row in var_listResultados]
                 

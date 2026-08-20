@@ -28,18 +28,25 @@ class TreinarRegressores:
 
         # Instancia modelo de regressão linear vazio
         var_objModelo = LinearRegression()
-        
+
+        # Resolve X e y corretos ANTES do treino. Para o alvo "desconto", usa o conjunto
+        # filtrado por horizonte (Xr_desc_train/Xr_desc_test), que contém apenas jogos cujo
+        # desconto de fato ocorreu dentro da janela do horizonte — diferente do alvo "dias",
+        # que usa o conjunto de regressão completo (Xr_train/Xr_test) com o valor capado.
+        var_dfXTrain = var_dictSplits["Xr_train"] if arg_strAlvo == "dias" else var_dictSplits["Xr_desc_train"]
+        var_dfXTest = var_dictSplits["Xr_test"] if arg_strAlvo == "dias" else var_dictSplits["Xr_desc_test"]
+
         # TREINA: ajusta os pesos do modelo aos dados de treino
         # O modelo encontra: y = a0 + a1*x1 + a2*x2 + ... + an*xn (reta multidimensional)
         var_serYTrain = var_dictSplits["yr_train"] if arg_strAlvo == "dias" else var_dictSplits["yr_desc_train"]
         var_serYTest = var_dictSplits["yr_test"] if arg_strAlvo == "dias" else var_dictSplits["yr_desc_test"]
-        var_objModelo.fit(var_dictSplits["Xr_train"], var_serYTrain)
-        
+        var_objModelo.fit(var_dfXTrain, var_serYTrain)
+
         # PREDIZ no treino: usa o modelo treinado para fazer predições
-        var_arrPredTrain = var_objModelo.predict(var_dictSplits["Xr_train"])
-        
+        var_arrPredTrain = var_objModelo.predict(var_dfXTrain)
+
         # PREDIZ no teste: usa o modelo em dados que nunca viu
-        var_arrPredTest = var_objModelo.predict(var_dictSplits["Xr_test"])
+        var_arrPredTest = var_objModelo.predict(var_dfXTest)
 
         # Centraliza o cálculo de métricas via _metricas_regressao (evita duplicação)
         var_dictMetricas = Metricas._metricas_regressao(var_serYTest, var_arrPredTest)
@@ -93,8 +100,8 @@ class TreinarRegressores:
         return {
             "modelo": var_objModelo,
             **var_dictMetricas,
-            "train_size": var_dictSplits["Xr_train"].shape[0],
-            "test_size": var_dictSplits["Xr_test"].shape[0],
+            "train_size": var_dfXTrain.shape[0],
+            "test_size": var_dfXTest.shape[0],
         }
 
 
@@ -121,25 +128,29 @@ class TreinarRegressores:
             random_state=42,            # Reprodutibilidade
         )
 
-        # Resolve o alvo correto ANTES do try/except
+        # Resolve X e y corretos ANTES do try/except. Para o alvo "desconto", usa o
+        # conjunto filtrado por horizonte (Xr_desc_train/Xr_desc_test), que contém
+        # apenas jogos cujo desconto de fato ocorreu dentro da janela do horizonte.
+        var_dfXTrain = var_dictSplits["Xr_train"] if arg_strAlvo == "dias" else var_dictSplits["Xr_desc_train"]
+        var_dfXTest = var_dictSplits["Xr_test"] if arg_strAlvo == "dias" else var_dictSplits["Xr_desc_test"]
         var_serYTrain = var_dictSplits["yr_train"] if arg_strAlvo == "dias" else var_dictSplits["yr_desc_train"]
         var_serYTest = var_dictSplits["yr_test"] if arg_strAlvo == "dias" else var_dictSplits["yr_desc_test"]
 
         # TREINA com early stopping
         try:
             var_objModelo.fit(
-                var_dictSplits["Xr_train"],
+                var_dfXTrain,
                 var_serYTrain,
-                eval_set=[(var_dictSplits["Xr_test"], var_serYTest)],
+                eval_set=[(var_dfXTest, var_serYTest)],
                 verbose=False,
                 early_stopping_rounds=50,
             )
         except TypeError:
-            var_objModelo.fit(var_dictSplits["Xr_train"], var_serYTrain)
+            var_objModelo.fit(var_dfXTrain, var_serYTrain)
 
         # PREDIZ no treino e teste
-        var_arrPredTrain = var_objModelo.predict(var_dictSplits["Xr_train"])
-        var_arrPredTest = var_objModelo.predict(var_dictSplits["Xr_test"])
+        var_arrPredTrain = var_objModelo.predict(var_dfXTrain)
+        var_arrPredTest = var_objModelo.predict(var_dfXTest)
 
         # Calcula métricas no teste
         var_dictMetricas = Metricas._metricas_regressao(var_serYTest, var_arrPredTest)
@@ -192,8 +203,8 @@ class TreinarRegressores:
         return {
             "modelo": var_objModelo,
             **var_dictMetricas,
-            "train_size": var_dictSplits["Xr_train"].shape[0],
-            "test_size": var_dictSplits["Xr_test"].shape[0],
+            "train_size": var_dfXTrain.shape[0],
+            "test_size": var_dfXTest.shape[0],
         }
 
 
@@ -221,25 +232,29 @@ class TreinarRegressores:
             verbose=-1,                 # Silencioso
         )
 
-        # Resolve o alvo correto ANTES do try/except
+        # Resolve X e y corretos ANTES do try/except. Para o alvo "desconto", usa o
+        # conjunto filtrado por horizonte (Xr_desc_train/Xr_desc_test), que contém
+        # apenas jogos cujo desconto de fato ocorreu dentro da janela do horizonte.
+        var_dfXTrain = var_dictSplits["Xr_train"] if arg_strAlvo == "dias" else var_dictSplits["Xr_desc_train"]
+        var_dfXTest = var_dictSplits["Xr_test"] if arg_strAlvo == "dias" else var_dictSplits["Xr_desc_test"]
         var_serYTrain = var_dictSplits["yr_train"] if arg_strAlvo == "dias" else var_dictSplits["yr_desc_train"]
         var_serYTest = var_dictSplits["yr_test"] if arg_strAlvo == "dias" else var_dictSplits["yr_desc_test"]
 
         # TREINA com early stopping
         try:
             var_objModelo.fit(
-                var_dictSplits["Xr_train"],
+                var_dfXTrain,
                 var_serYTrain,
-                eval_set=[(var_dictSplits["Xr_test"], var_serYTest)],
+                eval_set=[(var_dfXTest, var_serYTest)],
                 eval_metric="rmse",
                 callbacks=[lgb.early_stopping(stopping_rounds=50, verbose=False)],
             )
         except TypeError:
-            var_objModelo.fit(var_dictSplits["Xr_train"], var_serYTrain)
+            var_objModelo.fit(var_dfXTrain, var_serYTrain)
 
         # PREDIZ no treino e teste
-        var_arrPredTrain = var_objModelo.predict(var_dictSplits["Xr_train"])
-        var_arrPredTest = var_objModelo.predict(var_dictSplits["Xr_test"])
+        var_arrPredTrain = var_objModelo.predict(var_dfXTrain)
+        var_arrPredTest = var_objModelo.predict(var_dfXTest)
 
         # Calcula métricas no teste
         var_dictMetricas = Metricas._metricas_regressao(var_serYTest, var_arrPredTest)
@@ -292,8 +307,8 @@ class TreinarRegressores:
         return {
             "modelo": var_objModelo,
             **var_dictMetricas,
-            "train_size": var_dictSplits["Xr_train"].shape[0],
-            "test_size": var_dictSplits["Xr_test"].shape[0],
+            "train_size": var_dfXTrain.shape[0],
+            "test_size": var_dfXTest.shape[0],
         }
 
 

@@ -68,37 +68,16 @@ class Treinar_Modelos:
             var_floatMelhorF1 = var_dictModelosClassificacao[var_strHorizonte][var_strMelhorModelo]['f1_macro']
             logger.info(f"MELHOR MODELO ({var_strHorizonte}): {var_strMelhorModelo} (F1-Score: {var_floatMelhorF1:.4f})")
             
-        # TREINA REGRESSORES DE DESCONTO APENAS UMA VEZ
-        logger.info("=" * 80)
-        logger.info("TREINANDO REGRESSORES (DESCONTO) - ÚNICO PARA TODOS OS HORIZONTES")
-        logger.info("=" * 80)
-        
-        var_dictRegDesc = TreinarRegressores.treinar_modelo_regressao_linear(arg_strHorizonte="30d", arg_strAlvo="desconto")
-        var_dictRegXGBDesc = TreinarRegressores.treinar_modelo_xgboost_regressao(arg_strHorizonte="30d", arg_strAlvo="desconto")
-        var_dictRegLGBDesc = TreinarRegressores.treinar_modelo_lightgbm_regressao(arg_strHorizonte="30d", arg_strAlvo="desconto")
-        
-        var_dictDescontoBase = {
-            "LightGBM": var_dictRegLGBDesc,
-            "XGBoost": var_dictRegXGBDesc,
-            "LinearRegression": var_dictRegDesc,
-        }
-
-        logger.info("-" * 80)
-        logger.info("RESUMO COMPARATIVO - REGRESSÃO (DESCONTO)")
-        logger.info(f"{'Modelo':<18} | {'RMSE (%)':>12} | {'MAE (%)':>11} | {'MSE':>10} | Dataset")
-        logger.info("-" * 80)
-
-        for var_strNome, var_dictMetricas in var_dictDescontoBase.items():
-            logger.info(
-                f"{var_strNome:<18} | {var_dictMetricas['rmse']:>12.2f} | "
-                f"{var_dictMetricas['mae']:>11.2f} | {var_dictMetricas['mse']:>10.2f} | "
-                f"{var_dictMetricas['train_size']:,} treino / {var_dictMetricas['test_size']:,} teste"
-            )
-
-        var_strMelhorRegressorDesc = min(var_dictDescontoBase.items(), key=lambda x: x[1]["rmse"])[0]
-        var_floatMelhorRMSEDesc = var_dictDescontoBase[var_strMelhorRegressorDesc]["rmse"]
-        logger.info(f"MELHOR MODELO REGRESSÃO DESCONTO: {var_strMelhorRegressorDesc} (RMSE: {var_floatMelhorRMSEDesc:.2f}%)")
-
+        # =====================================================================
+        # TREINA REGRESSORES DE DIAS E DE DESCONTO, POR HORIZONTE
+        # =====================================================================
+        # O regressor de desconto (profundidade esperada do desconto) é treinado
+        # DENTRO do loop por horizonte, usando o conjunto filtrado por horizonte
+        # vindo de NormalizarModelos (apenas jogos cujo desconto de fato ocorreu
+        # dentro da janela do horizonte). Antes desta correção, o regressor de
+        # desconto era treinado uma única vez com horizonte fixo "30d" e o mesmo
+        # modelo era copiado para os 3 horizontes, dando falsa impressão de
+        # diferenciação por horizonte nos arquivos .joblib salvos em disco.
         var_dictModelosRegressaoDias = {}
         var_dictModelosRegressaoDesconto = {}
 
@@ -116,9 +95,6 @@ class Treinar_Modelos:
                 "XGBoost": var_dictRegXGB,
                 "LinearRegression": var_dictReg,
             }
-            
-            # ATRIBUI OS MODELOS DE DESCONTO PRÉ-TREINADOS AO HORIZONTE ATUAL
-            var_dictModelosRegressaoDesconto[var_strHorizonte] = var_dictDescontoBase
 
             logger.info("-" * 80)
             logger.info(f"RESUMO COMPARATIVO - REGRESSÃO ({var_strHorizonte.upper()})")
@@ -135,6 +111,39 @@ class Treinar_Modelos:
             var_strMelhorRegressor = min(var_dictModelosRegressaoDias[var_strHorizonte].items(), key=lambda x: x[1]["rmse"])[0]
             var_floatMelhorRMSE = var_dictModelosRegressaoDias[var_strHorizonte][var_strMelhorRegressor]["rmse"]
             logger.info(f"MELHOR MODELO REGRESSÃO ({var_strHorizonte}): {var_strMelhorRegressor} (RMSE: {var_floatMelhorRMSE:.2f} dias)")
+
+            # -----------------------------------------------------------------
+            # REGRESSORES DE DESCONTO — TREINADOS PARA ESTE HORIZONTE
+            # -----------------------------------------------------------------
+            logger.info("=" * 80)
+            logger.info(f"TREINANDO REGRESSORES (DESCONTO) - HORIZONTE: {var_strHorizonte}")
+            logger.info("=" * 80)
+
+            var_dictRegDesc = TreinarRegressores.treinar_modelo_regressao_linear(arg_strHorizonte=var_strHorizonte, arg_strAlvo="desconto")
+            var_dictRegXGBDesc = TreinarRegressores.treinar_modelo_xgboost_regressao(arg_strHorizonte=var_strHorizonte, arg_strAlvo="desconto")
+            var_dictRegLGBDesc = TreinarRegressores.treinar_modelo_lightgbm_regressao(arg_strHorizonte=var_strHorizonte, arg_strAlvo="desconto")
+
+            var_dictModelosRegressaoDesconto[var_strHorizonte] = {
+                "LightGBM": var_dictRegLGBDesc,
+                "XGBoost": var_dictRegXGBDesc,
+                "LinearRegression": var_dictRegDesc,
+            }
+
+            logger.info("-" * 80)
+            logger.info(f"RESUMO COMPARATIVO - REGRESSÃO DESCONTO ({var_strHorizonte.upper()})")
+            logger.info(f"{'Modelo':<18} | {'RMSE (%)':>12} | {'MAE (%)':>11} | {'MSE':>10} | Dataset")
+            logger.info("-" * 80)
+
+            for var_strNome, var_dictMetricas in var_dictModelosRegressaoDesconto[var_strHorizonte].items():
+                logger.info(
+                    f"{var_strNome:<18} | {var_dictMetricas['rmse']:>12.2f} | "
+                    f"{var_dictMetricas['mae']:>11.2f} | {var_dictMetricas['mse']:>10.2f} | "
+                    f"{var_dictMetricas['train_size']:,} treino / {var_dictMetricas['test_size']:,} teste"
+                )
+
+            var_strMelhorRegressorDesc = min(var_dictModelosRegressaoDesconto[var_strHorizonte].items(), key=lambda x: x[1]["rmse"])[0]
+            var_floatMelhorRMSEDesc = var_dictModelosRegressaoDesconto[var_strHorizonte][var_strMelhorRegressorDesc]["rmse"]
+            logger.info(f"MELHOR MODELO REGRESSÃO DESCONTO ({var_strHorizonte}): {var_strMelhorRegressorDesc} (RMSE: {var_floatMelhorRMSEDesc:.2f}%)")
 
         logger.info("="*80)
         logger.info("TREINAMENTO CONCLUÍDO COM SUCESSO")

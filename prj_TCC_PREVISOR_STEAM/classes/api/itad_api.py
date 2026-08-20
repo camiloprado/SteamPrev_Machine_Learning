@@ -1,9 +1,9 @@
 from prj_TCC_PREVISOR_STEAM.classes.framework.AllSettings import Settings
 from prj_TCC_PREVISOR_STEAM.classes.data.repositories.postgre_itad import PostgreSQLITAD
+from prj_TCC_PREVISOR_STEAM.classes.utils.http_retry import retry_with_backoff
 
 from typing import Sequence
 from datetime import datetime, timedelta, timezone
-from email.utils import parsedate_to_datetime
 import asyncio
 import random
 import logging
@@ -16,12 +16,18 @@ ITAD_LOOKUP_URL = "https://api.isthereanydeal.com/lookup/id/title/v1"
 ITAD_HISTORY_URL = "https://api.isthereanydeal.com/games/history/v2"
 ITAD_LOOKUP_IDS_URL = "https://api.isthereanydeal.com/games/lookup/v1"
 
+# Valor padrão (imutável) de backoff base, usado apenas quando nenhuma configuração
+# específica é fornecida. O valor efetivo é sempre passado explicitamente como
+# parâmetro através das chamadas (nunca como atributo de classe mutável), para que
+# chamadas concorrentes (ex.: asyncio.gather com lookup_itad_ids_batched e
+# fetch_price_history_bulk_batched) não sobrescrevam a configuração uma da outra.
+CON_DEFAULT_RETRY_BACKOFF_BASE = 0
+
 class ITADClient:
     """
     Cliente para interagir com a Is There Any Deal API.
     """
     _var_intDelayBetweenBatches = 0
-    _var_intRetryBackoffBase = 0
     _var_intProcessados = 0
 
     @classmethod
@@ -39,7 +45,7 @@ class ITADClient:
         var_dictConfigAPI = Settings.steam_api_itad()
         var_intBatchSize = var_dictConfigAPI.get("BatchSize", 200)
         cls._var_intDelayBetweenBatches = var_dictConfigAPI.get("DelayBetweenBatches", var_dictConfigAPI.get("Delay", 120))
-        cls._var_intRetryBackoffBase = var_dictConfigAPI.get("RetryBackoffBase", cls._var_intDelayBetweenBatches)
+        var_intRetryBackoffBase = var_dictConfigAPI.get("RetryBackoffBase", cls._var_intDelayBetweenBatches)
         var_intAsyncConcurrency = var_dictConfigAPI.get("Concurrency", 3)
 
         var_intBatchSizeMax = int(os.getenv("STEAM_BATCH_SIZE_ITAD_MAX", 1000))
@@ -55,7 +61,7 @@ class ITADClient:
             "ITAD LOOKUP (batches): "
             f"Total itens={var_intTotalItems:,} Tamanho batch={var_intBatchSize:,} Total batches={var_intTotalBatches} (estimado) "
             f"concorrência={var_intAsyncConcurrency} delayBatch={cls._var_intDelayBetweenBatches}s "
-            f"retryBase={cls._var_intRetryBackoffBase}s"
+            f"retryBase={var_intRetryBackoffBase}s"
         )
         
         var_dictAllResults = {}
@@ -78,7 +84,7 @@ class ITADClient:
             )
             
             # Processa o batch atual
-            var_dictResults, var_dictBatchStats = await cls.lookup_itad_ids(var_listBatch)
+            var_dictResults, var_dictBatchStats = await cls.lookup_itad_ids(var_listBatch, arg_intRetryBackoffBase=var_intRetryBackoffBase)
             
             # Usa estatísticas retornadas para ajuste dinâmico do batch size
             var_intAusentes = var_dictBatchStats["ausentes"]
@@ -133,13 +139,16 @@ class ITADClient:
         return var_dictAllResults
     
     @classmethod
-    async def lookup_itad_ids(cls, arg_seqAppids: Sequence[int]) -> tuple[dict[int, dict], dict]:
+    async def lookup_itad_ids(cls, arg_seqAppids: Sequence[int], arg_intRetryBackoffBase: int = CON_DEFAULT_RETRY_BACKOFF_BASE) -> tuple[dict[int, dict], dict]:
         """
         Realiza lookup de IDs na API do IsThereAnyDeal (ITAD) de forma assíncrona.
-        
+
         Parâmetros:
         - arg_seqAppids (Sequence[int]): Uma sequência de appids dos jogos.
-        
+        - arg_intRetryBackoffBase (int): Base (em segundos) do backoff exponencial usado no retry
+          de erros 429/502, passada explicitamente para evitar estado mutável compartilhado entre
+          chamadas concorrentes.
+
         Retorna:
         - tuple: Uma tupla contendo:
             - var_dictResults (dict): Um dicionário mapeando appids para seus dados do ITAD.
@@ -236,7 +245,7 @@ class ITADClient:
                             if e_http.status == 403:
                                 var_intErrosForbidden += 1
                             elif e_http.status == 429:
-                                var_dictRetryData = await cls._retry_with_backoff(arg_clientSession, arg_intAppid, arg_strTipo='lookup_ids')  # Retry para 429
+                                var_dictRetryData = await cls._retry_with_backoff(arg_clientSession, arg_intAppid, arg_strTipo='lookup_ids', arg_intRetryBackoffBase=arg_intRetryBackoffBase)  # Retry para 429
                                 if var_dictRetryData:
                                     # Sucesso no retry - processa os dados
                                     if var_dictRetryData and var_dictRetryData.get("found"):
@@ -252,7 +261,7 @@ class ITADClient:
                             elif e_http.status == 502:
                                 # Erro 502: Tenta retry com backoff exponencial
                                 logger.debug(f"AppID {arg_intAppid}: 502 detectado, iniciando retry com backoff...")
-                                var_dictRetryData = await cls._retry_with_backoff(arg_clientSession, arg_intAppid, arg_strTipo='lookup_ids')
+                                var_dictRetryData = await cls._retry_with_backoff(arg_clientSession, arg_intAppid, arg_strTipo='lookup_ids', arg_intRetryBackoffBase=arg_intRetryBackoffBase)
                                 if var_dictRetryData:
                                     # Sucesso no retry - processa os dados
                                     if var_dictRetryData and var_dictRetryData.get("found"):
@@ -358,7 +367,7 @@ class ITADClient:
         var_dictConfigAPI = Settings.steam_api_itad()
         var_intBatchSize = var_dictConfigAPI.get("BatchSize", 200)
         cls._var_intDelayBetweenBatches = var_dictConfigAPI.get("DelayBetweenBatches", var_dictConfigAPI.get("Delay", 120))
-        cls._var_intRetryBackoffBase = var_dictConfigAPI.get("RetryBackoffBase", cls._var_intDelayBetweenBatches)
+        var_intRetryBackoffBase = var_dictConfigAPI.get("RetryBackoffBase", cls._var_intDelayBetweenBatches)
         var_intAsyncConcurrency = var_dictConfigAPI.get("Concurrency", 1)
         var_intTotalItems = len(var_listBatchTotal)
         if var_intTotalItems == 0:
@@ -372,7 +381,7 @@ class ITADClient:
             "ITAD HISTÓRICO (batches): "
             f"Total itens={var_intTotalItems:,} Tamanho batch={var_intBatchSize:,} Total batches={var_intTotalBatches} (estimado) "
             f"concorrência={var_intAsyncConcurrency} anos={arg_intAnos} delayBatch={cls._var_intDelayBetweenBatches}s "
-            f"retryBase={cls._var_intRetryBackoffBase}s"
+            f"retryBase={var_intRetryBackoffBase}s"
         )
         
         var_dictAllResults = {}
@@ -395,7 +404,7 @@ class ITADClient:
             )
             
             # Processa o batch atual
-            var_dictBatchResults, var_dictBatchStats = await cls.fetch_price_history_bulk(var_listBatch, arg_intAnos)
+            var_dictBatchResults, var_dictBatchStats = await cls.fetch_price_history_bulk(var_listBatch, arg_intAnos, arg_intRetryBackoffBase=var_intRetryBackoffBase)
             var_dictAllResults.update(var_dictBatchResults)
             
             # Usa estatísticas retornadas para ajuste dinâmico do batch size
@@ -448,13 +457,16 @@ class ITADClient:
     
     # ------------------- Async ITAD price history bulk -------------------
     @classmethod
-    async def fetch_price_history_bulk(cls, arg_seqItadPlain: Sequence[str], arg_intAnos: int = 5) -> tuple[dict, dict]:
+    async def fetch_price_history_bulk(cls, arg_seqItadPlain: Sequence[str], arg_intAnos: int = 5, arg_intRetryBackoffBase: int = CON_DEFAULT_RETRY_BACKOFF_BASE) -> tuple[dict, dict]:
         """
         Busca o histórico de preços de múltiplos jogos na API do IsThereAnyDeal (ITAD) de forma assíncrona.
 
         Parâmetros:
         - arg_seqItadPlain (Sequence[str]): Uma sequência de identificadores "plain" dos jogos no ITAD.
         - arg_intAnos (int): O número de anos para buscar o histórico.
+        - arg_intRetryBackoffBase (int): Base (em segundos) do backoff exponencial usado no retry
+          de erros 429/502, passada explicitamente para evitar estado mutável compartilhado entre
+          chamadas concorrentes.
 
         Retorna:
         - tuple: Uma tupla contendo:
@@ -557,7 +569,7 @@ class ITADClient:
                             if e_http.status == 403:
                                 var_intErrosForbidden += 1
                             elif e_http.status == 429:
-                                var_listDataRetry = await cls._retry_with_backoff(arg_clientSession, arg_strItadPlain, arg_strTipo='preco', arg_strSince=var_strSince)  # Retry para 429
+                                var_listDataRetry = await cls._retry_with_backoff(arg_clientSession, arg_strItadPlain, arg_strTipo='preco', arg_strSince=var_strSince, arg_intRetryBackoffBase=arg_intRetryBackoffBase)  # Retry para 429
                                 if var_listDataRetry:
                                     cls._var_intProcessados += 1
                                     return var_listDataRetry
@@ -565,7 +577,7 @@ class ITADClient:
                             elif e_http.status == 502:
                                 # Erro 502: Tenta retry com backoff exponencial
                                 logger.debug(f"ITAD Plain {arg_strItadPlain}: 502 detectado, iniciando retry com backoff...")
-                                var_listDataRetry = await cls._retry_with_backoff(arg_clientSession, arg_strItadPlain, arg_strTipo='preco', arg_strSince=var_strSince)
+                                var_listDataRetry = await cls._retry_with_backoff(arg_clientSession, arg_strItadPlain, arg_strTipo='preco', arg_strSince=var_strSince, arg_intRetryBackoffBase=arg_intRetryBackoffBase)
                                 if var_listDataRetry:
                                     cls._var_intProcessados += 1
                                     return var_listDataRetry
@@ -641,16 +653,31 @@ class ITADClient:
 
     # ------------------- Método auxiliar para retry -------------------
     @classmethod
-    async def _retry_with_backoff(cls, arg_clientSession: aiohttp.ClientSession, arg_anyId: int | str, arg_strTipo: str = 'lookup_ids', arg_intMaxRetries: int = 3, arg_strSince: str = None) -> dict | None:
+    async def _retry_with_backoff(
+        cls,
+        arg_clientSession: aiohttp.ClientSession,
+        arg_anyId: int | str,
+        arg_strTipo: str = 'lookup_ids',
+        arg_intMaxRetries: int = 3,
+        arg_strSince: str = None,
+        arg_intRetryBackoffBase: int = CON_DEFAULT_RETRY_BACKOFF_BASE,
+    ) -> dict | None:
         """
-        Retry com backoff exponencial para erros 429 (Too Many Requests).
-        
+        Retry com backoff exponencial (+ jitter) para erros 429 (Too Many Requests) e 502 (Bad Gateway).
+
+        Delega a lógica genérica de retry para `http_retry.retry_with_backoff`, compartilhada com
+        o cliente Steam (steam_api.py), para evitar duplicação de código.
+
         Parâmetros:
         - arg_clientSession (aiohttp.ClientSession): Sessão HTTP reutilizável.
         - arg_anyId (int or str): ID do jogo (pode ser AppID ou ITAD Plain).
         - arg_strTipo (str): Tipo de dados sendo buscado (preço ou lookup_ids) para logs mais claros.
         - arg_intMaxRetries (int): Número máximo de tentativas.
         - arg_strSince (str): Data mínima para histórico de preços.
+        - arg_intRetryBackoffBase (int): Base (em segundos) do backoff exponencial. Recebida como
+          parâmetro explícito (não é mais lida de um atributo de classe mutável) para que chamadas
+          concorrentes não compartilhem/sobrescrevam esse estado.
+
         Retorna:
         - dict | None: Dados do jogo ou None se falhar.
         """
@@ -667,7 +694,7 @@ class ITADClient:
                         "country": "BR",
                         "since": arg_strSince,
                     }
-            
+
         elif arg_strTipo == 'lookup_ids':
             url = ITAD_LOOKUP_IDS_URL
             var_dictParams = {
@@ -675,61 +702,14 @@ class ITADClient:
                 "appid": arg_anyId,
             }
 
-        def _parse_retry_after_seconds(arg_resp: aiohttp.ClientResponse) -> int | None:
-            var_strRetryAfter = arg_resp.headers.get("Retry-After")
-            if not var_strRetryAfter:
-                return None
-
-            var_strRetryAfter = var_strRetryAfter.strip()
-
-            try:
-                var_floatSeconds = float(var_strRetryAfter)
-                if var_floatSeconds < 0:
-                    return None
-                return max(1, int(var_floatSeconds))
-            except ValueError:
-                pass
-
-            try:
-                var_dateRetryAt = parsedate_to_datetime(var_strRetryAfter)
-                if var_dateRetryAt.tzinfo is None:
-                    var_dateRetryAt = var_dateRetryAt.replace(tzinfo=timezone.utc)
-                var_dateNow = datetime.now(timezone.utc)
-                var_intSeconds = int((var_dateRetryAt - var_dateNow).total_seconds())
-                return max(1, var_intSeconds)
-            except Exception:
-                return None
-
-        for var_intAttempt in range(arg_intMaxRetries):
-            try:
-                async with arg_clientSession.get(url, params=var_dictParams) as resp:
-                    if resp.status == 429:
-                        var_intWaitTime = _parse_retry_after_seconds(resp)
-                        if var_intWaitTime is None:
-                            var_intWaitTime = (2 ** var_intAttempt) * cls._var_intRetryBackoffBase
-
-                        logger.warning(
-                            f"ITAD retry ({arg_strTipo}) id={arg_anyId} status=429 "
-                            f"tentativa={var_intAttempt+1}/{arg_intMaxRetries} espera={var_intWaitTime}s"
-                        )
-                        await asyncio.sleep(var_intWaitTime)
-                        continue
-                    if resp.status == 502:
-                        var_intWaitTime = (2 ** var_intAttempt) * cls._var_intRetryBackoffBase
-                        logger.warning(
-                            f"ITAD retry ({arg_strTipo}) id={arg_anyId} status=502 "
-                            f"tentativa={var_intAttempt+1}/{arg_intMaxRetries} espera={var_intWaitTime}s"
-                        )
-                        await asyncio.sleep(var_intWaitTime)
-                        continue
-                    elif resp.status == 200:
-                        return await resp.json()
-                    else:
-                        logger.debug(f"ITAD resposta id={arg_anyId} status={resp.status} tentativa={var_intAttempt+1}")
-                        return None
-            except Exception as e:
-                if var_intAttempt == arg_intMaxRetries - 1:
-                    logger.error(f"ID {arg_anyId}: Falha após {arg_intMaxRetries} tentativas - {e}")
-                    return None
-                await asyncio.sleep(5)  # Espera 5s entre tentativas com erro
-        return None
+        return await retry_with_backoff(
+            arg_clientSession=arg_clientSession,
+            arg_strUrl=url,
+            arg_intRetryBackoffBase=arg_intRetryBackoffBase,
+            arg_anyId=arg_anyId,
+            arg_objLogger=logger,
+            arg_strTipo=arg_strTipo,
+            arg_strLogPrefix="ITAD",
+            arg_dictParams=var_dictParams,
+            arg_intMaxRetries=arg_intMaxRetries,
+        )

@@ -1,9 +1,9 @@
 from prj_TCC_PREVISOR_STEAM.classes.data.repositories.postgre_steam import PostgreSQLSteam
 from prj_TCC_PREVISOR_STEAM.classes.framework.AllSettings import Settings
+from prj_TCC_PREVISOR_STEAM.classes.utils.http_retry import retry_with_backoff
 
 from typing import Sequence
-from datetime import datetime, timezone
-from email.utils import parsedate_to_datetime
+from datetime import datetime
 import asyncio
 import random
 import logging
@@ -21,12 +21,18 @@ CON_DEFAULT_HEADERS = {
 STEAM_DETAILS_URL = "https://store.steampowered.com/api/appdetails"
 STEAM_REVIEWS_URL = "https://store.steampowered.com/appreviews/{appid}"
 
+# Valor padrão (imutável) de backoff base, usado apenas quando nenhuma configuração
+# específica é fornecida. O valor efetivo é sempre passado explicitamente como
+# parâmetro através das chamadas (nunca como atributo de classe mutável), para que
+# chamadas concorrentes (ex.: asyncio.gather com fetch_details_bulk_batched e
+# fetch_reviews_summary_batched) não sobrescrevam a configuração uma da outra.
+CON_DEFAULT_RETRY_BACKOFF_BASE = 0
+
 class SteamClient:
     """
     Cliente para interagir com a Steam API.
     """
     _var_intDelayBetweenBatches = 0
-    _var_intRetryBackoffBase = 0
     _var_intProcessados = 0
 
     # ------------------- Async bulk details com batches -------------------
@@ -49,7 +55,7 @@ class SteamClient:
         var_intBatchSizeMax = var_dictConfigAPI.get("BatchSizeMax", 200)
         var_intBatchSize = var_intBatchSizeInicial
         cls._var_intDelayBetweenBatches = var_dictConfigAPI.get("DelayBetweenBatches", var_dictConfigAPI.get("Delay", 180))
-        cls._var_intRetryBackoffBase = var_dictConfigAPI.get("RetryBackoffBase", cls._var_intDelayBetweenBatches)
+        var_intRetryBackoffBase = var_dictConfigAPI.get("RetryBackoffBase", cls._var_intDelayBetweenBatches)
         var_intAsyncConcurrency = var_dictConfigAPI.get("Concurrency", 1)
         var_intTentativaMaxima = var_dictConfigAPI.get("max_tentativas", 3)
         var_intTotalItems = len(arg_seqAppids)
@@ -77,7 +83,7 @@ class SteamClient:
             )
             
             # Processa o batch atual e recebe estatísticas
-            var_listBatchResults, var_dictBatchStats = await cls.fetch_details_bulk(var_listBatch)
+            var_listBatchResults, var_dictBatchStats = await cls.fetch_details_bulk(var_listBatch, arg_intRetryBackoffBase=var_intRetryBackoffBase)
             var_listDetails = []
             for var_dictResult in var_listBatchResults:
                 # Valida se o resultado não é None ou exceção
@@ -153,15 +159,28 @@ class SteamClient:
 
     # ------------------- Método auxiliar para retry -------------------
     @classmethod
-    async def _retry_with_backoff(cls, arg_clientSession: aiohttp.ClientSession, arg_intAppid: int, arg_strTipo: str = 'detalhes', arg_intMaxRetries: int = 3) -> dict | None:
+    async def _retry_with_backoff(
+        cls,
+        arg_clientSession: aiohttp.ClientSession,
+        arg_intAppid: int,
+        arg_strTipo: str = 'detalhes',
+        arg_intMaxRetries: int = 3,
+        arg_intRetryBackoffBase: int = CON_DEFAULT_RETRY_BACKOFF_BASE,
+    ) -> dict | None:
         """
-        Retry com backoff exponencial para erros 429 (Too Many Requests).
-        
+        Retry com backoff exponencial (+ jitter) para erros 429 (Too Many Requests) e 502 (Bad Gateway).
+
+        Delega a lógica genérica de retry para `http_retry.retry_with_backoff`, compartilhada com
+        o cliente ITAD (itad_api.py), para evitar duplicação de código.
+
         Parâmetros:
         - arg_clientSession (aiohttp.ClientSession): Sessão HTTP reutilizável.
         - arg_intAppid (int): AppID do jogo.
         - arg_strTipo (str): Tipo de dados sendo buscado (detalhes ou reviews) para logs mais claros.
         - arg_intMaxRetries (int): Número máximo de tentativas.
+        - arg_intRetryBackoffBase (int): Base (em segundos) do backoff exponencial. Recebida como
+          parâmetro explícito (não é mais lida de um atributo de classe mutável) para que chamadas
+          concorrentes não compartilhem/sobrescrevam esse estado.
 
         Retorna:
         - dict | None: Dados do jogo ou None se falhar.
@@ -172,75 +191,29 @@ class SteamClient:
         elif arg_strTipo == 'reviews':
             url = STEAM_REVIEWS_URL.format(appid=arg_intAppid)
 
-        def _parse_retry_after_seconds(arg_resp: aiohttp.ClientResponse) -> int | None:
-            var_strRetryAfter = arg_resp.headers.get("Retry-After")
-            if not var_strRetryAfter:
-                return None
-
-            var_strRetryAfter = var_strRetryAfter.strip()
-
-            try:
-                var_floatSeconds = float(var_strRetryAfter)
-                if var_floatSeconds < 0:
-                    return None
-                return max(1, int(var_floatSeconds))
-            except ValueError:
-                pass
-
-            try:
-                var_dateRetryAt = parsedate_to_datetime(var_strRetryAfter)
-                if var_dateRetryAt.tzinfo is None:
-                    var_dateRetryAt = var_dateRetryAt.replace(tzinfo=timezone.utc)
-                var_dateNow = datetime.now(timezone.utc)
-                var_intSeconds = int((var_dateRetryAt - var_dateNow).total_seconds())
-                return max(1, var_intSeconds)
-            except Exception:
-                return None
-            
-        for var_intAttempt in range(arg_intMaxRetries):
-            try:
-                async with arg_clientSession.get(url) as resp:
-                    if resp.status == 429:
-                        var_intWaitTime = _parse_retry_after_seconds(resp)
-                        if var_intWaitTime is None:
-                            var_intWaitTime = (2 ** var_intAttempt) * cls._var_intRetryBackoffBase
-                        logger.warning(
-                            f"STEAM retry ({arg_strTipo}) id={arg_intAppid} status=429 "
-                            f"tentativa={var_intAttempt+1}/{arg_intMaxRetries} espera={var_intWaitTime}s"
-                        )
-                        await asyncio.sleep(var_intWaitTime)
-                        continue
-                    if resp.status == 502:
-                        var_intWaitTime = (2 ** var_intAttempt) * cls._var_intRetryBackoffBase
-                        logger.warning(
-                            f"STEAM retry ({arg_strTipo}) id={arg_intAppid} status=502 "
-                            f"tentativa={var_intAttempt+1}/{arg_intMaxRetries} espera={var_intWaitTime}s"
-                        )
-                        await asyncio.sleep(var_intWaitTime)
-                        continue
-                    elif resp.status == 200:
-                        return await resp.json()
-                    else:
-                        logger.debug(
-                            f"STEAM resposta id={arg_intAppid} status={resp.status} "
-                            f"tentativa={var_intAttempt+1}"
-                        )
-                        return None
-            except Exception as e:
-                if var_intAttempt == arg_intMaxRetries - 1:
-                    logger.error(f"STEAM retry id={arg_intAppid}: Falha após {arg_intMaxRetries} tentativas - {e}")
-                    return None
-                await asyncio.sleep(5)  # Espera 5s entre tentativas com erro
-        return None
+        return await retry_with_backoff(
+            arg_clientSession=arg_clientSession,
+            arg_strUrl=url,
+            arg_intRetryBackoffBase=arg_intRetryBackoffBase,
+            arg_anyId=arg_intAppid,
+            arg_objLogger=logger,
+            arg_strTipo=arg_strTipo,
+            arg_strLogPrefix="STEAM",
+            arg_dictParams=None,
+            arg_intMaxRetries=arg_intMaxRetries,
+        )
 
     # ------------------- Async bulk details -------------------
     @classmethod
-    async def fetch_details_bulk(cls, arg_seqAppids: Sequence[int]) -> tuple[list[dict], dict]:
+    async def fetch_details_bulk(cls, arg_seqAppids: Sequence[int], arg_intRetryBackoffBase: int = CON_DEFAULT_RETRY_BACKOFF_BASE) -> tuple[list[dict], dict]:
         """
         Busca os detalhes de múltiplos jogos na Steam de forma assíncrona.
-        
+
         Parâmetros:
         - arg_seqAppids (Sequence[int]): Uma sequência de appids dos jogos.
+        - arg_intRetryBackoffBase (int): Base (em segundos) do backoff exponencial usado no retry
+          de erros 429/502, passada explicitamente para evitar estado mutável compartilhado entre
+          chamadas concorrentes.
 
         Retorna:
         - tuple[list[dict], dict]: Uma tupla contendo:
@@ -460,7 +433,7 @@ class SteamClient:
                             elif e_http.status == 429:
                                 # Erro 429: Tenta retry com backoff exponencial
                                 logger.debug(f"AppID {arg_intAppid}: 429 detectado, iniciando retry com backoff...")
-                                var_dictRetryData = await cls._retry_with_backoff(arg_clientSession, arg_intAppid, arg_strTipo='detalhes', arg_intMaxRetries=3)
+                                var_dictRetryData = await cls._retry_with_backoff(arg_clientSession, arg_intAppid, arg_strTipo='detalhes', arg_intMaxRetries=3, arg_intRetryBackoffBase=arg_intRetryBackoffBase)
                                 if var_dictRetryData:
                                     # Sucesso no retry - processa os dados
                                     if var_dictRetryData.get(str(arg_intAppid), {}).get("success"):
@@ -478,7 +451,7 @@ class SteamClient:
                             elif e_http.status == 502:
                                 # Erro 502: Tenta retry com backoff exponencial
                                 logger.debug(f"AppID {arg_intAppid}: 502 detectado, iniciando retry com backoff...")
-                                var_dictRetryData = await cls._retry_with_backoff(arg_clientSession, arg_intAppid, arg_strTipo='detalhes', arg_intMaxRetries=3)
+                                var_dictRetryData = await cls._retry_with_backoff(arg_clientSession, arg_intAppid, arg_strTipo='detalhes', arg_intMaxRetries=3, arg_intRetryBackoffBase=arg_intRetryBackoffBase)
                                 if var_dictRetryData:
                                     # Sucesso no retry - processa os dados
                                     if var_dictRetryData.get(str(arg_intAppid), {}).get("success"):
@@ -601,7 +574,7 @@ class SteamClient:
         var_dictConfigAPI = Settings.steam_api_reviews()
         var_intBatchSize = var_dictConfigAPI.get("BatchSize", 200)
         cls._var_intDelayBetweenBatches = var_dictConfigAPI.get("DelayBetweenBatches", var_dictConfigAPI.get("Delay", 120))
-        cls._var_intRetryBackoffBase = var_dictConfigAPI.get("RetryBackoffBase", cls._var_intDelayBetweenBatches)
+        var_intRetryBackoffBase = var_dictConfigAPI.get("RetryBackoffBase", cls._var_intDelayBetweenBatches)
         var_intAsyncConcurrency = var_dictConfigAPI.get("Concurrency", 1)
         var_intTotalItems = len(arg_seqAppids)
         var_intTotalBatches = (var_intTotalItems + var_intBatchSize - 1) // var_intBatchSize
@@ -626,7 +599,7 @@ class SteamClient:
             )
 
             # Processa o batch atual
-            var_listBatchResults = await cls.fetch_reviews_summary(var_listBatch)
+            var_listBatchResults = await cls.fetch_reviews_summary(var_listBatch, arg_intRetryBackoffBase=var_intRetryBackoffBase)
             
             var_listReviews = []
             var_intAusentesReviews = 0
@@ -670,13 +643,16 @@ class SteamClient:
     
     # ------------------- Async reviews summary -------------------
     @classmethod
-    async def fetch_reviews_summary(cls, arg_seqAppids: Sequence[int]) -> dict[int, dict]:
+    async def fetch_reviews_summary(cls, arg_seqAppids: Sequence[int], arg_intRetryBackoffBase: int = CON_DEFAULT_RETRY_BACKOFF_BASE) -> dict[int, dict]:
         """
         Busca o resumo de reviews de múltiplos jogos na Steam de forma assíncrona.
-        
+
         Parâmetros:
         - arg_seqAppids (Sequence[int]): Uma sequência de appids dos jogos.
-        
+        - arg_intRetryBackoffBase (int): Base (em segundos) do backoff exponencial usado no retry
+          de erros 429/502, passada explicitamente para evitar estado mutável compartilhado entre
+          chamadas concorrentes.
+
         Retorna:
         - var_dictResult (dict): Um dicionário mapeando appids para seus resumos de reviews.
         """
@@ -794,7 +770,7 @@ class SteamClient:
                                 logger.debug(
                                     f"REVIEWS 429 detectado id={arg_intAppid}, iniciando retry"
                                 )
-                                var_dictRetryData = await cls._retry_with_backoff(arg_clientSession, arg_intAppid, arg_intMaxRetries=3, arg_strTipo='reviews')
+                                var_dictRetryData = await cls._retry_with_backoff(arg_clientSession, arg_intAppid, arg_intMaxRetries=3, arg_strTipo='reviews', arg_intRetryBackoffBase=arg_intRetryBackoffBase)
                                 if var_dictRetryData:
                                     # Sucesso no retry - processa os dados
                                     if var_dictRetryData.get("success") == 1:
