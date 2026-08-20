@@ -1,11 +1,14 @@
 from prj_TCC_PREVISOR_STEAM.classes.framework.AllSettings import Settings
-from prj_TCC_PREVISOR_STEAM.classes.data.repositories.postgre_generico import PostgreSQL
 from prj_TCC_PREVISOR_STEAM.classes.data.repositories.postgre_itad import PostgreSQLITAD
 
 from typing import Sequence
 from datetime import datetime, timedelta, timezone
 from email.utils import parsedate_to_datetime
-import asyncio, random, logging, aiohttp, os
+import asyncio
+import random
+import logging
+import aiohttp
+import os
 
 logger = logging.getLogger("itad")
 
@@ -246,6 +249,22 @@ class ITADClient:
                                         return (arg_intAppid, "AUSENTE")
                                 # Falhou mesmo com retry
                                 var_intErrosTooManyRequests += 1
+                            elif e_http.status == 502:
+                                # Erro 502: Tenta retry com backoff exponencial
+                                logger.debug(f"AppID {arg_intAppid}: 502 detectado, iniciando retry com backoff...")
+                                var_dictRetryData = await cls._retry_with_backoff(arg_clientSession, arg_intAppid, arg_strTipo='lookup_ids')
+                                if var_dictRetryData:
+                                    # Sucesso no retry - processa os dados
+                                    if var_dictRetryData and var_dictRetryData.get("found"):
+                                        var_dictGame = var_dictRetryData.get("game", {})
+                                        if isinstance(var_dictGame, dict):
+                                            cls._var_intProcessados += 1
+                                            return (arg_intAppid, var_dictGame)
+                                    elif var_dictRetryData and var_dictRetryData.get("found") is False:
+                                        var_intNaoEncontrados += 1
+                                        return (arg_intAppid, "AUSENTE")
+                                # Falhou mesmo com retry
+                                var_intErrosOutros += 1
                         return (arg_intAppid, None)
                             
                     except asyncio.TimeoutError:
@@ -543,6 +562,14 @@ class ITADClient:
                                     cls._var_intProcessados += 1
                                     return var_listDataRetry
                                 var_intErrosTooManyRequests += 1
+                            elif e_http.status == 502:
+                                # Erro 502: Tenta retry com backoff exponencial
+                                logger.debug(f"ITAD Plain {arg_strItadPlain}: 502 detectado, iniciando retry com backoff...")
+                                var_listDataRetry = await cls._retry_with_backoff(arg_clientSession, arg_strItadPlain, arg_strTipo='preco', arg_strSince=var_strSince)
+                                if var_listDataRetry:
+                                    cls._var_intProcessados += 1
+                                    return var_listDataRetry
+                                var_intErrosOutros += 1
                         return None
                     except asyncio.TimeoutError:
                         # Captura erro de timeout.

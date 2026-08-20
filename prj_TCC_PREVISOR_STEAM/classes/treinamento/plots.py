@@ -1,11 +1,7 @@
 import os
 import logging
 from pathlib import Path
-from datetime import datetime
-import matplotlib.pyplot as plt
-import seaborn as sns
 import pandas as pd
-from sklearn.metrics import confusion_matrix
 
 logger = logging.getLogger("treino.plots")
 

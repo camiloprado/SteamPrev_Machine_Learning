@@ -1,11 +1,14 @@
 from prj_TCC_PREVISOR_STEAM.classes.data.repositories.postgre_steam import PostgreSQLSteam
 from prj_TCC_PREVISOR_STEAM.classes.framework.AllSettings import Settings
-from prj_TCC_PREVISOR_STEAM.classes.data.repositories.postgre_generico import PostgreSQL
 
 from typing import Sequence
 from datetime import datetime, timezone
 from email.utils import parsedate_to_datetime
-import asyncio, random, logging, aiohttp, traceback
+import asyncio
+import random
+import logging
+import aiohttp
+import traceback
 from dotenv import load_dotenv
 
 logger = logging.getLogger(__name__)

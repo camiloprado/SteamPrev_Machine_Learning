@@ -1,8 +1,8 @@
-from prj_TCC_PREVISOR_STEAM.classes.framework.AllSettings import Settings
 from prj_TCC_PREVISOR_STEAM.classes.data.repositories.postgre_generico import PostgreSQL
 
-from psycopg2.extras import execute_batch, execute_values
-import json, logging
+from psycopg2.extras import execute_values
+import json
+import logging
 
 logger = logging.getLogger("db.bdgeral")
 
@@ -122,7 +122,7 @@ class PostgreSQLBDGeral(PostgreSQL):
             """
 
             if arg_boolFiltroPadrao:
-                var_strSQLGeral += f"""
+                var_strSQLGeral += """
                 WHERE su.type = 'game' 
                     AND su.preco <> 'Gratuito' 
                     AND sim.id_itad IS NOT NULL 

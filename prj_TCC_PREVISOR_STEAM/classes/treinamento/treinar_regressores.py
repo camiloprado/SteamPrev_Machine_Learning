@@ -5,7 +5,6 @@ from prj_TCC_PREVISOR_STEAM.classes.treinamento.normalizar_modelos import Normal
 from sklearn.linear_model import LinearRegression
 import logging
 from datetime import datetime
-import pandas as pd
 import xgboost as xgb
 import lightgbm as lgb
 

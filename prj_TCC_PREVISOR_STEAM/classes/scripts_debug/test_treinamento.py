@@ -146,7 +146,7 @@ class Treinamento_Teste:
             labels=['free', 'budget', 'mid', 'premium', 'luxury']
         )
         
-        print(f"\nDistribuição de categorias de preço:")
+        print("\nDistribuição de categorias de preço:")
         print(data['price_category'].value_counts().sort_index())
         
         return data
@@ -171,7 +171,7 @@ class Treinamento_Teste:
             labels=['nicho', 'moderado', 'popular', 'muito_popular']
         )
         
-        print(f"\nDistribuição de categorias de popularidade:")
+        print("\nDistribuição de categorias de popularidade:")
         print(data['popularity_category'].value_counts().sort_index())
         
         return data
@@ -204,7 +204,7 @@ class Treinamento_Teste:
             labels=['negativo', 'misto', 'positivo', 'muito_positivo']
         )
         
-        print(f"\nDistribuição de categorias de score:")
+        print("\nDistribuição de categorias de score:")
         print(data['score_category'].value_counts().sort_index())
         
         return data
@@ -221,7 +221,6 @@ class Treinamento_Teste:
         - None: Exibe o gráfico
         """
         import matplotlib.pyplot as plt
-        import pandas as pd
         
         fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(15, 5))
         
@@ -262,7 +261,6 @@ class Treinamento_Teste:
         Retorna:
         - dict: Dicionário com métricas de qualidade
         """
-        import numpy as np
         
         metrics = {}
         
@@ -286,13 +284,13 @@ class Treinamento_Teste:
         print("\n" + "="*80)
         print("MÉTRICAS DE QUALIDADE DA DIVISÃO")
         print("="*80)
-        print(f"\nDIVISÃO ALEATÓRIA:")
+        print("\nDIVISÃO ALEATÓRIA:")
         print(f"  Desvio Padrão dos Erros: {metrics['random_error_std']:.2f}%")
         print(f"  Erro Absoluto Médio: {metrics['random_mae']:.2f}%")
         print(f"  Erro Máximo: {metrics['random_max_error']:.2f}%")
         print(f"  Score de Qualidade: {metrics['random_quality_score']:.2f}/100")
         
-        print(f"\nDIVISÃO ESTRATIFICADA:")
+        print("\nDIVISÃO ESTRATIFICADA:")
         print(f"  Desvio Padrão dos Erros: {metrics['stratified_error_std']:.2f}%")
         print(f"  Erro Absoluto Médio: {metrics['stratified_mae']:.2f}%")
         print(f"  Erro Máximo: {metrics['stratified_max_error']:.2f}%")
@@ -316,7 +314,6 @@ class Treinamento_Teste:
         Retorna:
         - str: Recomendação do método
         """
-        import pandas as pd
         
         # Análise da distribuição
         value_counts = data[column].value_counts()

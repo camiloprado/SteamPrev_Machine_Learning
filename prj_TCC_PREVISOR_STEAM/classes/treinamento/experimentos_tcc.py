@@ -64,7 +64,7 @@ def otimizar_hiperparametros_xgboost(arg_dfX_train: pd.DataFrame, arg_serY_train
         logger.info(f"Melhores hiperparâmetros encontrados: {var_objStudy.best_params}")
         return var_objStudy.best_params
 
-    except ImportError as var_objErro:
+    except ImportError:
         logger.error("Biblioteca 'optuna' ou 'xgboost' não instalada. Instale com 'pip install optuna xgboost'.")
         os.system("pip install optuna xgboost")
         return otimizar_hiperparametros_xgboost(arg_dfX_train, arg_serY_train, arg_intNumeroTreinos)
@@ -111,7 +111,7 @@ def gerar_explicabilidade_shap(arg_objModelo:object, arg_dfXTest:pd.DataFrame, a
         
         logger.info(f"Gráfico SHAP salvo em: {var_strCaminhoSalvar}")
         return True
-    except ImportError as var_objErro:
+    except ImportError:
         logger.error("Biblioteca 'shap' não instalada. Instale com 'pip install shap'.")
         os.system("pip install shap")
         return gerar_explicabilidade_shap(arg_objModelo, arg_dfXTest, arg_strNomeModelo)

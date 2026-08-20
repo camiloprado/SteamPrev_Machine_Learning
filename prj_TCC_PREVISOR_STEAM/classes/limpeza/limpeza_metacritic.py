@@ -1,4 +1,3 @@
-from prj_TCC_PREVISOR_STEAM.classes.framework.AllSettings import Settings
 
 import logging
 

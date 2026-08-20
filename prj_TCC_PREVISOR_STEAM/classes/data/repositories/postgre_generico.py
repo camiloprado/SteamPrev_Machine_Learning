@@ -1,11 +1,7 @@
 from prj_TCC_PREVISOR_STEAM.classes.framework.AllSettings import Settings
 
-from datetime import datetime
-from psycopg2.extras import execute_batch, execute_values
 from psycopg2 import pool
-from time import sleep
-from typing import Generator
-import psycopg2, json, logging
+import logging
 
 logger = logging.getLogger("db.core")
 

@@ -1,12 +1,9 @@
-from prj_TCC_PREVISOR_STEAM.classes.framework.AllSettings import Settings
 from prj_TCC_PREVISOR_STEAM.classes.treinamento.normalizar_modelos import NormalizarModelos
 from prj_TCC_PREVISOR_STEAM.classes.treinamento import experimentos_tcc
-from prj_TCC_PREVISOR_STEAM.classes.treinamento.exportar_modelos import ExportarModelos, ModelRegistry
+from prj_TCC_PREVISOR_STEAM.classes.treinamento.exportar_modelos import ExportarModelos
 
 from prj_TCC_PREVISOR_STEAM.classes.treinamento.treinar_classificadores import TreinarClassificadores
 from prj_TCC_PREVISOR_STEAM.classes.treinamento.treinar_regressores import TreinarRegressores
-from prj_TCC_PREVISOR_STEAM.classes.treinamento.plots import Plots
-from prj_TCC_PREVISOR_STEAM.classes.treinamento.metricas import Metricas
 
 import pandas as pd
 import joblib

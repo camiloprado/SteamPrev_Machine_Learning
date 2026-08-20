@@ -1,7 +1,5 @@
-from prj_TCC_PREVISOR_STEAM.classes.framework.AllSettings import Settings
 
-from typing import List, Dict, Any
-from datetime import datetime
+from typing import Dict, Any
 import unicodedata
 import re
 import logging

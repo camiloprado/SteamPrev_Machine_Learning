@@ -4,7 +4,10 @@ from prj_TCC_PREVISOR_STEAM.classes.api.steamspy_api import SteamSpyClient
 from typing import Any
 from datetime import datetime, timedelta
 from time import sleep
-import json, logging, os, requests
+import json
+import logging
+import os
+import requests
 
 logger = logging.getLogger("steam.local")
 
@@ -49,7 +52,7 @@ class LocalClient:
                     Settings._var_listApp = json.loads(open(var_strPath, "r", encoding="utf-8").read())
                     Settings._var_boolAppListLoaded = True
                     return Settings._var_listApp
-            except Exception as e:
+            except Exception:
                 pass
 
         # Se chegou aqui, precisa buscar da API ou do JSON local
@@ -131,13 +134,13 @@ class LocalClient:
                 var_intStatusCode = e.response.status_code if hasattr(e, 'response') else 0
                 
                 if var_intStatusCode == 404:
-                    logger.warning(f"API Steam GetAppList retornou 404 (endpoint descontinuado)")
+                    logger.warning("API Steam GetAppList retornou 404 (endpoint descontinuado)")
                     logger.warning("Tentando por SteamSpy...")
                     var_listDataNovos = SteamSpyClient._fetch_from_steamspy()  # Retorna APENAS novos + modificados
 
                     if not var_listDataNovos:
                         logger.warning("API SteamSpy não retornou dados. Tentando arquivo local...")
-                        logger.info(f"Usando arquivo JSON local como fallback...")
+                        logger.info("Usando arquivo JSON local como fallback...")
                         return cls._load_from_local_json()
                     
                     # var_listDataMesclada = cls.mesclar_dados(var_listDataNovos)  # Mescla novos dados do SteamSpy com cache existente
@@ -145,7 +148,7 @@ class LocalClient:
                     return var_listDataNovos
                 
                 elif var_intStatusCode == 503:
-                    logger.warning(f"Serviço Steam temporariamente indisponível (503 Service Unavailable)")
+                    logger.warning("Serviço Steam temporariamente indisponível (503 Service Unavailable)")
                     return False
                 elif var_intStatusCode >= 500:
                     logger.warning(f"Erro interno do servidor Steam ({var_intStatusCode})")

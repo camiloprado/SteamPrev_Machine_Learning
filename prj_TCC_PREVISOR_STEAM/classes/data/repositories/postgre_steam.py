@@ -3,7 +3,8 @@ from prj_TCC_PREVISOR_STEAM.classes.data.repositories.postgre_generico import Po
 
 from datetime import datetime
 from psycopg2.extras import execute_batch, execute_values
-import json, logging
+import json
+import logging
 
 logger = logging.getLogger("db.steam")
 
