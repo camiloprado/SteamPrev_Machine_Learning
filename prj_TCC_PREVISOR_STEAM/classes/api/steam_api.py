@@ -37,7 +37,7 @@ class SteamClient:
         - arg_seqAppids (Sequence[int]): Uma sequência de appids dos jogos.
 
         Retorna:
-        - var_dictAllResults (dict): Um dicionário com todos os detalhes dos jogos.
+        - None. Os detalhes são persistidos no PostgreSQL durante o processamento dos batches.
         """
         logger = logging.getLogger("steam.details")
         var_dictConfigAPI = Settings.steam_api_details()

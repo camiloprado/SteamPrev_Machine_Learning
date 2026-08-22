@@ -563,10 +563,10 @@ class NormalizarModelos:
             "review_score",                                                                                 # Positivo/Negativo
             "preco_catalogo",                                                                               # Preço original
             "preco_atual_hist",                                                                             # Preço atual do jogo na steam
-            "preco_media_janela",                                                                           # Preço médio dos ultimos 180 dias
-            "preco_std_janela",                                                                             # Desvio padrão dos ultimos 180 dias
-            "preco_min_janela",                                                                             # Preço mínimo dos ultimos 180 dias
-            "preco_max_janela",                                                                             # Preço máximo dos ultimos 180 dias
+            "preco_media_janela",                                                                           # Preço médio na janela histórica (ML_JANELA_ANOS, padrão 5)
+            "preco_std_janela",                                                                             # Desvio padrão na janela histórica (ML_JANELA_ANOS, padrão 5)
+            "preco_min_janela",                                                                             # Preço mínimo na janela histórica (ML_JANELA_ANOS, padrão 5)
+            "preco_max_janela",                                                                             # Preço máximo na janela histórica (ML_JANELA_ANOS, padrão 5)
             "frequencia_descontos_por_ano",                                                                 # Frequência de descontos por ano
             "dias_no_preco_atual",                                                                          # Dias no preço atual
             "ratio_preco_atual_vs_minimo",                                                                  # Razão entre preço atual e mínimo

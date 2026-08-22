@@ -1,14 +1,9 @@
-from prj_TCC_PREVISOR_STEAM.classes.framework.AllSettings import Settings
 from prj_TCC_PREVISOR_STEAM.classes.treinamento.normalizar_modelos import NormalizarModelos
-from prj_TCC_PREVISOR_STEAM.classes.treinamento import experimentos_tcc
-from prj_TCC_PREVISOR_STEAM.classes.treinamento.exportar_modelos import ExportarModelos, ModelRegistry
+from prj_TCC_PREVISOR_STEAM.classes.treinamento.exportar_modelos import ExportarModelos
 
 from prj_TCC_PREVISOR_STEAM.classes.treinamento.treinar_classificadores import TreinarClassificadores
 from prj_TCC_PREVISOR_STEAM.classes.treinamento.treinar_regressores import TreinarRegressores
-from prj_TCC_PREVISOR_STEAM.classes.treinamento.plots import Plots
-from prj_TCC_PREVISOR_STEAM.classes.treinamento.metricas import Metricas
 
-import pandas as pd
 import joblib
 import shutil
 from pathlib import Path
@@ -36,7 +31,7 @@ class Treinar_Modelos:
         logger.info("=" * 80)
         logger.info("INICIANDO TREINAMENTO DE MODELOS DE CLASSIFICAÇÃO E REGRESSÃO")
         logger.info("=" * 80)
-        
+
         var_listHorizontes = NormalizarModelos.obter_horizontes_disponiveis()
         var_dictModelosClassificacao = {}
 
@@ -44,11 +39,11 @@ class Treinar_Modelos:
             logger.info("=" * 80)
             logger.info(f"TREINANDO CLASSIFICADORES - HORIZONTE: {var_strHorizonte}")
             logger.info("=" * 80)
-            
+
             var_dictLGBM = TreinarClassificadores.treinar_modelo_lightgbm(arg_strHorizonte=var_strHorizonte)
             var_dictXGB = TreinarClassificadores.treinar_modelo_xgboost(arg_strHorizonte=var_strHorizonte)
             var_dictRF = TreinarClassificadores.treinar_modelo_random_forest(arg_strHorizonte=var_strHorizonte)
-            
+
             var_dictModelosClassificacao[var_strHorizonte] = {
                 "LightGBM": var_dictLGBM,
                 "XGBoost": var_dictXGB,
@@ -59,49 +54,28 @@ class Treinar_Modelos:
             logger.info(f"RESUMO COMPARATIVO - {var_strHorizonte.upper()}")
             logger.info(f"{'Modelo':<18} | {'Accuracy':>10} | {'Precision':>10} | {'F1-Score':>10} | Dataset")
             logger.info("-" * 80)
-            
+
             for var_strNome, var_dictMetricas in var_dictModelosClassificacao[var_strHorizonte].items():
                 logger.info(
                     f"{var_strNome:<18} | {var_dictMetricas['accuracy']:>10.4f} | "
                     f"{var_dictMetricas['precision_macro']:>10.4f} | {var_dictMetricas['f1_macro']:>10.4f} | "
                     f"{var_dictMetricas['train_size']:,} treino / {var_dictMetricas['test_size']:,} teste"
                 )
-            
+
             var_strMelhorModelo = max(var_dictModelosClassificacao[var_strHorizonte].items(), key=lambda x: x[1]['f1_macro'])[0]
             var_floatMelhorF1 = var_dictModelosClassificacao[var_strHorizonte][var_strMelhorModelo]['f1_macro']
             logger.info(f"MELHOR MODELO ({var_strHorizonte}): {var_strMelhorModelo} (F1-Score: {var_floatMelhorF1:.4f})")
-            
-        # TREINA REGRESSORES DE DESCONTO APENAS UMA VEZ
-        logger.info("=" * 80)
-        logger.info("TREINANDO REGRESSORES (DESCONTO) - ÚNICO PARA TODOS OS HORIZONTES")
-        logger.info("=" * 80)
-        
-        var_dictRegDesc = TreinarRegressores.treinar_modelo_regressao_linear(arg_strHorizonte="30d", arg_strAlvo="desconto")
-        var_dictRegXGBDesc = TreinarRegressores.treinar_modelo_xgboost_regressao(arg_strHorizonte="30d", arg_strAlvo="desconto")
-        var_dictRegLGBDesc = TreinarRegressores.treinar_modelo_lightgbm_regressao(arg_strHorizonte="30d", arg_strAlvo="desconto")
-        
-        var_dictDescontoBase = {
-            "LightGBM": var_dictRegLGBDesc,
-            "XGBoost": var_dictRegXGBDesc,
-            "LinearRegression": var_dictRegDesc,
-        }
 
-        logger.info("-" * 80)
-        logger.info("RESUMO COMPARATIVO - REGRESSÃO (DESCONTO)")
-        logger.info(f"{'Modelo':<18} | {'RMSE (%)':>12} | {'MAE (%)':>11} | {'MSE':>10} | Dataset")
-        logger.info("-" * 80)
-
-        for var_strNome, var_dictMetricas in var_dictDescontoBase.items():
-            logger.info(
-                f"{var_strNome:<18} | {var_dictMetricas['rmse']:>12.2f} | "
-                f"{var_dictMetricas['mae']:>11.2f} | {var_dictMetricas['mse']:>10.2f} | "
-                f"{var_dictMetricas['train_size']:,} treino / {var_dictMetricas['test_size']:,} teste"
-            )
-
-        var_strMelhorRegressorDesc = min(var_dictDescontoBase.items(), key=lambda x: x[1]["rmse"])[0]
-        var_floatMelhorRMSEDesc = var_dictDescontoBase[var_strMelhorRegressorDesc]["rmse"]
-        logger.info(f"MELHOR MODELO REGRESSÃO DESCONTO: {var_strMelhorRegressorDesc} (RMSE: {var_floatMelhorRMSEDesc:.2f}%)")
-
+        # =====================================================================
+        # TREINA REGRESSORES DE DIAS E DE DESCONTO, POR HORIZONTE
+        # =====================================================================
+        # O regressor de desconto (profundidade esperada do desconto) é treinado
+        # DENTRO do loop por horizonte, usando o conjunto filtrado por horizonte
+        # vindo de NormalizarModelos (apenas jogos cujo desconto de fato ocorreu
+        # dentro da janela do horizonte). Antes desta correção, o regressor de
+        # desconto era treinado uma única vez com horizonte fixo "30d" e o mesmo
+        # modelo era copiado para os 3 horizontes, dando falsa impressão de
+        # diferenciação por horizonte nos arquivos .joblib salvos em disco.
         var_dictModelosRegressaoDias = {}
         var_dictModelosRegressaoDesconto = {}
 
@@ -119,9 +93,6 @@ class Treinar_Modelos:
                 "XGBoost": var_dictRegXGB,
                 "LinearRegression": var_dictReg,
             }
-            
-            # ATRIBUI OS MODELOS DE DESCONTO PRÉ-TREINADOS AO HORIZONTE ATUAL
-            var_dictModelosRegressaoDesconto[var_strHorizonte] = var_dictDescontoBase
 
             logger.info("-" * 80)
             logger.info(f"RESUMO COMPARATIVO - REGRESSÃO ({var_strHorizonte.upper()})")
@@ -138,6 +109,39 @@ class Treinar_Modelos:
             var_strMelhorRegressor = min(var_dictModelosRegressaoDias[var_strHorizonte].items(), key=lambda x: x[1]["rmse"])[0]
             var_floatMelhorRMSE = var_dictModelosRegressaoDias[var_strHorizonte][var_strMelhorRegressor]["rmse"]
             logger.info(f"MELHOR MODELO REGRESSÃO ({var_strHorizonte}): {var_strMelhorRegressor} (RMSE: {var_floatMelhorRMSE:.2f} dias)")
+
+            # -----------------------------------------------------------------
+            # REGRESSORES DE DESCONTO — TREINADOS PARA ESTE HORIZONTE
+            # -----------------------------------------------------------------
+            logger.info("=" * 80)
+            logger.info(f"TREINANDO REGRESSORES (DESCONTO) - HORIZONTE: {var_strHorizonte}")
+            logger.info("=" * 80)
+
+            var_dictRegDesc = TreinarRegressores.treinar_modelo_regressao_linear(arg_strHorizonte=var_strHorizonte, arg_strAlvo="desconto")
+            var_dictRegXGBDesc = TreinarRegressores.treinar_modelo_xgboost_regressao(arg_strHorizonte=var_strHorizonte, arg_strAlvo="desconto")
+            var_dictRegLGBDesc = TreinarRegressores.treinar_modelo_lightgbm_regressao(arg_strHorizonte=var_strHorizonte, arg_strAlvo="desconto")
+
+            var_dictModelosRegressaoDesconto[var_strHorizonte] = {
+                "LightGBM": var_dictRegLGBDesc,
+                "XGBoost": var_dictRegXGBDesc,
+                "LinearRegression": var_dictRegDesc,
+            }
+
+            logger.info("-" * 80)
+            logger.info(f"RESUMO COMPARATIVO - REGRESSÃO DESCONTO ({var_strHorizonte.upper()})")
+            logger.info(f"{'Modelo':<18} | {'RMSE (%)':>12} | {'MAE (%)':>11} | {'MSE':>10} | Dataset")
+            logger.info("-" * 80)
+
+            for var_strNome, var_dictMetricas in var_dictModelosRegressaoDesconto[var_strHorizonte].items():
+                logger.info(
+                    f"{var_strNome:<18} | {var_dictMetricas['rmse']:>12.2f} | "
+                    f"{var_dictMetricas['mae']:>11.2f} | {var_dictMetricas['mse']:>10.2f} | "
+                    f"{var_dictMetricas['train_size']:,} treino / {var_dictMetricas['test_size']:,} teste"
+                )
+
+            var_strMelhorRegressorDesc = min(var_dictModelosRegressaoDesconto[var_strHorizonte].items(), key=lambda x: x[1]["rmse"])[0]
+            var_floatMelhorRMSEDesc = var_dictModelosRegressaoDesconto[var_strHorizonte][var_strMelhorRegressorDesc]["rmse"]
+            logger.info(f"MELHOR MODELO REGRESSÃO DESCONTO ({var_strHorizonte}): {var_strMelhorRegressorDesc} (RMSE: {var_floatMelhorRMSEDesc:.2f}%)")
 
         logger.info("="*80)
         logger.info("TREINAMENTO CONCLUÍDO COM SUCESSO")
@@ -159,56 +163,6 @@ class Treinar_Modelos:
             ExportarModelos.exportar(var_dictTodosModelos)
         except Exception as e:
             logger.warning(f"Falha ao exportar modelos padronizados: {e}")
-
-        # =====================================================================
-        # BLOCO DE EXPERIMENTOS TCC
-        # =====================================================================
-        var_dictSplits = NormalizarModelos._obter_splits("30d")
-        
-        if str(os.getenv("ML_EXPERIMENTAL_OPTUNA", "False")).lower() in ("true", "1", "yes"):
-            try:
-                experimentos_tcc.otimizar_hiperparametros_xgboost(var_dictSplits["X_train"], var_dictSplits["y_train"], arg_intNumeroTreinos=5)
-            except Exception as e:
-                logger.error(f"Erro no experimento Optuna: {e}")
-
-        if str(os.getenv("ML_EXPERIMENTAL_SHAP", "False")).lower() in ("true", "1", "yes"):
-            try:
-                experimentos_tcc.gerar_explicabilidade_shap(var_dictModelosClassificacao["30d"]["XGBoost"]["modelo"], var_dictSplits["X_test"], arg_strNomeModelo="XGBoost_Classificacao_30d")
-            except Exception as e:
-                logger.error(f"Erro no experimento SHAP: {e}")
-
-        if str(os.getenv("ML_EXPERIMENTAL_CV_TEMPORAL", "False")).lower() in ("true", "1", "yes"):
-            try:
-                # Usa o MELHOR modelo 30d (pode ser RF, XGBoost ou LightGBM dependendo do treino)
-                var_strMelhorNome30d = max(
-                    var_dictModelosClassificacao["30d"].items(),
-                    key=lambda x: x[1]["f1_macro"]
-                )[0]
-                var_objMelhorModelo30d = var_dictModelosClassificacao["30d"][var_strMelhorNome30d]["modelo"]
-                logger.info(f"CV Temporal usando o modelo campeão de 30d: {var_strMelhorNome30d}")
-                var_dfX_full = pd.concat([var_dictSplits["X_train"], var_dictSplits["X_test"]])
-                var_serY_full = pd.concat([var_dictSplits["y_train"], var_dictSplits["y_test"]])
-                experimentos_tcc.avaliar_cross_validation_temporal(var_objMelhorModelo30d, var_dfX_full, var_serY_full)
-            except Exception as e:
-                logger.error(f"Erro no experimento CV Temporal: {e}")
-
-        if str(os.getenv("ML_EXPERIMENTAL_NOTEBOOK", "False")).lower() in ("true", "1", "yes"):
-            try:
-                experimentos_tcc.gerar_notebook_exploratorio()
-            except Exception as e:
-                logger.error(f"Erro no experimento Notebook: {e}")
-
-        if str(os.getenv("ML_EXPERIMENTAL_FASTAPI", "False")).lower() in ("true", "1", "yes"):
-            try:
-                experimentos_tcc.iniciar_api_rest()
-            except Exception as e:
-                logger.error(f"Erro no experimento FastAPI: {e}")
-
-        if str(os.getenv("ML_EXPERIMENTAL_STREAMLIT", "False")).lower() in ("true", "1", "yes"):
-            try:
-                experimentos_tcc.iniciar_dashboard_streamlit()
-            except Exception as e:
-                logger.error(f"Erro no experimento Streamlit: {e}")
 
 
     @classmethod
@@ -281,4 +235,3 @@ class Treinar_Modelos:
         logger.info("="*60)
         logger.info("MODELOS SALVOS COM SUCESSO")
         logger.info("="*60)
-

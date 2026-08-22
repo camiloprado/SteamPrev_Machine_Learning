@@ -9,7 +9,6 @@ import asyncio, random, logging, aiohttp, os
 
 logger = logging.getLogger("itad")
 
-ITAD_LOOKUP_URL = "https://api.isthereanydeal.com/lookup/id/title/v1"
 ITAD_HISTORY_URL = "https://api.isthereanydeal.com/games/history/v2"
 ITAD_LOOKUP_IDS_URL = "https://api.isthereanydeal.com/games/lookup/v1"
 
