@@ -2,24 +2,24 @@
 
 ## ✅ O QUE FOI CRIADO
 
-### 4 Métodos PostgreSQL (`postgre.py`)
+### 4 Métodos PostgreSQL (`postgre_itad.py` → `PostgreSQLITAD`)
 
 ```python
-# 1. Buscar AppIDs sem ITAD
-PostgreSQL.buscar_appids_sem_itad(arg_intPcId=1, arg_intTotalPcs=1)
+from prj_TCC_PREVISOR_STEAM.classes.data.repositories.postgre_itad import PostgreSQLITAD
+
+# 1. Buscar AppIDs sem ITAD (tabela steam_generico, sem mapeamento)
+PostgreSQLITAD.buscar_appids_sem_itad(arg_intLimit=100)
 # → [123, 456, 789, ...]
 
-# 2. Buscar AppIDs ITAD desatualizados
-PostgreSQL.buscar_appids_itad_desatualizados(arg_intDiasAtualizacao=90, ...)
+# 2. Buscar AppIDs ITAD desatualizados (multi-PC via PC_ID / TOTAL_PCS)
+PostgreSQLITAD.buscar_appids_itad_desatualizados(arg_intDiasAtualizacao=90, arg_intPcId=1, arg_intTotalPcs=1)
 # → [321, 654, 987, ...]
 
-# 3. Inserir ITAD em bulk (recomendado: até 1000 registros)
-PostgreSQL.inserir_dados_itad_raw_bulk(arg_dictDadosItad)
-# → 1000 (registros inseridos)
+# 3. Inserir ITAD em bulk (upsert; retorno None)
+PostgreSQLITAD.inserir_dados_itad_raw_bulk(arg_dictDadosItad)
 
 # 4. Inserir ITAD em lotes (grandes volumes)
-PostgreSQL.inserir_dados_itad_raw_batched(arg_dictDadosItad, arg_intBatchSize=1000)
-# → 5000 (total inserido)
+PostgreSQLITAD.inserir_dados_itad_raw_batched(arg_dictDadosItad, arg_intBatchSize=1000)
 ```
 
 ### 1 Método Previsor (`previsor.py`)
@@ -42,31 +42,30 @@ python -m prj_TCC_PREVISOR_STEAM.bot
 
 ### Opção 2: Manual (Python)
 ```python
-from prj_TCC_PREVISOR_STEAM.classes.data.repositories.postgre import PostgreSQL
-from prj_TCC_PREVISOR_STEAM.classes.api.steam_api import SteamClient
+from prj_TCC_PREVISOR_STEAM.classes.data.repositories.postgre_itad import PostgreSQLITAD
+from prj_TCC_PREVISOR_STEAM.classes.api.itad_api import ITADClient
 import asyncio
 
 # 1. Conectar
-PostgreSQL.conectar()
+PostgreSQLITAD.conectar()
 
 # 2. Buscar AppIDs
-appids = PostgreSQL.buscar_appids_sem_itad()[:100]  # 100 primeiros
+appids = PostgreSQLITAD.buscar_appids_sem_itad(arg_intLimit=100)
 
-# 3. Buscar dados ITAD
-dados = asyncio.run(SteamClient.lookup_itad_ids_batched(appids))
+# 3. Buscar dados ITAD (endpoint games/lookup/v1)
+dados = asyncio.run(ITADClient.lookup_itad_ids_batched(appids))
 
 # 4. Inserir no banco
-inseridos = PostgreSQL.inserir_dados_itad_raw_bulk(dados)
+PostgreSQLITAD.inserir_dados_itad_raw_bulk(dados)
 
 # 5. Desconectar
-PostgreSQL.desconectar()
+PostgreSQLITAD.desconectar()
 ```
 
-### Opção 3: Teste Rápido
+### Opção 3: Teste SQL
 ```bash
-cd d:\Projeto_TCC_CC
-python -m prj_TCC_PREVISOR_STEAM.classes.tests.test_itad_insert
-# Testa com 10 AppIDs
+# Script de conferência no PostgreSQL (não há mais test_itad_insert.py)
+# Ver: prj_TCC_PREVISOR_STEAM/resources/SQL/test_itad_insert.sql
 ```
 
 ---
@@ -173,13 +172,12 @@ SELECT
 ## 📁 ARQUIVOS
 
 ### Código Python
-- `classes/SQL/postgre.py` (linhas 859-977)
-- `classes/scripts/previsor.py` (linhas 454-537)
-- `classes/tests/test_itad_insert.py` (teste completo)
+- `classes/data/repositories/postgre_itad.py` (`PostgreSQLITAD`)
+- `classes/api/itad_api.py` (`ITADClient`)
+- `classes/data/previsor.py` (`alimentar_banco_dados_ITAD_docker`)
 
 ### SQL
-- `resources/docs/create_steam_itad_mapping.sql` (criar tabelas)
-- `resources/docs/test_itad_insert.sql` (testes manuais)
+- `resources/SQL/test_itad_insert.sql` (conferência no PostgreSQL)
 
 ### Documentação
 - `resources/docs/ITAD_Docker_Guide.md` (guia completo)

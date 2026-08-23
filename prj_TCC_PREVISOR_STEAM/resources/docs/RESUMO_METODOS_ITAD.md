@@ -2,15 +2,15 @@
 
 ## ✅ Métodos Criados
 
-### 📁 postgre.py
+### 📁 postgre_itad.py (`PostgreSQLITAD`)
 
-#### 1. `inserir_dados_itad_raw_bulk(arg_dictDadosItad: dict) -> int`
+#### 1. `inserir_dados_itad_raw_bulk(arg_dictDadosItad: dict) -> None`
 **Função:** Insere dados ITAD em bulk (uma transação)
 
 **Parâmetros:**
 - `arg_dictDadosItad` (dict): `{appid: {"id": str, "slug": str, "title": str, ...}}`
 
-**Retorna:** Número de registros inseridos
+**Retorna:** None (persistência via upsert `ON CONFLICT`)
 
 **O que faz:**
 1. Insere/atualiza `itad_raw` (id_itad, slug, title, type, mature, assets, ultima_atualizacao)
@@ -23,51 +23,50 @@
 var_dictDados = {
     730: {"id": "app/730", "slug": "csgo", "title": "CS:GO", "type": "game", "mature": False}
 }
-var_int = PostgreSQL.inserir_dados_itad_raw_bulk(var_dictDados)
-# Retorna: 1
+PostgreSQLITAD.inserir_dados_itad_raw_bulk(var_dictDados)
 ```
 
 ---
 
-#### 2. `inserir_dados_itad_raw_batched(arg_dictDadosItad: dict, arg_intBatchSize: int = 1000) -> int`
+#### 2. `inserir_dados_itad_raw_batched(arg_dictDadosItad: dict, arg_intBatchSize: int = 1000) -> None`
 **Função:** Divide inserção em lotes para evitar timeout
 
 **Parâmetros:**
 - `arg_dictDadosItad` (dict): Mesma estrutura acima
 - `arg_intBatchSize` (int): Tamanho do lote (padrão: 1000)
 
-**Retorna:** Total de registros inseridos
+**Retorna:** None
 
 **O que faz:**
 1. Divide `arg_dictDadosItad` em lotes de `arg_intBatchSize`
 2. Chama `inserir_dados_itad_raw_bulk()` para cada lote
 3. Pausa 1 segundo entre lotes
-4. Retorna soma total de inserções
+4. Não retorna contagem (side-effect no banco)
 
 **Exemplo:**
 ```python
 var_dictGrande = {1: {...}, 2: {...}, ..., 5000: {...}}  # 5000 registros
-var_int = PostgreSQL.inserir_dados_itad_raw_batched(var_dictGrande, arg_intBatchSize=1000)
+var_int = PostgreSQLITAD.inserir_dados_itad_raw_batched(var_dictGrande, arg_intBatchSize=1000)
 # Processa: 1000 + 1000 + 1000 + 1000 + 1000 = 5000
 ```
 
 ---
 
-#### 3. `buscar_appids_sem_itad(arg_intPcId: int = 1, arg_intTotalPcs: int = 1) -> list[int]`
-**Função:** Retorna AppIDs do `steam_bd` que não estão em `steam_itad_mapping`
+#### 3. `buscar_appids_sem_itad(arg_intLimit: int = None) -> list[int]`
+**Função:** Retorna AppIDs de `steam_generico` que não estão em `steam_itad_mapping`
 
 **SQL:**
 ```sql
-SELECT sb.appid 
-FROM steam_bd sb
-LEFT JOIN steam_itad_mapping sim ON sb.appid = sim.appid
+SELECT sg.appid
+FROM steam_generico sg
+LEFT JOIN steam_itad_mapping sim ON sg.appid = sim.appid
 WHERE sim.appid IS NULL
-AND MOD(sb.appid, TOTAL_PCS) = PC_ID - 1;
+ORDER BY sg.appid;
 ```
 
 **Exemplo:**
 ```python
-var_list = PostgreSQL.buscar_appids_sem_itad(arg_intPcId=1, arg_intTotalPcs=1)
+var_list = PostgreSQLITAD.buscar_appids_sem_itad(arg_intLimit=100)
 # Retorna: [123, 456, 789, 1011, ...]
 ```
 
@@ -87,7 +86,7 @@ AND MOD(sim.appid, TOTAL_PCS) = PC_ID - 1;
 
 **Exemplo:**
 ```python
-var_list = PostgreSQL.buscar_appids_itad_desatualizados(arg_intDiasAtualizacao=90)
+var_list = PostgreSQLITAD.buscar_appids_itad_desatualizados(arg_intDiasAtualizacao=90)
 # Retorna: [321, 654, 987, ...]
 ```
 
@@ -104,8 +103,8 @@ var_list = PostgreSQL.buscar_appids_itad_desatualizados(arg_intDiasAtualizacao=9
 3. Combina listas (remove duplicatas)
 4. Processa em lotes de `RANGE_PROCESSAMENTO_ITAD_RAW` (env)
 5. Para cada lote:
-   - Chama `SteamClient.lookup_itad_ids_batched()` (API ITAD)
-   - Chama `PostgreSQL.inserir_dados_itad_raw_bulk()` (insere banco)
+   - Chama `ITADClient.lookup_itad_ids_batched()` (`games/lookup/v1`)
+   - Chama `PostgreSQLITAD.inserir_dados_itad_raw_bulk()` (insere banco)
    - Pausa 2 segundos
 6. Log de progresso
 
@@ -129,17 +128,17 @@ Previsor.alimentar_banco_dados_ITAD_docker()
 ```
 1. Previsor.alimentar_banco_dados_ITAD_docker()
    ↓
-2. PostgreSQL.buscar_appids_sem_itad() → [123, 456, 789]
+2. PostgreSQLITAD.buscar_appids_sem_itad() → [123, 456, 789]
    ↓
-3. PostgreSQL.buscar_appids_itad_desatualizados() → [321, 654]
+3. PostgreSQLITAD.buscar_appids_itad_desatualizados() → [321, 654]
    ↓
 4. Combina: [123, 456, 789, 321, 654]
    ↓
 5. Loop por lotes (RANGE_PROCESSAMENTO_ITAD_RAW):
-   ├─ SteamClient.lookup_itad_ids_batched([123, 456, ...])
+   ├─ ITADClient.lookup_itad_ids_batched([123, 456, ...])
    │  └─ API ITAD → {"123": {"id": "app/123", ...}, ...}
    │
-   ├─ PostgreSQL.inserir_dados_itad_raw_bulk({"123": {...}})
+   ├─ PostgreSQLITAD.inserir_dados_itad_raw_bulk({"123": {...}})
    │  ├─ INSERT INTO itad_raw ...
    │  └─ INSERT INTO steam_itad_mapping ...
    │
@@ -185,9 +184,9 @@ CREATE TABLE steam_itad_mapping (
 
 ### Teste 1: Inserção Manual
 ```python
-from prj_TCC_PREVISOR_STEAM.classes.data.repositories.postgre import PostgreSQL
+from prj_TCC_PREVISOR_STEAM.classes.data.repositories.postgre_itad import PostgreSQLITAD
 
-PostgreSQL.conectar()
+PostgreSQLITAD.conectar()
 
 var_dictTeste = {
     730: {
@@ -200,10 +199,10 @@ var_dictTeste = {
     }
 }
 
-var_int = PostgreSQL.inserir_dados_itad_raw_bulk(var_dictTeste)
-print(f"Inseridos: {var_int}")  # Esperado: 1
+var_int = PostgreSQLITAD.inserir_dados_itad_raw_bulk(var_dictTeste)
+print(f"Inseridos: {var_int}")  # Esperado: None
 
-PostgreSQL.desconectar()
+PostgreSQLITAD.desconectar()
 ```
 
 ### Teste 2: Workflow Completo (HML)
@@ -283,7 +282,7 @@ WHERE sim.appid IS NULL;
 ## 🎯 Checklist de Uso
 
 - [ ] Tabela `steam_generico` populada (AppIDs base)
-- [ ] Tabela `steam_bd` populada (dados steam)
+- [ ] Tabela `steam_generico` populada (dados steam)
 - [ ] Tabela `itad_raw` criada (`create_steam_itad_mapping.sql`)
 - [ ] Tabela `steam_itad_mapping` criada
 - [ ] `.env` configurado (`ITAD_API_KEY`, `RANGE_PROCESSAMENTO_ITAD_RAW`)
@@ -295,19 +294,22 @@ WHERE sim.appid IS NULL;
 
 ## 📦 Arquivos Criados
 
-1. **postgre.py** (linhas 859-977):
+1. **postgre_itad.py** (`PostgreSQLITAD`):
    - `inserir_dados_itad_raw_bulk()`
    - `inserir_dados_itad_raw_batched()`
-   - `buscar_appids_sem_itad()` (corrigido)
-   - `buscar_appids_itad_desatualizados()` (corrigido)
+   - `buscar_appids_sem_itad()`
+   - `buscar_appids_itad_desatualizados()`
 
-2. **previsor.py** (linhas 454-537):
+2. **itad_api.py** (`ITADClient`):
+   - `lookup_itad_ids_batched()` — `games/lookup/v1`
+   - histórico — `games/history/v2`
+
+3. **previsor.py**:
    - `alimentar_banco_dados_ITAD_docker()`
 
-3. **SQL**:
-   - `create_steam_itad_mapping.sql` (tabela mapping)
-   - `test_itad_insert.sql` (testes manuais)
+4. **SQL**:
+   - `resources/SQL/test_itad_insert.sql`
 
-4. **Documentação**:
+5. **Documentação**:
    - `ITAD_Docker_Guide.md` (guia completo)
    - `RESUMO_METODOS_ITAD.md` (este arquivo)

@@ -27,20 +27,19 @@
 
 ## Métodos Disponíveis
 
-### 1. PostgreSQL (postgre.py)
+### 1. PostgreSQLITAD (postgre_itad.py)
 
 #### Consulta
 ```python
-# Busca AppIDs sem dados ITAD
-var_listNovos = PostgreSQL.buscar_appids_sem_itad(
-    arg_intPcId=1,           # ID deste PC
-    arg_intTotalPcs=1        # Total de PCs
-)
+from prj_TCC_PREVISOR_STEAM.classes.data.repositories.postgre_itad import PostgreSQLITAD
+
+# Busca AppIDs sem dados ITAD (steam_generico sem mapeamento)
+var_listNovos = PostgreSQLITAD.buscar_appids_sem_itad(arg_intLimit=100)
 # Retorna: [123, 456, 789, ...]
 
-# Busca AppIDs com ITAD desatualizado (>90 dias)
-var_listDesatualizados = PostgreSQL.buscar_appids_itad_desatualizados(
-    arg_intDiasAtualizacao=90,  # Dias para considerar desatualizado
+# Busca AppIDs com ITAD desatualizado (multi-PC)
+var_listDesatualizados = PostgreSQLITAD.buscar_appids_itad_desatualizados(
+    arg_intDiasAtualizacao=90,
     arg_intPcId=1,
     arg_intTotalPcs=1
 )
@@ -49,7 +48,6 @@ var_listDesatualizados = PostgreSQL.buscar_appids_itad_desatualizados(
 
 #### Inserção
 ```python
-# Inserção em bulk (até 1000 registros recomendado)
 var_dictDados = {
     730: {
         "id": "app/730",
@@ -59,52 +57,29 @@ var_dictDados = {
         "mature": False,
         "assets": {"banner": "https://..."}
     },
-    570: {
-        "id": "app/570",
-        "slug": "dota-2",
-        "title": "Dota 2",
-        ...
-    }
 }
 
-var_intInseridos = PostgreSQL.inserir_dados_itad_raw_bulk(var_dictDados)
-# Insere em: itad_raw + steam_itad_mapping
-# Retorna: 2
+PostgreSQLITAD.inserir_dados_itad_raw_bulk(var_dictDados)
+# Upsert em: itad_raw + steam_itad_mapping
 
-# Inserção em lotes (para grandes volumes)
-var_intTotal = PostgreSQL.inserir_dados_itad_raw_batched(
+PostgreSQLITAD.inserir_dados_itad_raw_batched(
     arg_dictDadosItad=var_dictGrande,
-    arg_intBatchSize=1000  # Lotes de 1000
+    arg_intBatchSize=1000
 )
-# Retorna: total de registros inseridos
 ```
 
-### 2. SteamClient (steam_api.py)
+### 2. ITADClient (itad_api.py)
 
-#### Busca ITAD API
+#### Busca ITAD API (`games/lookup/v1`)
 ```python
 import asyncio
+from prj_TCC_PREVISOR_STEAM.classes.api.itad_api import ITADClient
 
-# Busca dados ITAD para lista de AppIDs
 var_listAppIDs = [730, 570, 440, 10, 20]
 
 var_dictResultados = asyncio.run(
-    SteamClient.lookup_itad_ids_batched(arg_seqAppids=var_listAppIDs)
+    ITADClient.lookup_itad_ids_batched(arg_seqAppids=var_listAppIDs)
 )
-
-# Estrutura retornada:
-# {
-#     730: {
-#         "id": "app/730",
-#         "slug": "counter-strike-global-offensive",
-#         "title": "Counter-Strike: Global Offensive",
-#         "type": "game",
-#         "mature": False,
-#         "assets": {"banner": "https://...", "boxart": "https://..."}
-#     },
-#     570: {...},
-#     ...
-# }
 ```
 
 ### 3. Previsor (previsor.py)
@@ -117,12 +92,12 @@ var_dictResultados = asyncio.run(
 Previsor.alimentar_banco_dados_ITAD_docker()
 
 # Fluxo interno:
-# 1. Busca AppIDs sem ITAD (steam_bd - steam_itad_mapping)
+# 1. Busca AppIDs sem ITAD (steam_generico - steam_itad_mapping)
 # 2. Busca AppIDs ITAD desatualizados (>90 dias)
 # 3. Processa em lotes de RANGE_PROCESSAMENTO_ITAD_RAW (default: 5000)
 # 4. Para cada lote:
-#    - Chama SteamClient.lookup_itad_ids_batched()
-#    - Insere via PostgreSQL.inserir_dados_itad_raw_bulk()
+#    - Chama ITADClient.lookup_itad_ids_batched()
+#    - Insere via PostgreSQLITAD.inserir_dados_itad_raw_bulk()
 # 5. Suporta multi-PC via PC_ID e TOTAL_PCS
 ```
 
@@ -143,30 +118,29 @@ ITAD_API_KEY=your_key_here          # Chave da API IsThereAnyDeal
 ## Exemplo de Uso Manual
 
 ```python
-from prj_TCC_PREVISOR_STEAM.classes.data.repositories.postgre import PostgreSQL
-from prj_TCC_PREVISOR_STEAM.classes.api.steam_api import SteamClient
+from prj_TCC_PREVISOR_STEAM.classes.data.repositories.postgre_itad import PostgreSQLITAD
+from prj_TCC_PREVISOR_STEAM.classes.api.itad_api import ITADClient
 import asyncio
 
 # 1. Conectar ao banco
-PostgreSQL.conectar()
+PostgreSQLITAD.conectar()
 
 # 2. Buscar AppIDs que precisam de dados ITAD
-var_listAppIDs = PostgreSQL.buscar_appids_sem_itad(arg_intPcId=1, arg_intTotalPcs=1)
+var_listAppIDs = PostgreSQLITAD.buscar_appids_sem_itad(arg_intLimit=100)
 print(f"AppIDs sem ITAD: {len(var_listAppIDs)}")
 
 # 3. Processar em lote pequeno (exemplo: 100)
 var_listLote = var_listAppIDs[:100]
 
 # 4. Buscar dados na API ITAD
-var_dictDados = asyncio.run(SteamClient.lookup_itad_ids_batched(var_listLote))
+var_dictDados = asyncio.run(ITADClient.lookup_itad_ids_batched(var_listLote))
 print(f"Dados obtidos: {len(var_dictDados)}")
 
 # 5. Inserir no banco
-var_intInseridos = PostgreSQL.inserir_dados_itad_raw_bulk(var_dictDados)
-print(f"Inseridos: {var_intInseridos}")
+PostgreSQLITAD.inserir_dados_itad_raw_bulk(var_dictDados)
 
 # 6. Desconectar
-PostgreSQL.desconectar()
+PostgreSQLITAD.desconectar()
 ```
 
 ## Verificação no PostgreSQL
