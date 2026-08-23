@@ -1,4 +1,3 @@
-from prj_TCC_PREVISOR_STEAM.classes.framework.AllSettings import Settings
 from prj_TCC_PREVISOR_STEAM.classes.data.repositories.postgre_bdgeral import PostgreSQLBDGeral
 from sklearn.model_selection import train_test_split, GroupShuffleSplit
 
@@ -684,8 +683,18 @@ class NormalizarModelos:
         # =================================================================
         # REGRESSÃO — SPLITS POR HORIZONTE (30d, 60d, 90d)
         # =================================================================
-        # Capa o alvo de regressão no limite do horizonte.
+        # Alvo "dias até desconto": capa o valor no limite do horizonte.
         # Amostras com desconto além do horizonte recebem valor = cap.
+        #
+        # Alvo "desconto esperado" (profundidade do desconto): diferente do alvo
+        # de dias, não faz sentido "capar" um percentual de desconto. Em vez
+        # disso, FILTRA as linhas para conter apenas jogos cujo
+        # alvo_dias_ate_desconto ORIGINAL (antes do cap) seja <= ao horizonte em
+        # questão — ou seja, o regressor de desconto de 30d aprende apenas com
+        # jogos que de fato tiveram desconto dentro de 30 dias, o de 60d com
+        # jogos com desconto dentro de 60 dias, e assim por diante. Isso garante
+        # que os 3 horizontes treinem regressores de desconto genuinamente
+        # diferentes (antes, os 3 usavam exatamente o mesmo conjunto de dados).
         var_dictRegressaoHorizontes = {}
         var_dictMapDiasHorizonteReg = {"30d": 30, "60d": 60, "90d": 90}
 
@@ -693,19 +702,47 @@ class NormalizarModelos:
             var_serYrTrainH = var_serYrTrain.clip(upper=var_intDiasCap)
             var_serYrTestH = var_serYrTest.clip(upper=var_intDiasCap)
 
+            # Filtro por linha (não por valor) para o alvo de desconto esperado.
+            # var_serYrTrain/var_serYrTest ainda não foram clipados aqui, então
+            # representam o número real de dias até o desconto (já limitado
+            # globalmente por REGRESSAO_MAX_DIAS no feature engineering).
+            var_boolDescNoHorizTrain = var_serYrTrain <= var_intDiasCap
+            var_boolDescNoHorizTest = var_serYrTest <= var_intDiasCap
+
+            var_dfXrDescTrainH = var_dfXrTrain[var_boolDescNoHorizTrain]
+            var_dfXrDescTestH = var_dfXrTest[var_boolDescNoHorizTest]
+            var_serYrDescTrainH = var_serYrDescTrain[var_boolDescNoHorizTrain]
+            var_serYrDescTestH = var_serYrDescTest[var_boolDescNoHorizTest]
+
+            # Salvaguarda: se o filtro por horizonte esvaziar o conjunto (ex.: poucos
+            # jogos com desconto dentro de uma janela muito curta), cai de volta para
+            # o conjunto de regressão completo (comportamento anterior) em vez de
+            # treinar com um conjunto vazio.
+            if var_dfXrDescTrainH.empty or var_dfXrDescTestH.empty:
+                logger.warning(
+                    f"Horizonte '{var_strHorizReg}': filtro de desconto por horizonte resultou em "
+                    f"conjunto vazio (treino={var_dfXrDescTrainH.shape[0]:,}, teste={var_dfXrDescTestH.shape[0]:,}). "
+                    "Usando conjunto de regressão completo (sem filtro por horizonte) como fallback."
+                )
+                var_dfXrDescTrainH, var_dfXrDescTestH = var_dfXrTrain, var_dfXrTest
+                var_serYrDescTrainH, var_serYrDescTestH = var_serYrDescTrain, var_serYrDescTest
+
             var_dictRegressaoHorizontes[var_strHorizReg] = {
                 "Xr_train": var_dfXrTrain,
                 "Xr_test": var_dfXrTest,
                 "yr_train": var_serYrTrainH,
                 "yr_test": var_serYrTestH,
-                "yr_desc_train": var_serYrDescTrain,
-                "yr_desc_test": var_serYrDescTest,
+                "Xr_desc_train": var_dfXrDescTrainH,
+                "Xr_desc_test": var_dfXrDescTestH,
+                "yr_desc_train": var_serYrDescTrainH,
+                "yr_desc_test": var_serYrDescTestH,
             }
 
             logger.info(
                 f"Regressão ({var_strHorizReg}, cap={var_intDiasCap}d): "
                 f"Treino={var_dfXrTrain.shape[0]:,} | Teste={var_dfXrTest.shape[0]:,} | "
-                f"y_train max={float(var_serYrTrainH.max()):.0f} | y_test max={float(var_serYrTestH.max()):.0f}"
+                f"y_train max={float(var_serYrTrainH.max()):.0f} | y_test max={float(var_serYrTestH.max()):.0f} | "
+                f"desconto_treino={var_dfXrDescTrainH.shape[0]:,} | desconto_teste={var_dfXrDescTestH.shape[0]:,}"
             )
 
         # =================================================================
@@ -765,6 +802,12 @@ class NormalizarModelos:
             "Xr_test": var_dictRegressao["Xr_test"],
             "yr_train": var_dictRegressao["yr_train"],
             "yr_test": var_dictRegressao["yr_test"],
+            # Xr_desc_train/Xr_desc_test contêm apenas as linhas cujo desconto ocorreu
+            # dentro do horizonte (ver _preparar_todos_splits). Quando o split de
+            # regressão usado for o fallback horizonte-independente (sem essas chaves),
+            # cai de volta para Xr_train/Xr_test (comportamento anterior à correção).
+            "Xr_desc_train": var_dictRegressao.get("Xr_desc_train", var_dictRegressao["Xr_train"]),
+            "Xr_desc_test": var_dictRegressao.get("Xr_desc_test", var_dictRegressao["Xr_test"]),
             "yr_desc_train": var_dictRegressao["yr_desc_train"],
             "yr_desc_test": var_dictRegressao["yr_desc_test"],
         }

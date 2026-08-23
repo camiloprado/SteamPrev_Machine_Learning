@@ -1,6 +1,10 @@
-from prj_TCC_PREVISOR_STEAM.classes.framework.AllSettings import Settings
 from datetime import datetime
-import asyncio, random, json, logging, os, aiohttp
+import asyncio
+import random
+import json
+import logging
+import os
+import aiohttp
 
 logger = logging.getLogger("steamspy")
 
@@ -23,15 +27,25 @@ class SteamSpyClient:
         - list: Lista de dicionários com appid e nome dos jogos (apenas novos/modificados).
         """
         try:
-            # Tenta usar loop existente se houver
-            loop = asyncio.get_running_loop()
-            # Se estamos dentro de um loop async, não podemos usar asyncio.run()
-            logger.warning("_fetch_from_steamspy chamado dentro de loop async. Use _fetch_from_steamspy_async() diretamente.")
-            # Cria uma task e retorna um future
-            return asyncio.create_task(cls._fetch_from_steamspy_async())
+            # Verifica se já existe um loop async em execução
+            asyncio.get_running_loop()
+            var_boolLoopEmExecucao = True
         except RuntimeError:
-            # Não há loop rodando, pode usar asyncio.run()
-            return asyncio.run(cls._fetch_from_steamspy_async())
+            # Não há loop rodando, pode usar asyncio.run() normalmente
+            var_boolLoopEmExecucao = False
+
+        if var_boolLoopEmExecucao:
+            # Se estamos dentro de um loop async, não podemos usar asyncio.run() nem
+            # retornar uma Task não aguardada (quem chama espera uma list, não uma
+            # Task/Future, o que quebraria checagens como "if not var_listDataNovos").
+            # Falha explicitamente em vez de devolver um valor do tipo errado.
+            raise RuntimeError(
+                "_fetch_from_steamspy() não pode ser chamado de dentro de um loop "
+                "async já em execução. Use 'await SteamSpyClient._fetch_from_steamspy_async()' "
+                "diretamente nesse caso."
+            )
+
+        return asyncio.run(cls._fetch_from_steamspy_async())
 
     # ------------------- Fallback SteamSpy (Versão Async) -------------------
     @classmethod
@@ -229,11 +243,11 @@ class SteamSpyClient:
                 return {"page": arg_intPage, "data": None, "novos": 0, "modificados": 0, "ignorados": 0, "status": "error"}
         
         # ========== PROCESSAMENTO PARALELO COM asyncio.gather() ==========
-        logger.info(f"=== COLETA STEAMSPY COM PARALELIZAÇÃO ===")
+        logger.info("=== COLETA STEAMSPY COM PARALELIZAÇÃO ===")
         logger.info(f"Páginas máximas: {var_intMaxPaginas}")
         logger.info(f"Concorrência: {var_intConcorrenciaPaginas} páginas simultâneas")
         logger.info(f"Tempo estimado: {(var_intMaxPaginas / var_intConcorrenciaPaginas) * 1.5:.1f}s")
-        logger.info(f"========================================\n")
+        logger.info("========================================\n")
         
         var_semSemaphore = asyncio.Semaphore(var_intConcorrenciaPaginas)
         var_listAllData = []
@@ -294,13 +308,13 @@ class SteamSpyClient:
         var_intPaginasSucesso = len([r for r in var_listResults if isinstance(r, dict) and r["status"] == "success"])
         
         logger.info(f"{'='*70}")
-        logger.info(f"COLETA STEAMSPY CONCLUÍDA")
+        logger.info("COLETA STEAMSPY CONCLUÍDA")
         logger.info(f"{'='*70}")
         logger.info(f"Páginas processadas: {var_intPaginasSucesso:,} sucessos de {var_intMaxPaginas:,}")
         logger.info(f"Páginas vazias: {var_intPaginasVazias:,}")
         logger.info(f"Páginas com erro 500: {var_intPaginasErro500:,}")
         logger.info(f"Páginas com rate limit: {var_intPaginasRateLimit:,}")
-        logger.info(f"")
+        logger.info("")
         logger.info(f"Jogos NOVOS: {var_intJogosNovos:,}")
         logger.info(f"Jogos MODIFICADOS: {var_intJogosModificados:,}")
         logger.info(f"Jogos IGNORADOS (cache): {var_intJogosIgnorados:,}")

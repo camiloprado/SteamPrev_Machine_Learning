@@ -1,10 +1,8 @@
 import logging
-import pandas as pd
 from sklearn.ensemble import RandomForestClassifier
 import xgboost as xgb
 import lightgbm as lgb
 from prj_TCC_PREVISOR_STEAM.classes.treinamento.metricas import Metricas
-from prj_TCC_PREVISOR_STEAM.classes.treinamento.plots import Plots
 from prj_TCC_PREVISOR_STEAM.classes.treinamento.balancear import Balancear
 from prj_TCC_PREVISOR_STEAM.classes.treinamento.normalizar_modelos import NormalizarModelos
 

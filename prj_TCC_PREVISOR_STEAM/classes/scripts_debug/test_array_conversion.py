@@ -1,7 +1,6 @@
 """
 Script de teste rápido para verificar conversão de arrays PostgreSQL
 """
-import pandas as pd
 import psycopg2
 import logging
 import os
@@ -39,7 +38,7 @@ for coluna in colunas:
     
     resultados = cursor.fetchall()
     
-    logger.info(f"\n  Valores originais do PostgreSQL:")
+    logger.info("\n  Valores originais do PostgreSQL:")
     for idx, (valor,) in enumerate(resultados, 1):
         logger.info(f"    [{idx}] Tipo Python: {type(valor).__name__}")
         logger.info(f"        Valor: {valor}")
@@ -49,7 +48,7 @@ for coluna in colunas:
             convertido = ', '.join(valor)
             logger.info(f"        Convertido: '{convertido}'")
         elif isinstance(valor, list):
-            logger.info(f"        Convertido: '' (lista vazia)")
+            logger.info("        Convertido: '' (lista vazia)")
         else:
             logger.info(f"        ⚠ NÃO É LISTA! Tipo: {type(valor)}")
 

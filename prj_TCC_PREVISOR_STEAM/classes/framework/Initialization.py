@@ -1,5 +1,3 @@
-from prj_TCC_PREVISOR_STEAM.classes.framework.AllSettings import Settings
-from prj_TCC_PREVISOR_STEAM.classes.api.steam_api import SteamClient
 from prj_TCC_PREVISOR_STEAM.classes.framework.InitApplication import InitApplication
 
 import logging

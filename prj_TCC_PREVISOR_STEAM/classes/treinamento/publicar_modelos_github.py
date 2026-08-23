@@ -313,13 +313,13 @@ def publicar_modelos(arg_pathExport: Path | None = None, arg_strRepo: str | None
     # ── Body com métricas ──
     var_listLinhasBody = [
         f"## Modelos ML — Previsor Steam v{var_strVersao}",
-        f"",
+        "",
         f"**Exportado em:** `{var_strExportadoEm}`  ",
-        f"**Repositório de treinamento:** `camiloprado/Projeto_TCC_CC`",
-        f"",
-        f"### Métricas dos Modelos",
-        f"| Arquivo | Algoritmo | Horizonte | Métrica |",
-        f"|---------|-----------|-----------|---------|",
+        "**Repositório de treinamento:** `camiloprado/Projeto_TCC_CC`",
+        "",
+        "### Métricas dos Modelos",
+        "| Arquivo | Algoritmo | Horizonte | Métrica |",
+        "|---------|-----------|-----------|---------|",
     ]
     for var_strArquivo, var_dictInfo in var_dictManifest.get("models", {}).items():
         var_strAlgo = var_dictInfo.get("algorithm", "N/A")
@@ -335,14 +335,14 @@ def publicar_modelos(arg_pathExport: Path | None = None, arg_strRepo: str | None
             f"| `{var_strArquivo}` | {var_strAlgo} | {var_strHorizonte} | {var_strMetrica} |"
         )
     var_listLinhasBody.extend([
-        f"",
-        f"### Download automático",
-        f"A extensão baixa os modelos automaticamente via `scripts/download_models.py`.",
-        f"",
-        f"```bash",
-        f"# Download manual",
-        f"python -m scripts.download_models --force",
-        f"```",
+        "",
+        "### Download automático",
+        "A extensão baixa os modelos automaticamente via `scripts/download_models.py`.",
+        "",
+        "```bash",
+        "# Download manual",
+        "python -m scripts.download_models --force",
+        "```",
     ])
     var_strBody = "\n".join(var_listLinhasBody)
 

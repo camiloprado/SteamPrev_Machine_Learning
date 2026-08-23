@@ -1,4 +1,3 @@
-from prj_TCC_PREVISOR_STEAM.classes.framework.AllSettings import Settings
 from prj_TCC_PREVISOR_STEAM.classes.framework.Initialization import Initialization
 from prj_TCC_PREVISOR_STEAM.classes.framework.Loop import Loop
 from prj_TCC_PREVISOR_STEAM.classes.framework.End import End

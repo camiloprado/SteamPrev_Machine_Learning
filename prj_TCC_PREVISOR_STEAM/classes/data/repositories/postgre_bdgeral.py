@@ -1,8 +1,8 @@
-from prj_TCC_PREVISOR_STEAM.classes.framework.AllSettings import Settings
 from prj_TCC_PREVISOR_STEAM.classes.data.repositories.postgre_generico import PostgreSQL
 
-from psycopg2.extras import execute_batch, execute_values
-import json, logging
+from psycopg2.extras import execute_values
+import json
+import logging
 
 logger = logging.getLogger("db.bdgeral")
 
@@ -84,13 +84,14 @@ class PostgreSQLBDGeral(PostgreSQL):
                 cls.desconectar(var_connConnection)
 
     @classmethod
-    def buscar_dados_Geral(cls, arg_strFiltro: str = None, arg_boolFiltroPadrao: bool = False) -> list:
+    def buscar_dados_Geral(cls, arg_boolFiltroPadrao: bool = False) -> list:
         """
         Busca dados na tabela steam_geral.
 
         Parâmetros:
-        - arg_strFiltro (str): Filtro opcional para a consulta SQL. Exemplo: "preco != 'Grátis'".
-        
+        - arg_boolFiltroPadrao (bool): Se True, aplica o filtro padrão de jogos pagos com dados
+          válidos (type='game', preço não gratuito, com mapeamento e histórico ITAD). (Padrão: False)
+
         Retorna:
         - list[dict]: Lista de dicionários com os dados dos jogos.
         """
@@ -122,17 +123,12 @@ class PostgreSQLBDGeral(PostgreSQL):
             """
 
             if arg_boolFiltroPadrao:
-                var_strSQLGeral += f"""
-                WHERE su.type = 'game' 
-                    AND su.preco <> 'Gratuito' 
-                    AND sim.id_itad IS NOT NULL 
+                var_strSQLGeral += """
+                WHERE su.type = 'game'
+                    AND su.preco <> 'Gratuito'
+                    AND sim.id_itad IS NOT NULL
                     AND sim.id_itad NOT IN ('', 'AUSENTE')
                     AND ir.historico_preco IS NOT NULL
-                    """
-            else:
-                if arg_strFiltro:
-                    var_strSQLGeral += f"""
-                    WHERE {arg_strFiltro}
                     """
 
             var_strSQLGeral += "ORDER BY su.appid;"

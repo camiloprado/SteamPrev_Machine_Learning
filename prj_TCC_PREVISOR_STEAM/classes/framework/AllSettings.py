@@ -14,41 +14,68 @@ class Settings:
     """
     _var_dictSettings = {}
 
+    @staticmethod
+    def _obter_env_db_obrigatoria(arg_strChave: str) -> str:
+        """
+        Lê uma variável de ambiente obrigatória de conexão com o banco de dados.
+
+        Antes, variáveis como DB_PASSWORD caíam silenciosamente em um valor
+        padrão adivinhável (ex.: "postgres") quando não definidas no .env,
+        o que é um risco de segurança e mascara erros de configuração.
+        Agora, a ausência da variável falha explicitamente.
+
+        Parâmetros:
+        - arg_strChave (str): Nome da variável de ambiente (ex.: "DB_PASSWORD").
+
+        Retorna:
+        - str: Valor da variável de ambiente.
+
+        Levanta:
+        - RuntimeError: Se a variável não estiver definida no ambiente/.env.
+        """
+        var_strValor = os.getenv(arg_strChave)
+        if not var_strValor:
+            raise RuntimeError(f"{arg_strChave} não definida no .env")
+        return var_strValor
+
     @classmethod
     def bd_settings_default(cls):
         """
         Configurações padrão do banco de dados.
-        Lê as configurações do arquivo .env ou usa valores padrão.
+        Lê as configurações do arquivo .env. Levanta RuntimeError se alguma
+        variável obrigatória não estiver definida.
         """
-        cls._var_strDBName: str = os.getenv("DB_NAME", "default_db")
-        cls._var_strDBUser: str = os.getenv("DB_USER", "postgres")
-        cls._var_strDBPassword: str = os.getenv("DB_PASSWORD", "postgres")
-        cls._var_strDBHost: str = os.getenv("DB_HOST", "localhost")
-        cls._var_strDBPort: str = os.getenv("DB_PORT", "5433")
+        cls._var_strDBName: str = cls._obter_env_db_obrigatoria("DB_NAME")
+        cls._var_strDBUser: str = cls._obter_env_db_obrigatoria("DB_USER")
+        cls._var_strDBPassword: str = cls._obter_env_db_obrigatoria("DB_PASSWORD")
+        cls._var_strDBHost: str = cls._obter_env_db_obrigatoria("DB_HOST")
+        cls._var_strDBPort: str = cls._obter_env_db_obrigatoria("DB_PORT")
 
     @classmethod
     def bd_settings_steam(cls):
         """
         Configurações do banco de dados Steam.
-        Lê as configurações do arquivo .env ou usa valores padrão.
+        Lê as configurações do arquivo .env. Levanta RuntimeError se alguma
+        variável obrigatória não estiver definida.
         """
-        cls._var_strDBName: str = os.getenv("DB_NAME", "steam_data")
-        cls._var_strDBUser: str = os.getenv("DB_USER", "postgres")
-        cls._var_strDBPassword: str = os.getenv("DB_PASSWORD", "postgres")
-        cls._var_strDBHost: str = os.getenv("DB_HOST", "localhost")
-        cls._var_strDBPort: str = os.getenv("DB_PORT", "5433")
+        cls._var_strDBName: str = cls._obter_env_db_obrigatoria("DB_NAME")
+        cls._var_strDBUser: str = cls._obter_env_db_obrigatoria("DB_USER")
+        cls._var_strDBPassword: str = cls._obter_env_db_obrigatoria("DB_PASSWORD")
+        cls._var_strDBHost: str = cls._obter_env_db_obrigatoria("DB_HOST")
+        cls._var_strDBPort: str = cls._obter_env_db_obrigatoria("DB_PORT")
 
-    @classmethod 
+    @classmethod
     def bd_settings_previsao(cls):
         """
         Configurações do banco de dados de previsão.
-        Lê as configurações do arquivo .env ou usa valores padrão.
+        Lê as configurações do arquivo .env. Levanta RuntimeError se alguma
+        variável obrigatória não estiver definida.
         """
-        cls._var_strDBName: str = os.getenv("DB_NAME", "previsao_steam")
-        cls._var_strDBUser: str = os.getenv("DB_USER", "postgres")
-        cls._var_strDBPassword: str = os.getenv("DB_PASSWORD", "postgres")
-        cls._var_strDBHost: str = os.getenv("DB_HOST", "localhost")
-        cls._var_strDBPort: str = os.getenv("DB_PORT", "5433")
+        cls._var_strDBName: str = cls._obter_env_db_obrigatoria("DB_NAME")
+        cls._var_strDBUser: str = cls._obter_env_db_obrigatoria("DB_USER")
+        cls._var_strDBPassword: str = cls._obter_env_db_obrigatoria("DB_PASSWORD")
+        cls._var_strDBHost: str = cls._obter_env_db_obrigatoria("DB_HOST")
+        cls._var_strDBPort: str = cls._obter_env_db_obrigatoria("DB_PORT")
     
     @classmethod
     def steam_api_details(cls) -> dict:

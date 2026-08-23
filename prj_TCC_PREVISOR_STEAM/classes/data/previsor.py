@@ -1,16 +1,14 @@
-from prj_TCC_PREVISOR_STEAM.classes.framework.AllSettings import Settings
 from prj_TCC_PREVISOR_STEAM.classes.api.steam_api import SteamClient
 from prj_TCC_PREVISOR_STEAM.classes.api.itad_api import ITADClient
-from prj_TCC_PREVISOR_STEAM.classes.data.repositories.postgre_generico import PostgreSQL
 from prj_TCC_PREVISOR_STEAM.classes.data.repositories.postgre_steam import PostgreSQLSteam
 from prj_TCC_PREVISOR_STEAM.classes.data.repositories.postgre_itad import PostgreSQLITAD
 from prj_TCC_PREVISOR_STEAM.classes.data.repositories.postgre_checkpoint import PostgreSQLCheckpoint
 from prj_TCC_PREVISOR_STEAM.classes.data.repositories.postgre_bdgeral import PostgreSQLBDGeral
 
-from datetime import datetime
 from time import sleep
-import json, logging, asyncio, os
-from typing import Dict, Any
+import logging
+import asyncio
+import os
 
 logger = logging.getLogger("previsor")
 
@@ -201,7 +199,7 @@ class Previsor:
             for i in range(var_intInicioCheckpoint, var_intTamanhoTotalFila, var_intRange):
                 logger.info(f"Processando aplicativos ITAD de {i + 1} a {min(i + var_intRange, var_intTamanhoTotalFila)} de {var_intTamanhoTotalFila}")
                 logger.info(f"Progresso: {(i/var_intTamanhoTotalFila)*100:.1f}%")
-                logger.info(f"----------------------------------------")
+                logger.info("----------------------------------------")
                 
                 # Carrega os aplicativos atuais
                 if var_intAmbiente == "HML":

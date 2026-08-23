@@ -1,11 +1,14 @@
 """
 Teste de retry automático com API Steam indisponível
+
+Nota: find_app_list()/load_app_list() foram movidos de SteamClient (steam_api.py)
+para LocalClient (local_steam.py). Este script foi atualizado para refletir isso.
 """
 import sys
 import os
 sys.path.insert(0, os.path.dirname(__file__))
 
-from prj_TCC_PREVISOR_STEAM.classes.api.steam_api import SteamClient
+from prj_TCC_PREVISOR_STEAM.classes.api.local_steam import LocalClient
 from unittest.mock import patch, Mock
 import requests
 
@@ -20,7 +23,7 @@ with patch('requests.get') as mock_get:
     mock_get.return_value = mock_response
     
     try:
-        SteamClient.find_app_list()
+        LocalClient.find_app_list()
         print("   ✗ Deveria ter lançado exceção após 5 tentativas")
     except Exception as e:
         if "após 5 tentativas" in str(e):
@@ -53,7 +56,7 @@ with patch('requests.get') as mock_get:
     mock_get.side_effect = side_effect_success_third
     
     try:
-        resultado = SteamClient.find_app_list()
+        resultado = LocalClient.find_app_list()
         if len(resultado) == 1 and resultado[0]['appid'] == 10:
             print(f"   ✓ Sucesso após {CallCounter.count} tentativas!")
         else:
@@ -67,7 +70,7 @@ with patch('requests.get') as mock_get:
     mock_get.side_effect = requests.exceptions.Timeout("Connection timeout")
     
     try:
-        SteamClient.find_app_list()
+        LocalClient.find_app_list()
         print("   ✗ Deveria ter lançado exceção de timeout")
     except Exception as e:
         if "Timeout após 5 tentativas" in str(e):

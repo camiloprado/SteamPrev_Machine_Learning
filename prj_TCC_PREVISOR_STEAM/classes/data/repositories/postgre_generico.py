@@ -1,13 +1,27 @@
 from prj_TCC_PREVISOR_STEAM.classes.framework.AllSettings import Settings
 
-from datetime import datetime
-from psycopg2.extras import execute_batch, execute_values
 from psycopg2 import pool
-from time import sleep
-from typing import Generator
-import psycopg2, json, logging
+import logging
 
 logger = logging.getLogger("db.core")
+
+# Allowlist de nomes de tabelas conhecidas do projeto. Usada para validar
+# arg_strNomeTabela antes de interpolar via f-string em SQL (nomes de tabela
+# não podem ser parametrizados com %s/psycopg2), evitando SQL injection caso
+# esse parâmetro venha de uma fonte não totalmente confiável.
+CON_TABELAS_VALIDAS = frozenset({
+    "steam_generico",
+    "steam_raw",
+    "steam_categorias",
+    "steam_generos",
+    "steam_linguagens",
+    "steam_review_score_desc",
+    "steam_unificado",
+    "itad_raw",
+    "steam_itad_mapping",
+    "steam_geral",
+    "processing_checkpoint",
+})
 
 class PostgreSQL:
     """
@@ -15,6 +29,25 @@ class PostgreSQL:
     """
     _var_connConnection = None
     _var_poolConnectionPool = None
+
+    @classmethod
+    def _validar_nome_tabela(cls, arg_strNomeTabela: str) -> str:
+        """
+        Valida que o nome da tabela pertence à allowlist de tabelas conhecidas do projeto,
+        prevenindo SQL injection via interpolação de nome de tabela em f-string.
+
+        Parâmetros:
+        - arg_strNomeTabela (str): Nome da tabela a ser validado.
+
+        Retorna:
+        - str: O próprio nome da tabela, se válido.
+
+        Levanta:
+        - ValueError: Se o nome da tabela não estiver na allowlist.
+        """
+        if arg_strNomeTabela not in CON_TABELAS_VALIDAS:
+            raise ValueError(f"Nome de tabela inválido ou não permitido: '{arg_strNomeTabela}'")
+        return arg_strNomeTabela
 
     @classmethod
     def _init_pool(cls):
@@ -104,6 +137,7 @@ class PostgreSQL:
         - list[dict]: Lista de dicionários com os dados dos jogos.
         """
         try:
+            cls._validar_nome_tabela(arg_strNomeTabela)
             var_strSQL = f"""
             SELECT * FROM {arg_strNomeTabela};
             """
@@ -136,20 +170,23 @@ class PostgreSQL:
         """
         cls.conectar()
         try:
+            cls._validar_nome_tabela(arg_strNomeTabela)
             var_intDias = Settings._var_dictSettings.get("dias_para_atualizacao", 30)
-            
+
             var_strSQL = f"""
             SELECT * FROM {arg_strNomeTabela}
             WHERE ultima_atualizacao < CURRENT_DATE - INTERVAL '{var_intDias} days'
             """
-            
+
+            var_listParams = []
             if arg_intLimite:
-                var_strSQL += f" LIMIT {arg_intLimite}"
-            
+                var_strSQL += " LIMIT %s"
+                var_listParams.append(arg_intLimite)
+
             var_strSQL += ";"
-            
+
             with cls._var_connConnection.cursor() as cursor:
-                cursor.execute(var_strSQL)
+                cursor.execute(var_strSQL, var_listParams or None)
                 var_listResultados = cursor.fetchall()
                 var_listColnames = [desc[0] for desc in cursor.description]
                 var_listDados = [dict(zip(var_listColnames, row)) for row in var_listResultados]

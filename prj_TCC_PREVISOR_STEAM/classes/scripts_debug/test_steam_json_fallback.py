@@ -1,5 +1,8 @@
 """
 Testa o fallback para arquivo JSON local quando a API Steam retorna 404.
+
+Nota: find_app_list()/load_app_list() foram movidos de SteamClient (steam_api.py)
+para LocalClient (local_steam.py). Este script foi atualizado para refletir isso.
 """
 import sys
 import os
@@ -11,7 +14,7 @@ logging.basicConfig(
     format='%(asctime)s - %(levelname)s - %(message)s'
 )
 
-from prj_TCC_PREVISOR_STEAM.classes.api.steam_api import SteamClient
+from prj_TCC_PREVISOR_STEAM.classes.api.local_steam import LocalClient
 
 print("\n" + "="*80)
 print("TESTE: Carregamento com fallback para steam_applist.json")
@@ -19,8 +22,8 @@ print("="*80 + "\n")
 
 try:
     # Força reload para testar o fallback
-    print("[DEBUG] Chamando SteamClient.load_app_list()...")
-    apps = SteamClient.load_app_list(arg_boolForce=True)
+    print("[DEBUG] Chamando LocalClient.load_app_list()...")
+    apps = LocalClient.load_app_list(arg_boolForce=True)
     print(f"[DEBUG] Retorno: {type(apps)}, len={len(apps) if apps else 0}")
     
     if apps:

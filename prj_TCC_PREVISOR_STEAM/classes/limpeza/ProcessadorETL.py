@@ -1,4 +1,3 @@
-from prj_TCC_PREVISOR_STEAM.classes.framework.AllSettings import Settings
 from prj_TCC_PREVISOR_STEAM.classes.data.repositories.postgre_generico import PostgreSQL
 from prj_TCC_PREVISOR_STEAM.classes.data.repositories.postgre_steam import PostgreSQLSteam
 from prj_TCC_PREVISOR_STEAM.classes.limpeza.limpeza import Limpar
@@ -8,15 +7,12 @@ from prj_TCC_PREVISOR_STEAM.classes.limpeza.limpeza_linguagens import LimparLing
 from prj_TCC_PREVISOR_STEAM.classes.limpeza.limpeza_desenvolvedor import LimparDesenvolvedor
 from prj_TCC_PREVISOR_STEAM.classes.limpeza.limpeza_distribuidores import LimparDistribuidores
 from prj_TCC_PREVISOR_STEAM.classes.limpeza.limpeza_preco import LimparPreco
-from prj_TCC_PREVISOR_STEAM.classes.limpeza.limpeza_metacritic import LimparMetacritic
 from prj_TCC_PREVISOR_STEAM.classes.limpeza.limpeza_categoria import LimparCategoria
 from prj_TCC_PREVISOR_STEAM.classes.limpeza.limpeza_genero import LimparGenero
 from prj_TCC_PREVISOR_STEAM.classes.limpeza.limpeza_data_lancamento import LimparDataLancamento
 
-from typing import List, Dict, Any
-import re, logging
-import unicodedata
-from datetime import datetime
+from typing import Dict
+import logging
 
 logger = logging.getLogger("etl")
 

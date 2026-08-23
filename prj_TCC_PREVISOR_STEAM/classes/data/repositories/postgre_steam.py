@@ -3,7 +3,8 @@ from prj_TCC_PREVISOR_STEAM.classes.data.repositories.postgre_generico import Po
 
 from datetime import datetime
 from psycopg2.extras import execute_batch, execute_values
-import json, logging
+import json
+import logging
 
 logger = logging.getLogger("db.steam")
 
@@ -412,22 +413,25 @@ class PostgreSQLSteam(PostgreSQL):
             """
             
             # Aplica filtro de divisão de trabalho entre PCs (se aplicável)
+            var_listParams = []
             if arg_intTotalPcs > 1:
                 # MOD(appid, total_pcs) = (pc_id - 1)
                 # PC 1: MOD(appid, 2) = 0 (pares)
                 # PC 2: MOD(appid, 2) = 1 (ímpares)
-                var_strSQL += f" AND MOD(sg.appid, {arg_intTotalPcs}) = {arg_intPcId - 1}"
-            
+                var_strSQL += " AND MOD(sg.appid, %s) = %s"
+                var_listParams.extend([arg_intTotalPcs, arg_intPcId - 1])
+
             if arg_intLimite:
-                var_strSQL += f" LIMIT {arg_intLimite}"
-            
+                var_strSQL += " LIMIT %s"
+                var_listParams.append(arg_intLimite)
+
             var_strSQL += ";"
-            
+
             with var_connConnection.cursor() as cursor:
-                cursor.execute(var_strSQL)
+                cursor.execute(var_strSQL, var_listParams or None)
                 var_listResultados = cursor.fetchall()
                 var_listAppids = [row[0] for row in var_listResultados]
-                
+
                 logger.info(f"Encontrados {len(var_listAppids):,} AppIDs não processados para PC {arg_intPcId}")
                 return var_listAppids
                 
@@ -458,27 +462,33 @@ class PostgreSQLSteam(PostgreSQL):
                 logger.error("Conexão com banco de dados não estabelecida")
                 return []
             
+            cls._validar_nome_tabela(arg_strNomeTabela)
+
             var_intDias = Settings._var_dictSettings.get("dias_para_atualizacao", 30)
-            
+
             logger.info(f"Buscando AppIDs desatualizados (>{var_intDias} dias)...")
 
             if arg_strNomeTabela == 'itad_raw':
-                arg_strNomeTabela = 'steam_itad_mapping sim JOIN itad_raw ir ON sim.id_itad = ir.id_itad'
+                var_strFromClausula = 'steam_itad_mapping sim JOIN itad_raw ir ON sim.id_itad = ir.id_itad'
+            else:
+                var_strFromClausula = arg_strNomeTabela
 
             var_strSQL = f"""
-            SELECT appid FROM {arg_strNomeTabela}
+            SELECT appid FROM {var_strFromClausula}
             WHERE ultima_atualizacao < CURRENT_DATE - INTERVAL '{var_intDias} days'
             """
-            
+
+            var_listParams = []
             # Aplica filtro de PC se necessário
             if arg_intTotalPcs > 1:
-                var_strSQL += f" AND MOD(appid, {arg_intTotalPcs}) = {arg_intPcId - 1}"
-            
+                var_strSQL += " AND MOD(appid, %s) = %s"
+                var_listParams.extend([arg_intTotalPcs, arg_intPcId - 1])
+
             var_strSQL += ";"
-            
+
             with var_connConnection.cursor() as cursor:
-                cursor.execute(var_strSQL)
-                var_listResultados = cursor.fetchall()  
+                cursor.execute(var_strSQL, var_listParams or None)
+                var_listResultados = cursor.fetchall()
                 var_listAppids = [row[0] for row in var_listResultados]
                 
                 logger.info(f"Encontrados {len(var_listAppids):,} AppIDs desatualizados")

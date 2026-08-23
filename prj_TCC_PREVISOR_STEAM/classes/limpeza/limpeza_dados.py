@@ -1,11 +1,10 @@
 from prj_TCC_PREVISOR_STEAM.classes.data.repositories.postgre_generico import PostgreSQL
-from prj_TCC_PREVISOR_STEAM.classes.framework.AllSettings import Settings
 
 from datetime import datetime
 from sklearn.impute import SimpleImputer      
 from sklearn.preprocessing import OrdinalEncoder, OneHotEncoder
-from sklearn.base import BaseEstimator, TransformerMixin
-import json, locale, logging, pandas as pd
+import logging
+import pandas as pd
 
 logger = logging.getLogger(__name__)
 
