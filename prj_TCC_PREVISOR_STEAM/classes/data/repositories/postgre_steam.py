@@ -157,34 +157,38 @@ class PostgreSQLSteam(PostgreSQL):
                 logger.info("Nenhum dado dos fornecidos precisa ser atualizado.")
                 return False
             
-            # Insere/atualiza em lotes de 5000
+            # Insere/atualiza em lotes de 5000, em batch (execute_batch) em vez
+            # de 1 INSERT por registro — mesmo padrão já usado mais abaixo
+            # neste arquivo para steam_generico (linha ~112).
+            var_strSQL = """
+            INSERT INTO steam_generico (appid, name, ultima_atualizacao)
+            VALUES (%s, %s, %s)
+            ON CONFLICT (appid) DO UPDATE SET
+                name = EXCLUDED.name,
+                ultima_atualizacao = EXCLUDED.ultima_atualizacao;
+            """
+
             var_intTotalInserido = 0
+            var_connConnection = cls.conectar()
             for var_intIndex in range(0, len(var_listDadosParaInserir), 5000):
                 var_listLote = var_listDadosParaInserir[var_intIndex:var_intIndex + 5000]
-                
-                for var_dictDados in var_listLote:
-                    var_intAppid = var_dictDados.get("appid")
-                    if not var_intAppid:
-                        logger.warning("AppID ausente em dados steam_generico")
-                        continue
-                    
-                    var_strSQL = """
-                    INSERT INTO steam_generico (appid, name, ultima_atualizacao)
-                    VALUES (%s, %s, %s)
-                    ON CONFLICT (appid) DO UPDATE SET
-                        name = EXCLUDED.name,
-                        ultima_atualizacao = EXCLUDED.ultima_atualizacao;
-                    """
-                    
-                    var_connConnection = cls.conectar()
-                    with var_connConnection.cursor() as cursor:
-                        cursor.execute(var_strSQL, (
-                            var_intAppid,
-                            var_dictDados.get("name"),
-                            datetime.now()
-                        ))
-                        var_intTotalInserido += cursor.rowcount
-                
+
+                var_dtAgora = datetime.now()
+                var_listValoresLote = [
+                    (var_dictDados.get("appid"), var_dictDados.get("name"), var_dtAgora)
+                    for var_dictDados in var_listLote
+                    if var_dictDados.get("appid")
+                ]
+                if len(var_listValoresLote) < len(var_listLote):
+                    logger.warning("AppID ausente em dados steam_generico")
+
+                if not var_listValoresLote:
+                    continue
+
+                with var_connConnection.cursor() as cursor:
+                    execute_batch(cursor, var_strSQL, var_listValoresLote, page_size=1000)
+                    var_intTotalInserido += len(var_listValoresLote)
+
                 var_connConnection.commit()
                 logger.info(f"Lote de {len(var_listLote)} registros processado.")
             

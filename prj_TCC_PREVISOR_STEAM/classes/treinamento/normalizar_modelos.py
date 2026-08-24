@@ -142,31 +142,6 @@ class NormalizarModelos:
         return cls._var_dfDadosTreinamento
 
     @staticmethod
-    def _converter_preco_para_float(arg_strValor) -> float:
-        """
-        Converte string monetária no formato brasileiro para float.
-        
-        Parâmetros:
-        - arg_strValor (str): Valor a ser convertido, pode ser string ou numérico.
-
-        Retorna:
-        - float: Valor convertido para float, ou np.nan se a conversão falhar.
-        """
-        if arg_strValor is None:
-            return np.nan
-        
-        var_strValor = str(arg_strValor).strip()
-        if not var_strValor:
-            return np.nan
-
-        var_strValor = var_strValor.replace("R$", "").replace(" ", "")
-        var_strValor = var_strValor
-        try:
-            return float(var_strValor)
-        except ValueError:
-            return np.nan
-
-    @staticmethod
     def _separar_historico(arg_listHistorico:list) -> list:
         """
         Separar o histórico para uma lista de pontos com timestamp, preço e desconto.
@@ -294,7 +269,7 @@ class NormalizarModelos:
         return "mantem"
 
     @classmethod
-    def _extrair_alvos_horizonte(cls, arg_intTimestampAtual: int, arg_floatPrecoAtual: float, arg_listHistorico: list, arg_intIdx: int, arg_listDiasHorizonte: list, arg_intMaxTimestampGlobal: int, arg_floatThreshold: float) -> dict:
+    def _extrair_alvos_horizonte(cls, arg_intTimestampAtual: int, arg_floatPrecoAtual: float, arg_listHistorico: list, arg_intIdx: int, arg_listDiasHorizonte: list, arg_intUltimoTimestampJogo: int, arg_floatThreshold: float) -> dict:
         """
         Gera alvos de classificação para horizontes fixos (30d, 60d, 90d).
 
@@ -307,7 +282,10 @@ class NormalizarModelos:
         - arg_listHistorico (list): Lista completa de pontos do histórico.
         - arg_intIdx (int): Índice do ponto atual no histórico.
         - arg_listDiasHorizonte (list): Lista de horizontes em dias (ex: [30, 60, 90]).
-        - arg_intMaxTimestampGlobal (int): Timestamp máximo global do dataset.
+        - arg_intUltimoTimestampJogo (int): Timestamp do último ponto coletado
+          para ESTE jogo (não o máximo global do dataset — um jogo com coleta
+          mais esparsa/antiga não deve ser rotulado "mantém" só porque outro
+          jogo tem dados mais recentes).
         - arg_floatThreshold (float): Limiar de variação para classificar direção.
 
         Retorna:
@@ -316,14 +294,14 @@ class NormalizarModelos:
         var_dictAlvosHorizonte = {}
         for var_intDiasH in arg_listDiasHorizonte:
             var_intTimestampHorizonte = arg_intTimestampAtual + (var_intDiasH * 86400)
-            
+
             var_listPontosHorizonte = [
                 var_dictPonto for var_dictPonto in arg_listHistorico[arg_intIdx + 1:]
                 if var_dictPonto["timestamp"] <= var_intTimestampHorizonte
             ]
-            
+
             if not var_listPontosHorizonte:
-                if (arg_intMaxTimestampGlobal - arg_intTimestampAtual) >= (var_intDiasH * 86400):
+                if (arg_intUltimoTimestampJogo - arg_intTimestampAtual) >= (var_intDiasH * 86400):
                     var_dictAlvosHorizonte[f"alvo_direcao_{var_intDiasH}d"] = "mantem"
                 else:
                     var_dictAlvosHorizonte[f"alvo_direcao_{var_intDiasH}d"] = np.nan
@@ -466,12 +444,6 @@ class NormalizarModelos:
         if cls._var_dfDadosTreinamento is None:
             cls.carregar_dados_treinamento()
 
-        var_strMaxTimestamp = cls._var_dfDadosTreinamento["historico_preco"].apply(
-            lambda x: x[-1]["timestamp"] if isinstance(x, list) and x else 0
-        ).max()
-        var_intMaxTimestampGlobal = cls._converter_timestamp_para_epoch(var_strMaxTimestamp)
-        logger.info(f"Max Timestamp Global encontrado: {var_intMaxTimestampGlobal}")
-        
         var_listAmostras = []
         var_intAnosJanela = cls._var_intAnosJanelaHistorico
         var_intSegundosJanela = var_intAnosJanela * 365 * 86400
@@ -485,8 +457,17 @@ class NormalizarModelos:
             if len(var_listHistorico) < 2:
                 continue
 
+            # review_score não tem histórico point-in-time disponível nos dados
+            # coletados — usar o valor do snapshot atual para todas as amostras
+            # de um jogo é uma limitação de dados conhecida, não corrigível
+            # sem uma fonte de review_score histórico.
             var_floatReviewScore = pd.to_numeric(var_dictRow.get("review_score"), errors="coerce")
-            var_floatPrecoAtualCatalogo = cls._converter_preco_para_float(var_dictRow.get("preco"))
+
+            # Referência de censura para "mantém" no fim do histórico: o último
+            # timestamp coletado DESTE jogo, não o máximo do dataset inteiro —
+            # senão jogos com coleta mais esparsa/antiga seriam rotulados
+            # "mantém" só por falta de dado, contaminando o rótulo com ruído.
+            var_intUltimoTimestampJogo = var_listHistorico[-1]["timestamp"]
 
             for var_intIdx in range(len(var_listHistorico) - 1):
                 var_dictAtual = var_listHistorico[var_intIdx]
@@ -506,14 +487,20 @@ class NormalizarModelos:
                 ]
 
                 var_strDirecaoProxEvento = cls._extrair_alvo_proximo_evento(var_dictAtual, var_listHistorico, var_intIdx, var_floatThreshold)
-                var_dictAlvosHorizonte = cls._extrair_alvos_horizonte(var_intTimestampAtual, var_floatPrecoAtual, var_listHistorico, var_intIdx, var_listDiasHorizonte, var_intMaxTimestampGlobal, var_floatThreshold)
+                var_dictAlvosHorizonte = cls._extrair_alvos_horizonte(var_intTimestampAtual, var_floatPrecoAtual, var_listHistorico, var_intIdx, var_listDiasHorizonte, var_intUltimoTimestampJogo, var_floatThreshold)
                 var_intDiasProxDesconto, var_floatDescontoEsperado = cls._extrair_alvos_regressao(var_intTimestampAtual, var_listHistorico, var_intIdx)
                 var_dictFeatures = cls._extrair_features(var_intTimestampAtual, var_floatPrecoAtual, var_listJanela, var_listHistorico, var_intIdx)
 
                 var_dictAmostra = {
                     "appid": var_dictRow.get("appid"),
                     "review_score": float(var_floatReviewScore) if pd.notna(var_floatReviewScore) else 0.0,
-                    "preco_catalogo": float(var_floatPrecoAtualCatalogo) if pd.notna(var_floatPrecoAtualCatalogo) else 0.0,
+                    # preco_catalogo replica, em treino, o que a inferência faz:
+                    # o preço "atual" no momento de referência da amostra.
+                    # Antes usava o preço do snapshot mais recente (fora do loop),
+                    # ou seja, vazava o preço "do futuro" para amostras antigas —
+                    # inflando artificialmente as métricas. var_floatPrecoAtual já
+                    # é point-in-time (desconto==0 nesse ponto, garantido acima).
+                    "preco_catalogo": var_floatPrecoAtual,
                     "preco_atual_hist": var_floatPrecoAtual,
                     **var_dictFeatures,
                     "alvo_direcao_preco": var_strDirecaoProxEvento,

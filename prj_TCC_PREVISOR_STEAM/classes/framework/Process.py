@@ -39,6 +39,7 @@ class Process:
         logger.info("="*60)
 
         # ── Etapa 1: Coleta Steam (detalhes + reviews) ──────────────────────
+        var_listDesatualizados = []
         try:
             var_listDesatualizados = PostgreSQLSteam.buscar_appids_desatualizados_otimizado()
             if var_listDesatualizados:
@@ -56,8 +57,12 @@ class Process:
             logger.error(f"Etapa 1/5 — Coleta Steam falhou: {e}", exc_info=True)
 
         # ── Etapa 2: ETL (steam_raw → steam_unificado) ──────────────────────
+        # Reaproveita a lista da Etapa 1 em vez de reconsultar: os appids
+        # acabaram de ser coletados (ultima_atualizacao já foi atualizada em
+        # steam_raw), então reconsultar "desatualizados" aqui retornaria um
+        # conjunto diferente (ou vazio) — o alvo do ETL é justamente o lote
+        # que a Etapa 1 processou, não o que ainda está pendente.
         try:
-            var_listDesatualizados = PostgreSQLSteam.buscar_appids_desatualizados_otimizado()
             if var_listDesatualizados:
                 logger.info(f"Etapa 2/5 — ETL: processando {len(var_listDesatualizados):,} registros")
                 ProcessadorETL.processar_lote_unificado(var_listDesatualizados)

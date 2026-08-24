@@ -14,9 +14,10 @@ class Close:
     Classe para gerenciar o fechamento da aplicação.
     """
 
-    # Cada subclasse de PostgreSQL pode ter inicializado seu próprio
-    # connection pool (via cls._init_pool()), então é necessário fechar
-    # o pool de todas elas, e não apenas o da classe base.
+    # O connection pool agora é sempre único e compartilhado na classe base
+    # PostgreSQL (ver postgre_generico.py:_init_pool). O laço abaixo ainda
+    # itera todas as subclasses por segurança/histórico, mas na prática só
+    # PostgreSQL.__dict__ terá um pool próprio para fechar.
     _var_listRepositorios = [
         PostgreSQL,
         PostgreSQLSteam,

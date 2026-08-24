@@ -166,6 +166,33 @@ class Treinar_Modelos:
 
 
     @classmethod
+    def _limpar_versoes_antigas(cls, arg_pathModels: Path, arg_strPadraoGlob: str, arg_intManterUltimos: int = 3) -> None:
+        """
+        Apaga versões timestamped antigas de um modelo, mantendo apenas as N mais
+        recentes (o alias "_latest.joblib" cobre o uso corrente e nunca é afetado
+        por este padrão, já que o glob exige um timestamp numérico no nome).
+
+        Parâmetros:
+        - arg_pathModels (Path): Diretório onde os modelos são salvos.
+        - arg_strPadraoGlob (str): Padrão glob dos arquivos timestamped (ex.: "modelo_classificacao_XGBoost_30d_*.joblib").
+        - arg_intManterUltimos (int): Quantas versões mais recentes manter. (Padrão: 3)
+
+        Retorna:
+        - None
+        """
+        var_listArquivos = sorted(
+            (p for p in arg_pathModels.glob(arg_strPadraoGlob) if not p.name.endswith("_latest.joblib")),
+            key=lambda p: p.stat().st_mtime,
+            reverse=True,
+        )
+        for var_pathAntigo in var_listArquivos[arg_intManterUltimos:]:
+            try:
+                var_pathAntigo.unlink()
+                logger.info(f"Removido (retenção de {arg_intManterUltimos} versões): {var_pathAntigo.name}")
+            except OSError as e:
+                logger.warning(f"Falha ao remover versão antiga {var_pathAntigo.name}: {e}")
+
+    @classmethod
     def _salvar_modelos(cls, arg_dictModelos: dict) -> None:
         """
         Persiste todos os modelos treinados em resources/models/.
@@ -199,7 +226,7 @@ class Treinar_Modelos:
 
                     var_strNomeArq = f"modelo_classificacao_{var_strAlgo}_{var_strHorizonte}_{var_strTimestamp}.joblib"
                     var_pathArq = var_pathModels / var_strNomeArq
-                    joblib.dump(var_objModelo, var_pathArq)
+                    joblib.dump(var_objModelo, var_pathArq, compress=3)
                     logger.info(f"Salvo: {var_strNomeArq}")
 
                     # Copia o arquivo versionado para o alias _latest (evita segundo joblib.dump)
@@ -207,6 +234,10 @@ class Treinar_Modelos:
                     var_pathLatest = var_pathModels / var_strNomeLatest
                     shutil.copy2(var_pathArq, var_pathLatest)
                     logger.info(f"Atualizado: {var_strNomeLatest}")
+
+                    cls._limpar_versoes_antigas(
+                        var_pathModels, f"modelo_classificacao_{var_strAlgo}_{var_strHorizonte}_*.joblib"
+                    )
 
         # As chaves reais em arg_dictModelos são "regressao_dias" e "regressao_desconto"
         # (ver executar_treinamento -> var_dictTodosModelos). Iterar sobre as duas garante
@@ -223,7 +254,7 @@ class Treinar_Modelos:
 
                     var_strNomeArq = f"modelo_{var_strTipoRegressao}_{var_strAlgo}_{var_strHorizonte}_{var_strTimestamp}.joblib"
                     var_pathArq = var_pathModels / var_strNomeArq
-                    joblib.dump(var_objModelo, var_pathArq)
+                    joblib.dump(var_objModelo, var_pathArq, compress=3)
                     logger.info(f"Salvo: {var_strNomeArq}")
 
                     # Copia o arquivo versionado para o alias _latest (evita segundo joblib.dump)
@@ -231,6 +262,10 @@ class Treinar_Modelos:
                     var_pathLatest = var_pathModels / var_strNomeLatest
                     shutil.copy2(var_pathArq, var_pathLatest)
                     logger.info(f"Atualizado: {var_strNomeLatest}")
+
+                    cls._limpar_versoes_antigas(
+                        var_pathModels, f"modelo_{var_strTipoRegressao}_{var_strAlgo}_{var_strHorizonte}_*.joblib"
+                    )
 
         logger.info("="*60)
         logger.info("MODELOS SALVOS COM SUCESSO")

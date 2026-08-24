@@ -51,16 +51,25 @@ class PostgreSQL:
 
     @classmethod
     def _init_pool(cls):
-        """Inicializa connection pool se ainda não existir"""
-        if cls._var_poolConnectionPool is None:
+        """
+        Inicializa o connection pool compartilhado, se ainda não existir.
+
+        Escreve sempre em PostgreSQL._var_poolConnectionPool (a classe base),
+        nunca em cls._var_poolConnectionPool — "cls.attr = valor" dentro de um
+        classmethod grava no __dict__ da subclasse que chamou (PostgreSQLSteam,
+        PostgreSQLITAD, etc.), não no da base. Sem essa referência explícita,
+        cada subclasse acabava criando seu próprio pool de até 10 conexões,
+        multiplicando o número real de conexões abertas no Postgres.
+        """
+        if PostgreSQL._var_poolConnectionPool is None:
             try:
                 var_strDbname = Settings._var_dictSettings["db_name"]
                 var_strUser = Settings._var_dictSettings["db_user"]
                 var_strPassword = Settings._var_dictSettings["db_password"]
                 var_strHost = Settings._var_dictSettings["db_host"]
                 var_intPort = Settings._var_dictSettings["db_port"]
-                
-                cls._var_poolConnectionPool = pool.SimpleConnectionPool(
+
+                PostgreSQL._var_poolConnectionPool = pool.SimpleConnectionPool(
                     minconn=1,
                     maxconn=10,
                     dbname=var_strDbname,
@@ -73,7 +82,7 @@ class PostgreSQL:
             except Exception as e:
                 logger.error(f"Erro ao criar connection pool: {e}")
                 raise Exception(f"Erro ao criar connection pool: {e}")
-    
+
     @classmethod
     def conectar(cls):
         """
@@ -86,7 +95,7 @@ class PostgreSQL:
         if cls._var_connConnection is None or cls._var_connConnection.closed:
             try:
                 cls._init_pool()
-                cls._var_connConnection = cls._var_poolConnectionPool.getconn()
+                cls._var_connConnection = PostgreSQL._var_poolConnectionPool.getconn()
                 logger.debug("Conexão obtida do pool")
                 return cls._var_connConnection
             except Exception as e:
@@ -96,7 +105,7 @@ class PostgreSQL:
         else:
             logger.debug("Conexão já estabelecida")
             return cls._var_connConnection
-        
+
     @classmethod
     def desconectar(cls, arg_connConnection = None):
         """
@@ -106,14 +115,14 @@ class PostgreSQL:
         - arg_connConnection: Conexão específica a ser devolvida (opcional). Se None, usa a conexão atual da classe.
         """
         try:
-            if arg_connConnection and cls._var_poolConnectionPool:
-                cls._var_poolConnectionPool.putconn(arg_connConnection)
+            if arg_connConnection and PostgreSQL._var_poolConnectionPool:
+                PostgreSQL._var_poolConnectionPool.putconn(arg_connConnection)
                 logger.debug("Conexão devolvida ao pool")
                 cls._var_connConnection = None
                 return
-            
-            if cls._var_connConnection and cls._var_poolConnectionPool:
-                cls._var_poolConnectionPool.putconn(cls._var_connConnection)
+
+            if cls._var_connConnection and PostgreSQL._var_poolConnectionPool:
+                PostgreSQL._var_poolConnectionPool.putconn(cls._var_connConnection)
                 logger.debug("Conexão devolvida ao pool")
                 cls._var_connConnection = None
             elif cls._var_connConnection:

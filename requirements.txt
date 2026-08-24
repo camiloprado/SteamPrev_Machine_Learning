@@ -2,7 +2,7 @@
 lightgbm==4.6.0
 scikit-learn==1.7.0
 xgboost==3.0.4
-joblib  # serialização de modelos treinados
+joblib==1.5.2  # serialização de modelos treinados — pinado: .joblib é publicado/consumido por outro repositório (SteamPrev_Extensao)
 
 # ── Data Processing ───────────────────────────────────────────────────────────
 pandas==2.3.0

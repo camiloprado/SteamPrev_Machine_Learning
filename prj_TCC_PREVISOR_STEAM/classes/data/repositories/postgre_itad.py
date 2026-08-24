@@ -402,19 +402,20 @@ class PostgreSQLITAD(PostgreSQL):
         """
         var_connConnection = cls.conectar()
         try:
+            # Uma única query em batch (WHERE appid = ANY(%s)) em vez de 1 SELECT
+            # por AppID — evita milhares de round-trips ao Postgres por lote
+            # (RANGE_PROCESSAMENTO_ITAD_RAW pode chegar a 80.000 AppIDs).
+            var_strSQL = """
+            SELECT appid, id_itad FROM steam_itad_mapping WHERE appid = ANY(%s);
+            """
+            with var_connConnection.cursor() as cursor:
+                cursor.execute(var_strSQL, (list(arg_listAppids),))
+                var_dictMapaAppidParaItad = {row[0]: row[1] for row in cursor.fetchall()}
+
+            # Preserva o contrato original: um yield por AppID de entrada, na
+            # mesma ordem, com None para os que não têm mapeamento ITAD.
             for var_intAppid in arg_listAppids:
-                var_strSQL = """
-                SELECT id_itad FROM steam_itad_mapping WHERE appid = %s;
-                """
-                # Executa a consulta para cada AppID
-                with var_connConnection.cursor() as cursor:
-                    cursor.execute(var_strSQL, (var_intAppid,))
-                    var_tupleResultado = cursor.fetchone()
-                    if var_tupleResultado:
-                        # Retorna o ID ITAD encontrado
-                        yield var_tupleResultado[0]
-                    else:
-                        yield None
+                yield var_dictMapaAppidParaItad.get(var_intAppid)
         except Exception as e:
             logger.error(f"Erro ao buscar IDs ITAD para AppIDs fornecidos: {e}")
             raise Exception(f"Erro ao buscar IDs ITAD para AppIDs fornecidos: {e}")

@@ -160,7 +160,7 @@ class ExportarModelos:
                 var_strNomeArq = f"modelo_classificacao_{var_strHorizonte}.joblib"
                 var_pathArq = var_pathExport / var_strNomeArq
 
-                joblib.dump(var_objModelo, var_pathArq)
+                joblib.dump(var_objModelo, var_pathArq, compress=3)
                 var_strHash = cls._calcular_sha256(var_pathArq)
 
                 var_dictManifest["models"][var_strNomeArq] = {
@@ -236,7 +236,7 @@ class ExportarModelos:
                     var_strNomeArqReg = f"modelo_{var_strRegType}_{var_strHorizonte}.joblib"
                     var_pathArqReg = var_pathExport / var_strNomeArqReg
 
-                    joblib.dump(var_objModeloReg, var_pathArqReg)
+                    joblib.dump(var_objModeloReg, var_pathArqReg, compress=3)
                     var_strHashReg = cls._calcular_sha256(var_pathArqReg)
 
                     var_dictManifest["models"][var_strNomeArqReg] = {
@@ -264,6 +264,20 @@ class ExportarModelos:
         var_pathManifest = var_pathExport / "manifest.json"
         with open(var_pathManifest, "w", encoding="utf-8") as var_fileManifest:
             json.dump(var_dictManifest, var_fileManifest, indent=2, ensure_ascii=False)
+
+        # manifest.json é sobrescrito a cada exportação — sem histórico não é
+        # possível comparar métricas entre execuções. Registra um snapshot
+        # append-only (1 linha JSON por execução) para dar rastreabilidade
+        # experimental ao longo do desenvolvimento do TCC.
+        var_pathManifestHistory = var_pathExport / "manifest_history.jsonl"
+        try:
+            with open(var_pathManifestHistory, "a", encoding="utf-8") as var_fileHistory:
+                var_fileHistory.write(json.dumps(
+                    {"timestamp": datetime.now().isoformat(), **var_dictManifest},
+                    ensure_ascii=False,
+                ) + "\n")
+        except Exception as e:
+            logger.warning(f"Falha ao registrar manifest_history.jsonl: {e}")
 
         logger.info(f"📋 Manifest salvo: {var_pathManifest}")
         logger.info(f"Total de modelos exportados: {len(var_dictManifest['models'])}")
