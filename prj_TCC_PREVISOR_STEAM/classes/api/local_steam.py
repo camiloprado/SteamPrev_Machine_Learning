@@ -142,10 +142,13 @@ class LocalClient:
                         logger.warning("API SteamSpy não retornou dados. Tentando arquivo local...")
                         logger.info("Usando arquivo JSON local como fallback...")
                         return cls._load_from_local_json()
-                    
-                    # var_listDataMesclada = cls.mesclar_dados(var_listDataNovos)  # Mescla novos dados do SteamSpy com cache existente
-                    
-                    return var_listDataNovos
+
+                    # Mescla com o cache existente em vez de devolver só os
+                    # novos/modificados — sem isso, load_app_list() sobrescreve
+                    # o cache local inteiro com esse subconjunto parcial,
+                    # descartando silenciosamente qualquer jogo que o SteamSpy
+                    # não tenha reportado como alterado neste ciclo.
+                    return cls.mesclar_dados(var_listDataNovos)
                 
                 elif var_intStatusCode == 503:
                     logger.warning("Serviço Steam temporariamente indisponível (503 Service Unavailable)")
