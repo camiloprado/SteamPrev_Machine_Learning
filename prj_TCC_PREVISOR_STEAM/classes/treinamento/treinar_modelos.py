@@ -66,16 +66,7 @@ class Treinar_Modelos:
             var_floatMelhorF1 = var_dictModelosClassificacao[var_strHorizonte][var_strMelhorModelo]['f1_macro']
             logger.info(f"MELHOR MODELO ({var_strHorizonte}): {var_strMelhorModelo} (F1-Score: {var_floatMelhorF1:.4f})")
 
-        # =====================================================================
-        # TREINA REGRESSORES DE DIAS E DE DESCONTO, POR HORIZONTE
-        # =====================================================================
-        # O regressor de desconto (profundidade esperada do desconto) é treinado
-        # DENTRO do loop por horizonte, usando o conjunto filtrado por horizonte
-        # vindo de NormalizarModelos (apenas jogos cujo desconto de fato ocorreu
-        # dentro da janela do horizonte). Antes desta correção, o regressor de
-        # desconto era treinado uma única vez com horizonte fixo "30d" e o mesmo
-        # modelo era copiado para os 3 horizontes, dando falsa impressão de
-        # diferenciação por horizonte nos arquivos .joblib salvos em disco.
+        # Treina regressores de dias e de desconto, por horizonte.
         var_dictModelosRegressaoDias = {}
         var_dictModelosRegressaoDesconto = {}
 
@@ -110,9 +101,7 @@ class Treinar_Modelos:
             var_floatMelhorRMSE = var_dictModelosRegressaoDias[var_strHorizonte][var_strMelhorRegressor]["rmse"]
             logger.info(f"MELHOR MODELO REGRESSÃO ({var_strHorizonte}): {var_strMelhorRegressor} (RMSE: {var_floatMelhorRMSE:.2f} dias)")
 
-            # -----------------------------------------------------------------
             # REGRESSORES DE DESCONTO — TREINADOS PARA ESTE HORIZONTE
-            # -----------------------------------------------------------------
             logger.info("=" * 80)
             logger.info(f"TREINANDO REGRESSORES (DESCONTO) - HORIZONTE: {var_strHorizonte}")
             logger.info("=" * 80)
@@ -240,8 +229,6 @@ class Treinar_Modelos:
                     )
 
         # As chaves reais em arg_dictModelos são "regressao_dias" e "regressao_desconto"
-        # (ver executar_treinamento -> var_dictTodosModelos). Iterar sobre as duas garante
-        # que ambos os regressores sejam persistidos em disco com nomes que os distinguem.
         for var_strTipoRegressao in ("regressao_dias", "regressao_desconto"):
             if var_strTipoRegressao not in arg_dictModelos:
                 continue

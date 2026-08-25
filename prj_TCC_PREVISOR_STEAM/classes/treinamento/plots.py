@@ -66,8 +66,7 @@ class Plots:
             # Salva PNG E mostra na tela (útil para análise imediata)
             return (True, True, var_intDpi)
 
-        # Modo padrão: salva PNG com qualidade DPI, não mostra
-        # (melhor para processamento em lote, evita bloquear execução)
+        # Padrão: salva PNG e não mostra (evita bloquear o lote).
         return (True, False, var_intDpi)
 
 

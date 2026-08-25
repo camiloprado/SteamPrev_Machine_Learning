@@ -30,8 +30,7 @@ class Metricas:
         # Calcula acurácia global: quantos acertou no total (TP+TN) dividido pelo total de amostras
         var_floatAcc = accuracy_score(arg_arrReal, arg_arrPred)
         
-        # Calcula precisão média entre as 3 classes (cai/mantem/sobe)
-        # average="macro" = trata cada classe igualmente (não importa frequência)
+        # Precisão macro: média igual entre as classes cai/mantém/sobe.
         var_floatPrecision = precision_score(arg_arrReal, arg_arrPred, average="macro", zero_division=0)
         
         # Calcula F1-score macro (balanço entre Precisão e Recall)
@@ -197,7 +196,6 @@ class Metricas:
             return
 
         # DETECÇÃO DE OVERFITTING: calcula diferença de acurácia entre treino e teste
-        # Quanto maior a diferença, mais o modelo "decorou" em vez de "aprender"
         var_floatDiferencaAcc = abs(var_dictTrain['accuracy'] - var_dictTest['accuracy'])
         
         # Classificação automática do status de overfitting

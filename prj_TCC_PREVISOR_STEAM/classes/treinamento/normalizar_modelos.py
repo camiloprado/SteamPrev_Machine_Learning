@@ -19,10 +19,7 @@ class NormalizarModelos:
     _var_dfAmostrasTemporais = None
     _var_dictSplits = None
 
-    # Janela histórica configurável via env.
-    # ML_JANELA_ANOS (int)  → número de anos de histórico usados nas features (padrão: 5).
-    # ML_JANELA_EXTENDIDA (bool) → quando True, dobra a janela para capturar ciclos mais longos.
-    # Exemplo de uso: ML_JANELA_ANOS=5 ML_JANELA_EXTENDIDA=True → janela efetiva de 10 anos.
+    # Janela histórica em anos (ML_JANELA_ANOS, padrão 5).
     _var_intAnosJanelaHistorico: int = int(os.getenv("ML_JANELA_ANOS", "5"))
     _var_boolJanelaExtendida: bool = str(os.getenv("ML_JANELA_EXTENDIDA", "False")).lower() in ("true", "1", "yes")
 
@@ -174,16 +171,16 @@ class NormalizarModelos:
             var_dictPreco = var_dictDeal.get("price", {})
             var_floatPreco = var_dictPreco.get("amount")
 
-            # Tentativas adicionais para extrair o preço de campos alternativos, caso o campo principal esteja ausente ou inválido.
+            # Tentativa extra de extrair o preço de campos alternativos.
             if var_floatPreco is None:
                 var_floatPreco = var_dictItem.get("price")
             
-            # Se o preço ainda estiver ausente, tenta extrair de um campo "new" dentro do dicionário do preço, que pode conter o valor atual em casos de desconto.
+            # Se o preço ainda estiver ausente, tenta o campo "new" (valor atual em desconto).
             if var_floatPreco is None:
                 var_floatPreco = var_dictItem.get("new")
 
             try:
-                # Converte o timestamp para epoch e o preço para float, aplicando validações para garantir que ambos sejam valores numéricos válidos.
+                # Converte timestamp para epoch e preço para float, com validação.
                 var_intTimestamp = NormalizarModelos._converter_timestamp_para_epoch(var_strTimestamp)
                 if var_intTimestamp is None:
                     continue
@@ -195,7 +192,7 @@ class NormalizarModelos:
             if var_intTimestamp <= 0 or var_floatPreco <= 0:
                 continue
 
-            # Extrai o desconto, garantindo que seja um valor numérico válido, e aplicando uma conversão para float caso seja necessário.
+            # Extrai o desconto como float numérico válido.
             var_floatDesconto = var_dictDeal.get("cut", 0)
             try:
                 var_floatDesconto = float(var_floatDesconto)
@@ -458,15 +455,9 @@ class NormalizarModelos:
                 continue
 
             # review_score não tem histórico point-in-time disponível nos dados
-            # coletados — usar o valor do snapshot atual para todas as amostras
-            # de um jogo é uma limitação de dados conhecida, não corrigível
-            # sem uma fonte de review_score histórico.
             var_floatReviewScore = pd.to_numeric(var_dictRow.get("review_score"), errors="coerce")
 
-            # Referência de censura para "mantém" no fim do histórico: o último
-            # timestamp coletado DESTE jogo, não o máximo do dataset inteiro —
-            # senão jogos com coleta mais esparsa/antiga seriam rotulados
-            # "mantém" só por falta de dado, contaminando o rótulo com ruído.
+            # Timestamp final do histórico, usado como censura do rótulo "mantém".
             var_intUltimoTimestampJogo = var_listHistorico[-1]["timestamp"]
 
             for var_intIdx in range(len(var_listHistorico) - 1):
@@ -494,12 +485,7 @@ class NormalizarModelos:
                 var_dictAmostra = {
                     "appid": var_dictRow.get("appid"),
                     "review_score": float(var_floatReviewScore) if pd.notna(var_floatReviewScore) else 0.0,
-                    # preco_catalogo replica, em treino, o que a inferência faz:
-                    # o preço "atual" no momento de referência da amostra.
-                    # Antes usava o preço do snapshot mais recente (fora do loop),
-                    # ou seja, vazava o preço "do futuro" para amostras antigas —
-                    # inflando artificialmente as métricas. var_floatPrecoAtual já
-                    # é point-in-time (desconto==0 nesse ponto, garantido acima).
+                    # preco_catalogo replica, em treino, o preço no momento de referência da amostra.
                     "preco_catalogo": var_floatPrecoAtual,
                     "preco_atual_hist": var_floatPrecoAtual,
                     **var_dictFeatures,
@@ -510,6 +496,17 @@ class NormalizarModelos:
                 }
                 var_listAmostras.append(var_dictAmostra)
                 var_intAmostrasGeradas += 1
+
+                # Logger de progresso de 0%, 25%, 50%, 75%, 100%.
+                logger.info(f"Progresso: 0%")
+                if var_intAmostrasGeradas % (len(cls._var_dfDadosTreinamento) / 4) == 0:
+                    logger.info(f"Progresso: 25%")
+                elif var_intAmostrasGeradas % (len(cls._var_dfDadosTreinamento) / 2) == 0:
+                    logger.info(f"Progresso: 50%")
+                elif var_intAmostrasGeradas % (len(cls._var_dfDadosTreinamento) * 3 / 4) == 0:
+                    logger.info(f"Progresso: 75%")
+                elif var_intAmostrasGeradas == len(cls._var_dfDadosTreinamento):
+                    logger.info(f"Progresso: 100%")
 
         cls._var_dfAmostrasTemporais = pd.DataFrame(var_listAmostras)
         if cls._var_dfAmostrasTemporais.empty:
@@ -570,12 +567,7 @@ class NormalizarModelos:
 
         var_dictMapRotulo = {"cai": 0, "mantem": 1, "sobe": 2}
 
-        # =================================================================
-        # SPLIT POR APPID — UMA VEZ PARA TODOS OS HORIZONTES
-        # =================================================================
-        # Usa o alvo "prox_evento" como base para o split, já que todas as
-        # amostras têm este alvo válido. Depois aplica o mesmo split de
-        # appids para os demais horizontes.
+        # Split por appid, compartilhado entre todos os horizontes.
         var_serGroups = var_dfDataframeCopy["appid"]
 
         try:
@@ -605,9 +597,7 @@ class NormalizarModelos:
             var_setTrainAppids = set(var_serGroups.iloc[var_arrTrainIdx].unique())
             var_setTestAppids = set(var_serGroups.iloc[var_arrTestIdx].unique())
 
-        # =================================================================
         # CLASSIFICAÇÃO — SPLITS POR HORIZONTE
-        # =================================================================
         var_dictHorizontes = {}
 
         for var_strHorizonte, var_strColunaAlvo in cls._var_dictMapHorizonteColuna.items():
@@ -649,9 +639,7 @@ class NormalizarModelos:
             var_dictDistTeste = var_serYTest.value_counts().to_dict()
             logger.info(f"  Treino: {var_dictDistTreino} | Teste: {var_dictDistTeste}")
 
-        # =================================================================
         # REGRESSÃO — SPLIT (INDEPENDENTE DE HORIZONTE)
-        # =================================================================
         var_boolRegValido = var_dfDataframeCopy["alvo_dias_ate_desconto"].notna()
         var_dfReg = var_dfDataframeCopy[var_boolRegValido]
 
@@ -667,21 +655,7 @@ class NormalizarModelos:
 
         logger.info(f"Regressão: Treino={var_dfXrTrain.shape[0]:,} amostras | Teste={var_dfXrTest.shape[0]:,} amostras")
 
-        # =================================================================
-        # REGRESSÃO — SPLITS POR HORIZONTE (30d, 60d, 90d)
-        # =================================================================
-        # Alvo "dias até desconto": capa o valor no limite do horizonte.
-        # Amostras com desconto além do horizonte recebem valor = cap.
-        #
-        # Alvo "desconto esperado" (profundidade do desconto): diferente do alvo
-        # de dias, não faz sentido "capar" um percentual de desconto. Em vez
-        # disso, FILTRA as linhas para conter apenas jogos cujo
-        # alvo_dias_ate_desconto ORIGINAL (antes do cap) seja <= ao horizonte em
-        # questão — ou seja, o regressor de desconto de 30d aprende apenas com
-        # jogos que de fato tiveram desconto dentro de 30 dias, o de 60d com
-        # jogos com desconto dentro de 60 dias, e assim por diante. Isso garante
-        # que os 3 horizontes treinem regressores de desconto genuinamente
-        # diferentes (antes, os 3 usavam exatamente o mesmo conjunto de dados).
+        # REGRESSÃO — SPLITS POR HORIZONTE (30d, 60d, 90d) — Alvo "dias até desconto": capa o valor no limite do horizonte.
         var_dictRegressaoHorizontes = {}
         var_dictMapDiasHorizonteReg = {"30d": 30, "60d": 60, "90d": 90}
 
@@ -690,9 +664,6 @@ class NormalizarModelos:
             var_serYrTestH = var_serYrTest.clip(upper=var_intDiasCap)
 
             # Filtro por linha (não por valor) para o alvo de desconto esperado.
-            # var_serYrTrain/var_serYrTest ainda não foram clipados aqui, então
-            # representam o número real de dias até o desconto (já limitado
-            # globalmente por REGRESSAO_MAX_DIAS no feature engineering).
             var_boolDescNoHorizTrain = var_serYrTrain <= var_intDiasCap
             var_boolDescNoHorizTest = var_serYrTest <= var_intDiasCap
 
@@ -701,10 +672,7 @@ class NormalizarModelos:
             var_serYrDescTrainH = var_serYrDescTrain[var_boolDescNoHorizTrain]
             var_serYrDescTestH = var_serYrDescTest[var_boolDescNoHorizTest]
 
-            # Salvaguarda: se o filtro por horizonte esvaziar o conjunto (ex.: poucos
-            # jogos com desconto dentro de uma janela muito curta), cai de volta para
-            # o conjunto de regressão completo (comportamento anterior) em vez de
-            # treinar com um conjunto vazio.
+            # Fallback se o filtro por horizonte esvaziar o conjunto de desconto.
             if var_dfXrDescTrainH.empty or var_dfXrDescTestH.empty:
                 logger.warning(
                     f"Horizonte '{var_strHorizReg}': filtro de desconto por horizonte resultou em "
@@ -732,9 +700,7 @@ class NormalizarModelos:
                 f"desconto_treino={var_dfXrDescTrainH.shape[0]:,} | desconto_teste={var_dfXrDescTestH.shape[0]:,}"
             )
 
-        # =================================================================
         # CACHE FINAL
-        # =================================================================
         cls._var_dictSplits = {
             "horizontes": var_dictHorizontes,
             "regressao": {
@@ -789,10 +755,7 @@ class NormalizarModelos:
             "Xr_test": var_dictRegressao["Xr_test"],
             "yr_train": var_dictRegressao["yr_train"],
             "yr_test": var_dictRegressao["yr_test"],
-            # Xr_desc_train/Xr_desc_test contêm apenas as linhas cujo desconto ocorreu
-            # dentro do horizonte (ver _preparar_todos_splits). Quando o split de
-            # regressão usado for o fallback horizonte-independente (sem essas chaves),
-            # cai de volta para Xr_train/Xr_test (comportamento anterior à correção).
+            # Splits de desconto: só linhas cujo desconto caiu no horizonte.
             "Xr_desc_train": var_dictRegressao.get("Xr_desc_train", var_dictRegressao["Xr_train"]),
             "Xr_desc_test": var_dictRegressao.get("Xr_desc_test", var_dictRegressao["Xr_test"]),
             "yr_desc_train": var_dictRegressao["yr_desc_train"],

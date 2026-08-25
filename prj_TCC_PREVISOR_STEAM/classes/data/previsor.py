@@ -51,8 +51,7 @@ class Previsor:
             # Carregamento de teste de carga
             var_intAmbiente = os.getenv("AMBIENTE", "PRD").upper()
 
-            # Busca apenas AppIDs não processados (LEFT JOIN no banco)
-            # Já aplica filtro de divisão de trabalho entre PCs
+            # Busca apenas AppIDs não processados (LEFT JOIN no banco) — Já aplica filtro de divisão de trabalho entre PCs
             logger.info("Consultando AppIDs não processados...")
             var_listAppIDParaProcessar = PostgreSQLSteam.buscar_appids_nao_processados_otimizado(
                 arg_intPcId=var_intPcId,

@@ -101,9 +101,6 @@ class ExportarModelos:
             "github_repo": "camiloprado/SteamPrev_Machine_Learning",
             "models": {},
             # Contrato de saída: como a extensão deve interpretar cada modelo.
-            # Sem isso, quem consome o .joblib não tem como saber a ordem das
-            # classes nem a escala do desconto — precisa ser descoberto lendo
-            # o código de treinamento, o que não deveria ser necessário.
             "output_contract": {
                 "classificacao": {
                     "classes_ordem": ["cai", "mantem", "sobe"],
@@ -137,9 +134,7 @@ class ExportarModelos:
         var_strMelhorHorizonteGlobal = None
         var_strMelhorAlgoGlobal = None
 
-        # =====================================================================
         # CLASSIFICAÇÃO — Seleciona melhor modelo por horizonte (F1-macro)
-        # =====================================================================
         if "classificacao" in arg_dictModelos:
             for var_strHorizonte, var_dictAlgos in arg_dictModelos["classificacao"].items():
                 # Encontra o melhor algoritmo para este horizonte
@@ -187,9 +182,7 @@ class ExportarModelos:
                     var_strMelhorHorizonteGlobal = var_strHorizonte
                     var_strMelhorAlgoGlobal = var_strMelhorAlgo
 
-        # =====================================================================
         # MODELO LATEST — Alias para o melhor classificador geral
-        # =====================================================================
         if var_strMelhorHorizonteGlobal is not None:
             var_strNomeFonte = f"modelo_classificacao_{var_strMelhorHorizonteGlobal}.joblib"
             var_pathFonte = var_pathExport / var_strNomeFonte
@@ -213,9 +206,7 @@ class ExportarModelos:
                 f"({var_strMelhorAlgoGlobal}, F1: {var_floatMelhorF1Global:.4f})"
             )
 
-        # =====================================================================
         # REGRESSÃO — Seleciona melhor modelo por horizonte (menor RMSE)
-        # =====================================================================
         for var_strRegType in ["regressao_dias", "regressao_desconto"]:
             if var_strRegType in arg_dictModelos:
                 for var_strHorizonte, var_dictAlgos in arg_dictModelos[var_strRegType].items():
@@ -258,17 +249,12 @@ class ExportarModelos:
                         f"(Algoritmo: {var_strMelhorAlgoReg}, RMSE: {var_floatMelhorRMSE:.2f} {var_strMetricName})"
                     )
 
-        # =====================================================================
         # MANIFEST — Salva metadados da exportação
-        # =====================================================================
         var_pathManifest = var_pathExport / "manifest.json"
         with open(var_pathManifest, "w", encoding="utf-8") as var_fileManifest:
             json.dump(var_dictManifest, var_fileManifest, indent=2, ensure_ascii=False)
 
-        # manifest.json é sobrescrito a cada exportação — sem histórico não é
-        # possível comparar métricas entre execuções. Registra um snapshot
-        # append-only (1 linha JSON por execução) para dar rastreabilidade
-        # experimental ao longo do desenvolvimento do TCC.
+        # Snapshot append-only do manifest para histórico entre exportações.
         var_pathManifestHistory = var_pathExport / "manifest_history.jsonl"
         try:
             with open(var_pathManifestHistory, "a", encoding="utf-8") as var_fileHistory:
@@ -285,11 +271,7 @@ class ExportarModelos:
         logger.info("EXPORTAÇÃO CONCLUÍDA COM SUCESSO")
         logger.info("=" * 60)
 
-        # =====================================================================
-        # PUBLICAÇÃO AUTOMÁTICA NO GITHUB RELEASES
-        # Ativada por ML_AUTO_PUBLISH=True no .env (ou variável de ambiente).
-        # Requer também GITHUB_TOKEN configurado.
-        # =====================================================================
+        # Publicação automática no GitHub Releases (ML_AUTO_PUBLISH=True).
         var_boolAutoPublish = str(os.getenv("ML_AUTO_PUBLISH", "False")).lower() in ("true", "1", "yes")
         if var_boolAutoPublish:
             try:
@@ -345,9 +327,6 @@ if __name__ == "__main__":
         sys.exit(1)
 
     # Constrói dict simulado com modelos _latest (sem métricas reais).
-    # As chaves aqui precisam bater exatamente com o que ExportarModelos.exportar()
-    # espera e com o que Treinar_Modelos._salvar_modelos() efetivamente grava em disco:
-    # "classificacao", "regressao_dias" e "regressao_desconto".
     var_dictModelos: dict = {"classificacao": {}, "regressao_dias": {}, "regressao_desconto": {}}
     var_listHorizontes = ["30d", "60d", "90d"]
     var_listAlgosClass = ["LightGBM", "XGBoost", "RandomForest"]

@@ -26,7 +26,6 @@ class GetTask:
 
         try:
             # Atualiza o índice de apps a partir da Steam/SteamSpy e persiste em steam_generico.
-            # Este passo ocorre uma única vez por sessão, na inicialização.
             try:
                 var_listDados = LocalClient.find_app_list()
                 PostgreSQLSteam.inserir_dadosSteamGenerico(arg_listDadosGerais=var_listDados)
@@ -36,8 +35,7 @@ class GetTask:
                 # Fallback: carrega do arquivo local sem atualizar o banco
                 LocalClient.load_app_list()
 
-            # Insere 1 item genérico na fila. O Loop o consumirá e delegará
-            # a execução do pipeline completo para Process.execute().
+            # Insere 1 item na fila; o Loop consome e executa o pipeline.
             cls._var_listTaskQueue = [1]
             logger.info("Fila de tarefas criada com sucesso. 1 tarefa agendada.")
 

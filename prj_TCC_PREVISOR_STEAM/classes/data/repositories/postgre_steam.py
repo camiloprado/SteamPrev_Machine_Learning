@@ -157,9 +157,7 @@ class PostgreSQLSteam(PostgreSQL):
                 logger.info("Nenhum dado dos fornecidos precisa ser atualizado.")
                 return False
             
-            # Insere/atualiza em lotes de 5000, em batch (execute_batch) em vez
-            # de 1 INSERT por registro — mesmo padrão já usado mais abaixo
-            # neste arquivo para steam_generico (linha ~112).
+            # Insere/atualiza em lotes de 5000 via execute_batch.
             var_strSQL = """
             INSERT INTO steam_generico (appid, name, ultima_atualizacao)
             VALUES (%s, %s, %s)
@@ -407,8 +405,7 @@ class PostgreSQLSteam(PostgreSQL):
         try:
             logger.info(f"Buscando AppIDs não processados (PC {arg_intPcId}/{arg_intTotalPcs})...")
             
-            # faz LEFT JOIN direto no banco
-            # Retorna apenas AppIDs que NÃO existem em steam_raw
+            # faz LEFT JOIN direto no banco — Retorna apenas AppIDs que NÃO existem em steam_raw
             var_strSQL = """
             SELECT sg.appid 
             FROM steam_generico sg
@@ -419,9 +416,7 @@ class PostgreSQLSteam(PostgreSQL):
             # Aplica filtro de divisão de trabalho entre PCs (se aplicável)
             var_listParams = []
             if arg_intTotalPcs > 1:
-                # MOD(appid, total_pcs) = (pc_id - 1)
-                # PC 1: MOD(appid, 2) = 0 (pares)
-                # PC 2: MOD(appid, 2) = 1 (ímpares)
+                # MOD(appid, total_pcs) = (pc_id - 1) — PC 1: MOD(appid, 2) = 0 (pares)
                 var_strSQL += " AND MOD(sg.appid, %s) = %s"
                 var_listParams.extend([arg_intTotalPcs, arg_intPcId - 1])
 

@@ -15,16 +15,18 @@ logger = logging.getLogger("itad")
 ITAD_HISTORY_URL = "https://api.isthereanydeal.com/games/history/v2"
 ITAD_LOOKUP_IDS_URL = "https://api.isthereanydeal.com/games/lookup/v1"
 
-# Valor padrão (imutável) de backoff base, usado apenas quando nenhuma configuração
-# específica é fornecida. O valor efetivo é sempre passado explicitamente como
-# parâmetro através das chamadas (nunca como atributo de classe mutável), para que
-# chamadas concorrentes (ex.: asyncio.gather com lookup_itad_ids_batched e
-# fetch_price_history_bulk_batched) não sobrescrevam a configuração uma da outra.
+# Backoff base padrão, usado quando a configuração de retry não está definida.
 CON_DEFAULT_RETRY_BACKOFF_BASE = 0
 
 class ITADClient:
     """
     Cliente para interagir com a Is There Any Deal API.
+
+    Métodos:
+    - lookup_itad_ids_batched: Realiza lookup de IDs na API do IsThereAnyDeal (ITAD) de forma assíncrona, processando em batches.
+    - lookup_itad_ids: Realiza lookup de IDs na API do IsThereAnyDeal (ITAD) de forma assíncrona.
+    - fetch_price_history_bulk_batched: Busca o histórico de preços de múltiplos jogos na API do IsThereAnyDeal (ITAD) de forma assíncrona, processando em batches.
+    - fetch_price_history_bulk: Busca o histórico de preços de múltiplos jogos na API do IsThereAnyDeal (ITAD) de forma assíncrona.
     """
     _var_intDelayBetweenBatches = 0
     _var_intProcessados = 0
@@ -284,8 +286,7 @@ class ITADClient:
                         var_intErrosOutros += 1
                         return (arg_intAppid, None)
             
-            # Executa os workers assíncronos
-            # Configuração do connector para evitar ConnectionResetError no Windows
+            # Executa os workers assíncronos — Configuração do connector para evitar ConnectionResetError no Windows
             var_connector = aiohttp.TCPConnector(
                 limit=50,
                 limit_per_host=10,
@@ -592,8 +593,7 @@ class ITADClient:
                         logger.error(f"Erro não classificado: {err}")
                         return None
 
-            # Executa os workers assíncronos
-            # Configuração do connector para evitar ConnectionResetError no Windows
+            # Executa os workers assíncronos — Configuração do connector para evitar ConnectionResetError no Windows
             var_connector = aiohttp.TCPConnector(
                 limit=50,
                 limit_per_host=10,

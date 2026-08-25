@@ -21,11 +21,7 @@ CON_DEFAULT_HEADERS = {
 STEAM_DETAILS_URL = "https://store.steampowered.com/api/appdetails"
 STEAM_REVIEWS_URL = "https://store.steampowered.com/appreviews/{appid}"
 
-# Valor padrão (imutável) de backoff base, usado apenas quando nenhuma configuração
-# específica é fornecida. O valor efetivo é sempre passado explicitamente como
-# parâmetro através das chamadas (nunca como atributo de classe mutável), para que
-# chamadas concorrentes (ex.: asyncio.gather com fetch_details_bulk_batched e
-# fetch_reviews_summary_batched) não sobrescrevam a configuração uma da outra.
+# Backoff base padrão, usado quando a configuração de retry não está definida.
 CON_DEFAULT_RETRY_BACKOFF_BASE = 0
 
 class SteamClient:
@@ -481,8 +477,7 @@ class SteamClient:
                         var_intErrosOutros += 1
                         return None
 
-            # Executa os workers assíncronos
-            # Configuração do connector para evitar ConnectionResetError no Windows
+            # Executa os workers assíncronos — Configuração do connector para evitar ConnectionResetError no Windows
             var_connector = aiohttp.TCPConnector(
                 limit=100,  # Limite de conexões simultâneas
                 limit_per_host=20,  # Limite por host
@@ -799,8 +794,7 @@ class SteamClient:
                         var_intErrosOutros += 1
                         return None
 
-            # Executa os workers assíncronos
-            # Configuração do connector para evitar ConnectionResetError no Windows
+            # Executa os workers assíncronos — Configuração do connector para evitar ConnectionResetError no Windows
             var_connector = aiohttp.TCPConnector(
                 limit=100,
                 limit_per_host=20,

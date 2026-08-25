@@ -35,10 +35,7 @@ class SteamSpyClient:
             var_boolLoopEmExecucao = False
 
         if var_boolLoopEmExecucao:
-            # Se estamos dentro de um loop async, não podemos usar asyncio.run() nem
-            # retornar uma Task não aguardada (quem chama espera uma list, não uma
-            # Task/Future, o que quebraria checagens como "if not var_listDataNovos").
-            # Falha explicitamente em vez de devolver um valor do tipo errado.
+            # Dentro de um loop async já ativo, asyncio.run() não pode ser usado.
             raise RuntimeError(
                 "_fetch_from_steamspy() não pode ser chamado de dentro de um loop "
                 "async já em execução. Use 'await SteamSpyClient._fetch_from_steamspy_async()' "

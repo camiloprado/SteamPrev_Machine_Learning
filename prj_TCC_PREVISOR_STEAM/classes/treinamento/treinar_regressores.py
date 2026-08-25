@@ -21,23 +21,17 @@ class TreinarRegressores:
         Retorna:
         - dict: Dicionário contendo o modelo treinado, RMSE e tamanhos dos conjuntos de treino e teste.
         """
-        # Obtém dados normalizados: X_train, X_test, y_train, y_test
-        # Xr_train = features de REGRESSÃO no treino (r = regressão)
-        # yr_train = alvo de REGRESSÃO no treino (dias até desconto)
+        # Obtém splits normalizados (Xr_* = features de regressão).
         var_dictSplits = NormalizarModelos._obter_splits(arg_strHorizonte)
 
         # Instancia modelo de regressão linear vazio
         var_objModelo = LinearRegression()
 
-        # Resolve X e y corretos ANTES do treino. Para o alvo "desconto", usa o conjunto
-        # filtrado por horizonte (Xr_desc_train/Xr_desc_test), que contém apenas jogos cujo
-        # desconto de fato ocorreu dentro da janela do horizonte — diferente do alvo "dias",
-        # que usa o conjunto de regressão completo (Xr_train/Xr_test) com o valor capado.
+        # Usa splits de desconto quando o alvo não é "dias".
         var_dfXTrain = var_dictSplits["Xr_train"] if arg_strAlvo == "dias" else var_dictSplits["Xr_desc_train"]
         var_dfXTest = var_dictSplits["Xr_test"] if arg_strAlvo == "dias" else var_dictSplits["Xr_desc_test"]
 
-        # TREINA: ajusta os pesos do modelo aos dados de treino
-        # O modelo encontra: y = a0 + a1*x1 + a2*x2 + ... + an*xn (reta multidimensional)
+        # TREINA: ajusta os pesos do modelo aos dados de treino.
         var_serYTrain = var_dictSplits["yr_train"] if arg_strAlvo == "dias" else var_dictSplits["yr_desc_train"]
         var_serYTest = var_dictSplits["yr_test"] if arg_strAlvo == "dias" else var_dictSplits["yr_desc_test"]
         var_objModelo.fit(var_dfXTrain, var_serYTrain)
@@ -128,9 +122,7 @@ class TreinarRegressores:
             random_state=42,            # Reprodutibilidade
         )
 
-        # Resolve X e y corretos ANTES do try/except. Para o alvo "desconto", usa o
-        # conjunto filtrado por horizonte (Xr_desc_train/Xr_desc_test), que contém
-        # apenas jogos cujo desconto de fato ocorreu dentro da janela do horizonte.
+        # Usa splits de desconto quando o alvo não é "dias".
         var_dfXTrain = var_dictSplits["Xr_train"] if arg_strAlvo == "dias" else var_dictSplits["Xr_desc_train"]
         var_dfXTest = var_dictSplits["Xr_test"] if arg_strAlvo == "dias" else var_dictSplits["Xr_desc_test"]
         var_serYTrain = var_dictSplits["yr_train"] if arg_strAlvo == "dias" else var_dictSplits["yr_desc_train"]
@@ -232,9 +224,7 @@ class TreinarRegressores:
             verbose=-1,                 # Silencioso
         )
 
-        # Resolve X e y corretos ANTES do try/except. Para o alvo "desconto", usa o
-        # conjunto filtrado por horizonte (Xr_desc_train/Xr_desc_test), que contém
-        # apenas jogos cujo desconto de fato ocorreu dentro da janela do horizonte.
+        # Usa splits de desconto quando o alvo não é "dias".
         var_dfXTrain = var_dictSplits["Xr_train"] if arg_strAlvo == "dias" else var_dictSplits["Xr_desc_train"]
         var_dfXTest = var_dictSplits["Xr_test"] if arg_strAlvo == "dias" else var_dictSplits["Xr_desc_test"]
         var_serYTrain = var_dictSplits["yr_train"] if arg_strAlvo == "dias" else var_dictSplits["yr_desc_train"]

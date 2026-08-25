@@ -402,9 +402,7 @@ class PostgreSQLITAD(PostgreSQL):
         """
         var_connConnection = cls.conectar()
         try:
-            # Uma única query em batch (WHERE appid = ANY(%s)) em vez de 1 SELECT
-            # por AppID — evita milhares de round-trips ao Postgres por lote
-            # (RANGE_PROCESSAMENTO_ITAD_RAW pode chegar a 80.000 AppIDs).
+            # Uma única query em batch (WHERE appid = ANY(%s)).
             var_strSQL = """
             SELECT appid, id_itad FROM steam_itad_mapping WHERE appid = ANY(%s);
             """
@@ -412,8 +410,7 @@ class PostgreSQLITAD(PostgreSQL):
                 cursor.execute(var_strSQL, (list(arg_listAppids),))
                 var_dictMapaAppidParaItad = {row[0]: row[1] for row in cursor.fetchall()}
 
-            # Preserva o contrato original: um yield por AppID de entrada, na
-            # mesma ordem, com None para os que não têm mapeamento ITAD.
+            # Um yield por AppID de entrada, na mesma ordem.
             for var_intAppid in arg_listAppids:
                 yield var_dictMapaAppidParaItad.get(var_intAppid)
         except Exception as e:

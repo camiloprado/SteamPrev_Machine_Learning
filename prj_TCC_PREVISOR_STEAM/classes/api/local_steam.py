@@ -17,7 +17,6 @@ CON_DEFAULT_HEADERS = {
 }
 
 # STEAM_APP_LIST_URL API DESCONTINUADA PELA VALVE (404 desde Nov/2024)
-# Usando arquivo JSON local steam_applist.json com dados históricos
 STEAM_APP_LIST_URL_DEPRECATED = "https://api.steampowered.com/ISteamApps/GetAppList/v2/"
 
 class LocalClient:
@@ -143,11 +142,7 @@ class LocalClient:
                         logger.info("Usando arquivo JSON local como fallback...")
                         return cls._load_from_local_json()
 
-                    # Mescla com o cache existente em vez de devolver só os
-                    # novos/modificados — sem isso, load_app_list() sobrescreve
-                    # o cache local inteiro com esse subconjunto parcial,
-                    # descartando silenciosamente qualquer jogo que o SteamSpy
-                    # não tenha reportado como alterado neste ciclo.
+                    # Mescla o delta com o cache; senão load_app_list() sobrescreve o arquivo.
                     return cls.mesclar_dados(var_listDataNovos)
                 
                 elif var_intStatusCode == 503:

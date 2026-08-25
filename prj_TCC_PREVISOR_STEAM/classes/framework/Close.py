@@ -15,9 +15,6 @@ class Close:
     """
 
     # O connection pool agora é sempre único e compartilhado na classe base
-    # PostgreSQL (ver postgre_generico.py:_init_pool). O laço abaixo ainda
-    # itera todas as subclasses por segurança/histórico, mas na prática só
-    # PostgreSQL.__dict__ terá um pool próprio para fechar.
     _var_listRepositorios = [
         PostgreSQL,
         PostgreSQLSteam,
@@ -37,8 +34,6 @@ class Close:
         for var_intTentativa in range(Settings._var_dictSettings["max_tentativas"]):
             try:
                 # Devolve a conexão em uso (se houver) e encerra definitivamente
-                # o connection pool de cada repositório PostgreSQL, liberando os
-                # recursos do banco de dados antes do encerramento da aplicação.
                 for var_classRepositorio in cls._var_listRepositorios:
                     var_classRepositorio.desconectar()
 

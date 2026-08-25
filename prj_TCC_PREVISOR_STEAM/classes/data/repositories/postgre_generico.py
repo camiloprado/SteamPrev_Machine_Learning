@@ -5,10 +5,7 @@ import logging
 
 logger = logging.getLogger("db.core")
 
-# Allowlist de nomes de tabelas conhecidas do projeto. Usada para validar
-# arg_strNomeTabela antes de interpolar via f-string em SQL (nomes de tabela
-# não podem ser parametrizados com %s/psycopg2), evitando SQL injection caso
-# esse parâmetro venha de uma fonte não totalmente confiável.
+# Allowlist de tabelas conhecidas, usada para validar SQL dinâmico.
 CON_TABELAS_VALIDAS = frozenset({
     "steam_generico",
     "steam_raw",
