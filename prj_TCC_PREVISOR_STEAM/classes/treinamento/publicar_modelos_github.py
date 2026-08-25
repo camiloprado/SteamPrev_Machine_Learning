@@ -346,10 +346,11 @@ def publicar_modelos(arg_pathExport: Path | None = None, arg_strRepo: str | None
     ])
     var_strBody = "\n".join(var_listLinhasBody)
 
-    # ── Listar arquivos ──
+    # ── Listar arquivos do manifest (ignora joblibs antigos na pasta) ──
+    var_setNomesPermitidos = set(var_dictManifest.get("models", {}).keys()) | {"manifest.json"}
     var_listArquivos = sorted([
         var_pathCaminho for var_pathCaminho in var_pathExport.iterdir()
-        if var_pathCaminho.suffix in CON_SET_EXTENSOES_ASSET and var_pathCaminho.is_file()
+        if var_pathCaminho.is_file() and var_pathCaminho.name in var_setNomesPermitidos
     ])
 
     if not var_listArquivos:
@@ -404,7 +405,8 @@ def publicar_modelos(arg_pathExport: Path | None = None, arg_strRepo: str | None
 
     # ── Upload assets ──
     logger.info(f"\n Iniciando upload de {len(var_listArquivos)} arquivos...")
-    var_intSucesso = 0
+    var_intEnviados = 0
+    var_intIgnorados = 0
     var_intFalha = 0
 
     for var_pathArquivo in var_listArquivos:
@@ -413,7 +415,7 @@ def publicar_modelos(arg_pathExport: Path | None = None, arg_strRepo: str | None
         # Pula se já existe e não está forçando
         if var_strNomeArquivo in var_dictAssetsExistentes and not arg_boolForce:
             logger.info(f"   {var_strNomeArquivo} — já existe (use --force para re-upload)")
-            var_intSucesso += 1
+            var_intIgnorados += 1
             continue
 
         # Remove asset existente antes de re-upload
@@ -441,7 +443,7 @@ def publicar_modelos(arg_pathExport: Path | None = None, arg_strRepo: str | None
                 time.sleep(5)
 
         if var_boolOk:
-            var_intSucesso += 1
+            var_intEnviados += 1
         else:
             var_intFalha += 1
             logger.error(f"  Falha definitiva no upload de {var_strNomeArquivo}")
@@ -449,12 +451,16 @@ def publicar_modelos(arg_pathExport: Path | None = None, arg_strRepo: str | None
     # ── Resultado ──
     logger.info("=" * 60)
     if var_intFalha == 0:
-        logger.info(f" PUBLICAÇÃO CONCLUÍDA — {var_intSucesso} assets enviados com sucesso.")
+        logger.info(
+            f" PUBLICAÇÃO CONCLUÍDA — {var_intEnviados} enviados, "
+            f"{var_intIgnorados} já existiam e foram mantidos."
+        )
         logger.info(f"   Release: {var_dictRelease['html_url']}")
         return True
     else:
         logger.warning(
-            f" PUBLICAÇÃO PARCIAL — {var_intSucesso} enviados, {var_intFalha} com falha."
+            f" PUBLICAÇÃO PARCIAL — {var_intEnviados} enviados, "
+            f"{var_intIgnorados} mantidos, {var_intFalha} com falha."
         )
         logger.info(f"   Release: {var_dictRelease['html_url']}")
         return False

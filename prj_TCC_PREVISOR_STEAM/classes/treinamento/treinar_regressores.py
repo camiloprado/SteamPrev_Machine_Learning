@@ -114,12 +114,13 @@ class TreinarRegressores:
 
         # Instancia XGBoost para regressão (saída contínua) usando Pseudo Huber Loss
         var_objModelo = xgb.XGBRegressor(
-            n_estimators=300,           # 300 iterações de boosting
-            learning_rate=0.05,         # Aprendizado conservador
-            max_depth=8,                # Árvores rasas para evitar overfitting
-            subsample=0.9,              # Usa 90% das amostras
-            colsample_bytree=0.9,       # Usa 90% das features
-            random_state=42,            # Reprodutibilidade
+            n_estimators=300,         # 300 iterações de boosting
+            learning_rate=0.05,       # Taxa de aprendizado
+            max_depth=8,              # Profundidade máxima das árvores
+            subsample=0.9,            # Fração de amostras para treinar cada árvore
+            colsample_bytree=0.9,     # Fração de features para treinar cada árvore
+            random_state=42,          # Reprodutibilidade para garantir a mesma aleatoriedade
+            early_stopping_rounds=50, # Early stopping para evitar overfitting
         )
 
         # Usa splits de desconto quando o alvo não é "dias".
@@ -128,17 +129,12 @@ class TreinarRegressores:
         var_serYTrain = var_dictSplits["yr_train"] if arg_strAlvo == "dias" else var_dictSplits["yr_desc_train"]
         var_serYTest = var_dictSplits["yr_test"] if arg_strAlvo == "dias" else var_dictSplits["yr_desc_test"]
 
-        # TREINA com early stopping
-        try:
-            var_objModelo.fit(
-                var_dfXTrain,
-                var_serYTrain,
-                eval_set=[(var_dfXTest, var_serYTest)],
-                verbose=False,
-                early_stopping_rounds=50,
-            )
-        except TypeError:
-            var_objModelo.fit(var_dfXTrain, var_serYTrain)
+        var_objModelo.fit(
+            var_dfXTrain,
+            var_serYTrain,
+            eval_set=[(var_dfXTest, var_serYTest)],
+            verbose=False,
+        )
 
         # PREDIZ no treino e teste
         var_arrPredTrain = var_objModelo.predict(var_dfXTrain)

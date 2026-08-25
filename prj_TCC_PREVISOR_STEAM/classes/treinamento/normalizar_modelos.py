@@ -49,28 +49,29 @@ class NormalizarModelos:
             logger.warning("Sem amostras para registrar estatísticas de treinamento.")
             return
 
-        var_strAlvo = "alvo_direcao_preco"
         var_intQtdExemplos = len(arg_dfAmostras)
         logger.info(f"Quantidade de exemplos: {var_intQtdExemplos:,}")
+        logger.info("Tipo de Classe: Discreta (cai / mantem / sobe)")
 
-        if var_strAlvo in arg_dfAmostras.columns:
-            logger.info("Tipo de Classe: Discreta")
-
-            var_serDistribuicao = arg_dfAmostras[var_strAlvo].value_counts(dropna=False)
-            var_dictDistribuicao = var_serDistribuicao.to_dict()
-            logger.info(f"Distribuição de Classe: {var_dictDistribuicao}")
-
+        for var_strHorizonte, var_strColuna in cls._var_dictMapHorizonteColuna.items():
+            if var_strColuna not in arg_dfAmostras.columns:
+                continue
+            var_serDistribuicao = arg_dfAmostras[var_strColuna].value_counts(dropna=False)
+            logger.info(f"Distribuição de classe ({var_strHorizonte}): {var_serDistribuicao.to_dict()}")
             if not var_serDistribuicao.empty:
-                var_strClasseMajoritaria = str(var_serDistribuicao.idxmax())
-                var_strClasseMinoritara = str(var_serDistribuicao.idxmin())
-                logger.info(f"Classe Majoritária: {var_strClasseMajoritaria} ({int(var_serDistribuicao.max()):,} exemplos)")
-                logger.info(f"Classe Minoritária: {var_strClasseMinoritara} ({int(var_serDistribuicao.min()):,} exemplos)")
-
-                # Baseline que sempre prediz a classe majoritária.
                 var_floatErroMajoritario = 1.0 - (float(var_serDistribuicao.max()) / float(var_intQtdExemplos))
-                logger.info(f"Erro Majoritário: {var_floatErroMajoritario:.4f}")
-        else:
-            logger.warning("Coluna alvo_direcao_preco não encontrada para cálculo da distribuição de classe.")
+                logger.info(
+                    f"  Majoritária: {var_serDistribuicao.idxmax()} ({int(var_serDistribuicao.max()):,}) | "
+                    f"Minoritária: {var_serDistribuicao.idxmin()} ({int(var_serDistribuicao.min()):,}) | "
+                    f"Erro majoritário: {var_floatErroMajoritario:.4f}"
+                )
+
+        if "alvo_direcao_preco" in arg_dfAmostras.columns:
+            var_serProxEvento = arg_dfAmostras["alvo_direcao_preco"].value_counts(dropna=False)
+            logger.info(
+                f"Distribuição próximo evento (não é o alvo dos classificadores 30/60/90d): "
+                f"{var_serProxEvento.to_dict()}"
+            )
 
         if not arg_listFeatures:
             logger.warning("Lista de atributos vazia; não foi possível inferir tipo de atributos.")
@@ -448,72 +449,67 @@ class NormalizarModelos:
         var_listDiasHorizonte = [30, 60, 90]
         var_intAmostrasDescartadas = 0
         var_intAmostrasGeradas = 0
+        var_intTotalJogos = len(cls._var_dfDadosTreinamento)
+        var_setMarcosLogados = set()
+        logger.info(f"Progresso: 0% — 0/{var_intTotalJogos:,} jogos")
 
-        for _, var_dictRow in cls._var_dfDadosTreinamento.iterrows():
+        for var_intIdxJogo, (_, var_dictRow) in enumerate(cls._var_dfDadosTreinamento.iterrows(), start=1):
             var_listHistorico = cls._separar_historico(var_dictRow.get("historico_preco"))
-            if len(var_listHistorico) < 2:
-                continue
+            if len(var_listHistorico) >= 2:
+                var_floatReviewScore = pd.to_numeric(var_dictRow.get("review_score"), errors="coerce")
+                var_intUltimoTimestampJogo = var_listHistorico[-1]["timestamp"]
 
-            # review_score não tem histórico point-in-time disponível nos dados
-            var_floatReviewScore = pd.to_numeric(var_dictRow.get("review_score"), errors="coerce")
+                for var_intIdx in range(len(var_listHistorico) - 1):
+                    var_dictAtual = var_listHistorico[var_intIdx]
+                    if var_dictAtual.get("desconto", 0.0) > 0.0:
+                        var_intAmostrasDescartadas += 1
+                        continue
 
-            # Timestamp final do histórico, usado como censura do rótulo "mantém".
-            var_intUltimoTimestampJogo = var_listHistorico[-1]["timestamp"]
+                    var_intTimestampAtual = var_dictAtual["timestamp"]
+                    var_floatPrecoAtual = var_dictAtual["preco"]
+                    if var_floatPrecoAtual <= 0.0:
+                        continue
 
-            for var_intIdx in range(len(var_listHistorico) - 1):
-                var_dictAtual = var_listHistorico[var_intIdx]
-                if var_dictAtual.get("desconto", 0.0) > 0.0:
-                    var_intAmostrasDescartadas += 1
-                    continue
+                    var_intTimestampLimite = var_intTimestampAtual - var_intSegundosJanela
+                    var_listJanela = [
+                        var_dictItem for var_dictItem in var_listHistorico[:var_intIdx + 1]
+                        if var_dictItem["timestamp"] >= var_intTimestampLimite
+                    ]
 
-                var_intTimestampAtual = var_dictAtual["timestamp"]
-                var_floatPrecoAtual = var_dictAtual["preco"]
-                if var_floatPrecoAtual <= 0.0:
-                    continue
+                    var_strDirecaoProxEvento = cls._extrair_alvo_proximo_evento(var_dictAtual, var_listHistorico, var_intIdx, var_floatThreshold)
+                    var_dictAlvosHorizonte = cls._extrair_alvos_horizonte(var_intTimestampAtual, var_floatPrecoAtual, var_listHistorico, var_intIdx, var_listDiasHorizonte, var_intUltimoTimestampJogo, var_floatThreshold)
+                    var_intDiasProxDesconto, var_floatDescontoEsperado = cls._extrair_alvos_regressao(var_intTimestampAtual, var_listHistorico, var_intIdx)
+                    var_dictFeatures = cls._extrair_features(var_intTimestampAtual, var_floatPrecoAtual, var_listJanela, var_listHistorico, var_intIdx)
 
-                var_intTimestampLimite = var_intTimestampAtual - var_intSegundosJanela
-                var_listJanela = [
-                    var_dictItem for var_dictItem in var_listHistorico[:var_intIdx + 1]
-                    if var_dictItem["timestamp"] >= var_intTimestampLimite
-                ]
+                    var_dictAmostra = {
+                        "appid": var_dictRow.get("appid"),
+                        "review_score": float(var_floatReviewScore) if pd.notna(var_floatReviewScore) else 0.0,
+                        "preco_catalogo": var_floatPrecoAtual,
+                        "preco_atual_hist": var_floatPrecoAtual,
+                        **var_dictFeatures,
+                        "alvo_direcao_preco": var_strDirecaoProxEvento,
+                        "alvo_dias_ate_desconto": var_intDiasProxDesconto,
+                        "alvo_desconto_esperado": var_floatDescontoEsperado,
+                        **var_dictAlvosHorizonte,
+                    }
+                    var_listAmostras.append(var_dictAmostra)
+                    var_intAmostrasGeradas += 1
 
-                var_strDirecaoProxEvento = cls._extrair_alvo_proximo_evento(var_dictAtual, var_listHistorico, var_intIdx, var_floatThreshold)
-                var_dictAlvosHorizonte = cls._extrair_alvos_horizonte(var_intTimestampAtual, var_floatPrecoAtual, var_listHistorico, var_intIdx, var_listDiasHorizonte, var_intUltimoTimestampJogo, var_floatThreshold)
-                var_intDiasProxDesconto, var_floatDescontoEsperado = cls._extrair_alvos_regressao(var_intTimestampAtual, var_listHistorico, var_intIdx)
-                var_dictFeatures = cls._extrair_features(var_intTimestampAtual, var_floatPrecoAtual, var_listJanela, var_listHistorico, var_intIdx)
-
-                var_dictAmostra = {
-                    "appid": var_dictRow.get("appid"),
-                    "review_score": float(var_floatReviewScore) if pd.notna(var_floatReviewScore) else 0.0,
-                    # preco_catalogo replica, em treino, o preço no momento de referência da amostra.
-                    "preco_catalogo": var_floatPrecoAtual,
-                    "preco_atual_hist": var_floatPrecoAtual,
-                    **var_dictFeatures,
-                    "alvo_direcao_preco": var_strDirecaoProxEvento,
-                    "alvo_dias_ate_desconto": var_intDiasProxDesconto,
-                    "alvo_desconto_esperado": var_floatDescontoEsperado,
-                    **var_dictAlvosHorizonte,
-                }
-                var_listAmostras.append(var_dictAmostra)
-                var_intAmostrasGeradas += 1
-
-                # Logger de progresso de 0%, 25%, 50%, 75%, 100%.
-                logger.info(f"Progresso: 0%")
-                if var_intAmostrasGeradas % (len(cls._var_dfDadosTreinamento) / 4) == 0:
-                    logger.info(f"Progresso: 25%")
-                elif var_intAmostrasGeradas % (len(cls._var_dfDadosTreinamento) / 2) == 0:
-                    logger.info(f"Progresso: 50%")
-                elif var_intAmostrasGeradas % (len(cls._var_dfDadosTreinamento) * 3 / 4) == 0:
-                    logger.info(f"Progresso: 75%")
-                elif var_intAmostrasGeradas == len(cls._var_dfDadosTreinamento):
-                    logger.info(f"Progresso: 100%")
+            var_floatFrac = var_intIdxJogo / max(var_intTotalJogos, 1)
+            for var_floatMarco, var_strPct in ((0.25, "25%"), (0.5, "50%"), (0.75, "75%"), (1.0, "100%")):
+                if var_strPct not in var_setMarcosLogados and var_floatFrac >= var_floatMarco:
+                    var_setMarcosLogados.add(var_strPct)
+                    logger.info(
+                        f"Progresso construção amostras temporais: {var_strPct} — "
+                        f"{var_intIdxJogo:,}/{var_intTotalJogos:,} jogos, {var_intAmostrasGeradas:,} amostras"
+                    )
 
         cls._var_dfAmostrasTemporais = pd.DataFrame(var_listAmostras)
         if cls._var_dfAmostrasTemporais.empty:
             raise ValueError("Nenhuma amostra temporal foi gerada a partir de historico_preco.")
 
-        logger.info(f"Amostras temporais criadas: {var_intAmostrasGeradas:,}")
-        logger.info(f"Amostras descartadas (desconto ativo no ponto de origem): {var_intAmostrasDescartadas:,}")
+        logger.info(f"Amostras temporais criadas (origem em preço cheio): {var_intAmostrasGeradas:,}")
+        logger.info(f"Pontos ignorados por já estarem em promoção: {var_intAmostrasDescartadas:,}")
 
         for var_strHorizonte, var_strColuna in cls._var_dictMapHorizonteColuna.items():
             if var_strColuna in cls._var_dfAmostrasTemporais.columns:

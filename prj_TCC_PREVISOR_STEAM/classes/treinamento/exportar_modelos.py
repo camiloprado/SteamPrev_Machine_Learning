@@ -89,6 +89,8 @@ class ExportarModelos:
         - Path: Caminho do diretório de exportação.
         """
         var_pathExport = cls._obter_diretorio_export()
+        for var_pathAntigo in var_pathExport.glob("*.joblib"):
+            var_pathAntigo.unlink(missing_ok=True)
 
         logger.info("=" * 60)
         logger.info("EXPORTAÇÃO DE MODELOS - NOMENCLATURA PADRONIZADA")
@@ -276,7 +278,7 @@ class ExportarModelos:
         if var_boolAutoPublish:
             try:
                 logger.info(" ML_AUTO_PUBLISH=True — iniciando publicação no GitHub Releases...")
-                publicar_modelos(arg_pathExport=var_pathExport)
+                publicar_modelos(arg_pathExport=var_pathExport, arg_boolForce=True)
             except Exception as var_errPublish:
                 # Publicação nunca bloqueia a exportação
                 logger.warning(f" Publicação automática falhou (exportação concluída): {var_errPublish}")

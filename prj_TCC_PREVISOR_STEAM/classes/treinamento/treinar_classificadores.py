@@ -1,5 +1,6 @@
 import logging
 from sklearn.ensemble import RandomForestClassifier
+from sklearn.utils.class_weight import compute_sample_weight
 import xgboost as xgb
 import lightgbm as lgb
 from prj_TCC_PREVISOR_STEAM.classes.treinamento.metricas import Metricas
@@ -30,14 +31,14 @@ class TreinarClassificadores:
         )
 
         var_objModelo = RandomForestClassifier(
-            n_estimators=400,
-            max_depth=15,
-            min_samples_split=5,
-            min_samples_leaf=2,
-            max_features="sqrt",
-            random_state=42,
-            n_jobs=-1,
-            class_weight="balanced_subsample",
+            n_estimators=400,                     # Número de árvores de decisão
+            max_depth=15,                         # Profundidade máxima das árvores
+            min_samples_split=5,                  # Número mínimo de amostras para dividir um nó
+            min_samples_leaf=2,                   # Número mínimo de amostras em uma folha
+            max_features="sqrt",                  # Fração de features para considerar em cada split
+            random_state=42,                      # Reprodutibilidade para garantir a mesma aleatoriedade
+            n_jobs=-1,                            # Número de processos para paralelizar o treinamento
+            class_weight="balanced_subsample",    # Peso das classes para balancear o subamostreo
         )
         
         var_objModelo.fit(var_dfXTrainBalanced, var_serYTrainBalanced)
@@ -45,6 +46,10 @@ class TreinarClassificadores:
         var_arrPredTest = var_objModelo.predict(var_dictSplits["X_test"])
 
         var_dictMetricas = Metricas._metricas_classificacao(var_dictSplits["y_test"], var_arrPredTest)
+
+        logger.info("--------------------------------")
+        logger.info(f"Random Forest ({arg_strHorizonte})")
+        logger.info("--------------------------------")
 
         Metricas._log_metricas_treino_teste_classificacao(
             arg_strModelo=f"Random Forest ({arg_strHorizonte})",
@@ -66,7 +71,7 @@ class TreinarClassificadores:
         return {
             "modelo": var_objModelo,
             **var_dictMetricas,
-            "train_size": var_dictSplits["X_train"].shape[0],
+            "train_size": var_dfXTrainBalanced.shape[0],
             "test_size": var_dictSplits["X_test"].shape[0],
         }
 
@@ -92,36 +97,35 @@ class TreinarClassificadores:
         )
 
         var_objModelo = xgb.XGBClassifier(
-            objective="multi:softprob",
-            num_class=3,
-            eval_metric="mlogloss",
-            n_estimators=400,
-            learning_rate=0.03,
-            max_depth=10,
-            subsample=0.8,
-            colsample_bytree=0.8,
-            random_state=42,
+            objective="multi:softprob",    # Função de perda para classificação multiclasse
+            num_class=3,                   # Número de classes (cai, mantem, sobe)
+            eval_metric="mlogloss",        # Métrica de avaliação para classificação multiclasse
+            n_estimators=400,              # Número de árvores de decisão
+            learning_rate=0.03,            # Taxa de aprendizado
+            max_depth=10,                  # Profundidade máxima das árvores
+            subsample=0.8,                 # Fração de amostras para treinar cada árvore
+            colsample_bytree=0.8,          # Fração de features para treinar cada árvore
+            random_state=42,               # Reprodutibilidade para garantir a mesma aleatoriedade
+            early_stopping_rounds=50,      # Early stopping para evitar overfitting
         )
 
-        from sklearn.utils.class_weight import compute_sample_weight
         var_arrSampleWeights = compute_sample_weight("balanced", var_serYTrainBalanced)
-        
-        try:
-            var_objModelo.fit(
-                var_dfXTrainBalanced,
-                var_serYTrainBalanced,
-                sample_weight=var_arrSampleWeights,
-                eval_set=[(var_dictSplits["X_test"], var_dictSplits["y_test"])],
-                verbose=False,
-                early_stopping_rounds=50,
-            )
-        except TypeError:
-            var_objModelo.fit(var_dfXTrainBalanced, var_serYTrainBalanced, sample_weight=var_arrSampleWeights)
+        var_objModelo.fit(
+            var_dfXTrainBalanced,
+            var_serYTrainBalanced,
+            sample_weight=var_arrSampleWeights,
+            eval_set=[(var_dictSplits["X_test"], var_dictSplits["y_test"])],
+            verbose=False,
+        )
 
         var_arrPredTrain = var_objModelo.predict(var_dictSplits["X_train"])
         var_arrPredTest = var_objModelo.predict(var_dictSplits["X_test"])
 
         var_dictMetricas = Metricas._metricas_classificacao(var_dictSplits["y_test"], var_arrPredTest)
+        
+        logger.info("--------------------------------")
+        logger.info(f"XGBoost ({arg_strHorizonte})")
+        logger.info("--------------------------------")
 
         Metricas._log_metricas_treino_teste_classificacao(
             arg_strModelo=f"XGBoost ({arg_strHorizonte})",
@@ -142,7 +146,7 @@ class TreinarClassificadores:
         return {
             "modelo": var_objModelo,
             **var_dictMetricas,
-            "train_size": var_dictSplits["X_train"].shape[0],
+            "train_size": var_dfXTrainBalanced.shape[0],
             "test_size": var_dictSplits["X_test"].shape[0],
         }
 
@@ -168,16 +172,16 @@ class TreinarClassificadores:
         )
 
         var_objModelo = lgb.LGBMClassifier(
-            objective="multiclass",
-            num_class=3,
-            n_estimators=400,
-            learning_rate=0.05,
-            num_leaves=31,
-            subsample=0.9,
-            colsample_bytree=0.9,
-            random_state=42,
-            verbose=-1,
-            class_weight="balanced",
+            objective="multiclass",                # Função de perda para classificação multiclasse
+            num_class=3,                           # Número de classes (cai, mantem, sobe)
+            n_estimators=400,                      # Número de árvores de decisão
+            learning_rate=0.05,                    # Taxa de aprendizado (shrinkage)
+            num_leaves=31,                         # Número máximo de folhas em cada árvore
+            subsample=0.9,                         # Fração de amostras para treinar cada árvore
+            colsample_bytree=0.9,                  # Fração de features para treinar cada árvore
+            random_state=42,                       # Reprodutibilidade para garantir a mesma aleatoriedade
+            verbose=-1,                            # Nível de verbosidade (0 = nenhum log, 1 = logs básicos, 2 = logs detalhados, -1 = logs mínimos)
+            class_weight="balanced",               # Peso das classes para balancear o subamostreo (1 para cada classe)
         )
 
         try:
@@ -195,6 +199,10 @@ class TreinarClassificadores:
         var_arrPredTest = var_objModelo.predict(var_dictSplits["X_test"])
 
         var_dictMetricas = Metricas._metricas_classificacao(var_dictSplits["y_test"], var_arrPredTest)
+
+        logger.info("--------------------------------")
+        logger.info(f"LightGBM ({arg_strHorizonte})")
+        logger.info("--------------------------------")
 
         Metricas._log_metricas_treino_teste_classificacao(
             arg_strModelo=f"LightGBM ({arg_strHorizonte})",
@@ -215,7 +223,7 @@ class TreinarClassificadores:
         return {
             "modelo": var_objModelo,
             **var_dictMetricas,
-            "train_size": var_dictSplits["X_train"].shape[0],
+            "train_size": var_dfXTrainBalanced.shape[0],
             "test_size": var_dictSplits["X_test"].shape[0],
         }
 
