@@ -22,8 +22,8 @@ class CriarTabela(PostgreSQL):
                     name TEXT
                 );
             """
-            with var_connConnection.cursor() as var_cursorCursor:
-                var_cursorCursor.execute(var_strQuery)
+            with var_connConnection.cursor() as var_objCursor:
+                var_objCursor.execute(var_strQuery)
                 var_connConnection.commit()
 
         except Exception as err:
@@ -52,8 +52,8 @@ class CriarTabela(PostgreSQL):
                     ultima_atualizacao TIMESTAMP
                 );
             """
-            with var_connConnection.cursor() as var_cursorCursor:
-                var_cursorCursor.execute(var_strQuery)
+            with var_connConnection.cursor() as var_objCursor:
+                var_objCursor.execute(var_strQuery)
                 var_connConnection.commit()
 
         except Exception as err:
@@ -80,8 +80,8 @@ class CriarTabela(PostgreSQL):
                     nome_categoria VARCHAR(255)
                 );
             """
-            with var_connConnection.cursor() as var_cursorCursor:
-                var_cursorCursor.execute(var_strQuery)
+            with var_connConnection.cursor() as var_objCursor:
+                var_objCursor.execute(var_strQuery)
                 var_connConnection.commit()
 
         except Exception as err:
@@ -108,8 +108,8 @@ class CriarTabela(PostgreSQL):
                     nome_genero VARCHAR(255)
                 );
             """
-            with var_connConnection.cursor() as var_cursorCursor:
-                var_cursorCursor.execute(var_strQuery)
+            with var_connConnection.cursor() as var_objCursor:
+                var_objCursor.execute(var_strQuery)
                 var_connConnection.commit()
 
         except Exception as err:
@@ -136,8 +136,8 @@ class CriarTabela(PostgreSQL):
                     nome_linguagem VARCHAR(255)
                 );
             """
-            with var_connConnection.cursor() as var_cursorCursor:
-                var_cursorCursor.execute(var_strQuery)
+            with var_connConnection.cursor() as var_objCursor:
+                var_objCursor.execute(var_strQuery)
                 var_connConnection.commit()
 
         except Exception as err:
@@ -164,8 +164,8 @@ class CriarTabela(PostgreSQL):
                     descricao VARCHAR(255)
                 );
             """
-            with var_connConnection.cursor() as var_cursorCursor:
-                var_cursorCursor.execute(var_strQuery)
+            with var_connConnection.cursor() as var_objCursor:
+                var_objCursor.execute(var_strQuery)
                 var_connConnection.commit()
 
         except Exception as err:
@@ -208,8 +208,8 @@ class CriarTabela(PostgreSQL):
                     reviews_completo JSONB
                 );
             """
-            with var_connConnection.cursor() as var_cursorCursor:
-                var_cursorCursor.execute(var_strQuery)
+            with var_connConnection.cursor() as var_objCursor:
+                var_objCursor.execute(var_strQuery)
                 var_connConnection.commit()
 
         except Exception as err:
@@ -242,8 +242,8 @@ class CriarTabela(PostgreSQL):
                     ultima_atualizacao TIMESTAMP
                 );
             """
-            with var_connConnection.cursor() as var_cursorCursor:
-                var_cursorCursor.execute(var_strQuery)
+            with var_connConnection.cursor() as var_objCursor:
+                var_objCursor.execute(var_strQuery)
                 var_connConnection.commit()
 
         except Exception as err:
@@ -270,8 +270,8 @@ class CriarTabela(PostgreSQL):
                     id_itad VARCHAR(100)
                 );
             """
-            with var_connConnection.cursor() as var_cursorCursor:
-                var_cursorCursor.execute(var_strQuery)
+            with var_connConnection.cursor() as var_objCursor:
+                var_objCursor.execute(var_strQuery)
                 var_connConnection.commit()
 
         except Exception as err:
@@ -312,10 +312,10 @@ class CriarTabela(PostgreSQL):
                 ultima_atualizacao TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             );
             """
-            with var_connConnection.cursor() as cursor:
-                cursor.execute(var_strSQL)
+            with var_connConnection.cursor() as var_objCursor:
+                var_objCursor.execute(var_strSQL)
                 var_connConnection.commit()
-                
+
         except Exception as e:
             if var_connConnection:
                 var_connConnection.rollback()

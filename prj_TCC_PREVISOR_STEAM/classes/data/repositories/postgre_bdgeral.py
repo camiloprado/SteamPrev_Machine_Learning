@@ -45,31 +45,31 @@ class PostgreSQLBDGeral(PostgreSQL):
             AND type = 'game';
             """
             var_connConnection = cls.conectar()
-            with var_connConnection.cursor() as cursor:
-                cursor.execute(var_strSQL, (arg_listAppIDs,))
-                var_listResultados = cursor.fetchall()
+            with var_connConnection.cursor() as var_objCursor:
+                var_objCursor.execute(var_strSQL, (arg_listAppIDs,))
+                var_listResultados = var_objCursor.fetchall()
                 var_listDados = []
-                for row in var_listResultados:
+                for var_tupleRow in var_listResultados:
                     var_dictDetalhes = None
-                    if row[1] and row[1] not in ("AUSENTE", "ausente"):
+                    if var_tupleRow[1] and var_tupleRow[1] not in ("AUSENTE", "ausente"):
                         try:
-                            var_dictDetalhes = json.loads(row[1]) if isinstance(row[1], str) else row[1]
+                            var_dictDetalhes = json.loads(var_tupleRow[1]) if isinstance(var_tupleRow[1], str) else var_tupleRow[1]
                         except (json.JSONDecodeError, TypeError) as e:
-                            logger.warning(f"AppID {row[0]}: Erro ao parsear detalhes como JSON - {e}")
+                            logger.warning(f"AppID {var_tupleRow[0]}: Erro ao parsear detalhes como JSON - {e}")
                             var_dictDetalhes = "AUSENTE"
                     else:
                         var_dictDetalhes = "AUSENTE"
-                    
+
                     var_dictReviews = None
-                    if row[2] and row[2] not in ("AUSENTE", "ausente"):
+                    if var_tupleRow[2] and var_tupleRow[2] not in ("AUSENTE", "ausente"):
                         try:
-                            var_dictReviews = json.loads(row[2]) if isinstance(row[2], str) else row[2]
+                            var_dictReviews = json.loads(var_tupleRow[2]) if isinstance(var_tupleRow[2], str) else var_tupleRow[2]
                         except (json.JSONDecodeError, TypeError) as e:
-                            logger.warning(f"AppID {row[0]}: Erro ao parsear reviews como JSON - {e}")
+                            logger.warning(f"AppID {var_tupleRow[0]}: Erro ao parsear reviews como JSON - {e}")
                             var_dictReviews = None
-                    
+
                     var_dictDados = {
-                        "appid": row[0],
+                        "appid": var_tupleRow[0],
                         "detalhes": var_dictDetalhes,
                         "reviews": var_dictReviews
                     }
@@ -133,11 +133,11 @@ class PostgreSQLBDGeral(PostgreSQL):
 
             var_strSQLGeral += "ORDER BY su.appid;"
 
-            with var_connConnection.cursor() as var_curCursor:
-                var_curCursor.execute(var_strSQLGeral)
-                var_listResultados = var_curCursor.fetchall()
-                var_listColnames = [desc[0] for desc in var_curCursor.description]
-                var_listDados = [dict(zip(var_listColnames, row)) for row in var_listResultados]
+            with var_connConnection.cursor() as var_objCursor:
+                var_objCursor.execute(var_strSQLGeral)
+                var_listResultados = var_objCursor.fetchall()
+                var_listColnames = [desc[0] for desc in var_objCursor.description]
+                var_listDados = [dict(zip(var_listColnames, var_tupleRow)) for var_tupleRow in var_listResultados]
 
             logger.info(f"Dados buscados com sucesso da tabela steam_geral. Total de registros: {len(var_listDados)}")
             return var_listDados
@@ -205,8 +205,8 @@ class PostgreSQLBDGeral(PostgreSQL):
                     var_dictDado.get("review_score_desc"),
                     json.dumps(var_dictDado.get("historico_precos", []))
                 ))
-            with var_connConnection.cursor() as var_curCursor:
-                execute_values(var_curCursor, var_strSQLInsert, var_listValores)
+            with var_connConnection.cursor() as var_objCursor:
+                execute_values(var_objCursor, var_strSQLInsert, var_listValores)
                 var_connConnection.commit()
 
         except Exception as err:

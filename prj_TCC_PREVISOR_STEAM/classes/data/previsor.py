@@ -95,27 +95,27 @@ class Previsor:
             logger.info(f"Iniciando do índice: {var_intInicioCheckpoint:,}")
 
             # Itera sobre os aplicativos em lotes
-            for i in range(var_intInicioCheckpoint, var_intTamanhoTotalFila, var_intRange):
-                logger.info(f"Processando aplicativos de {i + 1} a {min(i + var_intRange, var_intTamanhoTotalFila)} de {var_intTamanhoTotalFila}")
-                logger.info(f"Progresso: {(i/var_intTamanhoTotalFila)*100:.1f}%")
-                
+            for var_intI in range(var_intInicioCheckpoint, var_intTamanhoTotalFila, var_intRange):
+                logger.info(f"Processando aplicativos de {var_intI + 1} a {min(var_intI + var_intRange, var_intTamanhoTotalFila)} de {var_intTamanhoTotalFila}")
+                logger.info(f"Progresso: {(var_intI/var_intTamanhoTotalFila)*100:.1f}%")
+
                 # Carrega os aplicativos atuais
                 if var_intAmbiente == "HML":
-                    var_listAppIDAtual = var_listAppIDParaProcessar[i:i+int(os.getenv("BATCH_TESTE", 20))]
+                    var_listAppIDAtual = var_listAppIDParaProcessar[var_intI:var_intI+int(os.getenv("BATCH_TESTE", 20))]
                 else:
-                    var_listAppIDAtual = var_listAppIDParaProcessar[i:i+var_intRange]
-                
+                    var_listAppIDAtual = var_listAppIDParaProcessar[var_intI:var_intI+var_intRange]
+
                 # Aguarda as tarefas assíncronas concorrentemente sem reconstruir o Event Loop
                 await asyncio.gather(
                     SteamClient.fetch_details_bulk_batched(arg_seqAppids=var_listAppIDAtual), # Busca detalhes dos jogos
                     SteamClient.fetch_reviews_summary_batched(arg_seqAppids=var_listAppIDAtual) # Busca reviews dos jogos
                 )
-                
+
                 # Salva checkpoint após batch bem-sucedido
-                PostgreSQLCheckpoint.salvar_checkpoint(var_intPcId, i + var_intRange, "STEAM")
-                
+                PostgreSQLCheckpoint.salvar_checkpoint(var_intPcId, var_intI + var_intRange, "STEAM")
+
                 # Pausa entre lotes
-                if i + var_intRange < var_intTamanhoTotalFila:
+                if var_intI + var_intRange < var_intTamanhoTotalFila:
                     logger.info("Aguardando 2 segundos antes do próximo lote...")
                     await asyncio.sleep(2)
             
@@ -195,33 +195,33 @@ class Previsor:
             logger.info(f"Iniciando ITAD do índice: {var_intInicioCheckpoint:,}")
 
             # Itera sobre os aplicativos em lotes
-            for i in range(var_intInicioCheckpoint, var_intTamanhoTotalFila, var_intRange):
-                logger.info(f"Processando aplicativos ITAD de {i + 1} a {min(i + var_intRange, var_intTamanhoTotalFila)} de {var_intTamanhoTotalFila}")
-                logger.info(f"Progresso: {(i/var_intTamanhoTotalFila)*100:.1f}%")
+            for var_intI in range(var_intInicioCheckpoint, var_intTamanhoTotalFila, var_intRange):
+                logger.info(f"Processando aplicativos ITAD de {var_intI + 1} a {min(var_intI + var_intRange, var_intTamanhoTotalFila)} de {var_intTamanhoTotalFila}")
+                logger.info(f"Progresso: {(var_intI/var_intTamanhoTotalFila)*100:.1f}%")
                 logger.info("----------------------------------------")
-                
+
                 # Carrega os aplicativos atuais
                 if var_intAmbiente == "HML":
-                    var_listAppIDAtual = var_listAppIDParaProcessar[i:i+int(os.getenv("BATCH_TESTE", 20))]
+                    var_listAppIDAtual = var_listAppIDParaProcessar[var_intI:var_intI+int(os.getenv("BATCH_TESTE", 20))]
                 else:
-                    var_listAppIDAtual = var_listAppIDParaProcessar[i:i+var_intRange]
-                
+                    var_listAppIDAtual = var_listAppIDParaProcessar[var_intI:var_intI+var_intRange]
+
                 logger.info(f"Número de IDs ITAD a processar neste lote: {len(var_listAppIDAtual)}")
-                
+
                 # Busca dados ITAD para os AppIDs
                 asyncio.run(ITADClient.lookup_itad_ids_batched(arg_seqAppids=var_listAppIDAtual))
-                
+
                 # Busca os IDs ITAD correspondentes aos AppIDs processados
                 var_listITADID = list(PostgreSQLITAD.buscar_itad_id_por_appid(arg_listAppids=var_listAppIDAtual))
 
                 # Busca histórico de preços ITAD para os AppIDs
                 asyncio.run(ITADClient.fetch_price_history_bulk_batched(arg_seqItadPlain=var_listITADID))
-                
+
                 # Salva checkpoint após batch ITAD bem-sucedido
-                PostgreSQLCheckpoint.salvar_checkpoint(var_intPcId, i + var_intRange, "ITAD")
-                
+                PostgreSQLCheckpoint.salvar_checkpoint(var_intPcId, var_intI + var_intRange, "ITAD")
+
                 # Pausa entre lotes
-                if i + var_intRange < var_intTamanhoTotalFila:
+                if var_intI + var_intRange < var_intTamanhoTotalFila:
                     logger.info("Aguardando 2 segundos antes do próximo lote...")
                     sleep(2)
             

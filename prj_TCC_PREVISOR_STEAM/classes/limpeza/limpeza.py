@@ -76,14 +76,14 @@ class Limpar:
         
         # Remove marcas diacríticas (acentos)
         var_strSemAcento = ''.join(
-            char for char in var_strNormalizado 
-            if unicodedata.category(char) != 'Mn'
+            var_strChar for var_strChar in var_strNormalizado
+            if unicodedata.category(var_strChar) != 'Mn'
         )
-        
+
         # Remove caracteres de controle
         var_strLimpo = ''.join(
-            char for char in var_strSemAcento
-            if char.isprintable() or char.isspace()
+            var_strChar for var_strChar in var_strSemAcento
+            if var_strChar.isprintable() or var_strChar.isspace()
         )
         
         # Remove espaços duplicados

@@ -13,16 +13,16 @@ from dotenv import load_dotenv
 
 logger = logging.getLogger(__name__)
 
-CON_DEFAULT_HEADERS = {
+CON_DICT_DEFAULT_HEADERS = {
     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
     "Accept-Language": "pt-BR,pt;q=0.9,en-US;q=0.8,en;q=0.7",
 }
 
-STEAM_DETAILS_URL = "https://store.steampowered.com/api/appdetails"
-STEAM_REVIEWS_URL = "https://store.steampowered.com/appreviews/{appid}"
+CON_STR_STEAM_DETAILS_URL = "https://store.steampowered.com/api/appdetails"
+CON_STR_STEAM_REVIEWS_URL = "https://store.steampowered.com/appreviews/{appid}"
 
 # Backoff base padrão, usado quando a configuração de retry não está definida.
-CON_DEFAULT_RETRY_BACKOFF_BASE = 0
+CON_INT_DEFAULT_RETRY_BACKOFF_BASE = 0
 
 class SteamClient:
     """
@@ -161,7 +161,7 @@ class SteamClient:
         arg_intAppid: int,
         arg_strTipo: str = 'detalhes',
         arg_intMaxRetries: int = 3,
-        arg_intRetryBackoffBase: int = CON_DEFAULT_RETRY_BACKOFF_BASE,
+        arg_intRetryBackoffBase: int = CON_INT_DEFAULT_RETRY_BACKOFF_BASE,
     ) -> dict | None:
         """
         Retry com backoff exponencial (+ jitter) para erros 429 (Too Many Requests) e 502 (Bad Gateway).
@@ -183,9 +183,9 @@ class SteamClient:
         """
         logger = logging.getLogger(f"steam.{arg_strTipo}")
         if arg_strTipo == 'detalhes':
-            url = f"{STEAM_DETAILS_URL}?appids={arg_intAppid}"
+            url = f"{CON_STR_STEAM_DETAILS_URL}?appids={arg_intAppid}"
         elif arg_strTipo == 'reviews':
-            url = STEAM_REVIEWS_URL.format(appid=arg_intAppid)
+            url = CON_STR_STEAM_REVIEWS_URL.format(appid=arg_intAppid)
 
         return await retry_with_backoff(
             arg_clientSession=arg_clientSession,
@@ -201,7 +201,7 @@ class SteamClient:
 
     # ------------------- Async bulk details -------------------
     @classmethod
-    async def fetch_details_bulk(cls, arg_seqAppids: Sequence[int], arg_intRetryBackoffBase: int = CON_DEFAULT_RETRY_BACKOFF_BASE) -> tuple[list[dict], dict]:
+    async def fetch_details_bulk(cls, arg_seqAppids: Sequence[int], arg_intRetryBackoffBase: int = CON_INT_DEFAULT_RETRY_BACKOFF_BASE) -> tuple[list[dict], dict]:
         """
         Busca os detalhes de múltiplos jogos na Steam de forma assíncrona.
 
@@ -401,7 +401,7 @@ class SteamClient:
                     var_dictParams = {"appids": arg_intAppid, "l": "brazilian"}
                     try:
                         # Faz a requisição assíncrona
-                        async with arg_clientSession.get(STEAM_DETAILS_URL, params=var_dictParams, timeout=30) as var_respResponse:
+                        async with arg_clientSession.get(CON_STR_STEAM_DETAILS_URL, params=var_dictParams, timeout=30) as var_respResponse:
                             var_respResponse.raise_for_status()
                             # Processa os dados recebidos
                             var_dictData = await var_respResponse.json()
@@ -487,7 +487,7 @@ class SteamClient:
             var_timeout = aiohttp.ClientTimeout(total=60, connect=10, sock_read=30)
             
             async with aiohttp.ClientSession(
-                headers=CON_DEFAULT_HEADERS,
+                headers=CON_DICT_DEFAULT_HEADERS,
                 connector=var_connector,
                 timeout=var_timeout
             ) as var_respSession:
@@ -638,7 +638,7 @@ class SteamClient:
     
     # ------------------- Async reviews summary -------------------
     @classmethod
-    async def fetch_reviews_summary(cls, arg_seqAppids: Sequence[int], arg_intRetryBackoffBase: int = CON_DEFAULT_RETRY_BACKOFF_BASE) -> dict[int, dict]:
+    async def fetch_reviews_summary(cls, arg_seqAppids: Sequence[int], arg_intRetryBackoffBase: int = CON_INT_DEFAULT_RETRY_BACKOFF_BASE) -> dict[int, dict]:
         """
         Busca o resumo de reviews de múltiplos jogos na Steam de forma assíncrona.
 
@@ -733,7 +733,7 @@ class SteamClient:
                 async with var_semSemaphore:
                     # Pequena espera para evitar throttling
                     await asyncio.sleep(random.random() * 0.3)
-                    var_strUrl = STEAM_REVIEWS_URL.format(appid=arg_intAppid)
+                    var_strUrl = CON_STR_STEAM_REVIEWS_URL.format(appid=arg_intAppid)
                     var_dictParams = {"json": "1", "language": "all"}
                     try:
                         # Faz a requisição assíncrona
@@ -804,7 +804,7 @@ class SteamClient:
             var_timeout = aiohttp.ClientTimeout(total=60, connect=10, sock_read=30)
             
             async with aiohttp.ClientSession(
-                headers=CON_DEFAULT_HEADERS,
+                headers=CON_DICT_DEFAULT_HEADERS,
                 connector=var_connector,
                 timeout=var_timeout
             ) as var_respSession:

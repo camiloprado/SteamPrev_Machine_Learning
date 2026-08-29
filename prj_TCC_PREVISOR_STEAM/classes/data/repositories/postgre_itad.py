@@ -43,10 +43,10 @@ class PostgreSQLITAD(PostgreSQL):
                 var_strSQL += " LIMIT %s"
                 var_listParams.append(arg_intLimit)
 
-            with var_connConnection.cursor() as cursor:
-                cursor.execute(var_strSQL, var_listParams or None)
-                var_listResultados = [row[0] for row in cursor.fetchall()]
-            
+            with var_connConnection.cursor() as var_objCursor:
+                var_objCursor.execute(var_strSQL, var_listParams or None)
+                var_listResultados = [var_tupleRow[0] for var_tupleRow in var_objCursor.fetchall()]
+
             return var_listResultados
             
         except Exception as e:
@@ -89,10 +89,10 @@ class PostgreSQLITAD(PostgreSQL):
 
             var_strSQL += ";"
 
-            with var_connConnection.cursor() as cursor:
-                cursor.execute(var_strSQL, var_listParams or None)
-                var_listResultados = cursor.fetchall()
-                var_listAppids = [row[0] for row in var_listResultados]
+            with var_connConnection.cursor() as var_objCursor:
+                var_objCursor.execute(var_strSQL, var_listParams or None)
+                var_listResultados = var_objCursor.fetchall()
+                var_listAppids = [var_tupleRow[0] for var_tupleRow in var_listResultados]
                 
                 logger.info(f"Encontrados {len(var_listAppids):,} AppIDs ITAD desatualizados")
                 return var_listAppids
@@ -175,31 +175,31 @@ class PostgreSQLITAD(PostgreSQL):
                 var_listItadRaw.append((var_strIdItad, var_strSlug, var_strTitle, var_strType, var_boolMature, var_jsonAssets, var_dateNow))
                 var_listItadMapping.append((var_intAppid, var_strIdItad))
 
-            with var_connConnection.cursor() as cursor:
+            with var_connConnection.cursor() as var_objCursor:
                 execute_values(
-                    cursor, 
+                    var_objCursor,
                     var_strSQLItadRaw,  # SQL com placeholder %s para os valores em batch
                     var_listItadRaw, # Lista de tuplas com os valores a serem inseridos
                     template='(%s, %s, %s, %s, %s, %s, %s)', # Define o template para os valores a serem inseridos
                     page_size=200 # Ajuste o tamanho do lote conforme necessário para otimizar desempenho e evitar sobrecarga de memória
                 )
                 # Obtém o número de registros processados
-                var_intRowCountItadRaw = cursor.rowcount
+                var_intRowCountItadRaw = var_objCursor.rowcount
 
                 # Confirma a transação após a inserção em batch
                 var_connConnection.commit()
                 logger.info(f"Inseridos/atualizados {var_intRowCountItadRaw:,} registros no ITAD Raw")
-                
+
                 execute_values(
-                    cursor, 
+                    var_objCursor,
                     var_strSQLMapping,  # SQL com placeholder %s para os valores em batch
                     var_listItadMapping, # Lista de tuplas com os valores a serem inseridos
                     template='(%s, %s)', # Define o template para os valores a serem inseridos
                     page_size=200 # Ajuste o tamanho do lote conforme necessário para otimizar desempenho e evitar sobrecarga de memória
                 )
-                
+
                 # Obtém o número de registros processados
-                var_intRowCountItadMapping = cursor.rowcount
+                var_intRowCountItadMapping = var_objCursor.rowcount
 
                 # Confirma a transação após a inserção em batch
                 var_connConnection.commit()
@@ -248,11 +248,11 @@ class PostgreSQLITAD(PostgreSQL):
                 var_listDadosItad.append((var_strHistoricoJson, var_dateNow, var_strIDITAD))
 
             var_intTotalAtualizados = 0
-            with var_connConnection.cursor() as cursor:
+            with var_connConnection.cursor() as var_objCursor:
                 for var_intIndex in range(0, len(var_listDadosItad), var_intBatchSize):
                     var_listLote = var_listDadosItad[var_intIndex:var_intIndex + var_intBatchSize]
-                    execute_batch(cursor, var_strSQLHistorico, var_listLote, page_size=200)
-                    var_intTotalAtualizados += cursor.rowcount
+                    execute_batch(var_objCursor, var_strSQLHistorico, var_listLote, page_size=200)
+                    var_intTotalAtualizados += var_objCursor.rowcount
 
             var_connConnection.commit()
             logger.info(f"Histórico de preços ITAD atualizado para {var_intTotalAtualizados:,} registros")
@@ -329,7 +329,7 @@ class PostgreSQLITAD(PostgreSQL):
             if var_intDeduplicated > 0:
                 logger.info(f"Deduplicados {var_intDeduplicated} registros ITAD duplicados ({var_intTotalAppIDs} AppIDs → {len(var_listITADRaw)} id_itad únicos)")
 
-            with var_connConnection.cursor() as var_curCursor:
+            with var_connConnection.cursor() as var_objCursor:
                 # 1. Insere/atualiza na tabela itad_raw
                 var_strSQLItadRaw = """
                 INSERT INTO itad_raw (id_itad, slug, title, type, mature, assets, ultima_atualizacao)
@@ -344,14 +344,14 @@ class PostgreSQLITAD(PostgreSQL):
                     ultima_atualizacao = EXCLUDED.ultima_atualizacao;
                 """
                 execute_values(
-                    var_curCursor, 
+                    var_objCursor, 
                     var_strSQLItadRaw,  # SQL com placeholder %s para os valores em batch
                     var_listITADRaw, # Lista de tuplas com os valores a serem inseridos
                     template='(%s, %s, %s, %s, %s, %s::jsonb, %s)', # Define o template para os valores a serem inseridos
                     page_size=200 # Ajuste o tamanho do lote conforme necessário para otimizar desempenho e evitar sobrecarga de memória
                 )
                 # Obtém o número de registros processados
-                var_intRowCount = var_curCursor.rowcount
+                var_intRowCount = var_objCursor.rowcount
 
                 # Confirma a transação após a inserção em batch
                 var_connConnection.commit()
@@ -366,7 +366,7 @@ class PostgreSQLITAD(PostgreSQL):
                     id_itad = EXCLUDED.id_itad;
                 """
                 execute_values(
-                    var_curCursor, 
+                    var_objCursor, 
                     var_strSQLMapping,  # SQL com placeholder %s para os valores em batch
                     var_listMapping, # Lista de tuplas com os valores a serem inseridos
                     template='(%s, %s)', # Define o template para os valores a serem inseridos
@@ -374,7 +374,7 @@ class PostgreSQLITAD(PostgreSQL):
                 )
                 
                 # Obtém o número de registros processados
-                var_intRowCount = var_curCursor.rowcount
+                var_intRowCount = var_objCursor.rowcount
 
                 # Confirma a transação após a inserção em batch
                 var_connConnection.commit()
@@ -406,9 +406,9 @@ class PostgreSQLITAD(PostgreSQL):
             var_strSQL = """
             SELECT appid, id_itad FROM steam_itad_mapping WHERE appid = ANY(%s);
             """
-            with var_connConnection.cursor() as cursor:
-                cursor.execute(var_strSQL, (list(arg_listAppids),))
-                var_dictMapaAppidParaItad = {row[0]: row[1] for row in cursor.fetchall()}
+            with var_connConnection.cursor() as var_objCursor:
+                var_objCursor.execute(var_strSQL, (list(arg_listAppids),))
+                var_dictMapaAppidParaItad = {var_tupleRow[0]: var_tupleRow[1] for var_tupleRow in var_objCursor.fetchall()}
 
             # Um yield por AppID de entrada, na mesma ordem.
             for var_intAppid in arg_listAppids:
@@ -439,10 +439,10 @@ class PostgreSQLITAD(PostgreSQL):
                 WHERE ir.ultima_atualizacao < CURRENT_DATE - INTERVAL '{var_intDias} days';
             """
             var_listITAD = []
-            with var_connConnection.cursor() as cursor:
-                cursor.execute(var_strSQL)
-                var_listResultados = cursor.fetchall()
-                
+            with var_connConnection.cursor() as var_objCursor:
+                var_objCursor.execute(var_strSQL)
+                var_listResultados = var_objCursor.fetchall()
+
             logger.info(f"Encontrados {len(var_listResultados):,} IDs ITAD com histórico de preços desatualizados")
             return var_listResultados
         except Exception as e:

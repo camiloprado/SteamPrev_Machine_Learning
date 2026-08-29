@@ -9,7 +9,7 @@ import aiohttp
 logger = logging.getLogger("steamspy")
 
 # Adicionar fonte alternativa:
-STEAMSPY_ALL_URL = "https://steamspy.com/api.php?request=all&page={var_intPage}"  # API ativa
+CON_STR_STEAMSPY_ALL_URL = "https://steamspy.com/api.php?request=all&page={var_intPage}"  # API ativa
 
 class SteamSpyClient:
     """
@@ -152,23 +152,23 @@ class SteamSpyClient:
                 
                 for var_intTentativa in range(var_intMaxRetries):
                     try:
-                        var_strUrl = STEAMSPY_ALL_URL.format(var_intPage=arg_intPage)
+                        var_strUrl = CON_STR_STEAMSPY_ALL_URL.format(var_intPage=arg_intPage)
                         
-                        async with arg_clientSession.get(var_strUrl, timeout=aiohttp.ClientTimeout(total=30)) as resp:
+                        async with arg_clientSession.get(var_strUrl, timeout=aiohttp.ClientTimeout(total=30)) as var_objResp:
                             # Verifica status HTTP
-                            if resp.status != 200:
-                                if resp.status == 500:
+                            if var_objResp.status != 200:
+                                if var_objResp.status == 500:
                                     logger.warning(f"Página {arg_intPage}: HTTP 500 (tentativa {var_intTentativa+1}/{var_intMaxRetries})")
                                     if var_intTentativa < var_intMaxRetries - 1:
                                         await asyncio.sleep((2 ** var_intTentativa) * 2)
                                         continue
                                     return {"page": arg_intPage, "data": None, "novos": 0, "modificados": 0, "ignorados": 0, "status": "error_500"}
                                 else:
-                                    logger.warning(f"Página {arg_intPage}: Status {resp.status}")
+                                    logger.warning(f"Página {arg_intPage}: Status {var_objResp.status}")
                                     return {"page": arg_intPage, "data": None, "novos": 0, "modificados": 0, "ignorados": 0, "status": "error"}
-                            
+
                             # Lê response text
-                            var_strText = await resp.text()
+                            var_strText = await var_objResp.text()
                             
                             # Verifica se está vazio
                             if not var_strText or var_strText.strip() == "":
@@ -302,7 +302,7 @@ class SteamSpyClient:
                     var_intJogosIgnorados += var_dictResult["ignorados"]
         
         # ========== RELATÓRIO FINAL ==========
-        var_intPaginasSucesso = len([r for r in var_listResults if isinstance(r, dict) and r["status"] == "success"])
+        var_intPaginasSucesso = len([var_objR for var_objR in var_listResults if isinstance(var_objR, dict) and var_objR["status"] == "success"])
         
         logger.info(f"{'='*70}")
         logger.info("COLETA STEAMSPY CONCLUÍDA")

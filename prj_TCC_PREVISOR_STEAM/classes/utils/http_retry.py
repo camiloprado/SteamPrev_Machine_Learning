@@ -24,7 +24,7 @@ import random
 
 import aiohttp
 
-CON_DEFAULT_MAX_RETRIES = 3
+CON_INT_DEFAULT_MAX_RETRIES = 3
 
 
 def parse_retry_after_seconds(arg_resp: aiohttp.ClientResponse) -> int | None:
@@ -72,7 +72,7 @@ async def retry_with_backoff(
     arg_strTipo: str = "",
     arg_strLogPrefix: str = "",
     arg_dictParams: dict | None = None,
-    arg_intMaxRetries: int = CON_DEFAULT_MAX_RETRIES,
+    arg_intMaxRetries: int = CON_INT_DEFAULT_MAX_RETRIES,
 ) -> dict | list | None:
     """
     Retry com backoff exponencial + jitter para erros 429 (Too Many Requests) e 502 (Bad Gateway).
@@ -97,9 +97,9 @@ async def retry_with_backoff(
     """
     for var_intAttempt in range(arg_intMaxRetries):
         try:
-            async with arg_clientSession.get(arg_strUrl, params=arg_dictParams) as resp:
-                if resp.status == 429:
-                    var_fltWaitTime = parse_retry_after_seconds(resp)
+            async with arg_clientSession.get(arg_strUrl, params=arg_dictParams) as var_objResp:
+                if var_objResp.status == 429:
+                    var_fltWaitTime = parse_retry_after_seconds(var_objResp)
                     if var_fltWaitTime is None:
                         var_fltWaitTime = (2 ** var_intAttempt) * arg_intRetryBackoffBase + random.uniform(0, arg_intRetryBackoffBase)
                     arg_objLogger.warning(
@@ -108,7 +108,7 @@ async def retry_with_backoff(
                     )
                     await asyncio.sleep(var_fltWaitTime)
                     continue
-                if resp.status == 502:
+                if var_objResp.status == 502:
                     var_fltWaitTime = (2 ** var_intAttempt) * arg_intRetryBackoffBase + random.uniform(0, arg_intRetryBackoffBase)
                     arg_objLogger.warning(
                         f"{arg_strLogPrefix} retry ({arg_strTipo}) id={arg_anyId} status=502 "
@@ -116,11 +116,11 @@ async def retry_with_backoff(
                     )
                     await asyncio.sleep(var_fltWaitTime)
                     continue
-                elif resp.status == 200:
-                    return await resp.json()
+                elif var_objResp.status == 200:
+                    return await var_objResp.json()
                 else:
                     arg_objLogger.debug(
-                        f"{arg_strLogPrefix} resposta id={arg_anyId} status={resp.status} tentativa={var_intAttempt+1}"
+                        f"{arg_strLogPrefix} resposta id={arg_anyId} status={var_objResp.status} tentativa={var_intAttempt+1}"
                     )
                     return None
         except Exception as e:

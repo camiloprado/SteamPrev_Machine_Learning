@@ -70,34 +70,34 @@ class PostgreSQLSteam(PostgreSQL):
                 ultima_atualizacao = EXCLUDED.ultima_atualizacao;
             """
             
-            with var_connConnection.cursor() as cursor:
+            with var_connConnection.cursor() as var_objCursor:
                 execute_values(
-                    cursor, 
+                    var_objCursor,
                     var_strSQL,  # SQL com placeholder %s para os valores em batch
                     var_listValores, # Lista de tuplas com os valores a serem inseridos
                     template='(%s, %s, %s, %s)', # Define o template para os valores a serem inseridos
                     page_size=200 # Ajuste o tamanho do lote conforme necessário para otimizar desempenho e evitar sobrecarga de memória
                 )
                 # Obtém o número de registros processados
-                var_intRowCount = cursor.rowcount
+                var_intRowCount = var_objCursor.rowcount
 
                 # Confirma a transação após a inserção em batch
                 var_connConnection.commit()
                 logger.info(f"Inserção em bulk concluída: {var_intRowCount} registros processados em steam_raw.")
-                
+
                 var_listAppidsInseridos = []
                 for var_dictDados in arg_listDados:
                     var_intAppid = var_dictDados.get("appid")
                     var_dictDetalhes = var_dictDados.get("detalhes")
                     if var_dictDetalhes == "AUSENTE":
                         continue
-                    
+
                     if var_intAppid and var_dictDetalhes and var_dictDetalhes.get("name"):
                         var_listAppidsInseridos.append((
                             var_intAppid,
                             var_dictDetalhes.get("name")
                         ))
-                
+
                 # Insere/atualiza steam_generico (batch)
                 if var_listAppidsInseridos:
                     var_strSQLGenerico = """
@@ -107,10 +107,12 @@ class PostgreSQLSteam(PostgreSQL):
                         name = EXCLUDED.name,
                         ultima_atualizacao = EXCLUDED.ultima_atualizacao;
                     """
-                    
-                    with var_connConnection.cursor() as var_curCursor:
-                        execute_batch(var_curCursor, var_strSQLGenerico, var_listAppidsInseridos)
-                    
+
+                    # Cursor distinto do var_objCursor acima: ambos coexistem no mesmo
+                    # escopo (aninhado dentro do `with` externo), não podem ter o mesmo nome.
+                    with var_connConnection.cursor() as var_objCursorGenerico:
+                        execute_batch(var_objCursorGenerico, var_strSQLGenerico, var_listAppidsInseridos)
+
                     var_connConnection.commit()
                     logger.debug(f"Sincronizados {len(var_listAppidsInseridos)} registros em steam_generico")
         
@@ -183,8 +185,8 @@ class PostgreSQLSteam(PostgreSQL):
                 if not var_listValoresLote:
                     continue
 
-                with var_connConnection.cursor() as cursor:
-                    execute_batch(cursor, var_strSQL, var_listValoresLote, page_size=1000)
+                with var_connConnection.cursor() as var_objCursor:
+                    execute_batch(var_objCursor, var_strSQL, var_listValoresLote, page_size=1000)
                     var_intTotalInserido += len(var_listValoresLote)
 
                 var_connConnection.commit()
@@ -275,8 +277,8 @@ class PostgreSQLSteam(PostgreSQL):
                 datetime.now()
             )
             
-            with var_connConnection.cursor() as cursor:
-                cursor.execute(var_strSQL, var_tupleValores)
+            with var_connConnection.cursor() as var_objCursor:
+                var_objCursor.execute(var_strSQL, var_tupleValores)
                 var_connConnection.commit()
                 
         except Exception as e:
@@ -362,16 +364,16 @@ class PostgreSQLSteam(PostgreSQL):
                 var_listValores.append(var_tupleValores)
 
             if var_listValores:
-                with var_connConnection.cursor() as var_curCursor:
+                with var_connConnection.cursor() as var_objCursor:
                     execute_values(
-                        var_curCursor, 
+                        var_objCursor, 
                         var_strSQL,  # SQL com placeholder %s para os valores em batch
                         var_listValores, # Lista de tuplas com os valores a serem inseridos
                         template='(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)', # Define o template para os valores a serem inseridos
                         page_size=200 # Ajuste o tamanho do lote conforme necessário para otimizar desempenho e evitar sobrecarga de memória
                     )
                     # Obtém o número de registros processados
-                    var_intRowCount = var_curCursor.rowcount
+                    var_intRowCount = var_objCursor.rowcount
 
                     # Confirma a transação após a inserção em batch
                     var_connConnection.commit()
@@ -426,10 +428,10 @@ class PostgreSQLSteam(PostgreSQL):
 
             var_strSQL += ";"
 
-            with var_connConnection.cursor() as cursor:
-                cursor.execute(var_strSQL, var_listParams or None)
-                var_listResultados = cursor.fetchall()
-                var_listAppids = [row[0] for row in var_listResultados]
+            with var_connConnection.cursor() as var_objCursor:
+                var_objCursor.execute(var_strSQL, var_listParams or None)
+                var_listResultados = var_objCursor.fetchall()
+                var_listAppids = [var_tupleRow[0] for var_tupleRow in var_listResultados]
 
                 logger.info(f"Encontrados {len(var_listAppids):,} AppIDs não processados para PC {arg_intPcId}")
                 return var_listAppids
@@ -485,11 +487,11 @@ class PostgreSQLSteam(PostgreSQL):
 
             var_strSQL += ";"
 
-            with var_connConnection.cursor() as cursor:
-                cursor.execute(var_strSQL, var_listParams or None)
-                var_listResultados = cursor.fetchall()
-                var_listAppids = [row[0] for row in var_listResultados]
-                
+            with var_connConnection.cursor() as var_objCursor:
+                var_objCursor.execute(var_strSQL, var_listParams or None)
+                var_listResultados = var_objCursor.fetchall()
+                var_listAppids = [var_tupleRow[0] for var_tupleRow in var_listResultados]
+
                 logger.info(f"Encontrados {len(var_listAppids):,} AppIDs desatualizados")
                 return var_listAppids
                 
@@ -516,10 +518,10 @@ class PostgreSQLSteam(PostgreSQL):
             SELECT id_categoria, nome_categoria FROM steam_categorias;
             """
             var_connConnection = cls.conectar()
-            with var_connConnection.cursor() as cursor:
-                cursor.execute(var_strSQL)
-                var_listResultados = cursor.fetchall()
-                var_dictCategorias = {row[0]: row[1] for row in var_listResultados}
+            with var_connConnection.cursor() as var_objCursor:
+                var_objCursor.execute(var_strSQL)
+                var_listResultados = var_objCursor.fetchall()
+                var_dictCategorias = {var_tupleRow[0]: var_tupleRow[1] for var_tupleRow in var_listResultados}
                 return var_dictCategorias
             
         except Exception as e:
@@ -545,10 +547,10 @@ class PostgreSQLSteam(PostgreSQL):
             SELECT id_genero, nome_genero FROM steam_generos;
             """
             var_connConnection = cls.conectar()
-            with var_connConnection.cursor() as cursor:
-                cursor.execute(var_strSQL)
-                var_listResultados = cursor.fetchall()
-                var_dictGeneros = {row[0]: row[1] for row in var_listResultados}
+            with var_connConnection.cursor() as var_objCursor:
+                var_objCursor.execute(var_strSQL)
+                var_listResultados = var_objCursor.fetchall()
+                var_dictGeneros = {var_tupleRow[0]: var_tupleRow[1] for var_tupleRow in var_listResultados}
                 return var_dictGeneros
             
         except Exception as e:
@@ -574,10 +576,10 @@ class PostgreSQLSteam(PostgreSQL):
             SELECT id_linguagem, nome_linguagem FROM steam_linguagens;
             """
             var_connConnection = cls.conectar()
-            with var_connConnection.cursor() as cursor:
-                cursor.execute(var_strSQL)
-                var_listResultados = cursor.fetchall()
-                var_dictLinguagens = {row[1]: row[0] for row in var_listResultados}
+            with var_connConnection.cursor() as var_objCursor:
+                var_objCursor.execute(var_strSQL)
+                var_listResultados = var_objCursor.fetchall()
+                var_dictLinguagens = {var_tupleRow[1]: var_tupleRow[0] for var_tupleRow in var_listResultados}
                 return var_dictLinguagens
             
         except Exception as e:
@@ -604,31 +606,31 @@ class PostgreSQLSteam(PostgreSQL):
             WHERE appid = ANY(%s);
             """
             var_connConnection = cls.conectar()
-            with var_connConnection.cursor() as cursor:
-                cursor.execute(var_strSQL, (arg_listAppIDs,))
-                var_listResultados = cursor.fetchall()
+            with var_connConnection.cursor() as var_objCursor:
+                var_objCursor.execute(var_strSQL, (arg_listAppIDs,))
+                var_listResultados = var_objCursor.fetchall()
                 var_listDados = []
-                for row in var_listResultados:
+                for var_tupleRow in var_listResultados:
                     var_dictDetalhes = None
-                    if row[1] and row[1] not in ("AUSENTE", "ausente"):
+                    if var_tupleRow[1] and var_tupleRow[1] not in ("AUSENTE", "ausente"):
                         try:
-                            var_dictDetalhes = json.loads(row[1]) if isinstance(row[1], str) else row[1]
+                            var_dictDetalhes = json.loads(var_tupleRow[1]) if isinstance(var_tupleRow[1], str) else var_tupleRow[1]
                         except (json.JSONDecodeError, TypeError) as e:
-                            logger.warning(f"AppID {row[0]}: Erro ao parsear detalhes como JSON - {e}")
+                            logger.warning(f"AppID {var_tupleRow[0]}: Erro ao parsear detalhes como JSON - {e}")
                             var_dictDetalhes = "AUSENTE"
                     else:
                         var_dictDetalhes = "AUSENTE"
-                    
+
                     var_dictReviews = None
-                    if row[2] and row[2] not in ("AUSENTE", "ausente"):
+                    if var_tupleRow[2] and var_tupleRow[2] not in ("AUSENTE", "ausente"):
                         try:
-                            var_dictReviews = json.loads(row[2]) if isinstance(row[2], str) else row[2]
+                            var_dictReviews = json.loads(var_tupleRow[2]) if isinstance(var_tupleRow[2], str) else var_tupleRow[2]
                         except (json.JSONDecodeError, TypeError) as e:
-                            logger.warning(f"AppID {row[0]}: Erro ao parsear reviews como JSON - {e}")
+                            logger.warning(f"AppID {var_tupleRow[0]}: Erro ao parsear reviews como JSON - {e}")
                             var_dictReviews = None
-                    
+
                     var_dictDados = {
-                        "appid": row[0],
+                        "appid": var_tupleRow[0],
                         "detalhes": var_dictDetalhes,
                         "reviews": var_dictReviews
                     }

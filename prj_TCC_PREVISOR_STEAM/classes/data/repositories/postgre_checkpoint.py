@@ -29,8 +29,8 @@ class PostgreSQLCheckpoint(PostgreSQL):
                 timestamp = EXCLUDED.timestamp;
             """
             
-            with var_connConnection.cursor() as cursor:
-                cursor.execute(var_strSQL, (arg_intPcId, arg_intUltimoIndice, arg_strTipo))
+            with var_connConnection.cursor() as var_objCursor:
+                var_objCursor.execute(var_strSQL, (arg_intPcId, arg_intUltimoIndice, arg_strTipo))
                 var_connConnection.commit()
                 logger.info(f"Checkpoint salvo: PC {arg_intPcId}, índice {arg_intUltimoIndice:,}, tipo {arg_strTipo}")
         except Exception as e:
@@ -58,9 +58,9 @@ class PostgreSQLCheckpoint(PostgreSQL):
             WHERE pc_id = %s AND tipo_processamento = %s;
             """
             
-            with var_connConnection.cursor() as cursor:
-                cursor.execute(var_strSQL, (arg_intPcId, arg_strTipo))
-                var_listResult = cursor.fetchone()
+            with var_connConnection.cursor() as var_objCursor:
+                var_objCursor.execute(var_strSQL, (arg_intPcId, arg_strTipo))
+                var_listResult = var_objCursor.fetchone()
                 
                 if var_listResult:
                     var_intIndice = var_listResult[0]
@@ -88,8 +88,8 @@ class PostgreSQLCheckpoint(PostgreSQL):
         try:
             var_strSQL = "DELETE FROM processing_checkpoint WHERE pc_id = %s AND tipo_processamento = %s;"
             
-            with var_connConnection.cursor() as cursor:
-                cursor.execute(var_strSQL, (arg_intPcId, arg_strTipo))
+            with var_connConnection.cursor() as var_objCursor:
+                var_objCursor.execute(var_strSQL, (arg_intPcId, arg_strTipo))
                 var_connConnection.commit()
                 logger.info(f"Checkpoint limpo: PC {arg_intPcId}, tipo {arg_strTipo}")
         except Exception as e:

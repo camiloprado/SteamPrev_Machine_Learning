@@ -6,7 +6,7 @@ import logging
 logger = logging.getLogger("db.core")
 
 # Allowlist de tabelas conhecidas, usada para validar SQL dinâmico.
-CON_TABELAS_VALIDAS = frozenset({
+CON_SET_TABELAS_VALIDAS = frozenset({
     "steam_generico",
     "steam_raw",
     "steam_categorias",
@@ -42,7 +42,7 @@ class PostgreSQL:
         Levanta:
         - ValueError: Se o nome da tabela não estiver na allowlist.
         """
-        if arg_strNomeTabela not in CON_TABELAS_VALIDAS:
+        if arg_strNomeTabela not in CON_SET_TABELAS_VALIDAS:
             raise ValueError(f"Nome de tabela inválido ou não permitido: '{arg_strNomeTabela}'")
         return arg_strNomeTabela
 
@@ -148,13 +148,13 @@ class PostgreSQL:
             SELECT * FROM {arg_strNomeTabela};
             """
             cls.conectar()
-            with cls._var_connConnection.cursor() as cursor:
-                cursor.execute(var_strSQL)
-                var_listResultados = cursor.fetchall()
-                var_listColnames = [desc[0] for desc in cursor.description]
-                var_listDados = [dict(zip(var_listColnames, row)) for row in var_listResultados]
+            with cls._var_connConnection.cursor() as var_objCursor:
+                var_objCursor.execute(var_strSQL)
+                var_listResultados = var_objCursor.fetchall()
+                var_listColnames = [desc[0] for desc in var_objCursor.description]
+                var_listDados = [dict(zip(var_listColnames, var_tupleRow)) for var_tupleRow in var_listResultados]
                 return var_listDados
-            
+
         except Exception as e:
             logger.error(f"Erro ao buscar todos os dados da tabela '{arg_strNomeTabela}': {e}")
             raise Exception(f"Erro ao buscar todos os dados da tabela '{arg_strNomeTabela}': {e}")
@@ -191,11 +191,11 @@ class PostgreSQL:
 
             var_strSQL += ";"
 
-            with cls._var_connConnection.cursor() as cursor:
-                cursor.execute(var_strSQL, var_listParams or None)
-                var_listResultados = cursor.fetchall()
-                var_listColnames = [desc[0] for desc in cursor.description]
-                var_listDados = [dict(zip(var_listColnames, row)) for row in var_listResultados]
+            with cls._var_connConnection.cursor() as var_objCursor:
+                var_objCursor.execute(var_strSQL, var_listParams or None)
+                var_listResultados = var_objCursor.fetchall()
+                var_listColnames = [desc[0] for desc in var_objCursor.description]
+                var_listDados = [dict(zip(var_listColnames, var_tupleRow)) for var_tupleRow in var_listResultados]
                 logger.info(f"Encontrados {len(var_listDados)} jogos desatualizados na tabela '{arg_strNomeTabela}'.")
                 return var_listDados
         except Exception as e:

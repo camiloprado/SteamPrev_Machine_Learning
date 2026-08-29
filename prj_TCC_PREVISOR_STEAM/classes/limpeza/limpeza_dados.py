@@ -25,7 +25,7 @@ class LimpezaDados:
         Retorna:
         - var_strDataFormatada (str): Data em formato "YYYY-MM-DD".
         """
-        var_listMeses = {
+        var_dictMeses = {
             "jan": "Jan", "fev": "Feb", "mar": "Mar", "abr": "Apr", "mai": "May", "jun": "Jun",
             "jul": "Jul", "ago": "Aug", "set": "Sep", "out": "Oct", "nov": "Nov", "dez": "Dec"
         }
@@ -34,7 +34,7 @@ class LimpezaDados:
             var_listPartes = var_strDataRaw.split("/")
             if len(var_listPartes) == 3:
                 var_strDia, var_strMes, var_strAno = var_listPartes
-                var_strMesIngles = var_listMeses.get(var_strMes.lower(), var_strMes)
+                var_strMesIngles = var_dictMeses.get(var_strMes.lower(), var_strMes)
                 var_strDataIngles = f"{var_strDia} {var_strMesIngles}, {var_strAno}"
                 var_dateData = datetime.strptime(var_strDataIngles, "%d %b, %Y")
                 var_strDataFormatada = var_dateData.strftime("%Y-%m-%d")

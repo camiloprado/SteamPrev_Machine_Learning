@@ -44,7 +44,7 @@ class LimparLinguagens:
         var_strTexto = re.sub(r'[";\*#]', '', var_strTexto)
         
         # Separa por vírgula e adiciona ao set
-        var_listSeparadas = [nome.strip() for nome in var_strTexto.split(',') if nome.strip()]
+        var_listSeparadas = [var_strNome.strip() for var_strNome in var_strTexto.split(',') if var_strNome.strip()]
         
         return var_listSeparadas
     
@@ -73,8 +73,8 @@ class LimparLinguagens:
             
             # Prepara dados para inserção
             var_listValores = [
-                (var_intMaxId + idx + 1, nome)
-                for idx, nome in enumerate(sorted(arg_listNovasLinguagens))
+                (var_intMaxId + var_intIdx + 1, var_strNome)
+                for var_intIdx, var_strNome in enumerate(sorted(arg_listNovasLinguagens))
             ]
             
             # Insere usando execute_values para performance
@@ -93,8 +93,8 @@ class LimparLinguagens:
             
             # Log das novas linguagens
             logger.info("Novas linguagens adicionadas:")
-            for _, nome in var_listValores[:20]:  # Mostra apenas as primeiras 20
-                logger.info(f"  • {nome}")
+            for _, var_strNome in var_listValores[:20]:  # Mostra apenas as primeiras 20
+                logger.info(f"  • {var_strNome}")
             if len(var_listValores) > 20:
                 logger.info(f"  ... e mais {len(var_listValores) - 20} linguagens")
             

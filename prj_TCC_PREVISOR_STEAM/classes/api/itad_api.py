@@ -12,11 +12,11 @@ import os
 
 logger = logging.getLogger("itad")
 
-ITAD_HISTORY_URL = "https://api.isthereanydeal.com/games/history/v2"
-ITAD_LOOKUP_IDS_URL = "https://api.isthereanydeal.com/games/lookup/v1"
+CON_STR_ITAD_HISTORY_URL = "https://api.isthereanydeal.com/games/history/v2"
+CON_STR_ITAD_LOOKUP_IDS_URL = "https://api.isthereanydeal.com/games/lookup/v1"
 
 # Backoff base padrão, usado quando a configuração de retry não está definida.
-CON_DEFAULT_RETRY_BACKOFF_BASE = 0
+CON_INT_DEFAULT_RETRY_BACKOFF_BASE = 0
 
 class ITADClient:
     """
@@ -140,7 +140,7 @@ class ITADClient:
         return var_dictAllResults
     
     @classmethod
-    async def lookup_itad_ids(cls, arg_seqAppids: Sequence[int], arg_intRetryBackoffBase: int = CON_DEFAULT_RETRY_BACKOFF_BASE) -> tuple[dict[int, dict], dict]:
+    async def lookup_itad_ids(cls, arg_seqAppids: Sequence[int], arg_intRetryBackoffBase: int = CON_INT_DEFAULT_RETRY_BACKOFF_BASE) -> tuple[dict[int, dict], dict]:
         """
         Realiza lookup de IDs na API do IsThereAnyDeal (ITAD) de forma assíncrona.
 
@@ -221,7 +221,7 @@ class ITADClient:
                     
                     try:
                         # Faz a requisição assíncrona
-                        async with arg_clientSession.get(ITAD_LOOKUP_IDS_URL, params=var_dictParams, timeout=30) as var_respResponse:
+                        async with arg_clientSession.get(CON_STR_ITAD_LOOKUP_IDS_URL, params=var_dictParams, timeout=30) as var_respResponse:
                             var_respResponse.raise_for_status()
                             # Processa os dados recebidos
                             var_dictData = await var_respResponse.json()
@@ -457,7 +457,7 @@ class ITADClient:
     
     # ------------------- Async ITAD price history bulk -------------------
     @classmethod
-    async def fetch_price_history_bulk(cls, arg_seqItadPlain: Sequence[str], arg_intAnos: int = 5, arg_intRetryBackoffBase: int = CON_DEFAULT_RETRY_BACKOFF_BASE) -> tuple[dict, dict]:
+    async def fetch_price_history_bulk(cls, arg_seqItadPlain: Sequence[str], arg_intAnos: int = 5, arg_intRetryBackoffBase: int = CON_INT_DEFAULT_RETRY_BACKOFF_BASE) -> tuple[dict, dict]:
         """
         Busca o histórico de preços de múltiplos jogos na API do IsThereAnyDeal (ITAD) de forma assíncrona.
 
@@ -549,7 +549,7 @@ class ITADClient:
                     }
                     try:
                         # Faz a requisição assíncrona
-                        async with arg_clientSession.get(ITAD_HISTORY_URL, params=var_dictParams, timeout=30) as var_respResponse:
+                        async with arg_clientSession.get(CON_STR_ITAD_HISTORY_URL, params=var_dictParams, timeout=30) as var_respResponse:
                             var_respResponse.raise_for_status()
                             # Processa os dados recebidos
                             var_listData = await var_respResponse.json()
@@ -659,7 +659,7 @@ class ITADClient:
         arg_strTipo: str = 'lookup_ids',
         arg_intMaxRetries: int = 3,
         arg_strSince: str = None,
-        arg_intRetryBackoffBase: int = CON_DEFAULT_RETRY_BACKOFF_BASE,
+        arg_intRetryBackoffBase: int = CON_INT_DEFAULT_RETRY_BACKOFF_BASE,
     ) -> dict | None:
         """
         Retry com backoff exponencial (+ jitter) para erros 429 (Too Many Requests) e 502 (Bad Gateway).
@@ -685,7 +685,7 @@ class ITADClient:
         else:
             logger = logging.getLogger("itad.lookup")
         if arg_strTipo == 'preco':
-            url = ITAD_HISTORY_URL
+            url = CON_STR_ITAD_HISTORY_URL
             var_dictParams = {
                         "key": Settings._var_strItadApiKey,
                         "id": arg_anyId,
@@ -695,7 +695,7 @@ class ITADClient:
                     }
 
         elif arg_strTipo == 'lookup_ids':
-            url = ITAD_LOOKUP_IDS_URL
+            url = CON_STR_ITAD_LOOKUP_IDS_URL
             var_dictParams = {
                 "key": Settings._var_strItadApiKey,
                 "appid": arg_anyId,

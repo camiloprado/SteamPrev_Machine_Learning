@@ -11,13 +11,13 @@ import requests
 
 logger = logging.getLogger("steam.local")
 
-CON_DEFAULT_HEADERS = {
+CON_DICT_DEFAULT_HEADERS = {
     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
     "Accept-Language": "pt-BR,pt;q=0.9,en-US;q=0.8,en;q=0.7",
 }
 
 # STEAM_APP_LIST_URL API DESCONTINUADA PELA VALVE (404 desde Nov/2024)
-STEAM_APP_LIST_URL_DEPRECATED = "https://api.steampowered.com/ISteamApps/GetAppList/v2/"
+CON_STR_STEAM_APP_LIST_URL_DEPRECATED = "https://api.steampowered.com/ISteamApps/GetAppList/v2/"
 
 class LocalClient:
     """
@@ -114,8 +114,8 @@ class LocalClient:
                 
                 # Faz a requisição para a Steam (API descontinuada desde Nov/2024)
                 var_respResponse = requests.get(
-                    STEAM_APP_LIST_URL_DEPRECATED, 
-                    headers=CON_DEFAULT_HEADERS, 
+                    CON_STR_STEAM_APP_LIST_URL_DEPRECATED, 
+                    headers=CON_DICT_DEFAULT_HEADERS, 
                     timeout=60
                 )
 
@@ -250,9 +250,9 @@ class LocalClient:
                 with open(var_strCachePath, "r", encoding="utf-8") as f:
                     var_listCacheExistente = json.load(f)
                     var_dictCacheExistente = {
-                        jogo["appid"]: jogo 
-                        for jogo in var_listCacheExistente 
-                        if isinstance(jogo, dict) and "appid" in jogo
+                        var_dictJogo["appid"]: var_dictJogo
+                        for var_dictJogo in var_listCacheExistente
+                        if isinstance(var_dictJogo, dict) and "appid" in var_dictJogo
                     }
                 logger.info(f"Cache existente: {len(var_dictCacheExistente):,} jogos")
             except Exception as e:
@@ -261,16 +261,16 @@ class LocalClient:
         # Atualiza/adiciona jogos novos e modificados
         var_intNovosAdicionados = 0
         var_intModificados = 0
-        for jogo in arg_listDataNovos:
-            var_intAppid = jogo.get("appid")
+        for var_dictJogo in arg_listDataNovos:
+            var_intAppid = var_dictJogo.get("appid")
             if var_intAppid:
                 if var_intAppid in var_dictCacheExistente:
                     # Verifica se nome mudou
-                    if var_dictCacheExistente[var_intAppid].get("name") != jogo.get("name"):
+                    if var_dictCacheExistente[var_intAppid].get("name") != var_dictJogo.get("name"):
                         var_intModificados += 1
                 else:
                     var_intNovosAdicionados += 1
-                var_dictCacheExistente[var_intAppid] = jogo
+                var_dictCacheExistente[var_intAppid] = var_dictJogo
         
         # Converte dicionário de volta para lista
         var_listDataMesclada = list(var_dictCacheExistente.values())

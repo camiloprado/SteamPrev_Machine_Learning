@@ -26,8 +26,8 @@ class LimparGenero:
         try:
             logger.info("Inserindo novos gêneros no banco...")
             var_connConnection = PostgreSQL.conectar()
-            arg_dictNovosGeneros = {idx: nome for idx, nome in enumerate(arg_dictNovosGeneros, start=1)}
-            var_listValores = [(idx, nome) for idx, nome in arg_dictNovosGeneros.items()]
+            arg_dictNovosGeneros = {var_intIdx: var_strNome for var_intIdx, var_strNome in enumerate(arg_dictNovosGeneros, start=1)}
+            var_listValores = [(var_intIdx, var_strNome) for var_intIdx, var_strNome in arg_dictNovosGeneros.items()]
 
             # Insere usando execute_values para performance
             from psycopg2.extras import execute_values
@@ -45,8 +45,8 @@ class LimparGenero:
             
             # Log dos novos gêneros
             logger.info("Novos gêneros adicionados:")
-            for _, nome in var_listValores[:20]:  # Mostra apenas as primeiras 20
-                logger.info(f"  • {nome}")
+            for _, var_strNome in var_listValores[:20]:  # Mostra apenas as primeiras 20
+                logger.info(f"  • {var_strNome}")
             if len(var_listValores) > 20:
                 logger.info(f"  ... e mais {len(var_listValores) - 20} gêneros")
             
