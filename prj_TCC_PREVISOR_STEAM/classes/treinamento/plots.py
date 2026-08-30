@@ -183,9 +183,10 @@ class Plots:
         try:
             var_arrYReal = np.asarray(arg_arrYReal, dtype=np.float64)
             var_arrYPred = np.asarray(arg_arrYPred, dtype=np.float64)
-            
-            var_objFig, var_objAxes = plt.subplots(figsize=(8.0, 6.0), dpi=max(72, int(arg_intDpi)))
-            
+
+            var_strFigSize = os.getenv("REGRESSAO_PLOT_FIGURE_SIZE", "8.0,6.0").split(",")
+            var_objFig, var_objAxes = plt.subplots(figsize=(float(var_strFigSize[0]), float(var_strFigSize[1])), dpi=max(72, int(arg_intDpi)))
+
             # Scatter plot: preditos vs reais
             var_objAxes.scatter(var_arrYReal, var_arrYPred, alpha=0.5, s=10, edgecolors='none')
             
@@ -263,9 +264,10 @@ class Plots:
             var_arrYReal = np.asarray(arg_arrYReal, dtype=np.float64)
             var_arrYPred = np.asarray(arg_arrYPred, dtype=np.float64)
             var_arrResiduos = var_arrYReal - var_arrYPred  # Erro = real - predito
-            
-            var_objFig, var_objAxes = plt.subplots(figsize=(8.0, 6.0), dpi=max(72, int(arg_intDpi)))
-            
+
+            var_strFigSize = os.getenv("REGRESSAO_PLOT_FIGURE_SIZE", "8.0,6.0").split(",")
+            var_objFig, var_objAxes = plt.subplots(figsize=(float(var_strFigSize[0]), float(var_strFigSize[1])), dpi=max(72, int(arg_intDpi)))
+
             # Scatter plot: resíduos vs preditos
             var_objAxes.scatter(var_arrYPred, var_arrResiduos, alpha=0.5, s=10, edgecolors='none')
             

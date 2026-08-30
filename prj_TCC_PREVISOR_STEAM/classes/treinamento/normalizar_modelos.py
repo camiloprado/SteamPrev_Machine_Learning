@@ -651,36 +651,42 @@ class NormalizarModelos:
 
         logger.info(f"Regressão: Treino={var_dfXrTrain.shape[0]:,} amostras | Teste={var_dfXrTest.shape[0]:,} amostras")
 
-        # REGRESSÃO — SPLITS POR HORIZONTE (30d, 60d, 90d) — Alvo "dias até desconto": capa o valor no limite do horizonte.
+        # REGRESSÃO — SPLITS POR HORIZONTE (30d, 60d, 90d).
+        # Alvo "dias" agora é filtrado por linha (igual ao "desconto"), não só clipado no valor —
+        # evita treinar com amostras cujo desconto real ocorre muito além do horizonte.
         var_dictRegressaoHorizontes = {}
         var_dictMapDiasHorizonteReg = {"30d": 30, "60d": 60, "90d": 90}
 
         for var_strHorizReg, var_intDiasCap in var_dictMapDiasHorizonteReg.items():
-            var_serYrTrainH = var_serYrTrain.clip(upper=var_intDiasCap)
-            var_serYrTestH = var_serYrTest.clip(upper=var_intDiasCap)
+            var_boolNoHorizTrain = var_serYrTrain <= var_intDiasCap
+            var_boolNoHorizTest = var_serYrTest <= var_intDiasCap
 
-            # Filtro por linha (não por valor) para o alvo de desconto esperado.
-            var_boolDescNoHorizTrain = var_serYrTrain <= var_intDiasCap
-            var_boolDescNoHorizTest = var_serYrTest <= var_intDiasCap
+            var_dfXrTrainH = var_dfXrTrain[var_boolNoHorizTrain]
+            var_dfXrTestH = var_dfXrTest[var_boolNoHorizTest]
+            var_serYrTrainH = var_serYrTrain[var_boolNoHorizTrain]
+            var_serYrTestH = var_serYrTest[var_boolNoHorizTest]
 
-            var_dfXrDescTrainH = var_dfXrTrain[var_boolDescNoHorizTrain]
-            var_dfXrDescTestH = var_dfXrTest[var_boolDescNoHorizTest]
-            var_serYrDescTrainH = var_serYrDescTrain[var_boolDescNoHorizTrain]
-            var_serYrDescTestH = var_serYrDescTest[var_boolDescNoHorizTest]
+            var_dfXrDescTrainH = var_dfXrTrain[var_boolNoHorizTrain]
+            var_dfXrDescTestH = var_dfXrTest[var_boolNoHorizTest]
+            var_serYrDescTrainH = var_serYrDescTrain[var_boolNoHorizTrain]
+            var_serYrDescTestH = var_serYrDescTest[var_boolNoHorizTest]
 
-            # Fallback se o filtro por horizonte esvaziar o conjunto de desconto.
-            if var_dfXrDescTrainH.empty or var_dfXrDescTestH.empty:
+            # Fallback: dias e desconto usam a mesma máscara, então esvaziam juntos.
+            if var_dfXrTrainH.empty or var_dfXrTestH.empty:
                 logger.warning(
-                    f"Horizonte '{var_strHorizReg}': filtro de desconto por horizonte resultou em "
-                    f"conjunto vazio (treino={var_dfXrDescTrainH.shape[0]:,}, teste={var_dfXrDescTestH.shape[0]:,}). "
-                    "Usando conjunto de regressão completo (sem filtro por horizonte) como fallback."
+                    f"Horizonte '{var_strHorizReg}': filtro por horizonte resultou em "
+                    f"conjunto vazio (treino={var_dfXrTrainH.shape[0]:,}, teste={var_dfXrTestH.shape[0]:,}). "
+                    "Usando conjunto completo (com clip no alvo 'dias') como fallback."
                 )
+                var_dfXrTrainH, var_dfXrTestH = var_dfXrTrain, var_dfXrTest
+                var_serYrTrainH = var_serYrTrain.clip(upper=var_intDiasCap)
+                var_serYrTestH = var_serYrTest.clip(upper=var_intDiasCap)
                 var_dfXrDescTrainH, var_dfXrDescTestH = var_dfXrTrain, var_dfXrTest
                 var_serYrDescTrainH, var_serYrDescTestH = var_serYrDescTrain, var_serYrDescTest
 
             var_dictRegressaoHorizontes[var_strHorizReg] = {
-                "Xr_train": var_dfXrTrain,
-                "Xr_test": var_dfXrTest,
+                "Xr_train": var_dfXrTrainH,
+                "Xr_test": var_dfXrTestH,
                 "yr_train": var_serYrTrainH,
                 "yr_test": var_serYrTestH,
                 "Xr_desc_train": var_dfXrDescTrainH,
@@ -690,8 +696,8 @@ class NormalizarModelos:
             }
 
             logger.info(
-                f"Regressão ({var_strHorizReg}, cap={var_intDiasCap}d): "
-                f"Treino={var_dfXrTrain.shape[0]:,} | Teste={var_dfXrTest.shape[0]:,} | "
+                f"Regressão ({var_strHorizReg}, cap={var_intDiasCap}d, filtrado por linha): "
+                f"Treino={var_dfXrTrainH.shape[0]:,} | Teste={var_dfXrTestH.shape[0]:,} | "
                 f"y_train max={float(var_serYrTrainH.max()):.0f} | y_test max={float(var_serYrTestH.max()):.0f} | "
                 f"desconto_treino={var_dfXrDescTrainH.shape[0]:,} | desconto_teste={var_dfXrDescTestH.shape[0]:,}"
             )
