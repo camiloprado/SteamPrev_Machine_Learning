@@ -3,6 +3,7 @@
 /.env.local
 /.vscode/
 /CLAUDE.md
+*.docx
 /prj_TCC_PREVISOR_STEAM.egg-info
 *__pycache__/
 /.pytest_cache/
