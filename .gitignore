@@ -2,6 +2,7 @@
 /.env
 /.env.local
 /.vscode/
+/CLAUDE.md
 /prj_TCC_PREVISOR_STEAM.egg-info
 *__pycache__/
 /.pytest_cache/
