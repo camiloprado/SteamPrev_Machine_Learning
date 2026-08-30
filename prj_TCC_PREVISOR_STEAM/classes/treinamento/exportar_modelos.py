@@ -251,6 +251,22 @@ class ExportarModelos:
                         f"(Algoritmo: {var_strMelhorAlgoReg}, RMSE: {var_floatMelhorRMSE:.2f} {var_strMetricName})"
                     )
 
+        # STEAM APPLIST — inclui o catálogo usado pela Extensão na busca por nome.
+        var_pathAppList = Path(__file__).resolve().parents[2] / "resources" / "dados" / "steam_applist.json"
+        if var_pathAppList.exists():
+            var_pathAppListExport = var_pathExport / "steam_applist.json"
+            shutil.copy2(var_pathAppList, var_pathAppListExport)
+            var_strHashAppList = cls._calcular_sha256(var_pathAppListExport)
+            var_intSizeAppList = var_pathAppListExport.stat().st_size
+            var_dictManifest["models"]["steam_applist.json"] = {
+                "type": "data",
+                "sha256": var_strHashAppList,
+                "size_bytes": var_intSizeAppList,
+            }
+            logger.info(f"✅ Exportado: steam_applist.json ({var_intSizeAppList / (1024*1024):.1f} MB)")
+        else:
+            logger.warning(f"steam_applist.json não encontrado em {var_pathAppList}, pulando inclusão no manifest.")
+
         # MANIFEST — Salva metadados da exportação
         var_pathManifest = var_pathExport / "manifest.json"
         with open(var_pathManifest, "w", encoding="utf-8") as var_fileManifest:
