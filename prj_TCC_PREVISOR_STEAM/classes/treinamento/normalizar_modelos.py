@@ -37,6 +37,49 @@ class NormalizarModelos:
         return list(cls._var_listHorizontes)
 
     @classmethod
+    def obter_estrategia_split_ativa(cls) -> str:
+        """Retorna a estratégia de split usada no treino atual ("grupo" ou "walkforward")."""
+        if cls._var_dictSplits is None:
+            cls._preparar_todos_splits()
+        return cls._var_dictSplits.get("estrategia_split", "grupo")
+
+    @classmethod
+    def _remover_outliers_iqr(cls, arg_dfDados: pd.DataFrame, arg_serMaskTreino: pd.Series, arg_listColunas: list[str], arg_floatFator: float = 1.5) -> pd.Series:
+        """
+        Marca outliers via IQR (limites calculados só nas linhas de treino, para não vazar
+        informação do teste) nas colunas informadas. Mesmos limites aplicados a treino e teste.
+
+        Retorna:
+        - pd.Series[bool]: True para linhas dentro dos limites (a manter), indexada como arg_dfDados.
+        """
+        var_serManter = pd.Series(True, index=arg_dfDados.index)
+        for var_strCol in arg_listColunas:
+            if var_strCol not in arg_dfDados.columns:
+                continue
+
+            var_serTreino = pd.to_numeric(arg_dfDados.loc[arg_serMaskTreino, var_strCol], errors="coerce").dropna()
+            if var_serTreino.empty:
+                continue
+
+            var_floatQ1, var_floatQ3 = var_serTreino.quantile([0.25, 0.75])
+            var_floatIQR = var_floatQ3 - var_floatQ1
+            if not np.isfinite(var_floatIQR) or var_floatIQR <= 0:
+                continue
+
+            var_floatLimInf = var_floatQ1 - arg_floatFator * var_floatIQR
+            var_floatLimSup = var_floatQ3 + arg_floatFator * var_floatIQR
+            var_serColuna = pd.to_numeric(arg_dfDados[var_strCol], errors="coerce")
+            var_serDentro = var_serColuna.between(var_floatLimInf, var_floatLimSup)
+
+            logger.info(
+                f"Outliers IQR ({var_strCol}): limites=[{var_floatLimInf:.2f}, {var_floatLimSup:.2f}] | "
+                f"removidos={int((~var_serDentro).sum()):,}"
+            )
+            var_serManter &= var_serDentro.fillna(False)
+
+        return var_serManter
+
+    @classmethod
     def _log_estatisticas_treinamento(cls, arg_dfAmostras: pd.DataFrame, arg_listFeatures: list[str] | None = None,) -> None:
         """
         Registra estatísticas descritivas do conjunto de treino para classificação.
@@ -415,10 +458,17 @@ class NormalizarModelos:
         
         var_floatPrecoMinJanela = float(np.min(var_listPrecosJanela))
         var_floatRatioPrecoVsMin = arg_floatPrecoAtual / var_floatPrecoMinJanela if var_floatPrecoMinJanela > 0 else 1.0
-        
+
+        # Quão atípico o preço atual é frente à própria janela do jogo (escala relativa,
+        # não sofre com o drift de preço absoluto do catálogo ao longo do tempo).
+        var_floatMediaJanela = float(np.mean(var_listPrecosJanela))
+        var_floatStdJanela = float(np.std(var_listPrecosJanela))
+        var_floatZscorePreco = (arg_floatPrecoAtual - var_floatMediaJanela) / var_floatStdJanela if var_floatStdJanela > 0 else 0.0
+
         return {
-            "preco_media_janela": float(np.mean(var_listPrecosJanela)),
-            "preco_std_janela": float(np.std(var_listPrecosJanela)),
+            "preco_media_janela": var_floatMediaJanela,
+            "preco_std_janela": var_floatStdJanela,
+            "preco_zscore_janela": var_floatZscorePreco,
             "preco_min_janela": var_floatPrecoMinJanela,
             "preco_max_janela": float(np.max(var_listPrecosJanela)),
             "frequencia_descontos_por_ano": var_floatFreqDescontosAno,
@@ -483,9 +533,9 @@ class NormalizarModelos:
 
                     var_dictAmostra = {
                         "appid": var_dictRow.get("appid"),
+                        "timestamp_atual": var_intTimestampAtual,  # p/ split temporal (walk-forward)
                         "review_score": float(var_floatReviewScore) if pd.notna(var_floatReviewScore) else 0.0,
                         "preco_catalogo": var_floatPrecoAtual,
-                        "preco_atual_hist": var_floatPrecoAtual,
                         **var_dictFeatures,
                         "alvo_direcao_preco": var_strDirecaoProxEvento,
                         "alvo_dias_ate_desconto": var_intDiasProxDesconto,
@@ -519,13 +569,84 @@ class NormalizarModelos:
         return cls._var_dfAmostrasTemporais
 
     @classmethod
+    def _split_grupo_appid(cls, arg_dfDataframeCopy: pd.DataFrame, arg_listFeatures: list[str]) -> tuple[pd.Series, pd.Series]:
+        """
+        Split por appid (GroupShuffleSplit, 20% teste) — nenhum jogo aparece em treino
+        e teste ao mesmo tempo. Não é temporal: o modelo pode ver todos os períodos do
+        calendário via outros jogos, o que tende a inflar as métricas (ver comparativo
+        com `_split_walkforward`).
+
+        Retorna:
+        - tuple[pd.Series, pd.Series]: máscaras booleanas (treino, teste), indexadas como arg_dfDataframeCopy.
+        """
+        var_dictMapRotulo = {"cai": 0, "mantem": 1, "sobe": 2}
+        var_serGroups = arg_dfDataframeCopy["appid"]
+
+        try:
+            var_dfXBase = arg_dfDataframeCopy[arg_listFeatures].fillna(0.0)
+            var_serYBase = arg_dfDataframeCopy["alvo_direcao_preco"].map(var_dictMapRotulo)
+
+            var_objGSplit = GroupShuffleSplit(n_splits=1, test_size=0.2, random_state=42)
+            var_arrTrainIdx, var_arrTestIdx = next(var_objGSplit.split(var_dfXBase, var_serYBase, groups=var_serGroups))
+
+            var_setTrainAppids = set(var_serGroups.iloc[var_arrTrainIdx].unique())
+            var_setTestAppids = set(var_serGroups.iloc[var_arrTestIdx].unique())
+
+            logger.info(f"Split por appid: apps únicos totais={var_serGroups.nunique():,}")
+            logger.info(f"Apps treino: {len(var_setTrainAppids):,} | Apps teste: {len(var_setTestAppids):,}")
+
+        except Exception as e:
+            logger.warning(f"Fallback para split aleatório (sem GroupShuffleSplit): {e}")
+            var_serYBase = arg_dfDataframeCopy["alvo_direcao_preco"].map(var_dictMapRotulo)
+
+            var_arrTrainIdx, var_arrTestIdx = train_test_split(
+                range(len(arg_dfDataframeCopy)),
+                test_size=0.2,
+                random_state=42,
+                stratify=var_serYBase,
+            )
+            var_setTrainAppids = set(var_serGroups.iloc[var_arrTrainIdx].unique())
+            var_setTestAppids = set(var_serGroups.iloc[var_arrTestIdx].unique())
+
+        return var_serGroups.isin(var_setTrainAppids), var_serGroups.isin(var_setTestAppids)
+
+    @classmethod
+    def _split_walkforward(cls, arg_dfDataframeCopy: pd.DataFrame) -> tuple[pd.Series, pd.Series]:
+        """
+        Split temporal: treino = passado, teste = futuro (corte por `timestamp_atual`).
+        Simula o cenário real de uso (prever o futuro nunca visto) — não deixa o modelo
+        ver a sazonalidade do período de teste através de outros jogos, ao contrário do
+        split por appid.
+
+        Tamanho do teste configurável via ML_WALKFORWARD_TEST_SIZE (padrão 0.2).
+
+        Retorna:
+        - tuple[pd.Series, pd.Series]: máscaras booleanas (treino, teste), indexadas como arg_dfDataframeCopy.
+        """
+        var_floatTestSize = float(os.getenv("ML_WALKFORWARD_TEST_SIZE", "0.2"))
+        var_serOrdenado = arg_dfDataframeCopy["timestamp_atual"].sort_values()
+        var_intCorte = int(len(var_serOrdenado) * (1 - var_floatTestSize))
+        var_intTsCorte = int(var_serOrdenado.iloc[var_intCorte])
+
+        var_serMaskTreino = arg_dfDataframeCopy["timestamp_atual"] < var_intTsCorte
+        var_serMaskTeste = ~var_serMaskTreino
+
+        logger.info(
+            f"Split walk-forward: corte temporal={pd.to_datetime(var_intTsCorte, unit='s').date()} | "
+            f"treino={int(var_serMaskTreino.sum()):,} | teste={int(var_serMaskTeste.sum()):,}"
+        )
+        return var_serMaskTreino, var_serMaskTeste
+
+    @classmethod
     def _preparar_todos_splits(cls) -> None:
         """
         Prepara os splits de treino/teste para todos os horizontes e para regressão.
 
-        Faz o split por appid UMA VEZ (GroupShuffleSplit) e reutiliza a mesma
-        divisão de jogos para todos os horizontes, garantindo consistência
-        e evitando vazamento de dados entre treino e teste.
+        Faz o split (por appid ou walk-forward, conforme ML_ESTRATEGIA_SPLIT) UMA VEZ
+        e reutiliza a mesma máscara treino/teste para todos os horizontes, garantindo
+        consistência. A partir daqui (remoção de outliers, filtro por horizonte de
+        regressão, etc.) o código é idêntico para as duas estratégias — nenhuma delas
+        recebe tratamento, corte ou tolerância diferente, para manter o comparativo honesto.
 
         Parâmetros:
 
@@ -541,7 +662,7 @@ class NormalizarModelos:
         var_listFeatures = [
             "review_score",                                                                                 # Positivo/Negativo
             "preco_catalogo",                                                                               # Preço original
-            "preco_atual_hist",                                                                             # Preço atual do jogo na steam
+            "preco_zscore_janela",                                                                           # Quão atípico o preço atual é vs. a própria janela do jogo (relativo, não absoluto)
             "preco_media_janela",                                                                           # Preço médio na janela histórica (ML_JANELA_ANOS, padrão 5)
             "preco_std_janela",                                                                             # Desvio padrão na janela histórica (ML_JANELA_ANOS, padrão 5)
             "preco_min_janela",                                                                             # Preço mínimo na janela histórica (ML_JANELA_ANOS, padrão 5)
@@ -563,35 +684,37 @@ class NormalizarModelos:
 
         var_dictMapRotulo = {"cai": 0, "mantem": 1, "sobe": 2}
 
-        # Split por appid, compartilhado entre todos os horizontes.
-        var_serGroups = var_dfDataframeCopy["appid"]
+        # Estratégia de split, compartilhada entre todos os horizontes: "grupo" (padrão,
+        # GroupShuffleSplit por appid) ou "walkforward" (corte temporal, treino=passado/
+        # teste=futuro). Ambas retornam só as máscaras treino/teste — o restante do método
+        # trata as duas de forma idêntica.
+        var_strEstrategiaSplit = str(os.getenv("ML_ESTRATEGIA_SPLIT", "grupo")).strip().lower()
+        if var_strEstrategiaSplit == "walkforward":
+            var_serMaskTreino, var_serMaskTeste = cls._split_walkforward(var_dfDataframeCopy)
+        else:
+            if var_strEstrategiaSplit != "grupo":
+                logger.warning(f"ML_ESTRATEGIA_SPLIT='{var_strEstrategiaSplit}' desconhecida, usando 'grupo'.")
+                var_strEstrategiaSplit = "grupo"
+            var_serMaskTreino, var_serMaskTeste = cls._split_grupo_appid(var_dfDataframeCopy, var_listFeatures)
+        logger.info(f"Estratégia de split ativa: {var_strEstrategiaSplit}")
 
-        try:
-            var_dfXBase = var_dfDataframeCopy[var_listFeatures].fillna(0.0)
-            var_serYBase = var_dfDataframeCopy["alvo_direcao_preco"].map(var_dictMapRotulo)
-
-            var_objGSplit = GroupShuffleSplit(n_splits=1, test_size=0.2, random_state=42)
-            var_arrTrainIdx, var_arrTestIdx = next(var_objGSplit.split(var_dfXBase, var_serYBase, groups=var_serGroups))
-
-            var_setTrainAppids = set(var_serGroups.iloc[var_arrTrainIdx].unique())
-            var_setTestAppids = set(var_serGroups.iloc[var_arrTestIdx].unique())
-
-            logger.info(f"Split por appid: apps únicos totais={var_serGroups.nunique():,}")
-            logger.info(f"Apps treino: {len(var_setTrainAppids):,} | Apps teste: {len(var_setTestAppids):,}")
-
-        except Exception as e:
-            logger.warning(f"Fallback para split aleatório (sem GroupShuffleSplit): {e}")
-            var_dfXBase = var_dfDataframeCopy[var_listFeatures].fillna(0.0)
-            var_serYBase = var_dfDataframeCopy["alvo_direcao_preco"].map(var_dictMapRotulo)
-
-            var_arrTrainIdx, var_arrTestIdx = train_test_split(
-                range(len(var_dfDataframeCopy)),
-                test_size=0.2,
-                random_state=42,
-                stratify=var_serYBase,
+        # REMOÇÃO DE OUTLIERS (IQR, limites calculados só no treino — sem vazamento).
+        # Aplicado às features monetárias, as mais sujeitas a erro de parsing/coleta.
+        var_boolRemoverOutliers = str(os.getenv("ML_REMOVER_OUTLIERS", "True")).lower() in ("true", "1", "yes")
+        if var_boolRemoverOutliers:
+            var_floatFatorIQR = float(os.getenv("ML_OUTLIER_IQR_FATOR", "1.5"))
+            var_listColunasOutlier = [
+                "preco_catalogo", "preco_media_janela", "preco_max_janela",
+            ]
+            var_serManterOutlier = cls._remover_outliers_iqr(
+                var_dfDataframeCopy, var_serMaskTreino, var_listColunasOutlier, var_floatFatorIQR
             )
-            var_setTrainAppids = set(var_serGroups.iloc[var_arrTrainIdx].unique())
-            var_setTestAppids = set(var_serGroups.iloc[var_arrTestIdx].unique())
+            logger.info(
+                f"Outliers removidos (combinado): {int((~var_serManterOutlier).sum()):,} de "
+                f"{len(var_serManterOutlier):,} amostras"
+            )
+        else:
+            var_serManterOutlier = pd.Series(True, index=var_dfDataframeCopy.index)
 
         # CLASSIFICAÇÃO — SPLITS POR HORIZONTE
         var_dictHorizontes = {}
@@ -601,17 +724,17 @@ class NormalizarModelos:
                 logger.warning(f"Coluna {var_strColunaAlvo} não encontrada. Horizonte '{var_strHorizonte}' ignorado.")
                 continue
 
-            # Filtra amostras com alvo válido para este horizonte
-            var_boolValido = var_dfDataframeCopy[var_strColunaAlvo].notna()
+            # Filtra amostras com alvo válido para este horizonte e sem outliers.
+            var_boolValido = var_dfDataframeCopy[var_strColunaAlvo].notna() & var_serManterOutlier
             var_dfValido = var_dfDataframeCopy[var_boolValido]
 
             if var_dfValido.empty:
                 logger.warning(f"Horizonte '{var_strHorizonte}': nenhuma amostra válida.")
                 continue
 
-            # Separa treino/teste mantendo o mesmo split de appids
-            var_boolTreinoMask = var_dfValido["appid"].isin(var_setTrainAppids)
-            var_boolTesteMask = var_dfValido["appid"].isin(var_setTestAppids)
+            # Separa treino/teste mantendo a mesma máscara da estratégia ativa
+            var_boolTreinoMask = var_serMaskTreino.loc[var_dfValido.index]
+            var_boolTesteMask = var_serMaskTeste.loc[var_dfValido.index]
 
             var_dfXTrain = var_dfValido[var_boolTreinoMask][var_listFeatures].fillna(0.0)
             var_dfXTest = var_dfValido[var_boolTesteMask][var_listFeatures].fillna(0.0)
@@ -636,11 +759,11 @@ class NormalizarModelos:
             logger.info(f"  Treino: {var_dictDistTreino} | Teste: {var_dictDistTeste}")
 
         # REGRESSÃO — SPLIT (INDEPENDENTE DE HORIZONTE)
-        var_boolRegValido = var_dfDataframeCopy["alvo_dias_ate_desconto"].notna()
+        var_boolRegValido = var_dfDataframeCopy["alvo_dias_ate_desconto"].notna() & var_serManterOutlier
         var_dfReg = var_dfDataframeCopy[var_boolRegValido]
 
-        var_boolTreinoMaskReg = var_dfReg["appid"].isin(var_setTrainAppids)
-        var_boolTesteMaskReg = var_dfReg["appid"].isin(var_setTestAppids)
+        var_boolTreinoMaskReg = var_serMaskTreino.loc[var_dfReg.index]
+        var_boolTesteMaskReg = var_serMaskTeste.loc[var_dfReg.index]
 
         var_dfXrTrain = var_dfReg[var_boolTreinoMaskReg][var_listFeatures].fillna(0.0)
         var_dfXrTest = var_dfReg[var_boolTesteMaskReg][var_listFeatures].fillna(0.0)
@@ -704,6 +827,7 @@ class NormalizarModelos:
 
         # CACHE FINAL
         cls._var_dictSplits = {
+            "estrategia_split": var_strEstrategiaSplit,
             "horizontes": var_dictHorizontes,
             "regressao": {
                 "Xr_train": var_dfXrTrain,

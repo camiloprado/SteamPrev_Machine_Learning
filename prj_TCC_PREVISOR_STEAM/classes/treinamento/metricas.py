@@ -16,6 +16,31 @@ logger = logging.getLogger("treino.metricas")
 
 class Metricas:
     @staticmethod
+    def _classificar_overfitting(arg_floatTrain: float, arg_floatTest: float, arg_boolRelativo: bool, arg_floatLimiarEstavel: float, arg_floatLimiarOverfitting: float) -> str:
+        """
+        Classifica overfitting comparando uma métrica entre treino e teste.
+        Usado tanto por classificação (gap absoluto de accuracy) quanto por
+        regressão (gap relativo de RMSE, já que a escala varia por horizonte/alvo).
+
+        Parâmetros:
+        - arg_floatTrain/arg_floatTest (float): métrica no treino/teste.
+        - arg_boolRelativo (bool): se True, gap é % relativo ao valor de treino; se False, gap é absoluto.
+        - arg_floatLimiarEstavel/arg_floatLimiarOverfitting (float): limiares do gap para "Estável"/"Overfitting detectado".
+
+        Retorna:
+        - str: rótulo de status ("Estável", "Possível overfitting" ou "Overfitting detectado").
+        """
+        var_floatGap = abs(arg_floatTrain - arg_floatTest)
+        if arg_boolRelativo:
+            var_floatGap = var_floatGap / max(abs(arg_floatTrain), 1e-9)
+
+        if var_floatGap < arg_floatLimiarEstavel:
+            return "Estável"
+        elif var_floatGap >= arg_floatLimiarOverfitting:
+            return "Overfitting detectado"
+        return "Possível overfitting"
+
+    @staticmethod
     def _metricas_classificacao(arg_arrReal, arg_arrPred) -> dict:
         """
         Calcula métricas de classificação e indicadores de erro.
@@ -195,16 +220,11 @@ class Metricas:
             logger.warning(f"Não foi possível calcular métricas treino/teste ({arg_strModelo}): {e}")
             return
 
-        # DETECÇÃO DE OVERFITTING: calcula diferença de acurácia entre treino e teste
-        var_floatDiferencaAcc = abs(var_dictTrain['accuracy'] - var_dictTest['accuracy'])
-        
-        # Classificação automática do status de overfitting
-        if var_floatDiferencaAcc < 0.03:  # < 3% de diferença
-            var_strOverfitting = " Estável"  # Modelo generaliza bem
-        elif var_floatDiferencaAcc >= 0.05:  # ≥ 5% de diferença
-            var_strOverfitting = " Overfitting detectado"  # Problema sério
-        else:  # 3-5% de diferença
-            var_strOverfitting = " Possível overfitting"  # Zona cinzenta
+        # DETECÇÃO DE OVERFITTING: gap absoluto de accuracy (escala 0-1, então <3%/>=5% fazem sentido em valor absoluto).
+        var_strOverfitting = " " + Metricas._classificar_overfitting(
+            var_dictTrain['accuracy'], var_dictTest['accuracy'], arg_boolRelativo=False,
+            arg_floatLimiarEstavel=0.03, arg_floatLimiarOverfitting=0.05,
+        )
         
         # LOG TREINO: mostra performance no conjunto que o modelo utilizou para aprender
         logger.info(
@@ -249,12 +269,18 @@ class Metricas:
             return
 
         var_strUnidade = "%" if arg_strAlvo == "desconto" else "dias"
-        
+
+        # DETECÇÃO DE OVERFITTING: gap relativo de RMSE (escala varia por horizonte/alvo, então % faz mais sentido que valor absoluto).
+        var_strOverfitting = " " + Metricas._classificar_overfitting(
+            var_floatRmseTrain, var_floatRmseTest, arg_boolRelativo=True,
+            arg_floatLimiarEstavel=0.10, arg_floatLimiarOverfitting=0.20,
+        )
+
         logger.info(
             f"{arg_strModelo} - TREINO | RMSE: {var_floatRmseTrain:.2f} {var_strUnidade} | MAE: {var_floatMaeTrain:.2f} {var_strUnidade} | MSE: {var_floatMseTrain:.2f}"
         )
         logger.info(
-            f"{arg_strModelo} - TESTE  | RMSE: {var_floatRmseTest:.2f} {var_strUnidade} | MAE: {var_floatMaeTest:.2f} {var_strUnidade} | MSE: {var_floatMseTest:.2f}"
+            f"{arg_strModelo} - TESTE  | RMSE: {var_floatRmseTest:.2f} {var_strUnidade} | MAE: {var_floatMaeTest:.2f} {var_strUnidade} | MSE: {var_floatMseTest:.2f} |{var_strOverfitting}"
         )
 
 
