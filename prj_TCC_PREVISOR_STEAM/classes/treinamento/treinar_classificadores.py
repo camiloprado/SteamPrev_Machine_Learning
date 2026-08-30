@@ -1,6 +1,5 @@
 import logging
 from sklearn.ensemble import RandomForestClassifier
-from sklearn.utils.class_weight import compute_sample_weight
 import xgboost as xgb
 import lightgbm as lgb
 from prj_TCC_PREVISOR_STEAM.classes.treinamento.metricas import Metricas
@@ -38,7 +37,8 @@ class TreinarClassificadores:
             max_features="sqrt",                  # Fração de features para considerar em cada split
             random_state=42,                      # Reprodutibilidade para garantir a mesma aleatoriedade
             n_jobs=-1,                            # Número de processos para paralelizar o treinamento
-            class_weight="balanced_subsample",    # Peso das classes para balancear o subamostreo
+            # Sem class_weight: o undersampling de Balancear já corrige o desbalanceamento;
+            # aplicar balanced_subsample por cima é correção dupla e piora o F1-macro (validado: -2,8pp).
         )
         
         var_objModelo.fit(var_dfXTrainBalanced, var_serYTrainBalanced)
@@ -109,11 +109,12 @@ class TreinarClassificadores:
             early_stopping_rounds=50,      # Early stopping para evitar overfitting
         )
 
-        var_arrSampleWeights = compute_sample_weight("balanced", var_serYTrainBalanced)
+        # Sem sample_weight: o undersampling de Balancear já corrige o desbalanceamento;
+        # aplicar compute_sample_weight("balanced") por cima é correção dupla e piora o
+        # F1-macro (validado: -6,5pp em 30d).
         var_objModelo.fit(
             var_dfXTrainBalanced,
             var_serYTrainBalanced,
-            sample_weight=var_arrSampleWeights,
             eval_set=[(var_dictSplits["X_test"], var_dictSplits["y_test"])],
             verbose=False,
         )
@@ -181,7 +182,8 @@ class TreinarClassificadores:
             colsample_bytree=0.9,                  # Fração de features para treinar cada árvore
             random_state=42,                       # Reprodutibilidade para garantir a mesma aleatoriedade
             verbose=-1,                            # Nível de verbosidade (0 = nenhum log, 1 = logs básicos, 2 = logs detalhados, -1 = logs mínimos)
-            class_weight="balanced",               # Peso das classes para balancear o subamostreo (1 para cada classe)
+            # Sem class_weight: o undersampling de Balancear já corrige o desbalanceamento;
+            # aplicar balanced por cima é correção dupla e piora o F1-macro (validado: -7,2pp).
         )
 
         try:
