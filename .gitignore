@@ -31,6 +31,7 @@ dashboard_tcc_temp.py
 !*/resources/dados/steam_applist.json
 */resources/relatorios/*.csv
 */resources/relatorios/*.png
+*/resources/relatorios/tcc_figuras/
 backup_public.sql
 
 # -------------------------------------------------------------------

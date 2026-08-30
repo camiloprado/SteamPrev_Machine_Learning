@@ -69,6 +69,30 @@ class ExportarModelos:
         return var_pathExport
 
     @classmethod
+    def _copiar_figura_melhor_modelo(cls, arg_strPadraoGlob: str, arg_strNomeDestino: str, arg_strSubpasta: str) -> None:
+        """
+        Copia o plot mais recente que casa com arg_strPadraoGlob para
+        resources/relatorios/tcc_figuras/<arg_strSubpasta>/, sempre sobrescrevendo
+        com o nome fixo arg_strNomeDestino — pasta pronta para uso direto no TCC,
+        sempre refletindo qual é o melhor modelo da rodada mais recente.
+
+        Parâmetros:
+        - arg_strPadraoGlob (str): Padrão glob (relativo a resources/relatorios) do plot a copiar.
+        - arg_strNomeDestino (str): Nome do arquivo de destino (fixo, sem timestamp).
+        - arg_strSubpasta (str): "classificacao" ou "regressao".
+        """
+        var_pathRelatorios = Path(__file__).resolve().parents[2] / "resources" / "relatorios"
+        var_listCandidatos = sorted(var_pathRelatorios.glob(arg_strPadraoGlob), key=lambda p: p.stat().st_mtime)
+
+        if not var_listCandidatos:
+            logger.warning(f"Nenhuma figura encontrada para o padrão '{arg_strPadraoGlob}' — pasta tcc_figuras não atualizada para este item.")
+            return
+
+        var_pathDestinoDir = var_pathRelatorios / "tcc_figuras" / arg_strSubpasta
+        var_pathDestinoDir.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(var_listCandidatos[-1], var_pathDestinoDir / arg_strNomeDestino)
+
+    @classmethod
     def exportar(cls, arg_dictModelos: dict) -> Path:
         """
         Exporta os melhores modelos com nomenclatura padronizada.
@@ -138,6 +162,9 @@ class ExportarModelos:
         var_strMelhorHorizonteGlobal = None
         var_strMelhorAlgoGlobal = None
 
+        # Índice de quais algoritmos geraram as figuras salvas em tcc_figuras/ nesta rodada.
+        var_dictIndiceFiguras = {"classificacao": {}, "regressao_dias": {}, "regressao_desconto": {}}
+
         # CLASSIFICAÇÃO — Seleciona melhor modelo por horizonte (F1-macro)
         if "classificacao" in arg_dictModelos:
             for var_strHorizonte, var_dictAlgos in arg_dictModelos["classificacao"].items():
@@ -179,6 +206,17 @@ class ExportarModelos:
                     f"✅ Exportado: {var_strNomeArq} "
                     f"(Algoritmo: {var_strMelhorAlgo}, F1: {var_floatMelhorF1:.4f})"
                 )
+
+                cls._copiar_figura_melhor_modelo(
+                    f"confusion_{var_strMelhorAlgo}_{var_strHorizonte}_teste_*_plot.png",
+                    f"matriz_confusao_{var_strHorizonte}.png",
+                    "classificacao",
+                )
+                var_dictIndiceFiguras["classificacao"][var_strHorizonte] = {
+                    "arquivo": f"classificacao/matriz_confusao_{var_strHorizonte}.png",
+                    "algoritmo": var_strMelhorAlgo,
+                    "f1_macro": round(var_floatMelhorF1, 6),
+                }
 
                 # Rastreia o melhor classificador global
                 if var_floatMelhorF1 > var_floatMelhorF1Global:
@@ -253,6 +291,22 @@ class ExportarModelos:
                         f"(Algoritmo: {var_strMelhorAlgoReg}, RMSE: {var_floatMelhorRMSE:.2f} {var_strMetricName})"
                     )
 
+                    var_strPrefixoPlot = "dias" if var_strRegType == "regressao_dias" else "desconto"
+                    for var_strTipoPlot in ("predito_vs_real", "residuos"):
+                        cls._copiar_figura_melhor_modelo(
+                            f"regressao_{var_strMelhorAlgoReg}_{var_strHorizonte}_{var_strPrefixoPlot}_{var_strTipoPlot}_*.png",
+                            f"{var_strPrefixoPlot}_{var_strTipoPlot}_{var_strHorizonte}.png",
+                            "regressao",
+                        )
+                    var_dictIndiceFiguras[var_strRegType][var_strHorizonte] = {
+                        "arquivos": [
+                            f"regressao/{var_strPrefixoPlot}_predito_vs_real_{var_strHorizonte}.png",
+                            f"regressao/{var_strPrefixoPlot}_residuos_{var_strHorizonte}.png",
+                        ],
+                        "algoritmo": var_strMelhorAlgoReg,
+                        "rmse": round(var_floatMelhorRMSE, 6),
+                    }
+
         # STEAM APPLIST — inclui o catálogo usado pela Extensão na busca por nome.
         var_pathAppList = Path(__file__).resolve().parents[2] / "resources" / "dados" / "steam_applist.json"
         if var_pathAppList.exists():
@@ -284,6 +338,16 @@ class ExportarModelos:
                 ) + "\n")
         except Exception as e:
             logger.warning(f"Falha ao registrar manifest_history.jsonl: {e}")
+
+        # ÍNDICE DE FIGURAS — quais algoritmos geraram os plots em resources/relatorios/tcc_figuras/.
+        var_pathIndiceFiguras = Path(__file__).resolve().parents[2] / "resources" / "relatorios" / "tcc_figuras" / "indice.json"
+        var_pathIndiceFiguras.parent.mkdir(parents=True, exist_ok=True)
+        with open(var_pathIndiceFiguras, "w", encoding="utf-8") as var_fileIndice:
+            json.dump(
+                {"exported_at": datetime.now().isoformat(), **var_dictIndiceFiguras},
+                var_fileIndice, indent=2, ensure_ascii=False,
+            )
+        logger.info(f"✅ Índice de figuras do TCC atualizado: {var_pathIndiceFiguras}")
 
         logger.info(f"📋 Manifest salvo: {var_pathManifest}")
         logger.info(f"Total de modelos exportados: {len(var_dictManifest['models'])}")
