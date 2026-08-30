@@ -72,6 +72,25 @@ class LocalClient:
             
             # Se conseguiu dados, salva no cache local
             if var_listData:
+                # Recusa sobrescrever com uma lista muito menor que a existente (resposta parcial/corrompida).
+                var_intExistente = 0
+                if os.path.exists(var_strPath):
+                    try:
+                        with open(var_strPath, "r", encoding="utf-8") as var_fileExistente:
+                            var_intExistente = len(json.load(var_fileExistente))
+                    except Exception:
+                        var_intExistente = 0
+
+                if var_intExistente and len(var_listData) < var_intExistente * 0.9:
+                    logger.error(
+                        f"Recusando sobrescrever {var_strPath}: nova lista tem "
+                        f"{len(var_listData):,} itens, menos de 90% dos "
+                        f"{var_intExistente:,} já existentes. Mantendo arquivo atual."
+                    )
+                    Settings._var_listApp = cls._load_from_local_json()
+                    Settings._var_boolAppListLoaded = True
+                    return Settings._var_listApp
+
                 os.makedirs(os.path.dirname(var_strPath), exist_ok=True)
                 with open(var_strPath, "w", encoding="utf-8") as f:
                     json.dump(var_listData, f)

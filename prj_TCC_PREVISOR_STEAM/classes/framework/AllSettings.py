@@ -151,7 +151,11 @@ class Settings:
         """
         cls._var_strItadApiKey: str | None = os.getenv("ITAD_API_KEY")
         cls._var_intCacheAppListMaxAgeDays: int = 30
-        cls._var_strAppListPath: str = "resources/dados/steam_applist.json"
+        # Ancorado em __file__, não no cwd, para bater com local_steam.py/steamspy_api.py.
+        cls._var_strAppListPath: str = os.path.join(
+            os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))),
+            "resources", "dados", "steam_applist.json",
+        )
         cls._var_listApp: list[dict[str, Any]] = []
         cls._var_boolAppListLoaded = False
         cls._var_dictConfigAPI = {
