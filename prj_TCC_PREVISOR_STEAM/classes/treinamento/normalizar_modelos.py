@@ -3,7 +3,7 @@ from sklearn.model_selection import train_test_split, GroupShuffleSplit
 
 import pandas as pd
 import numpy as np
-from datetime import datetime
+from datetime import datetime, timedelta
 import os
 
 import logging
@@ -30,6 +30,13 @@ class NormalizarModelos:
         "60d": "alvo_direcao_60d",
         "90d": "alvo_direcao_90d",
     }
+
+    # Calendário de liquidações Steam: por padrão dias fixos (Spring/Summer/Autumn/Winter),
+    # substituído por um calendário derivado dos próprios dados (ver
+    # _calcular_calendario_promocoes_empirico) quando ML_CALENDARIO_PROMOCOES_EMPIRICO=True.
+    _var_listDiasGrandesPromocoesPadrao = [75, 177, 327, 355]
+    _var_dictCalendarioPromocoesPorAno: dict[int, list[int]] = {}
+    _var_listDiasCanonicosPromocoes: list[int] = list(_var_listDiasGrandesPromocoesPadrao)
 
     @classmethod
     def obter_horizontes_disponiveis(cls) -> list[str]:
@@ -78,6 +85,77 @@ class NormalizarModelos:
             var_serManter &= var_serDentro.fillna(False)
 
         return var_serManter
+
+    @classmethod
+    def _calcular_calendario_promocoes_empirico(cls) -> None:
+        """
+        Deriva o calendário real de liquidações Steam a partir dos dados coletados, em vez
+        de assumir dias fixos do ano (que não se sustentam: a liquidação de Outono variou
+        de dia 279 a 319 entre 2022 e 2025, quase um mês de diferença).
+
+        Conta, por dia, quantos jogos têm desconto ativo simultaneamente; para cada ano com
+        cobertura suficiente (observado até pelo menos o dia 330 e picos com magnitude
+        mínima, para descartar anos com coleta parcial/esparsa), acha os 4 maiores picos
+        (Spring/Summer/Autumn/Winter) via busca gulosa com exclusão de vizinhança de 30 dias.
+
+        Preenche cls._var_dictCalendarioPromocoesPorAno (ano -> [4 dias do ano]) e
+        cls._var_listDiasCanonicosPromocoes (mediana dos anos confiáveis, usada como
+        fallback para anos sem dado confiável).
+        """
+        if cls._var_dfDadosTreinamento is None:
+            cls.carregar_dados_treinamento()
+
+        var_dictContagemPorDia: dict = {}
+        for _, var_dictRow in cls._var_dfDadosTreinamento.iterrows():
+            var_listHistorico = cls._separar_historico(var_dictRow.get("historico_preco"))
+            for var_dictPonto in var_listHistorico:
+                if var_dictPonto.get("desconto", 0.0) > 0.0:
+                    var_dtDia = datetime.fromtimestamp(var_dictPonto["timestamp"]).date()
+                    var_dictContagemPorDia[var_dtDia] = var_dictContagemPorDia.get(var_dtDia, 0) + 1
+
+        if not var_dictContagemPorDia:
+            logger.warning("Calendário de promoções: nenhum dia com desconto encontrado, mantendo dias fixos padrão.")
+            return
+
+        var_serContagem = pd.Series(var_dictContagemPorDia).sort_index()
+        var_serContagem.index = pd.to_datetime(var_serContagem.index)
+        var_serCompleta = var_serContagem.asfreq("D", fill_value=0)
+        var_serSuavizada = var_serCompleta.rolling(14, min_periods=1, center=True).mean()
+
+        var_dictCalendario = {}
+        for var_intAno in sorted(set(var_serSuavizada.index.year)):
+            var_serAno = var_serSuavizada[var_serSuavizada.index.year == var_intAno]
+            var_intMaxDiaAno = var_serAno.index.max().timetuple().tm_yday
+            if var_intMaxDiaAno < 330:
+                continue  # ano com coleta incompleta (não chegou até o Outono/Inverno)
+
+            var_serRestante = var_serAno.copy()
+            var_listPicos = []
+            for _ in range(4):
+                if var_serRestante.empty:
+                    break
+                var_dtPico = var_serRestante.idxmax()
+                var_listPicos.append((var_dtPico, float(var_serRestante.max())))
+                var_serRestante = var_serRestante[
+                    (var_serRestante.index < var_dtPico - timedelta(days=30))
+                    | (var_serRestante.index > var_dtPico + timedelta(days=30))
+                ]
+
+            if len(var_listPicos) < 4 or min(v for _, v in var_listPicos) < 300:
+                continue  # ano com dados esparsos/pouco confiáveis (ex.: início da coleta)
+
+            var_listPicos.sort(key=lambda item: item[0])
+            var_dictCalendario[var_intAno] = [dt.timetuple().tm_yday for dt, _ in var_listPicos]
+
+        cls._var_dictCalendarioPromocoesPorAno = var_dictCalendario
+
+        if var_dictCalendario:
+            var_arrSlots = np.array(list(var_dictCalendario.values()))
+            cls._var_listDiasCanonicosPromocoes = [int(round(v)) for v in np.median(var_arrSlots, axis=0)]
+            logger.info(f"Calendário de promoções derivado dos dados: {var_dictCalendario}")
+            logger.info(f"Dias canônicos (mediana, fallback): {cls._var_listDiasCanonicosPromocoes}")
+        else:
+            logger.warning("Calendário de promoções: nenhum ano com dados confiáveis, mantendo dias fixos padrão.")
 
     @classmethod
     def _log_estatisticas_treinamento(cls, arg_dfAmostras: pd.DataFrame, arg_listFeatures: list[str] | None = None,) -> None:
@@ -416,15 +494,23 @@ class NormalizarModelos:
         var_dtAtual = datetime.fromtimestamp(arg_intTimestampAtual)
         var_intMesAtual = var_dtAtual.month
         var_intDiaDoAno = var_dtAtual.timetuple().tm_yday
-        
-        var_listDiasGrandesPromocoes = [75, 177, 327, 355]
+
+        # Calendário empírico (por ano) quando disponível; cai para a mediana canônica
+        # dos anos confiáveis quando o ano da amostra não tem dado suficiente.
+        var_listDiasEsteAno = cls._var_dictCalendarioPromocoesPorAno.get(
+            var_dtAtual.year, cls._var_listDiasCanonicosPromocoes
+        )
+        var_listDiasProxAno = cls._var_dictCalendarioPromocoesPorAno.get(
+            var_dtAtual.year + 1, cls._var_listDiasCanonicosPromocoes
+        )
+
         var_intDiasProxPromo = 999
-        for var_intDiaPromo in var_listDiasGrandesPromocoes:
+        for var_intDiaPromo in var_listDiasEsteAno:
             if var_intDiaPromo >= var_intDiaDoAno:
                 var_intDiasProxPromo = min(var_intDiasProxPromo, var_intDiaPromo - var_intDiaDoAno)
-                
+
         if var_intDiasProxPromo == 999:
-            var_intDiasProxPromo = (365 - var_intDiaDoAno) + 75
+            var_intDiasProxPromo = (365 - var_intDiaDoAno) + min(var_listDiasProxAno)
             
         var_listPrecosJanela = [var_dictItem["preco"] for var_dictItem in arg_listJanela]
         var_listDescontosJanela = [var_dictItem.get("desconto", 0.0) for var_dictItem in arg_listJanela]
@@ -491,6 +577,8 @@ class NormalizarModelos:
         """
         if cls._var_dfDadosTreinamento is None:
             cls.carregar_dados_treinamento()
+
+        cls._calcular_calendario_promocoes_empirico()
 
         var_listAmostras = []
         var_intAnosJanela = cls._var_intAnosJanelaHistorico
@@ -618,15 +706,26 @@ class NormalizarModelos:
         ver a sazonalidade do período de teste através de outros jogos, ao contrário do
         split por appid.
 
-        Tamanho do teste configurável via ML_WALKFORWARD_TEST_SIZE (padrão 0.2).
+        Tamanho do teste configurável via ML_WALKFORWARD_TEST_SIZE (padrão 0.2), ou, se
+        ML_WALKFORWARD_JANELA_DIAS estiver definida, o teste passa a ser uma janela curta
+        e fixa (últimos N dias) em vez de uma fração do dataset — reflete a cadência real
+        de re-treino do sistema em produção (o modelo nunca fica "velho" por muito tempo),
+        em vez do gap de ~10 meses que a fração de 20% acaba gerando neste dataset.
 
         Retorna:
         - tuple[pd.Series, pd.Series]: máscaras booleanas (treino, teste), indexadas como arg_dfDataframeCopy.
         """
-        var_floatTestSize = float(os.getenv("ML_WALKFORWARD_TEST_SIZE", "0.2"))
-        var_serOrdenado = arg_dfDataframeCopy["timestamp_atual"].sort_values()
-        var_intCorte = int(len(var_serOrdenado) * (1 - var_floatTestSize))
-        var_intTsCorte = int(var_serOrdenado.iloc[var_intCorte])
+        var_strJanelaDias = os.getenv("ML_WALKFORWARD_JANELA_DIAS")
+        var_intTimestampMax = int(arg_dfDataframeCopy["timestamp_atual"].max())
+
+        if var_strJanelaDias:
+            var_intJanelaDias = int(var_strJanelaDias)
+            var_intTsCorte = var_intTimestampMax - (var_intJanelaDias * 86400)
+        else:
+            var_floatTestSize = float(os.getenv("ML_WALKFORWARD_TEST_SIZE", "0.2"))
+            var_serOrdenado = arg_dfDataframeCopy["timestamp_atual"].sort_values()
+            var_intCorte = int(len(var_serOrdenado) * (1 - var_floatTestSize))
+            var_intTsCorte = int(var_serOrdenado.iloc[var_intCorte])
 
         var_serMaskTreino = arg_dfDataframeCopy["timestamp_atual"] < var_intTsCorte
         var_serMaskTeste = ~var_serMaskTreino
