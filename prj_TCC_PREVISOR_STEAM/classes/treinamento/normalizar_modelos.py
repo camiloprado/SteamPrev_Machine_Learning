@@ -638,6 +638,47 @@ class NormalizarModelos:
         return var_serMaskTreino, var_serMaskTeste
 
     @classmethod
+    def _split_grupo_temporal(cls, arg_dfDataframeCopy: pd.DataFrame) -> tuple[pd.Series, pd.Series]:
+        """
+        Split duplo (grupo + temporal): o teste só contém linhas de appids nunca vistos
+        no treino E de um período posterior ao corte temporal — elimina simultaneamente
+        os dois vetores de vazamento (jogo conhecido e sazonalidade vista via outros jogos).
+
+        Treino = appid fora do grupo de teste E timestamp < corte.
+        Teste  = appid do grupo de teste E timestamp >= corte.
+        Linhas que não se encaixam em nenhuma das duas condições são descartadas.
+
+        Tamanho do grupo de teste configurável via ML_GRUPO_TEMPORAL_TEST_SIZE (padrão 0.2).
+
+        Retorna:
+        - tuple[pd.Series, pd.Series]: máscaras booleanas (treino, teste), indexadas como arg_dfDataframeCopy.
+        """
+        var_floatTestSize = float(os.getenv("ML_GRUPO_TEMPORAL_TEST_SIZE", "0.2"))
+        var_serOrdenado = arg_dfDataframeCopy["timestamp_atual"].sort_values()
+        var_intCorte = int(len(var_serOrdenado) * (1 - var_floatTestSize))
+        var_intTsCorte = int(var_serOrdenado.iloc[var_intCorte])
+
+        var_serAppids = arg_dfDataframeCopy["appid"].unique()
+        var_rng = np.random.default_rng(42)
+        var_arrAppidsEmbaralhados = var_rng.permutation(var_serAppids)
+        var_intCorteAppids = int(len(var_arrAppidsEmbaralhados) * (1 - var_floatTestSize))
+        var_setTestAppids = set(var_arrAppidsEmbaralhados[var_intCorteAppids:])
+
+        var_serEhAppidTeste = arg_dfDataframeCopy["appid"].isin(var_setTestAppids)
+        var_serEhFuturo = arg_dfDataframeCopy["timestamp_atual"] >= var_intTsCorte
+
+        var_serMaskTreino = ~var_serEhAppidTeste & ~var_serEhFuturo
+        var_serMaskTeste = var_serEhAppidTeste & var_serEhFuturo
+
+        logger.info(
+            f"Split grupo+temporal: corte temporal={pd.to_datetime(var_intTsCorte, unit='s').date()} | "
+            f"apps teste={len(var_setTestAppids):,} de {len(var_serAppids):,} | "
+            f"treino={int(var_serMaskTreino.sum()):,} | teste={int(var_serMaskTeste.sum()):,} | "
+            f"descartadas={int((~var_serMaskTreino & ~var_serMaskTeste).sum()):,}"
+        )
+        return var_serMaskTreino, var_serMaskTeste
+
+    @classmethod
     def _preparar_todos_splits(cls) -> None:
         """
         Prepara os splits de treino/teste para todos os horizontes e para regressão.
@@ -691,6 +732,8 @@ class NormalizarModelos:
         var_strEstrategiaSplit = str(os.getenv("ML_ESTRATEGIA_SPLIT", "grupo")).strip().lower()
         if var_strEstrategiaSplit == "walkforward":
             var_serMaskTreino, var_serMaskTeste = cls._split_walkforward(var_dfDataframeCopy)
+        elif var_strEstrategiaSplit == "grupo_temporal":
+            var_serMaskTreino, var_serMaskTeste = cls._split_grupo_temporal(var_dfDataframeCopy)
         else:
             if var_strEstrategiaSplit != "grupo":
                 logger.warning(f"ML_ESTRATEGIA_SPLIT='{var_strEstrategiaSplit}' desconhecida, usando 'grupo'.")
