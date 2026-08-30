@@ -101,6 +101,8 @@ class ExportarModelos:
             "version": cls._obter_versao_projeto(),
             "exported_at": datetime.now().isoformat(),
             "github_repo": "camiloprado/SteamPrev_Machine_Learning",
+            # "grupo" (padrão) ou "walkforward" — ver ML_ESTRATEGIA_SPLIT.
+            "split_strategy": os.getenv("ML_ESTRATEGIA_SPLIT", "grupo").strip().lower(),
             "models": {},
             # Contrato de saída: como a extensão deve interpretar cada modelo.
             "output_contract": {
