@@ -20,13 +20,19 @@ class Treinar_Modelos:
     """
 
     @classmethod
-    def executar_treinamento(cls):
+    def executar_treinamento(cls, arg_boolExportar: bool = True) -> dict:
         """
         Método para executar o treinamento de todos os modelos para todos os horizontes temporais.
 
         Parâmetros:
+        - arg_boolExportar (bool): Se True (padrão), salva os modelos em disco e exporta os
+          melhores com nomenclatura padronizada (resources/models/export/). Usar False para
+          rodadas diagnósticas/comparativas (ex.: ComparadorEstrategiasSplit) que não devem
+          sobrescrever os artefatos de produção.
 
         Retorna:
+        - dict: {"classificacao": {...}, "regressao_dias": {...}, "regressao_desconto": {...}}
+          com as métricas de todos os algoritmos, por horizonte.
         """
         logger.info("=" * 80)
         logger.info("INICIANDO TREINAMENTO DE MODELOS DE CLASSIFICAÇÃO E REGRESSÃO")
@@ -137,12 +143,17 @@ class Treinar_Modelos:
         logger.info("Matrizes de confusão salvas em: resources/relatorios/")
         logger.info("="*80)
 
+        var_dictTodosModelos = {
+            "classificacao": var_dictModelosClassificacao,
+            "regressao_dias": var_dictModelosRegressaoDias,
+            "regressao_desconto": var_dictModelosRegressaoDesconto,
+        }
+
+        if not arg_boolExportar:
+            logger.info("arg_boolExportar=False — rodada diagnóstica, artefatos de produção não alterados.")
+            return var_dictTodosModelos
+
         try:
-            var_dictTodosModelos = {
-                "classificacao": var_dictModelosClassificacao,
-                "regressao_dias": var_dictModelosRegressaoDias,
-                "regressao_desconto": var_dictModelosRegressaoDesconto,
-            }
             cls._salvar_modelos(var_dictTodosModelos)
         except Exception as e:
             logger.warning(f"Falha ao salvar modelos em disco: {e}")
@@ -152,6 +163,8 @@ class Treinar_Modelos:
             ExportarModelos.exportar(var_dictTodosModelos)
         except Exception as e:
             logger.warning(f"Falha ao exportar modelos padronizados: {e}")
+
+        return var_dictTodosModelos
 
 
     @classmethod
